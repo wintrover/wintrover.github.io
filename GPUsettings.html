@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTX 3060 GPU TensorFlow Guide</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <!-- Prism.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Back Button -->
+    <div class="section">
+        <a href="index.html" class="back-button">← Back to Home</a>
+    </div>
+
+    <div class="section">
+        <table class="main-table">
+            <tbody>
+                <tr>
+                    <td>
+                        <span class="highlight">RTX 3060 Laptop GPU and TensorFlow GPU Recognition Issues</span>
+                        
+                        <p>When I first attempted to use the RTX 3060 Laptop GPU for a deep learning project...</p>
+                        <div class="heading">There was a problem that the GPU was not recognized</div>
+                        <p>At first, I installed TensorFlow and ran a simple script...</p>
+                        
+                        <code class="language-python">
+                            import tensorflow as tf
+                            print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+                        </code>
+                        Num GPUs Available:  0
+
+                        </br>
+                        </br>
+                        <span class="highlight">The Troubleshooting Process</span>
+                        </br>
+                        </br>
+                        1. <span class="heading">NVIDIA Driver Version</span>
+                        <p>Downgrading to <strong>NVIDIA Driver 522.25</strong> began to resolve the issue.</p>
+                        
+                        2. <span class="heading">CUDA Toolkit Version</span>
+                        <p>TensorFlow 2.12 requires <strong>CUDA 11.8</strong> for compatibility.</p>
+                        
+                        3. <span class="heading">cuDNN Installation</span>
+                        <p>Installed <strong>cuDNN 8.6</strong> and configured environment variables.</p>
+                        
+                        <div class="papertitle">4. Verification</div>
+                    </br>
+                        <code class="language-bash">
+                            pip install tensorflow==2.12
+                        </code>
+                    </br>
+                    </br>
+                        <span class="highlight">Conclusion</span>
+                        <p>The RTX 3060 Laptop GPU requires precise alignment...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Prism.js JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>

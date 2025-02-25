@@ -14,54 +14,6 @@
   src: local('Lato Italic'), local('Lato-Italic'), url(https://fonts.gstatic.com/s/lato/v15/S6u8w4BMUTPHjxsAXC-qNiXg7Q.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-/* latin-ext */
-@font-face {
-  font-family: 'Lato';
-  font-style: italic;
-  font-weight: 700;
-  src: local('Lato Bold Italic'), local('Lato-BoldItalic'), url(https://fonts.gstatic.com/s/lato/v15/S6u_w4BMUTPHjxsI5wq_FQftx9897sxZ.woff2) format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Lato';
-  font-style: italic;
-  font-weight: 700;
-  src: local('Lato Bold Italic'), local('Lato-BoldItalic'), url(https://fonts.gstatic.com/s/lato/v15/S6u_w4BMUTPHjxsI5wq_Gwftx9897g.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v15/S6uyw4BMUTPHjxAwXiWtFCfQ7A.woff2) format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v15/S6uyw4BMUTPHjx4wXiWtFCc.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Lato Bold'), local('Lato-Bold'), url(https://fonts.gstatic.com/s/lato/v15/S6u9w4BMUTPHh6UVSwaPGQ3q5d0N7w.woff2) format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Lato Bold'), local('Lato-Bold'), url(https://fonts.gstatic.com/s/lato/v15/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 
 a {
   color: #1772d0;
@@ -81,7 +33,7 @@ tr,
 p,
 a {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 18px
+  font-size: 18px;
 }
 
 strong {
@@ -97,7 +49,7 @@ heading {
 papertitle {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
   font-size: 18px;
-  font-weight: 700
+  font-weight: 700;
 }
 
 name {
@@ -132,7 +84,7 @@ span.highlight {
 
 table {
   width: 100%;
-  max-width: 1000px; /* 기존 800px에서 1200px로 변경 */
+  max-width: 1000px;
   border: 0px;
   border-spacing: 0px;
   border-collapse: separate;
@@ -142,7 +94,7 @@ table {
 
 .main-table {
   width: 100%;
-  max-width: 1000px; /* 너비를 늘림 */
+  max-width: 1000px;
   border: 0px;
   border-spacing: 0px;
   border-collapse: separate;
@@ -152,23 +104,92 @@ table {
 
 @media (max-width: 768px) {
   .main-table {
-    max-width: 100%; /* 작은 화면에서는 너비를 100%로 설정 */
+    max-width: 100%;
   }
 }
 
 p {
-  font-size: 20px; /* 기본 폰트 크기를 조금 더 크게 */
+  font-size: 20px;
 }
 
 heading {
-  font-size: 30px; /* 제목 크기를 조금 더 크게 */
+  font-size: 30px;
 }
 
 name {
-  font-size: 36px; /* 이름 크기를 조금 더 크게 */
+  font-size: 36px;
 }
 
 img {
-  max-width: 100%; /* 이미지가 테이블 너비에 맞게 조정되도록 */
-  height: auto; /* 비율 유지 */
+  max-width: 100%;
+  height: auto;
+}
+
+/* 목록 스타일 */
+.steps {
+  list-style: decimal inside;
+  padding-left: 20px;
+  margin: 20px 0;
+}
+
+.steps li {
+  margin-bottom: 12px;
+}
+
+/* 섹션 간격 */
+.section {
+  margin-bottom: 40px;
+}
+
+/* 강조 텍스트 */
+.highlight {
+  background-color: #ffffd0;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+/* Prism.js 코드 블록 스타일 조정 */
+pre[class*="language-"] {
+  padding: 10px; /* 상하좌우 패딩 조정 */
+  margin: 10px 0; /* 위아래 마진 조정 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  font-size: 14px; /* 글자 크기 조정 */
+  line-height: 1.5; /* 줄 간격 조정 */
+  overflow-x: auto; /* 가로 스크롤 활성화 */
+  background-color: #2d2d2d; /* 배경 색상 */
+}
+
+code[class*="language-"] {
+  padding: 0; /* 코드 내부 패딩 제거 */
+  background: none; /* 배경 색상 제거 */
+  color: #ffffff; /* 글자 색상 */
+  font-family: 'Consolas', monospace; /* 글꼴 설정 */
+}
+
+.keyword {
+  color: #ff7b72;
+  font-weight: bold;
+}
+
+.string {
+  color: #a5d6ff;
+}
+/* Back Button Styling */
+.back-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #1772d0; /* Matches link color */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.back-button:hover {
+  color: #f09228; /* Matches hover color */
+}
+/* 강조 텍스트 스타일 */
+.highlight {
+  background-color: #ffffd0; /* 연한 노란색 배경 */
+  padding: 2px 5px; /* 내부 여백 */
+  border-radius: 3px; /* 모서리 둥글게 */
+  font-weight: bold; /* 굵은 글꼴 */
 }
