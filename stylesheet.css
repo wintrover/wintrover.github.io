@@ -193,3 +193,6 @@ code[class*="language-"] {
   border-radius: 3px; /* 모서리 둥글게 */
   font-weight: bold; /* 굵은 글꼴 */
 }
+papertitle, h6 {
+  display: inline;
+}
