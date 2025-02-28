@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepFake Detect App</title>
+  <link rel="stylesheet" href="/wintrover.github.io/stylesheet.css">
+</head>
+<body>
+  <!-- Back Button -->
+  <a href="/wintrover.github.io/index.html" class="back-button">← Back to Home</a>
+
+  <table class="main-table">
+    <tbody>
+      <tr>
+        <td>
+          <div class="project-item">
+            <h1 class="project-title">DeepFake Detect App</h1>
+            <a href="https://github.com/wintrover/DeepFakeDetectApp" class="project-link">GitHub</a>
+          </div>
+          
+          <p>This project focuses on developing a mobile application that uses deep learning models to detect deepfake images and videos.</p>
+
+          <!-- Trials and Tribulations Section -->
+          <div class="section">
+            <h2 id="trials">Trials and Tribulations During Development</h2>
+            <p>This section outlines the challenges faced during the development of the AI model for deepfake detection and how they were resolved.</p>
+
+            <!-- Scenario 1: Data Collection and Preprocessing -->
+            <div class="section">
+              <h3>Data Collection and Preprocessing Challenges</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> Initially, only public datasets (GAN-generated images) were used, resulting in an accuracy of just 65%. Noise issues arose due to variations in face angles, lighting, and resolution.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Created a custom dataset with 5,000 real user-taken images to improve data distribution.</li>
+                    <li>Applied data augmentation techniques such as random cropping, rotation, and brightness adjustments.</li>
+                    <li>Used the CLAHE algorithm for enhanced normalization to improve local contrast.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Scenario 2: Model Lightweighting Failures -->
+            <div class="section">
+              <h3>Model Lightweighting Failures and Performance Degradation</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> A ResNet-50-based model resulted in an inference time of 3.2 seconds, making real-time processing impossible. Tensor dimension mismatch errors occurred during ONNX conversion.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Switched to MobileNetV3-Small and applied depthwise separable convolutions, reducing inference time to 0.8 seconds.</li>
+                    <li>Reconverted the model with <code class="highlight">opset_version=13</code> to resolve compatibility issues.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Scenario 3: Android Integration Exceptions -->
+            <div class="section">
+              <h3>Exceptions During Android Integration</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> Memory leaks occurred when loading gallery images, causing OOM crashes. CPU inference caused delays on devices without GPU acceleration support.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Managed memory by reusing Bitmap and forcing <code class="highlight">recycle()</code> calls.</li>
+                    <li>Optimized CPU usage with ONNX Runtime’s SequentialExecutor to limit thread counts.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Scenario 4: Multi-Face Processing Logic Flaws -->
+            <div class="section">
+              <h3>Multi-Face Processing Logic Flaws</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> YOLO detected multiple faces, but the logic classified only the largest face, leading to false detections. Conflicts arose when both "Real" and "Fake" classifications were present in the same image.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Applied NMS (Non-Max Suppression) to remove overlapping bounding boxes.</li>
+                    <li>Improved the UI to display individual confidence scores for each face (e.g., "85% Real, 72% Fake").</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Scenario 5: False Detections in Real-World Environments -->
+            <div class="section">
+              <h3>False Detections in Real-World Environments</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> False detections occurred for video-captured images or reflections on screens. Face detection failed when masks or partial occlusions were present.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Added a video frame consistency check algorithm to ensure consistency across consecutive frames.</li>
+                    <li>Adjusted YOLO’s <code class="highlight">conf_threshold</code> from 0.8 to 0.65 to improve detection rates.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Outcome -->
+            <div class="section">
+              <h3>Outcome</h3>
+              <ul class="steps">
+                <li><strong>Accuracy:</strong> Achieved 92% (F1 Score 0.89).</li>
+                <li><strong>Performance:</strong> Average inference time of 0.7 seconds (Snapdragon 8 Gen2 benchmark).</li>
+                <li><strong>User Feedback:</strong> "3 out of 5 attempts to add verification marks succeeded," indicating room for improvement in model reliability.</li>
+              </ul>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
