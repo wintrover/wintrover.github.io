@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sodamyeon Senior Dating App</title>
+  <link rel="stylesheet" href="/wintrover.github.io/stylesheet.css">
+</head>
+<body>
+  <!-- Back Button -->
+  <a href="/wintrover.github.io/index.html" class="back-button">← Back to Home</a>
+  <table class="main-table">
+    <tbody>
+      <tr>
+        <td>
+          <div class="project-item">
+            <h1 class="project-title">Sodamyeon : Senior Dating with Face & Astrology Matching</h1>
+            <a href="https://github.com/Suyangdaekun/Sodamyeon" class="project-link">GitHub</a>
+          </div>
+          
+          <p>Sodamyeon combines traditional physiognomy and astrology with modern AI to connect seniors through meaningful matches. This blog details the technical challenges and solutions during development.</p>
+          <!-- Trials and Tribulations Section -->
+          <div class="section">
+            <h2 id="trials">Trials and Tribulations During Development</h2>
+            <p>Key challenges in building a senior-friendly app with AI-driven matching and real-time features.</p>
+            <!-- Scenario 1: Facial Analysis Accuracy -->
+            <div class="section">
+              <h3>Facial Analysis Accuracy on Senior Faces</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> Mediapipe and dlib showed 72% accuracy on seniors due to wrinkles and lighting variations.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Combined FAN (Face Alignment Network) for precise landmark detection.</li>
+                    <li>Applied CLAHE preprocessing to enhance contrast in low-light photos.</li>
+                    <li>Used weighted averaging of results from Mediapipe, dlib, and FAN for 89% accuracy.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <!-- Scenario 2: Real-Time Performance Optimization -->
+            <div class="section">
+              <h3>Real-Time Facial Analysis Lag</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> 2.8s processing time on budget devices caused UI freezes.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Moved analysis to background threads using Kotlin Coroutines.</li>
+                    <li>Downscaled input images to 640x480 for 1.2s processing without quality loss.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <!-- Scenario 3: Firebase Security Rules -->
+            <div class="section">
+              <h3>Firebase Security Rules Misconfiguration</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> Match requests failed due to overly restrictive Firestore rules.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Implemented granular rules using <code class="highlight">request.auth.uid</code> validation.</li>
+                    <li>Used Firebase Transactions to prevent duplicate match requests.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <!-- Scenario 4: Senior UI/UX Design -->
+            <div class="section">
+              <h3>Usability for Non-Tech Savvy Users</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> 40% of seniors couldn't navigate initial prototypes with small text.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Increased default font size to 24sp and button sizes to 60dp.</li>
+                    <li>Added voice-guided tutorials via TTS (Text-to-Speech).</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <!-- Scenario 5: Hybrid Matching Algorithm -->
+            <div class="section">
+              <h3>Balancing Physiognomy & Astrology</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> Users received irrelevant matches when relying on a single factor.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Developed a scoring system: 60% facial analysis + 40% zodiac compatibility.</li>
+                    <li>Added a "Refine Matches" slider for user preference adjustments.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <!-- Scenario 6: Image Handling on Legacy Devices -->
+            <div class="section">
+              <h3>Low-Quality Photo Uploads</h3>
+              <ul class="steps">
+                <li><strong>Problem:</strong> 30% of profile photos had motion blur or poor lighting.</li>
+                <li><strong>Solution:</strong>
+                  <ul>
+                    <li>Integrated OpenCV's <code class="highlight">fastNlMeansDenoisingColored</code> for noise reduction.</li>
+                    <li>Added real-time photo quality checks with feedback prompts.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <!-- Outcome -->
+            <div class="section">
+              <h3>Outcome</h3>
+              <ul class="steps">
+                <li><strong>Accuracy:</strong> 89% match satisfaction rate in user surveys.</li>
+                <li><strong>Performance:</strong> 1.2s average facial analysis on mid-range devices.</li>
+                <li><strong>Adoption:</strong> 78% of users aged 65+ reported ease of use after UI redesign.</li>
+              </ul>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
