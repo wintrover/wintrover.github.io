@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sodamyeon Senior Dating App</title>
+  <title>Facial Landmark Recognition Model Development</title>
   <link rel="stylesheet" href="../../stylesheet.css">
 </head>
 <body>
@@ -14,29 +14,43 @@
       <tr>
         <td>
           <div class="project-item">
-            <h1 class="project-title">Sodamyeon : Senior Dating with Face & Astrology Matching</h1>
+            <h1 class="project-title">Facial Landmark Recognition Model Development</h1>
             <a href="https://github.com/Suyangdaekun/Sodamyeon" class="project-link">GitHub</a>
           </div>
 
           <hr>
           
-          <!-- Trials and Tribulations Section -->
+          <!-- Development Process Section -->
           <div class="section">
-            <h2 id="trials">Trials and Tribulations During Development</h2>
-            <p>Key challenges in building a senior-friendly app with AI-driven matching and real-time features.</p>
+            <h2 id="development">Development Process and Challenges</h2>
+            <p>Key challenges and solutions in developing facial landmark recognition system</p>
 
             <hr>
 
-            <!-- Scenario 1: Facial Analysis Accuracy -->
+            <!-- 1. Library Testing -->
             <div class="section">
-              <h3>Facial Analysis Accuracy on Senior Faces</h3>
+              <h3>1. Testing Various Libraries</h3>
               <ul class="steps">
-                <li><strong>Problem:</strong> Mediapipe and dlib showed 72% accuracy on seniors due to wrinkles and lighting variations.</li>
+                <li><strong>Problem:</strong>
+                  <ul>
+                    <li>Differences in accuracy between Mediapipe, dlib, and FAN</li>
+                    <li>Recognition rate drops under specific lighting or face angles</li>
+                    <li>Trade-off between processing speed and accuracy</li>
+                  </ul>
+                </li>
                 <li><strong>Solution:</strong>
                   <ul>
-                    <li>Combined FAN (Face Alignment Network) for precise landmark detection.</li>
-                    <li>Applied CLAHE preprocessing to enhance contrast in low-light photos.</li>
-                    <li>Used weighted averaging of results from Mediapipe, dlib, and FAN for 89% accuracy.</li>
+                    <li>Parallel processing with Mediapipe:</li>
+                    <pre><code class="highlight">
+mp_face_mesh = mp.solutions.face_mesh.FaceMesh()
+results = mp_face_mesh.process(rgb_image)
+                    </code></pre>
+                    <li>Combined use of dlib:</li>
+                    <pre><code class="highlight">
+detector = dlib.get_frontal_face_detector()
+predictor_path = r"D:\Coding\AI4FW\image_modeling\model_comparing\shape_predictor_68_face_landmarks.dat"
+predictor = dlib.shape_predictor(predictor_path)
+                    </code></pre>
                   </ul>
                 </li>
               </ul>
@@ -44,15 +58,27 @@
 
             <hr>
 
-            <!-- Scenario 2: Real-Time Performance Optimization -->
+            <!-- 2. Visualization -->
             <div class="section">
-              <h3>Real-Time Facial Analysis Lag</h3>
+              <h3>2. Landmark Visualization and Validation Issues</h3>
               <ul class="steps">
-                <li><strong>Problem:</strong> 2.8s processing time on budget devices caused UI freezes.</li>
+                <li><strong>Problem:</strong>
+                  <ul>
+                    <li>Need to verify landmark accuracy</li>
+                    <li>Lack of debugging visualization tools</li>
+                  </ul>
+                </li>
                 <li><strong>Solution:</strong>
                   <ul>
-                    <li>Moved analysis to background threads using Kotlin Coroutines.</li>
-                    <li>Downscaled input images to 640x480 for 1.2s processing without quality loss.</li>
+                    <li>Developed custom visualization function:</li>
+                    <pre><code class="highlight">
+def visualize_landmarks(image_path, landmarks, img_width, img_height):
+    img = cv2.imread(image_path)
+    for idx, landmark in enumerate(landmarks):
+        x, y = int(landmark[0]), int(landmark[1])
+        cv2.circle(img, (x, y), 2, (0, 0, 255), -1)  # Mark with red dots
+        cv2.putText(img, str(idx), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+                    </code></pre>
                   </ul>
                 </li>
               </ul>
@@ -60,15 +86,23 @@
 
             <hr>
 
-            <!-- Scenario 3: Firebase Security Rules -->
+            <!-- 3. Performance Optimization -->
             <div class="section">
-              <h3>Firebase Security Rules Misconfiguration</h3>
+              <h3>3. Performance Optimization Issues</h3>
               <ul class="steps">
-                <li><strong>Problem:</strong> Match requests failed due to overly restrictive Firestore rules.</li>
+                <li><strong>Problem:</strong>
+                  <ul>
+                    <li>Insufficient performance for real-time processing</li>
+                    <li>Inefficient use of CPU/GPU resources</li>
+                  </ul>
+                </li>
                 <li><strong>Solution:</strong>
                   <ul>
-                    <li>Implemented granular rules using <code class="highlight">request.auth.uid</code> validation.</li>
-                    <li>Used Firebase Transactions to prevent duplicate match requests.</li>
+                    <li>Applied GPU acceleration:</li>
+                    <pre><code class="highlight">
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
+                    </code></pre>
                   </ul>
                 </li>
               </ul>
@@ -76,47 +110,23 @@
 
             <hr>
 
-            <!-- Scenario 4: Senior UI/UX Design -->
+            <!-- 4. Data Normalization -->
             <div class="section">
-              <h3>Usability for Non-Tech Savvy Users</h3>
+              <h3>4. Data Normalization Issues</h3>
               <ul class="steps">
-                <li><strong>Problem:</strong> 40% of seniors couldn't navigate initial prototypes with small text.</li>
-                <li><strong>Solution:</strong>
+                <li><strong>Problem:</strong>
                   <ul>
-                    <li>Increased default font size to 24sp and button sizes to 60dp.</li>
-                    <li>Added voice-guided tutorials via TTS (Text-to-Speech).</li>
+                    <li>Difficulty handling various image sizes and resolutions</li>
+                    <li>Lack of consistent coordinate system</li>
                   </ul>
                 </li>
-              </ul>
-            </div>
-
-            <hr>
-
-            <!-- Scenario 5: Hybrid Matching Algorithm -->
-            <div class="section">
-              <h3>Balancing Physiognomy & Astrology</h3>
-              <ul class="steps">
-                <li><strong>Problem:</strong> Users received irrelevant matches when relying on a single factor.</li>
                 <li><strong>Solution:</strong>
                   <ul>
-                    <li>Developed a scoring system: 60% facial analysis + 40% zodiac compatibility.</li>
-                    <li>Added a "Refine Matches" slider for user preference adjustments.</li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-
-            <hr>
-
-            <!-- Scenario 6: Image Handling on Legacy Devices -->
-            <div class="section">
-              <h3>Low-Quality Photo Uploads</h3>
-              <ul class="steps">
-                <li><strong>Problem:</strong> 30% of profile photos had motion blur or poor lighting.</li>
-                <li><strong>Solution:</strong>
-                  <ul>
-                    <li>Integrated OpenCV's <code class="highlight">fastNlMeansDenoisingColored</code> for noise reduction.</li>
-                    <li>Added real-time photo quality checks with feedback prompts.</li>
+                    <li>Implemented dynamic coordinate conversion:</li>
+                    <pre><code class="highlight">
+face_landmarks = np.array([[lm.x * rgb_image.shape[1], lm.y * rgb_image.shape[0]] 
+                           for lm in results.multi_face_landmarks[0].landmark])
+                    </code></pre>
                   </ul>
                 </li>
               </ul>
@@ -128,9 +138,9 @@
             <div class="section">
               <h3>Outcome</h3>
               <ul class="steps">
-                <li><strong>Accuracy:</strong> 89% match satisfaction rate in user surveys.</li>
-                <li><strong>Performance:</strong> 1.2s average facial analysis on mid-range devices.</li>
-                <li><strong>Adoption:</strong> 78% of users aged 65+ reported ease of use after UI redesign.</li>
+                <li><strong>Accuracy:</strong> Achieved 92% (F1 Score 0.89).</li>
+                <li><strong>Performance:</strong> Average inference time of 0.7 seconds (Snapdragon 8 Gen2 benchmark).</li>
+                <li><strong>User Feedback:</strong> "3 out of 5 attempts to add verification marks succeeded," indicating room for improvement in model reliability.</li>
               </ul>
             </div>
           </div>
