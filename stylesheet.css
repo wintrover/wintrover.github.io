@@ -85,10 +85,6 @@ strong {
   vertical-align: middle;
 }
 
-/* .main-table td:last-child {
-  padding-bottom: 15px;
-} */
-
 @media (max-width: 768px) {
   .main-table td {
     display: block;
@@ -194,4 +190,54 @@ img {
   color: #1772d0;
   text-decoration: none;
   font-weight: bold;
+}
+
+/* 구분선 스타일 정의 */
+.section-divider {
+  border: 0;
+  border-top: 2px solid #333333; /* 메인 주제 구분선 (진한 회색) */
+  margin: 40px 0;
+  transition: all 0.3s ease;
+}
+
+.section-divider:hover {
+  border-color: #666666; /* 호버 시 약간 밝은 회색으로 변경 */
+}
+
+.subsection-divider {
+  border: 0;
+  border-top: 1px dashed #999999; /* 소주제 구분선 (밝은 회색 점선) */
+  margin: 30px 0;
+  transition: all 0.3s ease;
+}
+
+.subsection-divider:hover {
+  border-color: #cccccc; /* 호버 시 약간 밝은 회색으로 변경 */
+}
+
+/* 계층적 구조 강화 */
+.problem-header {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333333;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  transition: color 0.3s ease;
+}
+
+.problem-header:hover {
+  color: #1772d0; /* 호버 시 파란색으로 변경 */
+}
+
+.outcome-header {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333333;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  transition: color 0.3s ease;
+}
+
+.outcome-header:hover {
+  color: #1772d0; /* 호버 시 파란색으로 변경 */
 }
