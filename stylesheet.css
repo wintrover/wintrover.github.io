@@ -72,6 +72,10 @@ strong {
   padding: 0 20px;
 }
 
+.container > * + * {
+  margin-top: 20px;
+}
+
 .main-table {
   width: 100%;
   max-width: 1000px;
@@ -82,15 +86,8 @@ strong {
 }
 
 .main-table td {
-  vertical-align: middle;
-}
-
-@media (max-width: 768px) {
-  .main-table td {
-    display: block;
-    width: 100%;
-    padding: 10px 0;
-  }
+  padding: 15px;
+  box-sizing: border-box;
 }
 
 /* Components */
@@ -240,4 +237,30 @@ img {
 
 .outcome-header:hover {
   color: #1772d0; /* 호버 시 파란색으로 변경 */
+}
+
+html {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 28px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
+  
+  p {
+    font-size: 16px;
+  }
 }
