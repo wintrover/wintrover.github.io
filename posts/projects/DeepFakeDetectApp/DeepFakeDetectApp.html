@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DeepFake Detect App</title>
-  <link rel="stylesheet" href="/stylesheet.css"> <!-- 외부 CSS 파일 연결 -->
+  
+  <!-- Prism.js CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  
+  <!-- 외부 CSS 파일 연결 -->
+  <link rel="stylesheet" href="/stylesheet.css">
 </head>
 <body>
   <!-- Back Button -->
@@ -43,14 +48,19 @@
 
             <!-- Scenario 1: Model Lightweighting Failures -->
             <div class="section">
-              <!-- <a href="Case1.html" class="project-link"><h3>Model Lightweighting Failures and Performance Degradation</h3></a> -->
-              Model Lightweighting Failures and Performance Degradation
+              <h3>Model Lightweighting Failures and Performance Degradation</h3>
               <ul class="steps">
                 <li><strong>Problem:</strong> A ResNet-50-based model resulted in an inference time of 3.2 seconds, making real-time processing impossible.</li>
                 <li><strong>Solution:</strong>
                   <ul>
                     <li>Switched to MobileNetV3-Small and applied depthwise separable convolutions, reducing inference time to 0.7 seconds (Snapdragon 8 Gen2 benchmark).</li>
-                    <li>Reconverted the model with <code class="highlight">opset_version=13</code> to resolve compatibility issues.</li>
+                    <li>Reconverted the model with 
+                      <pre class="language-python">
+                        <code>opset_version=13</code>
+                      </pre>
+                      <button class="copy-btn">Copy</button>
+                      to resolve compatibility issues.
+                    </li>
                   </ul>
                 </li>
               </ul>
@@ -82,7 +92,12 @@
                 <li><strong>Solution:</strong>
                   <ul>
                     <li>Added a video frame consistency check algorithm to ensure consistency across consecutive frames.</li>
-                    <li>Adjusted YOLO’s <code class="highlight">conf_threshold</code> from 0.8 to 0.65 to improve detection rates.</li>
+                    <li>Adjusted YOLO’s 
+                      <pre><code class="language-python">
+conf_threshold = 0.65
+                      </code></pre>
+                      to improve detection rates.
+                    </li>
                   </ul>
                 </li>
               </ul>
@@ -97,7 +112,12 @@
                 <li><strong>Problem:</strong> Memory leaks occurred when loading gallery images, causing OOM crashes.</li>
                 <li><strong>Solution:</strong>
                   <ul>
-                    <li>Managed memory by reusing Bitmap and forcing <code class="highlight">recycle()</code> calls.</li>
+                    <li>Managed memory by reusing Bitmap and forcing 
+                      <pre><code class="language-java">
+bitmap.recycle()
+                      </code></pre>
+                      calls.
+                    </li>
                     <li>Optimized CPU usage with ONNX Runtime’s SequentialExecutor to limit thread counts.</li>
                   </ul>
                 </li>
@@ -120,5 +140,8 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- Prism.js JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 </body>
 </html>

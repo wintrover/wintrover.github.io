@@ -112,7 +112,6 @@ strong {
 }
 
 .steps {
-  list-style: decimal inside;
   padding-left: 20px;
   margin: 20px 0;
 }
@@ -263,4 +262,32 @@ body {
   p {
     font-size: 16px;
   }
+}
+
+/* 코드 블록 스타일 */
+pre {
+  position: relative;
+  padding: 15px;
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+/* 복사 버튼 스타일 */
+.copy-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.copy-btn:hover {
+  background-color: #0056b3;
 }
