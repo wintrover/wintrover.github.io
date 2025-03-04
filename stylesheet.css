@@ -65,13 +65,6 @@ strong {
   font-weight: 700;
 }
 
-/* Layout */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
 .container > * + * {
   margin-top: 20px;
 }
@@ -280,23 +273,45 @@ body {
 }
 
 /* 복사 버튼 스타일 */
+/* 복사 버튼 스타일 */
 .code-container {
   position: relative;
-  display: inline-block;
+  display: block; /* inline-block에서 block으로 변경 */
   width: 100%;
+  margin: 15px 0; /* 상하 마진 추가 */
+}
+
+.code-container pre {
+  font-size: 12px; /* 글씨 크기 축소 */
+  padding: 10px; /* 패딩 축소 */
+  line-height: 1.4; /* 줄간격 조정 */
+  max-height: 200px; /* 최대 높이 제한 (선택적) */
+  overflow-y: auto; /* 세로 스크롤 추가 */
+  overflow-x: auto; /* 가로 스크롤 유지 */
+  background-color: #2d2d2d; /* 배경색 유지 */
+  color: #ffffff;
+  border-radius: 5px;
+  position: relative; /* 스크롤 영역 내부 요소 위치 조정 */
+}
+
+.code-container code {
+  font-family: 'Consolas', monospace;
+  white-space: pre-wrap; /* 긴 줄 자동 줄바꿈 */
+  word-break: break-all; /* 단어 분할 허용 */
 }
 
 .copy-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 10px; /* 버튼 위치 조정 */
+  right: 20px; /* 버튼 위치 조정 (스크롤바 너비 포함) */
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 3px 8px; /* 버튼 크기 축소 */
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 12px;
+  border-radius: 3px; /* 버튼 모서리 약간 더 작게 */
+  font-size: 10px; /* 버튼 글씨 크기 축소 */
+  z-index: 10; /* 다른 요소 위에 표시 */
 }
 
 .copy-btn:hover {
