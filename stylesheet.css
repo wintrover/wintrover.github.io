@@ -5,7 +5,7 @@
   font-weight: 400;
   src: local('Lato Italic'), local('Lato-Italic'),
        url(https://fonts.gstatic.com/s/lato/v15/S6u8w4BMUTPHjxsAUi-qNiXg7eU0.woff2) format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF; 
 }
 
 @font-face {
@@ -125,30 +125,45 @@ strong {
 }
 
 /* Code Styling */
-pre[class*="language-"] {
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
-  font-size: 14px;
-  line-height: 1.5;
-  overflow-x: auto;
+pre {
+  position: relative;
+  padding: 15px;
   background-color: #2d2d2d;
+  color: #ffffff;
+  border-radius: 5px;
+  overflow-x: auto;
 }
 
-code[class*="language-"] {
+code {
   padding: 0;
   background: none;
-  color: #ffffff;
+  color: inherit;
   font-family: 'Consolas', monospace;
 }
 
-.keyword {
+.hljs-keyword {
   color: #ff7b72;
   font-weight: bold;
 }
 
-.string {
+.hljs-string {
   color: #a5d6ff;
+}
+
+.hljs-comment {
+  color: #6a9955;
+}
+
+.hljs-number {
+  color: #b5cea8;
+}
+
+.hljs-function {
+  color: #dcdcaa;
+}
+
+.hljs-variable {
+  color: #9cdcfe;
 }
 
 /* Images */
@@ -254,31 +269,27 @@ body {
   h1 {
     font-size: 28px;
   }
-  
+
   h2 {
     font-size: 24px;
   }
-  
+
   p {
     font-size: 16px;
   }
 }
 
-/* 코드 블록 스타일 */
-pre {
+/* 복사 버튼 스타일 */
+.code-container {
   position: relative;
-  padding: 15px;
-  background-color: #2d2d2d;
-  color: #ffffff;
-  border-radius: 5px;
-  overflow-x: auto;
+  display: inline-block;
+  width: 100%;
 }
 
-/* 복사 버튼 스타일 */
 .copy-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 10px;
+  right: 10px;
   background-color: #007bff;
   color: white;
   border: none;

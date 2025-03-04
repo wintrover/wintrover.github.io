@@ -55,10 +55,10 @@
                   <ul>
                     <li>Switched to MobileNetV3-Small and applied depthwise separable convolutions, reducing inference time to 0.7 seconds (Snapdragon 8 Gen2 benchmark).</li>
                     <li>Reconverted the model with 
-                      <pre class="language-python">
-                        <code>opset_version=13</code>
-                      </pre>
-                      <button class="copy-btn">Copy</button>
+                      <div class="code-container">
+                        <pre><code class="language-python">opset_version = 13</code></pre>
+                        <button class="copy-btn">Copy</button>
+                      </div>                      
                       to resolve compatibility issues.
                     </li>
                   </ul>
