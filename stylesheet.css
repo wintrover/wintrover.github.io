@@ -45,6 +45,10 @@ h1, h2, h3, h4, h5 {
   margin-bottom: 0px;
 }
 
+h5.period {
+  margin: 0px;
+}
+
 h1 {
   font-size: 36px;
 }
