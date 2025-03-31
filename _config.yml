@@ -1,0 +1,14 @@
+title: Su Hyok Yun
+description: My personal portfolio website
+baseurl: "" # GitHub Pages의 경우 비워두고, 로컬에서는 필요시 /wintrover.github.io 설정
+url: "https://wintrover.github.io"
+markdown: kramdown
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# 사이트 구조에 맞게 컬렉션 설정
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name 

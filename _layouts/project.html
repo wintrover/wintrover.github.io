@@ -1,0 +1,36 @@
+---
+layout: default
+---
+<!-- Back Button -->
+<a href="{{ site.baseurl }}/" class="back-button">← Back to Previous page</a>
+
+<table class="main-table">
+  <tr>
+    <td>
+      <div class="project-item">
+        <h1 class="project-title">{{ page.title }}</h1>
+        {% if page.github_link %}
+        <a href="{{ page.github_link }}" class="project-link">GitHub</a>
+        {% endif %}
+      </div>
+      <h5 class="period">development period : {{ page.dev_period }}</h5>
+
+      <hr class="section-divider">
+
+      {% if page.youtube_embed %}
+      <iframe 
+        width="50%" 
+        height="300" 
+        src="{{ page.youtube_embed }}" 
+        title="{{ page.title }}_Demo" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen>
+      </iframe>
+      {% endif %}
+
+      {{ content }}
+    </td>
+  </tr>
+</table> 

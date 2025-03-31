@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+
+  <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" rel="stylesheet">
+
+  <meta name="author" content="Su Hyok Yun">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO 관련 메타 태그 -->
+  <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+  <meta name="keywords" content="AI, ML, LLM, Robotics, Frontend Developer, Su Hyok Yun, Portfolio, Projects">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph (OG) 태그: 소셜 미디어 공유 시 사용 -->
+  <meta property="og:title" content="{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}">
+  <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+  <meta property="og:image" content="{{ site.url }}/images/developer_thumbnail.jpg">
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter 카드 태그 -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}">
+  <meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+  <meta name="twitter:image" content="{{ site.url }}/images/developer_thumbnail.jpg">
+
+  <!-- 스타일시트 및 파비콘 -->
+  <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/stylesheet.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>">
+
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Su Hyok Yun",
+    "url": "https://wintrover.github.io",
+    "image": "https://wintrover.github.io/images/profile.png",
+    "jobTitle": "AI/ML Developer",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Independent"
+    },
+    "alumniOf": [
+      {
+        "@type": "Organization",
+        "name": "EIsystem"
+      },
+      {
+        "@type": "Organization",
+        "name": "Vizcam"
+      }
+    ],
+    "sameAs": [
+      "https://github.com/wintrover/",
+      "https://www.linkedin.com/in/suhyok-yun-1934b713a/",
+      "https://www.instagram.com/wintrover/"
+    ]
+  }
+  </script>
+</head>
+
+<body>
+  {{ content }}
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="{{ site.baseurl }}/script.js"></script>
+</body>
+</html> 

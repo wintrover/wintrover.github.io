@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DeepFake Detect App</title>
-  <link rel="stylesheet" href="/stylesheet.css">
+  <link rel="stylesheet" href="../../../stylesheet.css">
   <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" rel="stylesheet">
 </head>
 <body>
   <!-- Back Button -->
-  <a href="/index.html" class="back-button">← Back to Previous page</a>
+  <a href="../../../index.html" class="back-button">← Back to Previous page</a>
 
   <table class="main-table">
     <tr>
@@ -126,7 +126,7 @@ print(filtered_boxes)</code></pre>
                 <strong>Solution:</strong>
                 <ul>
                   <li>Added a video frame consistency check algorithm to ensure consistency across consecutive frames.</li>
-                  <li>Adjusted YOLO’s <code>conf_threshold = 0.65</code> to improve detection rates.</li>
+                  <li>Adjusted YOLO's <code>conf_threshold = 0.65</code> to improve detection rates.</li>
                 </ul>
               </li>
             </ul>
@@ -162,7 +162,7 @@ consistent_frames = check_frame_consistency(frames)</code></pre>
                 <strong>Solution:</strong>
                 <ul>
                   <li>Managed memory by reusing Bitmap and forcing <code>bitmap.recycle()</code> calls.</li>
-                  <li>Optimized CPU usage with ONNX Runtime’s SequentialExecutor to limit thread counts.</li>
+                  <li>Optimized CPU usage with ONNX Runtime's SequentialExecutor to limit thread counts.</li>
                 </ul>
               </li>
             </ul>
@@ -192,6 +192,6 @@ bitmap.recycle();</code></pre>
   </table>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script src="/script.js"></script>
+  <script src="../../../script.js"></script>
 </body>
 </html>
