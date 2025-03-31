@@ -10,7 +10,7 @@ youtube_embed: https://www.youtube.com/embed/O3X-rWDxpi8
 skills: 
   - ONNX
   - Kotlin
-  - YOLOv11
+  - YOLO11
   - EfficientNet
 ---
 
@@ -140,7 +140,7 @@ private fun processImageWithMemorySafety(bitmap: Bitmap): DetectionResult? {
       <li>
         <strong data-en="Solution:" data-ko="해결책:"></strong>
         <ul>
-          <li data-en="Replaced with YOLOv11-Face for more robust detection (accuracy improved to 94%)." data-ko="더 강력한 검출을 위해 YOLOv11-Face로 대체했습니다(정확도 94%로 향상)."></li>
+          <li data-en="Replaced with YOLO11n-Face for more robust detection (accuracy improved to 94%)." data-ko="더 강력한 검출을 위해 YOLO11n-Face로 대체했습니다(정확도 94%로 향상)."></li>
           <li data-en="Implemented box expansion logic to capture more of the face context for better classification." data-ko="더 나은 분류를 위해 얼굴 컨텍스트를 더 많이 캡처하도록 박스 확장 로직을 구현했습니다."></li>
         </ul>
       </li>
