@@ -10,7 +10,7 @@ layout: default
       <div class="project-item">
         <h1 class="project-title" data-en="{{ page.title }}" data-ko="{{ page.ko_title | default: page.title }}">{{ page.title }}</h1>
         {% if page.github_link %}
-        <a href="{{ page.github_link }}" class="project-link">GitHub</a>
+        <a href="{{ page.github_link }}" target="_blank" class="project-link">GitHub</a>
         {% endif %}
       </div>
       <h5 class="period" data-en="development period : {{ page.dev_period }}" data-ko="개발 기간 : {{ page.dev_period }}">development period : {{ page.dev_period }}</h5>
