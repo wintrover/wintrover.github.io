@@ -197,12 +197,11 @@ table[style*="height:120px"] span {
 }
 
 table[style*="height:120px"] img {
-  max-height: 120px;
-  max-width: 100%;
-  width: auto;
-  height: auto;
+  width: 100%;
+  max-height: 130px;
   object-fit: contain;
   margin: 0 auto;
+  display: block;
 }
 
 .project-item {
