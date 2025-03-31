@@ -170,6 +170,41 @@ img {
   display: block;
 }
 
+/* 프로젝트 카드 스타일 */
+table[style*="height:120px"] {
+  height: 150px !important;
+  display: table;
+  margin-bottom: 25px !important;
+  /* border-bottom: 1px solid #eeeeee; */ /* 하단 경계선 제거 */
+}
+
+table[style*="height:120px"] td {
+  vertical-align: middle !important;
+  line-height: 1.5;
+}
+
+table[style*="height:120px"] papertitle {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #1772d0;
+}
+
+table[style*="height:120px"] span {
+  display: block;
+  margin-bottom: 8px;
+}
+
+table[style*="height:120px"] img {
+  max-height: 120px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
 .project-item {
   display: flex;
   align-items: center;
