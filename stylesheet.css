@@ -449,8 +449,8 @@ code:not(.hljs) {
 /* 호버 시 나타나는 복사 버튼 */
 .hover-copy-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 5px;
+  right: 5px;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -461,17 +461,19 @@ code:not(.hljs) {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10;
+  z-index: 100; /* z-index 값 크게 증가 */
   opacity: 0;
   transition: opacity 0.2s ease;
   padding: 0;
+  pointer-events: auto; /* 버튼 클릭 가능하도록 설정 */
 }
 
 .hover-copy-btn:hover {
   background: #f0f0f0;
 }
 
-.code-block:hover .hover-copy-btn {
+.code-block:hover .hover-copy-btn,
+.code-block figure:hover .hover-copy-btn {
   opacity: 1;
 }
 
@@ -513,4 +515,10 @@ code:not(.hljs) {
 html[lang="en"] [data-ko-only],
 html[lang="ko"] [data-en-only] {
   display: none;
+}
+
+/* figure 요소 내부에서도 복사 버튼이 올바르게 표시되도록 설정 */
+.code-block figure.highlight {
+  margin: 0;
+  position: relative;
 }
