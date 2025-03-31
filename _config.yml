@@ -7,8 +7,15 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
 
-# 사이트 구조에 맞게 컬렉션 설정
+# 사이트 구조 설정
 collections:
   projects:
     output: true
-    permalink: /projects/:name 
+    permalink: /projects/:name
+
+# 기타 설정
+defaults:
+  - scope:
+      path: "assets/images"
+    values:
+      image: true 
