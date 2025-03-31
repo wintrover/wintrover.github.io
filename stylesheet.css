@@ -78,7 +78,7 @@ strong {
   max-width: 1000px;
   border-spacing: 0;
   border-collapse: collapse;
-  margin: 0 auto;
+  margin: 60px auto 0;
   table-layout: fixed;
 }
 
@@ -90,11 +90,11 @@ strong {
 /* Components */
 .back-button {
   display: inline-block;
-  margin: 20px 0;
   font-size: 18px;
   color: #1772d0;
   text-decoration: none;
   transition: color 0.3s ease;
+  margin: 0;
 }
 
 .back-button:hover {
@@ -519,10 +519,9 @@ code:not(.hljs) {
 
 /* 언어 토글 버튼 스타일 */
 .language-toggle-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
+  position: static;
   z-index: 1000;
+  margin-right: 20px; /* 오른쪽에서 안쪽으로 여백 추가 */
 }
 
 .language-toggle-btn {
@@ -555,4 +554,26 @@ html[lang="ko"] [data-en-only] {
 .code-block figure.highlight {
   margin: 0;
   position: relative;
+}
+
+/* 헤더 스타일 추가 */
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 10px 20px;
+  padding-right: 40px; /* 오른쪽 여백 추가 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
 }

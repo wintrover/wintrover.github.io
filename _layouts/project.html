@@ -1,8 +1,15 @@
 ---
 layout: default
 ---
-<!-- Back Button -->
-<a href="{{ site.baseurl }}/" class="back-button" data-en="← Back to Previous page" data-ko="← 이전 페이지로 돌아가기">← Back to Previous page</a>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 네비게이션 영역에 돌아가기 버튼 추가
+  const navigationDiv = document.querySelector('.navigation');
+  if (navigationDiv) {
+    navigationDiv.innerHTML = '<a href="{{ site.baseurl }}/" class="back-button" data-en="← Back to Previous page" data-ko="← 이전 페이지로 돌아가기">← Back to Previous page</a>';
+  }
+});
+</script>
 
 <table class="main-table">
   <tr>
