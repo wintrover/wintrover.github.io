@@ -28,7 +28,7 @@ skills:
       <li>
         <strong data-en="Problem:" data-ko="문제:"></strong>
         <ul>
-          <li data-en="The initial EfficientNet-B4 model was accurate (96%), but resulted in an AAB file over 110MB, exceeding the Google Play Store limit." data-ko="초기 EfficientNet-B4 모델은 정확도가 높았지만(96%), AAB 파일이 110MB를 초과하여 Google Play 스토어 제한을 넘었습니다."></li>
+          <li data-en="The initial EfficientNet-B4 model was accurate (96%), but resulted in an APK file over 110MB, exceeding the Google Play Store limit." data-ko="초기 EfficientNet-B4 모델은 정확도가 높았지만(96%), APK 파일이 110MB를 초과하여 Google Play 스토어 제한을 넘었습니다."></li>
           <li data-en="The ONNX model alone was 68MB, too large for mobile deployment." data-ko="ONNX 모델만 68MB로, 모바일 배포에 너무 컸습니다."></li>
         </ul>
       </li>
