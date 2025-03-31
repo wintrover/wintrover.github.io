@@ -37,7 +37,8 @@ skills:
       </li>
     </ul>
 
-    <div class="code-container">
+    <div class="code-block">
+      <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
       <pre><code class="language-python">import torch
 
 model = torch.hub.load('pytorch/vision:v0.10.0', 'mobilenet_v3_small', pretrained=True)
@@ -47,7 +48,6 @@ torch.onnx.export(
     torch.randn(1, 3, 224, 224),
     "mobilenet_v3_small.onnx",
     opset_version=13)</code></pre>
-      <button class="copy-btn">Copy</button>
     </div>
   </div>
 
@@ -72,7 +72,8 @@ torch.onnx.export(
       </li>
     </ul>
 
-    <div class="code-container">
+    <div class="code-block">
+      <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
       <pre><code class="language-python">import cv2
 
 def apply_nms(boxes, scores, threshold=0.5):
@@ -84,7 +85,6 @@ boxes = [[50, 50, 100, 100], [60, 60, 110, 110]]
 scores = [0.9, 0.75]
 filtered_boxes = apply_nms(boxes, scores)
 print(filtered_boxes)</code></pre>
-      <button class="copy-btn">Copy</button>
     </div>
   </div>
 
@@ -109,7 +109,8 @@ print(filtered_boxes)</code></pre>
       </li>
     </ul>
 
-    <div class="code-container">
+    <div class="code-block">
+      <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
       <pre><code class="language-python">def check_frame_consistency(frames, threshold=0.65):
     consistent_frames = []
     for frame in frames:
@@ -120,7 +121,6 @@ print(filtered_boxes)</code></pre>
 # 예제 데이터
 frames = [cv2.imread(f"frame_{i}.jpg") for i in range(10)]
 consistent_frames = check_frame_consistency(frames)</code></pre>
-      <button class="copy-btn">Copy</button>
     </div>
   </div>
 
@@ -145,11 +145,11 @@ consistent_frames = check_frame_consistency(frames)</code></pre>
       </li>
     </ul>
 
-    <div class="code-container">
+    <div class="code-block">
+      <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
       <pre><code class="language-java">Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
 
 bitmap.recycle();</code></pre>
-      <button class="copy-btn">Copy</button>
     </div>
   </div>
 

@@ -39,7 +39,8 @@ skills:
       </li>
     </ul>
 
-    <div class="code-container">
+    <div class="code-block">
+      <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
       <pre><code class="language-python"># Mediapipe implementation
 import mediapipe as mp
 
@@ -50,7 +51,6 @@ results = mp_face_mesh.process(rgb_image)
 detector = dlib.get_frontal_face_detector()
 predictor_path = r"D:\Coding\AI4FW\image_modeling\model_comparing\shape_predictor_68_face_landmarks.dat"
 predictor = dlib.shape_predictor(predictor_path)</code></pre>
-      <button class="copy-btn">Copy</button>
     </div>
   </div>
 
@@ -75,14 +75,14 @@ predictor = dlib.shape_predictor(predictor_path)</code></pre>
       </li>
     </ul>
 
-    <div class="code-container">
+    <div class="code-block">
+      <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
       <pre><code class="language-python">def visualize_landmarks(image_path, landmarks, img_width, img_height):
     img = cv2.imread(image_path)
     for idx, landmark in enumerate(landmarks):
         x, y = int(landmark[0]), int(landmark[1])
         cv2.circle(img, (x, y), 2, (0, 0, 255), -1)  # Red dots
         cv2.putText(img, str(idx), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)</code></pre>
-      <button class="copy-btn">Copy</button>
     </div>
   </div>
 
@@ -107,10 +107,10 @@ predictor = dlib.shape_predictor(predictor_path)</code></pre>
       </li>
     </ul>
 
-    <div class="code-container">
+    <div class="code-block">
+      <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
       <pre><code class="language-python">device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")</code></pre>
-      <button class="copy-btn">Copy</button>
     </div>
   </div>
 
@@ -135,10 +135,10 @@ print(f"Using device: {device}")</code></pre>
       </li>
     </ul>
 
-    <div class="code-container">
+    <div class="code-block">
+      <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
       <pre><code class="language-python">face_landmarks = np.array([[lm.x * rgb_image.shape[1], lm.y * rgb_image.shape[0]] 
                        for lm in results.multi_face_landmarks[0].landmark])</code></pre>
-      <button class="copy-btn">Copy</button>
     </div>
   </div>
 

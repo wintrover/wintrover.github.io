@@ -321,3 +321,162 @@ body {
 .copy-btn:hover {
   background-color: #0056b3;
 }
+
+/* 현대적인 코드 블록 스타일 */
+.code-block {
+  margin: 20px 0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-family: 'SF Mono', Consolas, Menlo, Monaco, 'Courier New', monospace;
+  font-size: 0.85em;
+  line-height: 1.67;
+  position: relative; /* 버튼 위치 기준점 */
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #e8e8e8;
+  border-bottom: 1px solid #ddd;
+}
+
+.language-badge {
+  display: none; /* 언어 배지 숨김 */
+  color: #444;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  background: #f3f3f3;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #444;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background-color: #ddd;
+}
+
+.copy-icon {
+  margin-right: 5px;
+}
+
+.code-block pre {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background-color: #f3f3f3;
+}
+
+.code-block pre code {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  background-color: #f3f3f3;
+  color: #444;
+  white-space: pre-wrap;
+  -webkit-text-size-adjust: none;
+  font-family: 'SF Mono', Consolas, Menlo, Monaco, 'Courier New', monospace;
+  font-size: 0.9em;
+  line-height: 1.67;
+  border-radius: 0;
+}
+
+/* 코드 구문 강조 */
+.hljs-keyword {
+  color: #c7254e;
+}
+
+.hljs-string, .hljs-attr {
+  color: #1d8b4c;
+}
+
+.hljs-number, .hljs-literal {
+  color: #0b76b8;
+}
+
+.hljs-comment {
+  color: #888888;
+  font-style: italic;
+}
+
+.hljs-function, .hljs-title {
+  color: #4271ae;
+}
+
+/* 복사 버튼 애니메이션 */
+.copy-btn.copied {
+  background-color: #e2f0e3;
+  color: #1d8b4c;
+}
+
+/* 인라인 코드 스타일 */
+code:not(.hljs) {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: #c7254e;
+  background-color: #f9f2f4;
+  border-radius: 4px;
+  font-family: 'SF Mono', Consolas, Menlo, Monaco, 'Courier New', monospace;
+}
+
+/* 미디어 쿼리 for 모바일 */
+@media (max-width: 768px) {
+  .code-block {
+    margin: 15px 0;
+  }
+  
+  .code-header {
+    padding: 6px 10px;
+  }
+  
+  .code-block pre code {
+    padding: 12px;
+    font-size: 0.8em;
+  }
+}
+
+/* 호버 시 나타나는 복사 버튼 */
+.hover-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 0;
+}
+
+.hover-copy-btn:hover {
+  background: #f0f0f0;
+}
+
+.code-block:hover .hover-copy-btn {
+  opacity: 1;
+}
+
+/* 복사 버튼 클릭 효과 */
+.hover-copy-btn.copied {
+  background-color: #e2f0e3;
+  color: #1d8b4c;
+}
