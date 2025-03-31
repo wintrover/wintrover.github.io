@@ -2,18 +2,18 @@
 layout: default
 ---
 <!-- Back Button -->
-<a href="{{ site.baseurl }}/" class="back-button">← Back to Previous page</a>
+<a href="{{ site.baseurl }}/" class="back-button" data-en="← Back to Previous page" data-ko="← 이전 페이지로 돌아가기">← Back to Previous page</a>
 
 <table class="main-table">
   <tr>
     <td>
       <div class="project-item">
-        <h1 class="project-title">{{ page.title }}</h1>
+        <h1 class="project-title" data-en="{{ page.title }}" data-ko="{{ page.ko_title | default: page.title }}">{{ page.title }}</h1>
         {% if page.github_link %}
         <a href="{{ page.github_link }}" class="project-link">GitHub</a>
         {% endif %}
       </div>
-      <h5 class="period">development period : {{ page.dev_period }}</h5>
+      <h5 class="period" data-en="development period : {{ page.dev_period }}" data-ko="개발 기간 : {{ page.dev_period }}">development period : {{ page.dev_period }}</h5>
 
       <hr class="section-divider">
 

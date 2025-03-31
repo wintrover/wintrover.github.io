@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 언어 설정
+    const userLanguage = getUserLanguage();
+    setLanguage(userLanguage);
+    setupLanguageToggle();
+    
     // Highlight.js 초기화
     document.querySelectorAll('pre code').forEach(block => {
         hljs.highlightBlock(block);
@@ -31,6 +36,77 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// 언어 감지 및 설정 함수
+function getUserLanguage() {
+    // 저장된 언어 설정이 있는지 확인
+    const savedLanguage = localStorage.getItem('language');
+    if (savedLanguage) {
+        return savedLanguage;
+    }
+    
+    // 국가 기반 자동 언어 설정
+    try {
+        // 사용자 IP 기반 국가 감지 API (무료 서비스)
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                // 한국에서 접속한 경우 한국어로 설정
+                if (data.country === 'KR') {
+                    setLanguage('ko');
+                }
+            })
+            .catch(error => {
+                console.error('국가 감지 실패:', error);
+            });
+    } catch (error) {
+        console.error('언어 감지 중 오류 발생:', error);
+    }
+    
+    // 기본값은 영어
+    return 'en';
+}
+
+// 언어 설정 함수
+function setLanguage(lang) {
+    document.documentElement.setAttribute('lang', lang);
+    localStorage.setItem('language', lang);
+    
+    // 모든 다국어 요소 업데이트
+    document.querySelectorAll('[data-en], [data-ko]').forEach(element => {
+        if (lang === 'en' && element.hasAttribute('data-en')) {
+            element.innerHTML = element.getAttribute('data-en');
+        } else if (lang === 'ko' && element.hasAttribute('data-ko')) {
+            element.innerHTML = element.getAttribute('data-ko');
+        }
+    });
+}
+
+// 언어 토글 설정
+function setupLanguageToggle() {
+    const toggle = document.getElementById('language-toggle');
+    if (toggle) {
+        toggle.addEventListener('click', function() {
+            const currentLang = localStorage.getItem('language') || 'en';
+            const newLang = currentLang === 'en' ? 'ko' : 'en';
+            setLanguage(newLang);
+            
+            // 토글 버튼 텍스트 업데이트
+            updateToggleText(newLang);
+        });
+        
+        // 초기 토글 텍스트 설정
+        updateToggleText(localStorage.getItem('language') || 'en');
+    }
+}
+
+// 토글 버튼 텍스트 업데이트
+function updateToggleText(lang) {
+    const toggle = document.getElementById('language-toggle');
+    if (toggle) {
+        toggle.textContent = lang === 'en' ? '한국어' : 'English';
+    }
+}
 
 // 코드 복사 기능
 function copyCode(button) {
