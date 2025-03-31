@@ -14,6 +14,62 @@ skills:
   - Selenium
 ---
 
+<style>
+/* 세부 항목 스타일 */
+details.challenge-item {
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+details.challenge-item summary {
+  padding: 15px;
+  cursor: pointer;
+  position: relative;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s;
+  list-style: none;
+}
+
+details.challenge-item summary::-webkit-details-marker {
+  display: none;
+}
+
+details.challenge-item summary::after {
+  content: '\25BC';
+  font-size: 0.8em;
+  color: #555;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s;
+}
+
+details.challenge-item[open] summary::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+details.challenge-item summary:hover {
+  background-color: #f0f0f0;
+}
+
+details.challenge-item[open] summary {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+details.challenge-item .challenge-content {
+  padding: 20px;
+}
+
+details.challenge-item summary h3 {
+  margin: 0;
+  display: inline;
+}
+</style>
+
 <!-- Project Logo -->
 <div class="logo-container" style="text-align: center; margin-bottom: 30px;">
   <img src="{{ site.baseurl }}/images/CVFactory_logo.png" alt="자소서공장 로고" style="max-width: 200px;">
@@ -38,41 +94,10 @@ skills:
 
   <hr class="subsection-divider">
 
-  <!-- 기술 스택 섹션 -->
-  <div class="section">
-    <h3 data-en="Technology Stack" data-ko="기술 스택"></h3>
-    <div class="tech-stack">
-      <div class="tech-category">
-        <h4 data-en="Backend" data-ko="백엔드"></h4>
-        <ul>
-          <li>Django</li>
-          <li>Django REST Framework</li>
-          <li>Groq API</li>
-          <li>Selenium / BeautifulSoup</li>
-        </ul>
-      </div>
-      <div class="tech-category">
-        <h4 data-en="Frontend" data-ko="프론트엔드"></h4>
-        <ul>
-          <li>HTML/CSS/JavaScript</li>
-          <li>Bootstrap</li>
-        </ul>
-      </div>
-      <div class="tech-category">
-        <h4 data-en="Deployment" data-ko="배포"></h4>
-        <ul>
-          <li>Docker</li>
-          <li>Git</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <hr class="subsection-divider">
-
   <!-- 개발 과정 -->
   <div class="section">
     <h3 data-en="Development Journey" data-ko="개발 여정"></h3>
+    
     <p data-en="The project was developed to streamline the personal statement creation process, especially for job seekers who need to highlight specific achievements and qualifications." data-ko="이 프로젝트는 특히 특정 성과와 자격을 강조해야 하는 구직자를 위해 자기소개서 작성 과정을 간소화하기 위해 개발되었습니다."></p>
     
     <div class="dev-timeline">
@@ -92,152 +117,106 @@ skills:
   </div>
 </div>
 
-<!-- Code Examples Section -->
+<hr class="subsection-divider">
+
+<!-- Technical Challenges and Solutions Section -->
 <div class="section">
-  <h2 data-en="Code Examples" data-ko="코드 예시"></h2>
-  
-  <div class="code-block">
-    <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
+  <h2 data-en="Technical Challenges and Solutions" data-ko="기술적 도전과 해결 과정"></h2>
+  <p data-en="Key challenges faced during development and the innovative solutions implemented." data-ko="개발 과정에서 직면한 주요 도전 과제와 구현된 혁신적인 해결책입니다."></p>
+
+  <hr class="subsection-divider">
+
+  <div class="challenges">
+    <details class="challenge-item">
+      <summary>
+        <h3 data-en="CSRF Protection Middleware Issue" data-ko="CSRF 보호 미들웨어 문제"></h3>
+      </summary>
+      <div class="challenge-content">
+        <div class="challenge-description">
+          <h4 data-en="Problem" data-ko="문제"></h4>
+          <p data-en="Encountered 'MiddlewareMixin.init() missing 1 required positional argument: get_response' error during CSRF verification in API views, causing insecure API endpoints despite Django's built-in protection." data-ko="API 뷰의 CSRF 검증 중 'MiddlewareMixin.init() missing 1 required positional argument: get_response' 오류가 발생하여 Django의 내장 보호 기능에도 불구하고 API 엔드포인트가 안전하지 않게 되었습니다."></p>
+          
+          <h4 data-en="Solution" data-ko="해결책"></h4>
+          <p data-en="Replaced direct instantiation of CsrfViewMiddleware with proper Django decorators (@csrf_protect) and implemented get_token(request) for token generation, maintaining security while fixing the initialization error." data-ko="CsrfViewMiddleware의 직접 인스턴스화를 적절한 Django 데코레이터(@csrf_protect)로 대체하고 토큰 생성을 위해 get_token(request)를 구현하여 초기화 오류를 수정하면서 보안을 유지했습니다."></p>
+          
+          <div class="code-snippet">
 {% highlight python %}
-# Groq API를 활용한 자기소개서 생성 코드
-import os
-from dotenv import load_dotenv
-import groq
-import re
-import logging
+# 수정 전
+try:
+    reason = CsrfViewMiddleware().process_view(request, None, (), {})
+    if reason:
+        logger.error(f" CSRF 보호로 인해 403 발생: {reason}")
+except Exception as e:
+    logger.error(f" CSRF 검사 중 오류 발생: {str(e)}")
 
-# .env 파일 로드
-load_dotenv(dotenv_path="groq.env")
+# 수정 후
+@api_view(["OPTIONS", "POST", "GET"])
+@permission_classes([AllowAny])
+@csrf_protect  # @csrf_exempt 대신 @csrf_protect 사용
+@ensure_csrf_cookie
+def create_resume(request):
+    # CSRF 토큰 생성 및 가져오기
+    csrf_token = get_token(request)
+    logger.debug(f" CSRF 쿠키: {request.COOKIES.get('csrftoken')}")
+    logger.debug(f" CSRF 토큰: {csrf_token}")
+    # ... 기존 코드 ...
+{% endhighlight %}
+          </div>
+        </div>
+      </div>
+    </details>
 
-# Groq API 키 설정
-api_key = os.getenv("GROQ_API_KEY")
+    <hr class="subsection-divider">
 
-# Groq 클라이언트 초기화
-client = groq.Client(api_key=api_key)
-
+    <details class="challenge-item">
+      <summary>
+        <h3 data-en="Groq API Token Limit Overflow" data-ko="Groq API 토큰 한도 초과 문제"></h3>
+      </summary>
+      <div class="challenge-content">
+        <div class="challenge-description">
+          <h4 data-en="Problem" data-ko="문제"></h4>
+          <p data-en="API calls failed with '413: Request too large for model qwen-qwq-32b' errors, as our request with job descriptions, company info, and user stories exceeded the 6,000 token limit (requesting 12,097 tokens)." data-ko="채용 공고, 회사 정보, 사용자 스토리를 포함한 요청이 6,000 토큰 한도를 초과하여(12,097 토큰 요청) '413: Request too large for model qwen-qwq-32b' 오류로 API 호출이 실패했습니다."></p>
+          
+          <h4 data-en="Solution" data-ko="해결책"></h4>
+          <p data-en="Implemented a multi-stage approach that breaks down the request into three smaller API calls: 1) job/company analysis (1,500 tokens), 2) resume draft creation (2,000 tokens), and 3) final resume polishing (2,000 tokens)." data-ko="요청을 세 개의 작은 API 호출로 분할하는 다단계 접근 방식을 구현했습니다: 1) 채용/회사 분석(1,500 토큰), 2) 자기소개서 초안 작성(2,000 토큰), 3) 최종 자기소개서 완성(2,000 토큰)."></p>
+          
+          <div class="code-snippet">
+{% highlight python %}
+# 수정 전: 단일 대형 API 호출
 def generate_resume(job_description, user_story, company_info = ""):
-    """
-    Groq API를 호출하여 자기소개서를 생성하는 함수
-    """
-    prompt = f"""
-    채용 공고 설명: {job_description}
-    사용자의 이야기: {user_story}
-    회사 정보: {company_info}
-
-    위 정보를 바탕으로 다음 구조의 자기소개서를 작성하세요:
-
-    1. 핵심역량과 지원동기 요약 (두괄식)
-    2. 회사가 당면한 문제와 채용의 배경 분석
-    3. 회사의 비전/인재상 분석 및 지원자 역량과의 연결성
-    4. 문제해결 능력과 관련 경험 (수치로 표현)
-    5. 입사 후 기여 가능 분야 및 예상 성과 (수치로 제시)
-    6. 핵심 경쟁력 강조
-    """
-
-    try:
-        # Groq API 호출
-        response = client.chat.completions.create(
-            model="qwen-qwq-32b",  # qwen-qwq-32b 모델 사용
-            messages=[
-                {"role": "system", "content": "당신은 자기소개서 전문가입니다. 주어진 채용 공고와 지원자 정보를 바탕으로 맞춤형 자기소개서를 작성해주세요."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=3000
-        )
-        
-        # 응답 처리
-        generated_resume = response.choices[0].message.content
-        return generated_resume
-
-    except Exception as e:
-        return "자기소개서 생성 중 오류가 발생했습니다. 다시 시도해 주세요."
-{% endhighlight %}
-  </div>
-  
-  <div class="code-block">
-    <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
-{% highlight python %}
-# 채용 공고 크롤링 코드
-import requests
-from bs4 import BeautifulSoup
-import logging
-import re
-from typing import Optional
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
-
-# 로깅 설정
-logger = logging.getLogger('crawlers')
-
-class WebScrapingError(Exception):
-    """웹 스크래핑 관련 사용자 정의 예외"""
-    pass
-
-def create_session():
-    """ HTTP 요청 세션 생성 (재시도 설정 포함)"""
-    session = requests.Session()
-    retries = Retry(
-        total=3,  # 최대 재시도 횟수
-        backoff_factor=1,  # 재시도 간격
-        status_forcelist=[429, 500, 502, 503, 504],  # 재시도할 HTTP 상태 코드
+    # ... 기존 코드 ...
+    response = client.chat.completions.create(
+        model="qwen-qwq-32b",
+        messages=[
+            {"role": "system", "content": "당신은 자기소개서 전문가입니다..."},
+            {"role": "user", "content": prompt}  # 거대한 프롬프트
+        ],
+        temperature=0.7,
+        max_tokens=3000  # 출력 토큰 수 조정
     )
-    adapter = HTTPAdapter(max_retries=retries)
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
-    return session
+    # ... 기존 코드 ...
 
-def fetch_job_description(url: str) -> Optional[str]:
-    """ 주어진 URL에서 채용 공고 정보를 크롤링하여 텍스트로 반환"""
-    session = create_session()
-    try:
-        logger.info(f"채용 공고 크롤링 시작: {url}")
-
-        # HTTP 요청 헤더 설정 (User-Agent 지정)
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
-        
-        # HTTP 요청 실행 (타임아웃 10초 설정)
-        response = session.get(url, headers=headers, timeout=10)
-        response.raise_for_status()  # HTTP 오류 발생 시 예외 발생
-
-        # 응답 인코딩 설정
-        response.encoding = response.apparent_encoding or 'utf-8'
-        html_content = response.text
-
-        # HTML 파싱
-        soup = BeautifulSoup(html_content, 'html.parser')
-        raw_text = soup.get_text(separator='\n')
-
-        # 텍스트 정제
-        cleaned_text = clean_text(raw_text)
-        return cleaned_text
-
-    except requests.exceptions.RequestException as e:
-        logger.error(f"HTTP 요청 오류: {str(e)}", exc_info=True)
-        raise WebScrapingError(f"HTTP 요청 오류 발생: {str(e)}")
-        
-def clean_text(text: str) -> str:
-    """ 크롤링된 텍스트에서 불필요한 문자를 제거하여 정제"""
-    try:
-        # 괄호와 그 안의 내용 제거
-        text = re.sub(r'\(.*?\)', '', text)  # 소괄호 제거
-        text = re.sub(r'\[.*?\]', '', text)  # 대괄호 제거
-
-        # 연속된 공백 및 줄바꿈 정리
-        text = re.sub(r'\s+', ' ', text).strip()
-
-        # 유니코드 제어 문자 제거
-        text = re.sub(r'[\x00-\x1F\x7F]', '', text)
-
-        return text
-    except re.error as e:
-        logger.error(f"정규식 오류: {str(e)}")
-        raise
+# 수정 후: 3단계 API 호출 접근 방식
+def generate_resume(job_description, user_story, company_info=""):
+    # 1단계: 채용 공고와 회사 정보 분석
+    job_analysis = analyze_job_and_company(job_description, company_info)
+    
+    # 2단계: 자기소개서 초안 작성
+    resume_draft = create_resume_draft(job_analysis, user_story)
+    
+    # 3단계: 최종 자기소개서 완성
+    final_resume = finalize_resume(resume_draft)
+    
+    return final_resume
 {% endhighlight %}
+          </div>
+        </div>
+      </div>
+    </details>
   </div>
 </div>
+
+<hr class="subsection-divider">
 
 <!-- Future Improvements Section -->
 <div class="section">
