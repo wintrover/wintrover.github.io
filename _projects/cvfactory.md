@@ -198,7 +198,7 @@ def generate_resume(job_description, user_story, company_info = ""):
 
 # 수정 후: 3단계 API 호출 접근 방식
 def generate_resume(job_description, user_story, company_info=""):
-    # 1단계: 채용 공고와 회사 정보 분석
+    # 1단계: 채용/회사 분석
     job_analysis = analyze_job_and_company(job_description, company_info)
     
     # 2단계: 자기소개서 초안 작성
@@ -210,6 +210,39 @@ def generate_resume(job_description, user_story, company_info=""):
     return final_resume
 {% endhighlight %}
           </div>
+
+          <h4 data-en="Additional Improvements" data-ko="추가 개선사항"></h4>
+          <p data-en="Further refined the solution by breaking down the functions into smaller, more manageable pieces:" data-ko="함수들을 더 작고 관리하기 쉬운 단위로 분리하여 해결책을 추가로 개선했습니다:"></p>
+          
+          <ul>
+            <li data-en="Resume Draft Creation:" data-ko="자기소개서 초안 작성:">
+              <ul>
+                <li data-en="create_resume_intro: Introduction section" data-ko="create_resume_intro: 도입부 섹션"></li>
+                <li data-en="create_resume_body: Main body section" data-ko="create_resume_body: 본문 섹션"></li>
+                <li data-en="create_resume_conclusion: Conclusion section" data-ko="create_resume_conclusion: 마무리 섹션"></li>
+              </ul>
+            </li>
+            <li data-en="Resume Finalization:" data-ko="자기소개서 완성:">
+              <ul>
+                <li data-en="finalize_resume_metrics: Emphasize quantified achievements" data-ko="finalize_resume_metrics: 수치화된 성과 강조"></li>
+                <li data-en="finalize_resume_style: Improve writing style" data-ko="finalize_resume_style: 문체 개선"></li>
+                <li data-en="finalize_resume_emphasis: Adjust emphasis points" data-ko="finalize_resume_emphasis: 강조점 조정"></li>
+              </ul>
+            </li>
+          </ul>
+
+          <h4 data-en="Current Status and Next Steps" data-ko="현재 상태 및 다음 단계"></h4>
+          <p data-en="Current token usage:" data-ko="현재 토큰 사용량:"></p>
+          <ul>
+            <li data-en="generate_resume: 12,097 tokens (limit: 6,000)" data-ko="generate_resume: 12,097 토큰 (제한: 6,000)"></li>
+            <li data-en="analyze_job_and_company: 11,194 tokens (limit: 6,000)" data-ko="analyze_job_and_company: 11,194 토큰 (제한: 6,000)"></li>
+          </ul>
+          <p data-en="Next steps:" data-ko="다음 단계:"></p>
+          <ul>
+            <li data-en="Reduce input data size (especially company_info and user_story)" data-ko="입력 데이터 크기 줄이기 (특히 company_info와 user_story)"></li>
+            <li data-en="Improve debug logging for better token usage monitoring" data-ko="토큰 사용량 모니터링을 위한 디버그 로깅 개선"></li>
+            <li data-en="Fix Django ALLOWED_HOSTS configuration" data-ko="Django ALLOWED_HOSTS 설정 수정"></li>
+          </ul>
         </div>
       </div>
     </details>
