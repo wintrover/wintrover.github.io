@@ -227,22 +227,22 @@ details.challenge-item summary h3 {
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 수정 전
 </span><span class="k">try</span><span class="p">:</span>
-    <span class="n">reason</span> <span class="o">=</span> <span class="nc">CsrfViewMiddleware</span><span class="p">().</span><span class="nf">process_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
+    <span class="n">reason</span> <span class="o">=</span> <span class="n">CsrfViewMiddleware</span><span class="p">().</span><span class="n">process_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
     <span class="k">if</span> <span class="n">reason</span><span class="p">:</span>
-        <span class="n">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 보호로 인해 403 발생: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+        <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s">" CSRF 보호로 인해 403 발생: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
 <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="n">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 검사 중 오류 발생: </span><span class="si">{</span><span class="nf">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s">" CSRF 검사 중 오류 발생: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
 
 <span class="c1"># 수정 후
-</span><span class="nd">@api_view</span><span class="p">([</span><span class="sh">"</span><span class="s">OPTIONS</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">POST</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">GET</span><span class="sh">"</span><span class="p">])</span>
-<span class="nd">@permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
-<span class="nd">@csrf_protect</span>  <span class="c1"># @csrf_exempt 대신 @csrf_protect 사용
-</span><span class="nd">@ensure_csrf_cookie</span>
+</span><span class="o">@</span><span class="n">api_view</span><span class="p">([</span><span class="s">"OPTIONS"</span><span class="p">,</span> <span class="s">"POST"</span><span class="p">,</span> <span class="s">"GET"</span><span class="p">])</span>
+<span class="o">@</span><span class="n">permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
+<span class="o">@</span><span class="n">csrf_protect</span>  <span class="c1"># @csrf_exempt 대신 @csrf_protect 사용
+</span><span class="o">@</span><span class="n">ensure_csrf_cookie</span>
 <span class="k">def</span> <span class="nf">create_resume</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="c1"># CSRF 토큰 생성 및 가져오기
-</span>    <span class="n">csrf_token</span> <span class="o">=</span> <span class="nf">get_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 쿠키: </span><span class="si">{</span><span class="n">request</span><span class="p">.</span><span class="n">COOKIES</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="sh">'</span><span class="s">csrftoken</span><span class="sh">'</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
-    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 토큰: </span><span class="si">{</span><span class="n">csrf_token</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+</span>    <span class="n">csrf_token</span> <span class="o">=</span> <span class="n">get_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s">" CSRF 쿠키: </span><span class="si">{</span><span class="n">request</span><span class="p">.</span><span class="n">COOKIES</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'csrftoken'</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s">" CSRF 토큰: </span><span class="si">{</span><span class="n">csrf_token</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
     <span class="c1"># ... 기존 코드 ...</span></code></pre></figure>
 
           </div>
@@ -267,13 +267,13 @@ details.challenge-item summary h3 {
           <div class="code-snippet">
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 수정 전: 단일 대형 API 호출
-</span><span class="k">def</span> <span class="nf">generate_resume</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">user_story</span><span class="p">,</span> <span class="n">company_info</span> <span class="o">=</span> <span class="sh">""</span><span class="p">):</span>
+</span><span class="k">def</span> <span class="nf">generate_resume</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">user_story</span><span class="p">,</span> <span class="n">company_info</span> <span class="o">=</span> <span class="s">""</span><span class="p">):</span>
     <span class="c1"># ... 기존 코드 ...
-</span>    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">chat</span><span class="p">.</span><span class="n">completions</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="sh">"</span><span class="s">qwen-qwq-32b</span><span class="sh">"</span><span class="p">,</span>
+</span>    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">chat</span><span class="p">.</span><span class="n">completions</span><span class="p">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="s">"qwen-qwq-32b"</span><span class="p">,</span>
         <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
-            <span class="p">{</span><span class="sh">"</span><span class="s">role</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">system</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">content</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">당신은 자기소개서 전문가입니다...</span><span class="sh">"</span><span class="p">},</span>
-            <span class="p">{</span><span class="sh">"</span><span class="s">role</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">user</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">content</span><span class="sh">"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}</span>  <span class="c1"># 거대한 프롬프트
+            <span class="p">{</span><span class="s">"role"</span><span class="p">:</span> <span class="s">"system"</span><span class="p">,</span> <span class="s">"content"</span><span class="p">:</span> <span class="s">"당신은 자기소개서 전문가입니다..."</span><span class="p">},</span>
+            <span class="p">{</span><span class="s">"role"</span><span class="p">:</span> <span class="s">"user"</span><span class="p">,</span> <span class="s">"content"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}</span>  <span class="c1"># 거대한 프롬프트
 </span>        <span class="p">],</span>
         <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
         <span class="n">max_tokens</span><span class="o">=</span><span class="mi">3000</span>  <span class="c1"># 출력 토큰 수 조정
@@ -281,15 +281,15 @@ details.challenge-item summary h3 {
     <span class="c1"># ... 기존 코드 ...
 </span>
 <span class="c1"># 수정 후: 3단계 API 호출 접근 방식
-</span><span class="k">def</span> <span class="nf">generate_resume</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">user_story</span><span class="p">,</span> <span class="n">company_info</span><span class="o">=</span><span class="sh">""</span><span class="p">):</span>
+</span><span class="k">def</span> <span class="nf">generate_resume</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">user_story</span><span class="p">,</span> <span class="n">company_info</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
     <span class="c1"># 1단계: 채용/회사 분석
-</span>    <span class="n">job_analysis</span> <span class="o">=</span> <span class="nf">analyze_job_and_company</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">company_info</span><span class="p">)</span>
+</span>    <span class="n">job_analysis</span> <span class="o">=</span> <span class="n">analyze_job_and_company</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">company_info</span><span class="p">)</span>
     
     <span class="c1"># 2단계: 자기소개서 초안 작성
-</span>    <span class="n">resume_draft</span> <span class="o">=</span> <span class="nf">create_resume_draft</span><span class="p">(</span><span class="n">job_analysis</span><span class="p">,</span> <span class="n">user_story</span><span class="p">)</span>
+</span>    <span class="n">resume_draft</span> <span class="o">=</span> <span class="n">create_resume_draft</span><span class="p">(</span><span class="n">job_analysis</span><span class="p">,</span> <span class="n">user_story</span><span class="p">)</span>
     
     <span class="c1"># 3단계: 최종 자기소개서 완성
-</span>    <span class="n">final_resume</span> <span class="o">=</span> <span class="nf">finalize_resume</span><span class="p">(</span><span class="n">resume_draft</span><span class="p">)</span>
+</span>    <span class="n">final_resume</span> <span class="o">=</span> <span class="n">finalize_resume</span><span class="p">(</span><span class="n">resume_draft</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">final_resume</span></code></pre></figure>
 
@@ -348,60 +348,60 @@ details.challenge-item summary h3 {
           <div class="code-snippet">
 
 <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// 수정 전: CSRF 토큰 없이 직접 API 호출</span>
-<span class="k">async</span> <span class="kd">function</span> <span class="nf">generateResume</span><span class="p">()</span> <span class="p">{</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">generateResume</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="na">recruitment_notice_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">job-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
-        <span class="na">target_company_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">company-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
-        <span class="na">user_story</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">user-story</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span>
+        <span class="na">recruitment_notice_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">job-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
+        <span class="na">target_company_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">company-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
+        <span class="na">user_story</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">user-story</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span>
     <span class="p">};</span>
 
     <span class="k">try</span> <span class="p">{</span>
-        <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
             <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
             <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
                 <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nf">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+            <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
         <span class="p">});</span>
         <span class="c1">// ... 결과 처리 ...</span>
-    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
 <span class="c1">// 수정 후: CSRF 토큰을 먼저 요청 후 API 호출</span>
-<span class="k">async</span> <span class="kd">function</span> <span class="nf">generateResume</span><span class="p">()</span> <span class="p">{</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">generateResume</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="na">recruitment_notice_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">job-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
-        <span class="na">target_company_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">company-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
-        <span class="na">user_story</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">user-story</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span>
+        <span class="na">recruitment_notice_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">job-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
+        <span class="na">target_company_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">company-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
+        <span class="na">user_story</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">user-story</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span>
     <span class="p">};</span>
 
     <span class="k">try</span> <span class="p">{</span>
         <span class="c1">// 1단계: CSRF 토큰 가져오기</span>
-        <span class="kd">const</span> <span class="nx">tokenResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">tokenResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
             <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">GET</span><span class="dl">'</span><span class="p">,</span>
             <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
                 <span class="dl">'</span><span class="s1">Accept</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">});</span>
         
-        <span class="k">if </span><span class="p">(</span><span class="nx">tokenResponse</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">tokenResponse</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
             <span class="c1">// 2단계: 토큰을 사용하여 실제 요청</span>
-            <span class="kd">const</span> <span class="nx">csrfToken</span> <span class="o">=</span> <span class="nx">tokenResponse</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">X-CSRFToken</span><span class="dl">'</span><span class="p">);</span>
+            <span class="kd">const</span> <span class="nx">csrfToken</span> <span class="o">=</span> <span class="nx">tokenResponse</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">X-CSRFToken</span><span class="dl">'</span><span class="p">);</span>
             
-            <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+            <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
                 <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
                 <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
                     <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
                     <span class="dl">'</span><span class="s1">X-CSRFToken</span><span class="dl">'</span><span class="p">:</span> <span class="nx">csrfToken</span>
                 <span class="p">},</span>
-                <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nf">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+                <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
             <span class="p">});</span>
             <span class="c1">// ... 결과 처리 ...</span>
         <span class="p">}</span>
-    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span></code></pre></figure>
 
@@ -413,26 +413,26 @@ details.challenge-item summary h3 {
           <div class="code-snippet">
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 수정 전: 데코레이터 순서 문제
-</span><span class="nd">@api_view</span><span class="p">([</span><span class="sh">"</span><span class="s">POST</span><span class="sh">"</span><span class="p">])</span>
-<span class="nd">@permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
-<span class="nd">@csrf_exempt</span>
+</span><span class="o">@</span><span class="n">api_view</span><span class="p">([</span><span class="s">"POST"</span><span class="p">])</span>
+<span class="o">@</span><span class="n">permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
+<span class="o">@</span><span class="n">csrf_exempt</span>
 <span class="k">def</span> <span class="nf">create_resume</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="c1"># ... 기존 코드 ...
 </span>
 <span class="c1"># 수정 후: 최적화된 데코레이터 순서와 CSRF 토큰 관리
-</span><span class="nd">@api_view</span><span class="p">([</span><span class="sh">"</span><span class="s">OPTIONS</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">POST</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">GET</span><span class="sh">"</span><span class="p">])</span>
-<span class="nd">@permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
-<span class="nd">@csrf_protect</span>  <span class="c1"># @csrf_exempt 대신 @csrf_protect 사용
-</span><span class="nd">@ensure_csrf_cookie</span>  <span class="c1"># 쿠키에 CSRF 토큰 보장
+</span><span class="o">@</span><span class="n">api_view</span><span class="p">([</span><span class="s">"OPTIONS"</span><span class="p">,</span> <span class="s">"POST"</span><span class="p">,</span> <span class="s">"GET"</span><span class="p">])</span>
+<span class="o">@</span><span class="n">permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
+<span class="o">@</span><span class="n">csrf_protect</span>  <span class="c1"># @csrf_exempt 대신 @csrf_protect 사용
+</span><span class="o">@</span><span class="n">ensure_csrf_cookie</span>  <span class="c1"># 쿠키에 CSRF 토큰 보장
 </span><span class="k">def</span> <span class="nf">create_resume</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="c1"># CSRF 토큰 명시적 생성 및 로깅
-</span>    <span class="n">csrf_token</span> <span class="o">=</span> <span class="nf">get_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 쿠키: </span><span class="si">{</span><span class="n">request</span><span class="p">.</span><span class="n">COOKIES</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="sh">'</span><span class="s">csrftoken</span><span class="sh">'</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
-    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 토큰: </span><span class="si">{</span><span class="n">csrf_token</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+</span>    <span class="n">csrf_token</span> <span class="o">=</span> <span class="n">get_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s">" CSRF 쿠키: </span><span class="si">{</span><span class="n">request</span><span class="p">.</span><span class="n">COOKIES</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'csrftoken'</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s">" CSRF 토큰: </span><span class="si">{</span><span class="n">csrf_token</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
     
-    <span class="k">if</span> <span class="n">request</span><span class="p">.</span><span class="n">method</span> <span class="o">==</span> <span class="sh">"</span><span class="s">GET</span><span class="sh">"</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">request</span><span class="p">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">"GET"</span><span class="p">:</span>
         <span class="c1"># GET 요청을 통해 CSRF 토큰 제공
-</span>        <span class="k">return</span> <span class="nc">Response</span><span class="p">({</span><span class="sh">"</span><span class="s">detail</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">CSRF 토큰이 쿠키에 설정되었습니다</span><span class="sh">"</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+</span>        <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s">"detail"</span><span class="p">:</span> <span class="s">"CSRF 토큰이 쿠키에 설정되었습니다"</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
         
     <span class="c1"># POST 요청 처리
 </span>    <span class="c1"># ... 기존 코드 ...</span></code></pre></figure>
@@ -477,7 +477,7 @@ details.challenge-item summary h3 {
           
           <div class="code-snippet">
 
-<figure class="highlight"><pre><code class="language-diff" data-lang="diff"># .gitignore 개선
+<figure class="highlight"><pre><code class="language-diff" data-lang="diff"><span class="err">#</span> .gitignore 개선
 <span class="gi">+ *.env
 + .env
 + .env.*
@@ -486,14 +486,14 @@ details.challenge-item summary h3 {
 + *secret*.env
 + *api_key*.env
 + cvfactory/*.env
-</span><span class="err">
-</span># settings.py 환경 변수 로드 개선
+</span>
+# settings.py 환경 변수 로드 개선
 <span class="gd">- load_dotenv(dotenv_path=BASE_DIR / "secretkey.env")
 - SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-7q@k&amp;$)+32d7r8nvr!sy3em4y^m19)58yf8)&amp;_je+e&amp;2f)parw")
 </span><span class="gi">+ load_dotenv(dotenv_path=BASE_DIR / ".env")
 + SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-</span><span class="err">
-</span># API 엔드포인트 CSRF 보호 개선
+</span>
+# API 엔드포인트 CSRF 보호 개선
 <span class="gd">- @csrf_exempt  # CSRF 보호를 비활성화 (개발 환경에서만 사용)
 </span><span class="gi">+ @csrf_protect  # CSRF 보호 활성화</span></code></pre></figure>
 

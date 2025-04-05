@@ -142,35 +142,35 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 라이브러리 비교 코드 일부 (MPvsdlibvsFA.py)
-</span><span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">():</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">CUDA Available:</span><span class="sh">"</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">())</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">CUDA Version:</span><span class="sh">"</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">version</span><span class="p">.</span><span class="n">cuda</span><span class="p">)</span>
+</span><span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"CUDA Available:"</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">is_available</span><span class="p">())</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"CUDA Version:"</span><span class="p">,</span> <span class="n">torch</span><span class="p">.</span><span class="n">version</span><span class="p">.</span><span class="n">cuda</span><span class="p">)</span>
     
     <span class="c1"># 기존 환경 변수 제거
-</span>    <span class="k">if</span> <span class="sh">'</span><span class="s">PYTORCH_CUDA_ALLOC_CONF</span><span class="sh">'</span> <span class="ow">in</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">:</span>
-        <span class="k">del</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="sh">'</span><span class="s">PYTORCH_CUDA_ALLOC_CONF</span><span class="sh">'</span><span class="p">]</span>
+</span>    <span class="k">if</span> <span class="s">'PYTORCH_CUDA_ALLOC_CONF'</span> <span class="ow">in</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'PYTORCH_CUDA_ALLOC_CONF'</span><span class="p">]</span>
     
-    <span class="n">num_gpus</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">device_count</span><span class="p">()</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Number of GPUs available: </span><span class="si">{</span><span class="n">num_gpus</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">num_gpus</span><span class="p">):</span>
-        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">GPU </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s">: </span><span class="si">{</span><span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">get_device_name</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">num_gpus</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">device_count</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Number of GPUs available: </span><span class="si">{</span><span class="n">num_gpus</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_gpus</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"GPU </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s">: </span><span class="si">{</span><span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
     
-    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">device</span><span class="p">(</span><span class="s">'cuda'</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">CUDA is not available. Using CPU.</span><span class="sh">"</span><span class="p">)</span>
-    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cpu</span><span class="sh">'</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"CUDA is not available. Using CPU."</span><span class="p">)</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">device</span><span class="p">(</span><span class="s">'cpu'</span><span class="p">)</span>
 
 <span class="c1"># 1. MediaPipe 처리
-</span><span class="n">mp_face_mesh</span> <span class="o">=</span> <span class="n">mp</span><span class="p">.</span><span class="n">solutions</span><span class="p">.</span><span class="n">face_mesh</span><span class="p">.</span><span class="nc">FaceMesh</span><span class="p">()</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">mp_face_mesh</span><span class="p">.</span><span class="nf">process</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">)</span>
+</span><span class="n">mp_face_mesh</span> <span class="o">=</span> <span class="n">mp</span><span class="p">.</span><span class="n">solutions</span><span class="p">.</span><span class="n">face_mesh</span><span class="p">.</span><span class="n">FaceMesh</span><span class="p">()</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">mp_face_mesh</span><span class="p">.</span><span class="n">process</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">results</span><span class="p">.</span><span class="n">multi_face_landmarks</span><span class="p">:</span>
-    <span class="n">mediapipe_landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([[</span><span class="n">lm</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">rgb_image</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lm</span><span class="p">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">rgb_image</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> 
+    <span class="n">mediapipe_landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([[</span><span class="n">lm</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">rgb_image</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lm</span><span class="p">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">rgb_image</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> 
                             <span class="k">for</span> <span class="n">lm</span> <span class="ow">in</span> <span class="n">results</span><span class="p">.</span><span class="n">multi_face_landmarks</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">landmark</span><span class="p">])</span>
 
 <span class="c1"># 2. dlib 처리
-</span><span class="n">detector</span> <span class="o">=</span> <span class="n">dlib</span><span class="p">.</span><span class="nf">get_frontal_face_detector</span><span class="p">()</span>
-<span class="n">predictor</span> <span class="o">=</span> <span class="n">dlib</span><span class="p">.</span><span class="nf">shape_predictor</span><span class="p">(</span><span class="n">predictor_path</span><span class="p">)</span>
-<span class="n">faces</span> <span class="o">=</span> <span class="nf">detector</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">)</span></code></pre></figure>
+</span><span class="n">detector</span> <span class="o">=</span> <span class="n">dlib</span><span class="p">.</span><span class="n">get_frontal_face_detector</span><span class="p">()</span>
+<span class="n">predictor</span> <span class="o">=</span> <span class="n">dlib</span><span class="p">.</span><span class="n">shape_predictor</span><span class="p">(</span><span class="n">predictor_path</span><span class="p">)</span>
+<span class="n">faces</span> <span class="o">=</span> <span class="n">detector</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">)</span></code></pre></figure>
 
     </div>
   </div>
@@ -203,33 +203,33 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 메모리 관리 개선 코드
-</span><span class="kn">import</span> <span class="n">torch</span>
-<span class="kn">import</span> <span class="n">gc</span>
+</span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">gc</span>
 
 <span class="k">def</span> <span class="nf">process_image_with_memory_safety</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">use_gpu</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># GPU 사용 가능 여부 및 메모리 확인
-</span>        <span class="k">if</span> <span class="n">use_gpu</span> <span class="ow">and</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">():</span>
+</span>        <span class="k">if</span> <span class="n">use_gpu</span> <span class="ow">and</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">is_available</span><span class="p">():</span>
             <span class="c1"># 현재 가용 메모리 확인
-</span>            <span class="n">free_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">get_device_properties</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">total_memory</span> <span class="o">-</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">memory_allocated</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span>            <span class="n">free_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">total_memory</span> <span class="o">-</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">memory_allocated</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">free_memory</span> <span class="o">&lt;</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">:</span>  <span class="c1"># 1GB 미만이면 CPU 사용
-</span>                <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">GPU memory low, falling back to CPU</span><span class="sh">"</span><span class="p">)</span>
-                <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cpu</span><span class="sh">'</span><span class="p">)</span>
+</span>                <span class="k">print</span><span class="p">(</span><span class="s">"GPU memory low, falling back to CPU"</span><span class="p">)</span>
+                <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">device</span><span class="p">(</span><span class="s">'cpu'</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cuda</span><span class="sh">'</span><span class="p">)</span>
+                <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">device</span><span class="p">(</span><span class="s">'cuda'</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">device</span><span class="p">(</span><span class="sh">'</span><span class="s">cpu</span><span class="sh">'</span><span class="p">)</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">device</span><span class="p">(</span><span class="s">'cpu'</span><span class="p">)</span>
             
         <span class="c1"># 모델 로드 및 처리
-</span>        <span class="n">model</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="nf">model</span><span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="nf">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+</span>        <span class="n">model</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">image</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
         
         <span class="k">return</span> <span class="n">result</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="c1"># 명시적 메모리 정리
-</span>        <span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">is_available</span><span class="p">():</span>
-            <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="nf">empty_cache</span><span class="p">()</span>
-        <span class="n">gc</span><span class="p">.</span><span class="nf">collect</span><span class="p">()</span></code></pre></figure>
+</span>        <span class="k">if</span> <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="n">torch</span><span class="p">.</span><span class="n">cuda</span><span class="p">.</span><span class="n">empty_cache</span><span class="p">()</span>
+        <span class="n">gc</span><span class="p">.</span><span class="n">collect</span><span class="p">()</span></code></pre></figure>
 
     </div>
   </div>
@@ -268,12 +268,12 @@ document.addEventListener('DOMContentLoaded', function() {
 </span>    <span class="n">RIGHT_EYE</span> <span class="o">=</span> <span class="p">[</span><span class="mi">362</span><span class="p">,</span> <span class="mi">263</span><span class="p">]</span>  <span class="c1"># 오른쪽 눈 외각, 내각
 </span>    
     <span class="c1"># 오류 발생 지점: 한 측정값이 0으로 나오는 경우 검사
-</span>    <span class="n">mouth_width</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="nf">norm</span><span class="p">(</span><span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_WIDTH</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span> <span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_WIDTH</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
-    <span class="n">mouth_height</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="nf">norm</span><span class="p">(</span><span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_HEIGHT</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span> <span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_HEIGHT</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+</span>    <span class="n">mouth_width</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">norm</span><span class="p">(</span><span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_WIDTH</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span> <span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_WIDTH</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">mouth_height</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">norm</span><span class="p">(</span><span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_HEIGHT</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span> <span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_HEIGHT</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
     <span class="k">if</span> <span class="n">mouth_height</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">입 높이가 0으로 계산됨. 랜드마크 좌표 확인 필요:</span><span class="sh">"</span><span class="p">)</span>
-        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">MOUTH_HEIGHT[0]: </span><span class="si">{</span><span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_HEIGHT</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
-        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">MOUTH_HEIGHT[1]: </span><span class="si">{</span><span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_HEIGHT</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"입 높이가 0으로 계산됨. 랜드마크 좌표 확인 필요:"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"MOUTH_HEIGHT[0]: </span><span class="si">{</span><span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_HEIGHT</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"MOUTH_HEIGHT[1]: </span><span class="si">{</span><span class="n">landmarks</span><span class="p">[</span><span class="n">MOUTH_HEIGHT</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
         <span class="c1"># 기본값 설정 또는 다른 측정 방법 사용
 </span>        
     <span class="c1"># 상대적 측정값: 얼굴 너비 대비 비율 계산
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="n">eye_right_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">landmarks</span><span class="p">[</span><span class="n">FACE_CONTOUR</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">right_eye_center</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">face_width</span>
     
     <span class="c1"># 얼굴 대칭 검사
-</span>    <span class="n">symmetry_balance</span> <span class="o">=</span> <span class="nf">abs</span><span class="p">(</span><span class="n">eye_left_ratio</span> <span class="o">-</span> <span class="n">eye_right_ratio</span><span class="p">)</span></code></pre></figure>
+</span>    <span class="n">symmetry_balance</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">eye_left_ratio</span> <span class="o">-</span> <span class="n">eye_right_ratio</span><span class="p">)</span></code></pre></figure>
 
     </div>
   </div>
@@ -317,34 +317,34 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># app.py에서 서버 측 처리 구현
-</span><span class="nd">@app.route</span><span class="p">(</span><span class="sh">'</span><span class="s">/api/analyze-face</span><span class="sh">'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">POST</span><span class="sh">'</span><span class="p">])</span>
+</span><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/api/analyze-face'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">'POST'</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">analyze_face_endpoint</span><span class="p">():</span>
-    <span class="k">if</span> <span class="sh">'</span><span class="s">image</span><span class="sh">'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="p">.</span><span class="n">files</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nf">jsonify</span><span class="p">({</span><span class="sh">'</span><span class="s">error</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">No image provided</span><span class="sh">'</span><span class="p">}),</span> <span class="mi">400</span>
+    <span class="k">if</span> <span class="s">'image'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="p">.</span><span class="n">files</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s">'error'</span><span class="p">:</span> <span class="s">'No image provided'</span><span class="p">}),</span> <span class="mi">400</span>
     
-    <span class="nb">file</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">files</span><span class="p">[</span><span class="sh">'</span><span class="s">image</span><span class="sh">'</span><span class="p">]</span>
-    <span class="n">temp_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">tempfile</span><span class="p">.</span><span class="nf">gettempdir</span><span class="p">(),</span> <span class="nb">file</span><span class="p">.</span><span class="n">filename</span><span class="p">)</span>
-    <span class="nb">file</span><span class="p">.</span><span class="nf">save</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
+    <span class="nb">file</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">files</span><span class="p">[</span><span class="s">'image'</span><span class="p">]</span>
+    <span class="n">temp_path</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="p">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="nb">file</span><span class="p">.</span><span class="n">filename</span><span class="p">)</span>
+    <span class="nb">file</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
     
     <span class="c1"># 장치 기능 헤더 확인
-</span>    <span class="n">device_capability</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="sh">'</span><span class="s">X-Device-Capability</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">low</span><span class="sh">'</span><span class="p">)</span>
+</span>    <span class="n">device_capability</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'X-Device-Capability'</span><span class="p">,</span> <span class="s">'low'</span><span class="p">)</span>
     
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># 기기 성능에 따라 다른 처리 방법 사용
-</span>        <span class="k">if</span> <span class="n">device_capability</span> <span class="o">==</span> <span class="sh">'</span><span class="s">high</span><span class="sh">'</span><span class="p">:</span>
+</span>        <span class="k">if</span> <span class="n">device_capability</span> <span class="o">==</span> <span class="s">'high'</span><span class="p">:</span>
             <span class="c1"># 고성능 기기: 모든 랜드마크 계산
-</span>            <span class="n">result</span> <span class="o">=</span> <span class="nf">analyze_face</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span> <span class="n">landmarks_type</span><span class="o">=</span><span class="sh">'</span><span class="s">full</span><span class="sh">'</span><span class="p">)</span>
+</span>            <span class="n">result</span> <span class="o">=</span> <span class="n">analyze_face</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span> <span class="n">landmarks_type</span><span class="o">=</span><span class="s">'full'</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># 저성능 기기: 축소된 랜드마크 세트 사용
-</span>            <span class="n">result</span> <span class="o">=</span> <span class="nf">analyze_face</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span> <span class="n">landmarks_type</span><span class="o">=</span><span class="sh">'</span><span class="s">reduced</span><span class="sh">'</span><span class="p">)</span>
+</span>            <span class="n">result</span> <span class="o">=</span> <span class="n">analyze_face</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span> <span class="n">landmarks_type</span><span class="o">=</span><span class="s">'reduced'</span><span class="p">)</span>
             
-        <span class="k">return</span> <span class="nf">jsonify</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
     <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nf">jsonify</span><span class="p">({</span><span class="sh">'</span><span class="s">error</span><span class="sh">'</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s">'error'</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="c1"># 임시 파일 정리
-</span>        <span class="k">if</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">exists</span><span class="p">(</span><span class="n">temp_path</span><span class="p">):</span>
-            <span class="n">os</span><span class="p">.</span><span class="nf">remove</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span></code></pre></figure>
+</span>        <span class="k">if</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="n">temp_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="p">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span></code></pre></figure>
 
     </div>
   </div>

@@ -353,31 +353,31 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="hover-copy-btn" onclick="copyCode(this)">📋</button>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 모델 재변환 스크립트
-</span><span class="kn">import</span> <span class="n">torch</span>
-<span class="kn">import</span> <span class="n">torchvision.models</span> <span class="k">as</span> <span class="n">models</span>
+</span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="n">models</span>
 
 <span class="k">def</span> <span class="nf">export_model_with_compatible_opset</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">opset_version</span><span class="o">=</span><span class="mi">11</span><span class="p">):</span>
     <span class="c1"># 모델 로드
-</span>    <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
-    <span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
+</span>    <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">.</span><span class="nb">eval</span><span class="p">()</span>
     
     <span class="c1"># 더미 입력
-</span>    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</span>    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
     
     <span class="c1"># ONNX로 내보내기 (opset 버전 명시)
-</span>    <span class="n">torch</span><span class="p">.</span><span class="n">onnx</span><span class="p">.</span><span class="nf">export</span><span class="p">(</span>
+</span>    <span class="n">torch</span><span class="p">.</span><span class="n">onnx</span><span class="p">.</span><span class="n">export</span><span class="p">(</span>
         <span class="n">model</span><span class="p">,</span>
         <span class="n">x</span><span class="p">,</span>
         <span class="n">output_path</span><span class="p">,</span>
         <span class="n">export_params</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
         <span class="n">opset_version</span><span class="o">=</span><span class="n">opset_version</span><span class="p">,</span>
         <span class="n">do_constant_folding</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-        <span class="n">input_names</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">input</span><span class="sh">'</span><span class="p">],</span>
-        <span class="n">output_names</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">output</span><span class="sh">'</span><span class="p">],</span>
-        <span class="n">dynamic_axes</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">input</span><span class="sh">'</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="sh">'</span><span class="s">batch_size</span><span class="sh">'</span><span class="p">},</span>
-                      <span class="sh">'</span><span class="s">output</span><span class="sh">'</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="sh">'</span><span class="s">batch_size</span><span class="sh">'</span><span class="p">}}</span>
+        <span class="n">input_names</span><span class="o">=</span><span class="p">[</span><span class="s">'input'</span><span class="p">],</span>
+        <span class="n">output_names</span><span class="o">=</span><span class="p">[</span><span class="s">'output'</span><span class="p">],</span>
+        <span class="n">dynamic_axes</span><span class="o">=</span><span class="p">{</span><span class="s">'input'</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s">'batch_size'</span><span class="p">},</span>
+                      <span class="s">'output'</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s">'batch_size'</span><span class="p">}}</span>
     <span class="p">)</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">모델이 opset 버전 </span><span class="si">{</span><span class="n">opset_version</span><span class="si">}</span><span class="s">으로 성공적으로 내보내졌습니다.</span><span class="sh">"</span><span class="p">)</span></code></pre></figure>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"모델이 opset 버전 </span><span class="si">{</span><span class="n">opset_version</span><span class="si">}</span><span class="s">으로 성공적으로 내보내졌습니다."</span><span class="p">)</span></code></pre></figure>
 
     </div>
   </div>
