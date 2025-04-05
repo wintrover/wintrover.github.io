@@ -1,0 +1,580 @@
+/* Font Definitions */
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Lato Italic'), local('Lato-Italic'),
+       url(https://fonts.gstatic.com/s/lato/v15/S6u8w4BMUTPHjxsAUi-qNiXg7eU0.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF; 
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Lato Italic'), local('Lato-Italic'),
+       url(https://fonts.gstatic.com/s/lato/v15/S6u8w4BMUTPHjxsAXC-qNiXg7Q.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Base Styles */
+body,
+p, a {
+  font-family: 'Lato', Verdana, Helvetica, sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: #1772d0;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:focus,
+a:hover {
+  color: #f09228;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5 {
+  font-family: 'Lato', Verdana, Helvetica, sans-serif;
+  margin-top: 50px;
+  margin-bottom: 0px;
+}
+
+h5.period {
+  margin: 0px;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 30px;
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+p {
+  font-size: 20px;
+}
+
+strong {
+  font-weight: 700;
+}
+
+.container > * + * {
+  margin-top: 20px;
+}
+
+.main-table {
+  width: 100%;
+  max-width: 1000px;
+  border-spacing: 0;
+  border-collapse: collapse;
+  margin: 60px auto 0;
+  table-layout: fixed;
+}
+
+.main-table td {
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+/* Components */
+.back-button {
+  display: inline-block;
+  font-size: 18px;
+  color: #1772d0;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  margin: 0;
+}
+
+.back-button:hover {
+  color: #f09228;
+}
+
+.highlight {
+  background-color: #ffffd0;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.steps {
+  padding-left: 20px;
+  margin: 20px 0;
+}
+
+.steps li {
+  margin-bottom: 12px;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+/* Code Styling */
+pre {
+  position: relative;
+  padding: 15px;
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+code {
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-family: 'Consolas', monospace;
+}
+
+.hljs-keyword {
+  color: #ff7b72;
+  font-weight: bold;
+}
+
+.hljs-string {
+  color: #a5d6ff;
+}
+
+.hljs-comment {
+  color: #6a9955;
+}
+
+.hljs-number {
+  color: #b5cea8;
+}
+
+.hljs-function {
+  color: #dcdcaa;
+}
+
+.hljs-variable {
+  color: #9cdcfe;
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 프로젝트 카드 스타일 */
+table[style*="height:120px"] {
+  height: 150px !important;
+  display: table;
+  margin-bottom: 25px !important;
+  /* border-bottom: 1px solid #eeeeee; */ /* 하단 경계선 제거 */
+}
+
+table[style*="height:120px"] td {
+  vertical-align: middle !important;
+  line-height: 1.5;
+}
+
+table[style*="height:120px"] papertitle {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #1772d0;
+}
+
+table[style*="height:120px"] span {
+  display: block;
+  margin-bottom: 8px;
+}
+
+table[style*="height:120px"] img {
+  width: 100%;
+  max-height: 130px;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}
+
+.project-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.project-item a {
+  text-decoration: none; /* 밑줄 제거 */
+  color: #1772d0; /* 링크 색상 */
+  font-weight: bold; /* 강조 */
+}
+
+.project-item h6 {
+  margin: 0; /* 기본 마진 제거 */
+  font-size: 14px; /* 글꼴 크기 조정 */
+}
+
+.project-title {
+  margin: 0;
+  font-size: 36px;
+  line-height: 1.2;
+}
+
+.project-link {
+  font-size: 18px;
+  color: #1772d0;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* 구분선 스타일 정의 */
+.section-divider {
+  border: 0;
+  border-top: 2px solid #333333; /* 메인 주제 구분선 (진한 회색) */
+  margin: 40px 0;
+  transition: all 0.3s ease;
+}
+
+.section-divider:hover {
+  border-color: #666666; /* 호버 시 약간 밝은 회색으로 변경 */
+}
+
+.subsection-divider {
+  border: 0;
+  border-top: 1px dashed #999999; /* 소주제 구분선 (밝은 회색 점선) */
+  margin: 30px 0;
+  transition: all 0.3s ease;
+}
+
+.subsection-divider:hover {
+  border-color: #cccccc; /* 호버 시 약간 밝은 회색으로 변경 */
+}
+
+/* 계층적 구조 강화 */
+.problem-header {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333333;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  transition: color 0.3s ease;
+}
+
+.problem-header:hover {
+  color: #1772d0; /* 호버 시 파란색으로 변경 */
+}
+
+.outcome-header {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333333;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  transition: color 0.3s ease;
+}
+
+.outcome-header:hover {
+  color: #1772d0; /* 호버 시 파란색으로 변경 */
+}
+
+html {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  p {
+    font-size: 16px;
+  }
+}
+
+/* 복사 버튼 스타일 */
+/* 복사 버튼 스타일 */
+.code-container {
+  position: relative;
+  display: block; /* inline-block에서 block으로 변경 */
+  width: 100%;
+  margin: 15px 0; /* 상하 마진 추가 */
+}
+
+.code-container pre {
+  font-size: 12px; /* 글씨 크기 축소 */
+  padding: 10px; /* 패딩 축소 */
+  line-height: 1.4; /* 줄간격 조정 */
+  max-height: 200px; /* 최대 높이 제한 (선택적) */
+  overflow-y: auto; /* 세로 스크롤 추가 */
+  overflow-x: auto; /* 가로 스크롤 유지 */
+  background-color: #2d2d2d; /* 배경색 유지 */
+  color: #ffffff;
+  border-radius: 5px;
+  position: relative; /* 스크롤 영역 내부 요소 위치 조정 */
+}
+
+.code-container code {
+  font-family: 'Consolas', monospace;
+  white-space: pre-wrap; /* 긴 줄 자동 줄바꿈 */
+  word-break: break-all; /* 단어 분할 허용 */
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px; /* 버튼 위치 조정 */
+  right: 20px; /* 버튼 위치 조정 (스크롤바 너비 포함) */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 3px 8px; /* 버튼 크기 축소 */
+  cursor: pointer;
+  border-radius: 3px; /* 버튼 모서리 약간 더 작게 */
+  font-size: 10px; /* 버튼 글씨 크기 축소 */
+  z-index: 10; /* 다른 요소 위에 표시 */
+}
+
+.copy-btn:hover {
+  background-color: #0056b3;
+}
+
+/* 현대적인 코드 블록 스타일 */
+.code-block {
+  margin: 20px 0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-family: 'SF Mono', Consolas, Menlo, Monaco, 'Courier New', monospace;
+  font-size: 0.85em;
+  line-height: 1.67;
+  position: relative; /* 버튼 위치 기준점 */
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #e8e8e8;
+  border-bottom: 1px solid #ddd;
+}
+
+.language-badge {
+  display: none; /* 언어 배지 숨김 */
+  color: #444;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  background: #f3f3f3;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #444;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background-color: #ddd;
+}
+
+.copy-icon {
+  margin-right: 5px;
+}
+
+.code-block pre {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background-color: #f3f3f3;
+}
+
+.code-block pre code {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  background-color: #f3f3f3;
+  color: #444;
+  white-space: pre-wrap;
+  -webkit-text-size-adjust: none;
+  font-family: 'SF Mono', Consolas, Menlo, Monaco, 'Courier New', monospace;
+  font-size: 0.9em;
+  line-height: 1.67;
+  border-radius: 0;
+}
+
+/* 코드 구문 강조 */
+.hljs-keyword {
+  color: #c7254e;
+}
+
+.hljs-string, .hljs-attr {
+  color: #1d8b4c;
+}
+
+.hljs-number, .hljs-literal {
+  color: #0b76b8;
+}
+
+.hljs-comment {
+  color: #888888;
+  font-style: italic;
+}
+
+.hljs-function, .hljs-title {
+  color: #4271ae;
+}
+
+/* 복사 버튼 애니메이션 */
+.copy-btn.copied {
+  background-color: #e2f0e3;
+  color: #1d8b4c;
+}
+
+/* 인라인 코드 스타일 */
+code:not(.hljs) {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: #c7254e;
+  background-color: #f9f2f4;
+  border-radius: 4px;
+  font-family: 'SF Mono', Consolas, Menlo, Monaco, 'Courier New', monospace;
+}
+
+/* 미디어 쿼리 for 모바일 */
+@media (max-width: 768px) {
+  .code-block {
+    margin: 15px 0;
+  }
+  
+  .code-header {
+    padding: 6px 10px;
+  }
+  
+  .code-block pre code {
+    padding: 12px;
+    font-size: 0.8em;
+  }
+}
+
+/* 호버 시 나타나는 복사 버튼 */
+.hover-copy-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100; /* z-index 값 크게 증가 */
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 0;
+  pointer-events: auto; /* 버튼 클릭 가능하도록 설정 */
+}
+
+.hover-copy-btn:hover {
+  background: #f0f0f0;
+}
+
+.code-block:hover .hover-copy-btn,
+.code-block figure:hover .hover-copy-btn {
+  opacity: 1;
+}
+
+/* 복사 버튼 클릭 효과 */
+.hover-copy-btn.copied {
+  background-color: #e2f0e3;
+  color: #1d8b4c;
+}
+
+/* 언어 토글 버튼 스타일 */
+.language-toggle-container {
+  position: static;
+  z-index: 1000;
+  margin-right: 20px; /* 오른쪽에서 안쪽으로 여백 추가 */
+}
+
+.language-toggle-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.language-toggle-btn:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+/* 영어/한국어 텍스트 전환 관련 스타일 */
+[data-en], [data-ko] {
+  transition: opacity 0.3s ease;
+  min-height: 1.2em; /* 최소 높이 설정 */
+}
+
+html[lang="en"] [data-ko-only],
+html[lang="ko"] [data-en-only] {
+  display: none;
+}
+
+/* figure 요소 내부에서도 복사 버튼이 올바르게 표시되도록 설정 */
+.code-block figure.highlight {
+  margin: 0;
+  position: relative;
+}
+
+/* 헤더 스타일 추가 */
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 10px 20px;
+  padding-right: 40px; /* 오른쪽 여백 추가 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+}

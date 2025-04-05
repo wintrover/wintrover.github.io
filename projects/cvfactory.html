@@ -1,0 +1,609 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>CVFactory - Su Hyok Yun</title>
+
+  <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" rel="stylesheet">
+
+  <meta name="author" content="Su Hyok Yun">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO 관련 메타 태그 -->
+  <meta name="description" content="An automated personal statement generation tool that creates professional documents from raw data.">
+  <meta name="keywords" content="AI, ML, LLM, Robotics, Frontend Developer, Su Hyok Yun, Portfolio, Projects">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph (OG) 태그: 소셜 미디어 공유 시 사용 -->
+  <meta property="og:title" content="CVFactory - Su Hyok Yun">
+  <meta property="og:description" content="An automated personal statement generation tool that creates professional documents from raw data.">
+  <meta property="og:image" content="https://wintrover.github.io/images/developer_thumbnail.jpg">
+  <meta property="og:url" content="https://wintrover.github.io/projects/cvfactory">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter 카드 태그 -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CVFactory - Su Hyok Yun">
+  <meta name="twitter:description" content="An automated personal statement generation tool that creates professional documents from raw data.">
+  <meta name="twitter:image" content="https://wintrover.github.io/images/developer_thumbnail.jpg">
+
+  <!-- 스타일시트 및 파비콘 -->
+  <link rel="stylesheet" type="text/css" href="/stylesheet.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>">
+
+  <!-- 구조화된 데이터 (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Su Hyok Yun",
+    "url": "https://wintrover.github.io",
+    "image": "https://wintrover.github.io/images/profile.png",
+    "jobTitle": "AI/ML Developer",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Independent"
+    },
+    "alumniOf": [
+      {
+        "@type": "Organization",
+        "name": "EIsystem"
+      },
+      {
+        "@type": "Organization",
+        "name": "Vizcam"
+      }
+    ],
+    "sameAs": [
+      "https://github.com/wintrover/",
+      "https://www.linkedin.com/in/suhyok-yun-1934b713a/",
+      "https://www.instagram.com/wintrover/"
+    ]
+  }
+  </script>
+</head>
+
+<body>
+  <div class="header-container">
+    <div class="navigation">
+      <!-- 이 부분은 project.html에서 채워질 예정 -->
+    </div>
+    <div class="language-toggle-container">
+      <button id="language-toggle" class="language-toggle-btn">한국어</button>
+    </div>
+  </div>
+  
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 네비게이션 영역에 돌아가기 버튼 추가
+  const navigationDiv = document.querySelector('.navigation');
+  if (navigationDiv) {
+    navigationDiv.innerHTML = '<a href="/" class="back-button" data-en="← Back to Previous page" data-ko="← 이전 페이지로 돌아가기">← Back to Previous page</a>';
+  }
+});
+</script>
+
+<table class="main-table">
+  <tr>
+    <td>
+      <div class="project-item">
+        <h1 class="project-title" data-en="CVFactory" data-ko="자소서공장">CVFactory</h1>
+        
+        <a href="https://github.com/wintrover/CVFactory" target="_blank" class="project-link">GitHub</a>
+        
+      </div>
+      <h5 class="period" data-en="development period : In progress" data-ko="개발 기간 : 진행 중">development period : In progress</h5>
+
+      <hr class="section-divider">
+
+      
+
+      <style>
+/* 세부 항목 스타일 */
+details.challenge-item {
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+details.challenge-item summary {
+  padding: 15px;
+  cursor: pointer;
+  position: relative;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s;
+  list-style: none;
+}
+
+details.challenge-item summary::-webkit-details-marker {
+  display: none;
+}
+
+details.challenge-item summary::after {
+  content: '\25BC';
+  font-size: 0.8em;
+  color: #555;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s;
+}
+
+details.challenge-item[open] summary::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+details.challenge-item summary:hover {
+  background-color: #f0f0f0;
+}
+
+details.challenge-item[open] summary {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+details.challenge-item .challenge-content {
+  padding: 20px;
+}
+
+details.challenge-item summary h3 {
+  margin: 0;
+  display: inline;
+}
+</style>
+
+<!-- Project Logo -->
+<div class="logo-container" style="text-align: center; margin-bottom: 30px;">
+  <img src="/images/CVFactory_logo.png" alt="자소서공장 로고" style="max-width: 200px;" />
+</div>
+
+<!-- Development Process Section -->
+<div class="section">
+  <h2 data-en="Development Process and Overview" data-ko="개발 과정 및 개요"></h2>
+  <p data-en="Key features and components of the automated personal statement generation tool." data-ko="자동화된 자기소개서 생성 도구의 주요 기능 및 구성 요소"></p>
+
+  <hr class="subsection-divider" />
+
+  <!-- 주요 기능 섹션 -->
+  <div class="section">
+    <h3 data-en="Key Features" data-ko="주요 기능"></h3>
+    <ul class="features">
+      <li data-en="Job Posting Crawler: Automatically collects relevant job information when a recruitment site URL is entered" data-ko="채용 공고 크롤링: 채용 사이트 URL을 입력하면 관련 채용 정보를 자동으로 수집"></li>
+      <li data-en="Company Information Crawler: Gathers company vision, mission, values, and other information through the company website URL" data-ko="기업 정보 크롤링: 기업 홈페이지 URL을 통해 기업의 비전, 미션, 가치관 등 정보 수집"></li>
+      <li data-en="Customized Cover Letter Generation: Automatically generates personalized cover letters using Groq API" data-ko="맞춤형 자기소개서 생성: Groq API를 활용하여 개인화된 자기소개서 자동 생성"></li>
+    </ul>
+  </div>
+
+  <hr class="subsection-divider" />
+
+  <!-- 개발 과정 -->
+  <div class="section">
+    <h3 data-en="Development Journey" data-ko="개발 여정"></h3>
+    
+    <p data-en="The project was developed to streamline the personal statement creation process, especially for job seekers who need to highlight specific achievements and qualifications." data-ko="이 프로젝트는 특히 특정 성과와 자격을 강조해야 하는 구직자를 위해 자기소개서 작성 과정을 간소화하기 위해 개발되었습니다."></p>
+    
+    <div class="dev-timeline">
+      <div class="timeline-item">
+        <h4 data-en="Phase 1: Web Crawling System" data-ko="1단계: 웹 크롤링 시스템"></h4>
+        <p data-en="Developed robust crawlers for job postings and company information using Selenium and BeautifulSoup to extract structured data from diverse sources." data-ko="Selenium과 BeautifulSoup을 활용하여 다양한 소스에서 구조화된 데이터를 추출하는 채용 공고 및 기업 정보 크롤러를 개발했습니다."></p>
+      </div>
+      <div class="timeline-item">
+        <h4 data-en="Phase 2: Django Backend &amp; API" data-ko="2단계: Django 백엔드 및 API"></h4>
+        <p data-en="Built a Django application with REST API endpoints for serving crawled data and managing user requests, along with data persistence and authentication system." data-ko="크롤링된 데이터를 제공하고 사용자 요청을 관리하기 위한 REST API 엔드포인트와 함께 데이터 지속성 및 인증 시스템을 갖춘 Django 애플리케이션을 구축했습니다."></p>
+      </div>
+      <div class="timeline-item">
+        <h4 data-en="Phase 3: AI Integration" data-ko="3단계: AI 통합"></h4>
+        <p data-en="Integrated Groq API to generate high-quality personal statements based on job descriptions, user profiles, and company information with optimized prompts for consistent results." data-ko="채용 공고, 사용자 프로필 및 기업 정보를 기반으로 일관된 결과를 위한 최적화된 프롬프트로 고품질 자기소개서를 생성하는 Groq API를 통합했습니다."></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="subsection-divider" />
+
+<!-- Technical Challenges and Solutions Section -->
+<div class="section">
+  <h2 data-en="Technical Challenges and Solutions" data-ko="기술적 도전과 해결 과정"></h2>
+  <p data-en="Key challenges faced during development and the innovative solutions implemented." data-ko="개발 과정에서 직면한 주요 도전 과제와 구현된 혁신적인 해결책입니다."></p>
+
+  <hr class="subsection-divider" />
+
+  <div class="challenges">
+    <details class="challenge-item">
+      <summary>
+        <h3 data-en="CSRF Protection Middleware Issue" data-ko="CSRF 보호 미들웨어 문제"></h3>
+      </summary>
+      <div class="challenge-content">
+        <div class="challenge-description">
+          <h4 data-en="Problem" data-ko="문제"></h4>
+          <p data-en="Encountered 'MiddlewareMixin.init() missing 1 required positional argument: get_response' error during CSRF verification in API views, causing insecure API endpoints despite Django's built-in protection." data-ko="API 뷰의 CSRF 검증 중 'MiddlewareMixin.init() missing 1 required positional argument: get_response' 오류가 발생하여 Django의 내장 보호 기능에도 불구하고 API 엔드포인트가 안전하지 않게 되었습니다."></p>
+          
+          <h4 data-en="Solution" data-ko="해결책"></h4>
+          <p data-en="Replaced direct instantiation of CsrfViewMiddleware with proper Django decorators (@csrf_protect) and implemented get_token(request) for token generation, maintaining security while fixing the initialization error." data-ko="CsrfViewMiddleware의 직접 인스턴스화를 적절한 Django 데코레이터(@csrf_protect)로 대체하고 토큰 생성을 위해 get_token(request)를 구현하여 초기화 오류를 수정하면서 보안을 유지했습니다."></p>
+          
+          <div class="code-snippet">
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 수정 전
+</span><span class="k">try</span><span class="p">:</span>
+    <span class="n">reason</span> <span class="o">=</span> <span class="nc">CsrfViewMiddleware</span><span class="p">().</span><span class="nf">process_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
+    <span class="k">if</span> <span class="n">reason</span><span class="p">:</span>
+        <span class="n">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 보호로 인해 403 발생: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+<span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 검사 중 오류 발생: </span><span class="si">{</span><span class="nf">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="c1"># 수정 후
+</span><span class="nd">@api_view</span><span class="p">([</span><span class="sh">"</span><span class="s">OPTIONS</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">POST</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">GET</span><span class="sh">"</span><span class="p">])</span>
+<span class="nd">@permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
+<span class="nd">@csrf_protect</span>  <span class="c1"># @csrf_exempt 대신 @csrf_protect 사용
+</span><span class="nd">@ensure_csrf_cookie</span>
+<span class="k">def</span> <span class="nf">create_resume</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># CSRF 토큰 생성 및 가져오기
+</span>    <span class="n">csrf_token</span> <span class="o">=</span> <span class="nf">get_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 쿠키: </span><span class="si">{</span><span class="n">request</span><span class="p">.</span><span class="n">COOKIES</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="sh">'</span><span class="s">csrftoken</span><span class="sh">'</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 토큰: </span><span class="si">{</span><span class="n">csrf_token</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="c1"># ... 기존 코드 ...</span></code></pre></figure>
+
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <hr class="subsection-divider" />
+
+    <details class="challenge-item">
+      <summary>
+        <h3 data-en="Groq API Token Limit Overflow" data-ko="Groq API 토큰 한도 초과 문제"></h3>
+      </summary>
+      <div class="challenge-content">
+        <div class="challenge-description">
+          <h4 data-en="Problem" data-ko="문제"></h4>
+          <p data-en="API calls failed with '413: Request too large for model qwen-qwq-32b' errors, as our request with job descriptions, company info, and user stories exceeded the 6,000 token limit (requesting 12,097 tokens)." data-ko="채용 공고, 회사 정보, 사용자 스토리를 포함한 요청이 6,000 토큰 한도를 초과하여(12,097 토큰 요청) '413: Request too large for model qwen-qwq-32b' 오류로 API 호출이 실패했습니다."></p>
+          
+          <h4 data-en="Solution" data-ko="해결책"></h4>
+          <p data-en="Implemented a multi-stage approach that breaks down the request into three smaller API calls: 1) job/company analysis (1,500 tokens), 2) resume draft creation (2,000 tokens), and 3) final resume polishing (2,000 tokens)." data-ko="요청을 세 개의 작은 API 호출로 분할하는 다단계 접근 방식을 구현했습니다: 1) 채용/회사 분석(1,500 토큰), 2) 자기소개서 초안 작성(2,000 토큰), 3) 최종 자기소개서 완성(2,000 토큰)."></p>
+          
+          <div class="code-snippet">
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 수정 전: 단일 대형 API 호출
+</span><span class="k">def</span> <span class="nf">generate_resume</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">user_story</span><span class="p">,</span> <span class="n">company_info</span> <span class="o">=</span> <span class="sh">""</span><span class="p">):</span>
+    <span class="c1"># ... 기존 코드 ...
+</span>    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">chat</span><span class="p">.</span><span class="n">completions</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="sh">"</span><span class="s">qwen-qwq-32b</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="sh">"</span><span class="s">role</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">system</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">content</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">당신은 자기소개서 전문가입니다...</span><span class="sh">"</span><span class="p">},</span>
+            <span class="p">{</span><span class="sh">"</span><span class="s">role</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">user</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">content</span><span class="sh">"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}</span>  <span class="c1"># 거대한 프롬프트
+</span>        <span class="p">],</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">3000</span>  <span class="c1"># 출력 토큰 수 조정
+</span>    <span class="p">)</span>
+    <span class="c1"># ... 기존 코드 ...
+</span>
+<span class="c1"># 수정 후: 3단계 API 호출 접근 방식
+</span><span class="k">def</span> <span class="nf">generate_resume</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">user_story</span><span class="p">,</span> <span class="n">company_info</span><span class="o">=</span><span class="sh">""</span><span class="p">):</span>
+    <span class="c1"># 1단계: 채용/회사 분석
+</span>    <span class="n">job_analysis</span> <span class="o">=</span> <span class="nf">analyze_job_and_company</span><span class="p">(</span><span class="n">job_description</span><span class="p">,</span> <span class="n">company_info</span><span class="p">)</span>
+    
+    <span class="c1"># 2단계: 자기소개서 초안 작성
+</span>    <span class="n">resume_draft</span> <span class="o">=</span> <span class="nf">create_resume_draft</span><span class="p">(</span><span class="n">job_analysis</span><span class="p">,</span> <span class="n">user_story</span><span class="p">)</span>
+    
+    <span class="c1"># 3단계: 최종 자기소개서 완성
+</span>    <span class="n">final_resume</span> <span class="o">=</span> <span class="nf">finalize_resume</span><span class="p">(</span><span class="n">resume_draft</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">final_resume</span></code></pre></figure>
+
+          </div>
+
+          <h4 data-en="Additional Improvements" data-ko="추가 개선사항"></h4>
+          <p data-en="Further refined the solution by breaking down the functions into smaller, more manageable pieces:" data-ko="함수들을 더 작고 관리하기 쉬운 단위로 분리하여 해결책을 추가로 개선했습니다:"></p>
+          
+          <ul>
+            <li data-en="Resume Draft Creation:" data-ko="자기소개서 초안 작성:">
+              <ul>
+                <li data-en="create_resume_intro: Introduction section" data-ko="create_resume_intro: 도입부 섹션"></li>
+                <li data-en="create_resume_body: Main body section" data-ko="create_resume_body: 본문 섹션"></li>
+                <li data-en="create_resume_conclusion: Conclusion section" data-ko="create_resume_conclusion: 마무리 섹션"></li>
+              </ul>
+            </li>
+            <li data-en="Resume Finalization:" data-ko="자기소개서 완성:">
+              <ul>
+                <li data-en="finalize_resume_metrics: Emphasize quantified achievements" data-ko="finalize_resume_metrics: 수치화된 성과 강조"></li>
+                <li data-en="finalize_resume_style: Improve writing style" data-ko="finalize_resume_style: 문체 개선"></li>
+                <li data-en="finalize_resume_emphasis: Adjust emphasis points" data-ko="finalize_resume_emphasis: 강조점 조정"></li>
+              </ul>
+            </li>
+          </ul>
+
+          <h4 data-en="Current Status and Next Steps" data-ko="현재 상태 및 다음 단계"></h4>
+          <p data-en="Current token usage:" data-ko="현재 토큰 사용량:"></p>
+          <ul>
+            <li data-en="generate_resume: 12,097 tokens (limit: 6,000)" data-ko="generate_resume: 12,097 토큰 (제한: 6,000)"></li>
+            <li data-en="analyze_job_and_company: 11,194 tokens (limit: 6,000)" data-ko="analyze_job_and_company: 11,194 토큰 (제한: 6,000)"></li>
+          </ul>
+          <p data-en="Next steps:" data-ko="다음 단계:"></p>
+          <ul>
+            <li data-en="Reduce input data size (especially company_info and user_story)" data-ko="입력 데이터 크기 줄이기 (특히 company_info와 user_story)"></li>
+            <li data-en="Improve debug logging for better token usage monitoring" data-ko="토큰 사용량 모니터링을 위한 디버그 로깅 개선"></li>
+            <li data-en="Fix Django ALLOWED_HOSTS configuration" data-ko="Django ALLOWED_HOSTS 설정 수정"></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <hr class="subsection-divider" />
+
+    <details class="challenge-item">
+      <summary>
+        <h3 data-en="Frontend-Backend CSRF Token Integration" data-ko="프론트엔드-백엔드 CSRF 토큰 통합 문제"></h3>
+      </summary>
+      <div class="challenge-content">
+        <div class="challenge-description">
+          <h4 data-en="Problem" data-ko="문제"></h4>
+          <p data-en="Cross-site request forgery (CSRF) warnings appeared in logs during resume creation API calls. Frontend JavaScript wasn't properly handling CSRF tokens required by Django's security middleware, leading to potential 403 errors." data-ko="자기소개서 생성 API 호출 중 로그에 교차 사이트 요청 위조(CSRF) 경고가 표시되었습니다. 프론트엔드 JavaScript가 Django의 보안 미들웨어에서 요구하는 CSRF 토큰을 제대로 처리하지 않아 403 오류가 발생할 가능성이 있었습니다."></p>
+          
+          <h4 data-en="Solution" data-ko="해결책"></h4>
+          <p data-en="Implemented a two-step API call approach in the frontend JavaScript: first request fetches the CSRF token, then the second request includes this token in the header for secure API calls." data-ko="프론트엔드 JavaScript에서 두 단계 API 호출 접근 방식을 구현했습니다: 첫 번째 요청은 CSRF 토큰을 가져오고, 두 번째 요청은 안전한 API 호출을 위해 헤더에 이 토큰을 포함합니다."></p>
+          
+          <div class="code-snippet">
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// 수정 전: CSRF 토큰 없이 직접 API 호출</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nf">generateResume</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="na">recruitment_notice_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">job-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
+        <span class="na">target_company_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">company-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
+        <span class="na">user_story</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">user-story</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span>
+    <span class="p">};</span>
+
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+            <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+                <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nf">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+        <span class="p">});</span>
+        <span class="c1">// ... 결과 처리 ...</span>
+    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 수정 후: CSRF 토큰을 먼저 요청 후 API 호출</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nf">generateResume</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="na">recruitment_notice_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">job-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
+        <span class="na">target_company_url</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">company-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">,</span>
+        <span class="na">user_story</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">user-story</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span>
+    <span class="p">};</span>
+
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="c1">// 1단계: CSRF 토큰 가져오기</span>
+        <span class="kd">const</span> <span class="nx">tokenResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+            <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">GET</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+                <span class="dl">'</span><span class="s1">Accept</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">});</span>
+        
+        <span class="k">if </span><span class="p">(</span><span class="nx">tokenResponse</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// 2단계: 토큰을 사용하여 실제 요청</span>
+            <span class="kd">const</span> <span class="nx">csrfToken</span> <span class="o">=</span> <span class="nx">tokenResponse</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">X-CSRFToken</span><span class="dl">'</span><span class="p">);</span>
+            
+            <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/api/resume/create/</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+                <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
+                <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
+                    <span class="dl">'</span><span class="s1">X-CSRFToken</span><span class="dl">'</span><span class="p">:</span> <span class="nx">csrfToken</span>
+                <span class="p">},</span>
+                <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nf">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+            <span class="p">});</span>
+            <span class="c1">// ... 결과 처리 ...</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">catch </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+          </div>
+
+          <h4 data-en="Backend CSRF Handler Improvements" data-ko="백엔드 CSRF 핸들러 개선사항"></h4>
+          <p data-en="Also modified the Django backend view to properly handle CSRF tokens with appropriate decorators:" data-ko="적절한 데코레이터로 CSRF 토큰을 올바르게 처리하도록 Django 백엔드 뷰도 수정했습니다:"></p>
+          
+          <div class="code-snippet">
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># 수정 전: 데코레이터 순서 문제
+</span><span class="nd">@api_view</span><span class="p">([</span><span class="sh">"</span><span class="s">POST</span><span class="sh">"</span><span class="p">])</span>
+<span class="nd">@permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
+<span class="nd">@csrf_exempt</span>
+<span class="k">def</span> <span class="nf">create_resume</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># ... 기존 코드 ...
+</span>
+<span class="c1"># 수정 후: 최적화된 데코레이터 순서와 CSRF 토큰 관리
+</span><span class="nd">@api_view</span><span class="p">([</span><span class="sh">"</span><span class="s">OPTIONS</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">POST</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">GET</span><span class="sh">"</span><span class="p">])</span>
+<span class="nd">@permission_classes</span><span class="p">([</span><span class="n">AllowAny</span><span class="p">])</span>
+<span class="nd">@csrf_protect</span>  <span class="c1"># @csrf_exempt 대신 @csrf_protect 사용
+</span><span class="nd">@ensure_csrf_cookie</span>  <span class="c1"># 쿠키에 CSRF 토큰 보장
+</span><span class="k">def</span> <span class="nf">create_resume</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># CSRF 토큰 명시적 생성 및 로깅
+</span>    <span class="n">csrf_token</span> <span class="o">=</span> <span class="nf">get_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 쿠키: </span><span class="si">{</span><span class="n">request</span><span class="p">.</span><span class="n">COOKIES</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="sh">'</span><span class="s">csrftoken</span><span class="sh">'</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> CSRF 토큰: </span><span class="si">{</span><span class="n">csrf_token</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">request</span><span class="p">.</span><span class="n">method</span> <span class="o">==</span> <span class="sh">"</span><span class="s">GET</span><span class="sh">"</span><span class="p">:</span>
+        <span class="c1"># GET 요청을 통해 CSRF 토큰 제공
+</span>        <span class="k">return</span> <span class="nc">Response</span><span class="p">({</span><span class="sh">"</span><span class="s">detail</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">CSRF 토큰이 쿠키에 설정되었습니다</span><span class="sh">"</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        
+    <span class="c1"># POST 요청 처리
+</span>    <span class="c1"># ... 기존 코드 ...</span></code></pre></figure>
+
+          </div>
+
+          <h4 data-en="Results and Impact" data-ko="결과 및 영향"></h4>
+          <p data-en="After implementing these changes:" data-ko="이러한 변경 사항을 구현한 후:"></p>
+          <ul>
+            <li data-en="&lt;strong&gt;CSRF warning messages in logs were eliminated&lt;/strong&gt;" data-ko="&lt;strong&gt;로그의 CSRF 경고 메시지가 제거되었습니다&lt;/strong&gt;"></li>
+            <li data-en="&lt;strong&gt;Resume generation API calls succeeded consistently&lt;/strong&gt;" data-ko="&lt;strong&gt;자기소개서 생성 API 호출이 일관되게 성공했습니다&lt;/strong&gt;"></li>
+            <li data-en="&lt;strong&gt;Improved overall security posture of the application&lt;/strong&gt;" data-ko="&lt;strong&gt;애플리케이션의 전반적인 보안 태세가 향상되었습니다&lt;/strong&gt;"></li>
+            <li data-en="&lt;strong&gt;Front-end now properly manages CSRF tokens for all API interactions&lt;/strong&gt;" data-ko="&lt;strong&gt;프론트엔드는 이제 모든 API 상호 작용에 대해 CSRF 토큰을 적절하게 관리합니다&lt;/strong&gt;"></li>
+          </ul>
+
+          <h4 data-en="Additional Security Enhancement" data-ko="추가 보안 개선사항"></h4>
+          <p data-en="Modified backend to handle OPTIONS requests for CORS preflight checks, enhancing cross-origin security without compromising functionality." data-ko="CORS 프리플라이트 검사를 위한 OPTIONS 요청을 처리하도록 백엔드를 수정하여 기능을 손상시키지 않으면서 크로스 오리진 보안을 강화했습니다."></p>
+        </div>
+      </div>
+    </details>
+    
+    <hr class="subsection-divider" />
+    
+    <details class="challenge-item">
+      <summary>
+        <h3 data-en="Environment Variable Integration and Security Enhancement" data-ko="환경 변수 통합 및 보안 강화"></h3>
+      </summary>
+      <div class="challenge-content">
+        <div class="challenge-description">
+          <h4 data-en="Problem" data-ko="문제"></h4>
+          <p data-en="Multiple security issues were identified during the security audit: exposed sensitive information in Git (Django secret key, OAuth credentials), disabled CSRF protection, enabled debug mode in production, and excessively verbose logging that could leak sensitive data." data-ko="보안 감사 중 여러 보안 문제가 확인되었습니다: Git에 노출된 민감한 정보(Django 시크릿 키, OAuth 자격 증명), 비활성화된 CSRF 보호, 프로덕션 환경에서의 디버그 모드 활성화, 그리고 민감한 데이터가 유출될 수 있는 과도한 로깅 등이 있었습니다."></p>
+          
+          <h4 data-en="Solution" data-ko="해결책"></h4>
+          <p data-en="Implemented a comprehensive security improvement plan:" data-ko="포괄적인 보안 개선 계획을 구현했습니다:"></p>
+          
+          <ol>
+            <li data-en="Environment variable consolidation: Integrated scattered environment variables (.env, secretkey.env, groq.env) into a single .env file for better security management" data-ko="환경 변수 통합: 분산된 환경 변수(.env, secretkey.env, groq.env)를 단일 .env 파일로 통합하여 보안 관리 개선"></li>
+            <li data-en="Strengthened .gitignore settings: Explicitly excluded all sensitive files to prevent accidental commits" data-ko=".gitignore 설정 강화: 실수로 인한 커밋을 방지하기 위해 모든 민감한 파일을 명시적으로 제외"></li>
+            <li data-en="Enhanced CSRF protection: Replaced @csrf_exempt with @csrf_protect and fixed CSRF token setup in API endpoints" data-ko="CSRF 보호 강화: @csrf_exempt를 @csrf_protect로 대체하고 API 엔드포인트에서 CSRF 토큰 설정 수정"></li>
+            <li data-en="Removed hardcoded secrets: Eliminated default hardcoded secret keys in settings.py" data-ko="하드코딩된 시크릿 제거: settings.py에서 기본 하드코딩된 시크릿 키 제거"></li>
+          </ol>
+          
+          <div class="code-snippet">
+
+<figure class="highlight"><pre><code class="language-diff" data-lang="diff"># .gitignore 개선
+<span class="gi">+ *.env
++ .env
++ .env.*
++ secretkey.env
++ groq.env
++ *secret*.env
++ *api_key*.env
++ cvfactory/*.env
+</span><span class="err">
+</span># settings.py 환경 변수 로드 개선
+<span class="gd">- load_dotenv(dotenv_path=BASE_DIR / "secretkey.env")
+- SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-7q@k&amp;$)+32d7r8nvr!sy3em4y^m19)58yf8)&amp;_je+e&amp;2f)parw")
+</span><span class="gi">+ load_dotenv(dotenv_path=BASE_DIR / ".env")
++ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+</span><span class="err">
+</span># API 엔드포인트 CSRF 보호 개선
+<span class="gd">- @csrf_exempt  # CSRF 보호를 비활성화 (개발 환경에서만 사용)
+</span><span class="gi">+ @csrf_protect  # CSRF 보호 활성화</span></code></pre></figure>
+
+          </div>
+
+          <h4 data-en="Results" data-ko="결과"></h4>
+          <p data-en="The security improvements yielded several benefits:" data-ko="보안 개선으로 다음과 같은 이점을 얻었습니다:"></p>
+          
+          <ul>
+            <li data-en="Enhanced API endpoint security with proper CSRF protection" data-ko="적절한 CSRF 보호로 API 엔드포인트 보안 강화"></li>
+            <li data-en="Eliminated risk of exposing sensitive credentials in version control" data-ko="버전 관리에서 민감한 자격 증명이 노출될 위험 제거"></li>
+            <li data-en="Better environment variable management through consolidation" data-ko="통합을 통한 환경 변수 관리 개선"></li>
+            <li data-en="Maintained full application functionality with improved security" data-ko="보안이 향상된 상태에서 전체 애플리케이션 기능 유지"></li>
+          </ul>
+          
+          <h4 data-en="Additional Security Recommendations" data-ko="추가 보안 권장사항"></h4>
+          <p data-en="For future improvements:" data-ko="향후 개선 사항:"></p>
+          
+          <ul>
+            <li data-en="Configure proper Django logging to prevent sensitive data leakage" data-ko="민감한 데이터 유출을 방지하는 적절한 Django 로깅 구성"></li>
+            <li data-en="Implement proper authentication and authorization for sensitive API endpoints" data-ko="민감한 API 엔드포인트에 대한 적절한 인증 및 권한 부여 구현"></li>
+            <li data-en="Set up proper CORS restrictions in production environments" data-ko="프로덕션 환경에서 적절한 CORS 제한 설정"></li>
+            <li data-en="Implement environment-specific configuration (dev/prod) to ensure DEBUG=False in production" data-ko="프로덕션에서 DEBUG=False를 보장하기 위한 환경별 구성(개발/프로덕션) 구현"></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </div>
+</div>
+
+<hr class="subsection-divider" />
+
+<!-- 서버 호스팅 선택 및 배포 Section -->
+<div class="section">
+  <h2 data-en="Server Hosting Selection and Deployment" data-ko="서버 호스팅 선택 및 배포"></h2>
+  <p data-en="The process of selecting and configuring the most suitable hosting service for the application's requirements." data-ko="애플리케이션 요구사항에 가장 적합한 호스팅 서비스를 선택하고 구성하는 과정입니다."></p>
+
+  <hr class="subsection-divider" />
+
+  <div class="section">
+    <h3 data-en="Hosting Service Selection" data-ko="호스팅 서비스 선택"></h3>
+    <p data-en="After evaluating several hosting options including Netlify, Firebase, and Render, we selected Render for the following reasons:" data-ko="Netlify, Firebase, Render 등 여러 호스팅 옵션을 평가한 후, 다음과 같은 이유로 Render를 선택했습니다:"></p>
+
+    <div class="comparison-table">
+      <table>
+        <thead>
+          <tr>
+            <th data-en="Criteria" data-ko="기준"></th>
+            <th data-en="Render" data-ko="Render"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-en="Free Plan" data-ko="무료 플랜"></td>
+            <td data-en="Offers free plan with usage limits" data-ko="사용량 제한이 있는 무료 플랜 제공"></td>
+          </tr>
+          <tr>
+            <td data-en="Dynamic Processing" data-ko="동적 처리"></td>
+            <td data-en="Supports continuously running web services, providing stable performance for heavy tasks like LLM processing and web crawling" data-ko="지속 실행 가능한 웹서비스 제공으로 LLM 처리 및 웹 크롤링과 같은 무거운 작업도 안정적으로 처리 가능"></td>
+          </tr>
+          <tr>
+            <td data-en="Execution Time/Memory Limits" data-ko="실행 시간/메모리 제한"></td>
+            <td data-en="Allows long-running processes with higher resource options available in standard plans" data-ko="장시간 처리 가능하며 표준 플랜에서 더 높은 리소스 옵션 제공"></td>
+          </tr>
+          <tr>
+            <td data-en="Custom Domain Support" data-ko="커스텀 도메인 지원"></td>
+            <td data-en="Supports custom domains with free SSL" data-ko="무료 SSL이 포함된 커스텀 도메인 지원"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p data-en="Render was specifically chosen for its ability to handle resource-intensive backend operations like web crawling and LLM processing, which are core functionalities of CVFactory." data-ko="Render는 특히 CVFactory의 핵심 기능인 웹 크롤링 및 LLM 처리와 같은 리소스 집약적인 백엔드 작업을 처리할 수 있는 능력 때문에 선택되었습니다."></p>
+  </div>
+
+  <hr class="subsection-divider" />
+
+  <div class="section">
+    <h3 data-en="Deployment Process" data-ko="배포 과정"></h3>
+    <p data-en="The application deployment on Render included the following key steps:" data-ko="Render에서의 애플리케이션 배포에는 다음과 같은 주요 단계가 포함되었습니다:"></p>
+    
+    <ol>
+      <li data-en="GitHub Integration: Connected the project repository to Render for automatic deployments" data-ko="GitHub 통합: 자동 배포를 위해 프로젝트 저장소를 Render에 연결"></li>
+      <li data-en="Environment Configuration: Set up all necessary environment variables in Render's secure environment" data-ko="환경 구성: Render의 보안 환경에서 모든 필요한 환경 변수 설정"></li>
+      <li data-en="Service Setup: Configured a Web Service with appropriate Python runtime and dependencies" data-ko="서비스 설정: 적절한 Python 런타임 및 종속성으로 웹 서비스 구성"></li>
+      <li data-en="Resource Allocation: Optimized resource allocation to balance performance and cost" data-ko="리소스 할당: 성능과 비용의 균형을 맞추기 위한 리소스 할당 최적화"></li>
+    </ol>
+    
+    <p data-en="The deployment strategy includes monitoring usage to ensure we stay within free tier limits while providing sufficient performance for the application." data-ko="배포 전략에는 애플리케이션에 충분한 성능을 제공하면서 무료 티어 한도 내에서 유지할 수 있도록 사용량을 모니터링하는 것이 포함됩니다."></p>
+  </div>
+</div>
+
+<hr class="subsection-divider" />
+
+<!-- Future Improvements Section -->
+<div class="section">
+  <h2 data-en="Future Improvements" data-ko="향후 개선 사항"></h2>
+  <ul class="future-items">
+    <li data-en="AI-powered content suggestions for more persuasive statements" data-ko="더 설득력 있는 내용을 위한 AI 기반 콘텐츠 제안"></li>
+    <li data-en="Keyword optimization for job description matching" data-ko="채용 공고 매칭을 위한 키워드 최적화"></li>
+    <li data-en="Integration with job platforms for direct application" data-ko="직접 지원을 위한 채용 플랫폼과의 통합"></li>
+    <li data-en="Expanded template library with industry-specific designs" data-ko="산업별 디자인이 포함된 확장된 템플릿 라이브러리"></li>
+  </ul>
+</div>
+
+    </td>
+  </tr>
+</table> 
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/script.js"></script>
+</body>
+</html> 
