@@ -57,3 +57,33 @@ skills:
 ---
 ```
 4. 프로젝트 내용 작성
+
+## GitHub Actions 자동 배포
+
+이 저장소는 GitHub Actions를 사용하여 자동으로 빌드되고 배포됩니다.
+
+### 작동 방식
+
+1. `main` 브랜치에 변경 사항을 푸시하면 자동으로 GitHub Actions 워크플로우가 실행됩니다.
+2. GitHub Actions는 저장소를 체크아웃하고, Jekyll 환경을 설정한 다음 사이트를 빌드합니다.
+3. 빌드된 사이트는 `gh-pages` 브랜치에 배포됩니다.
+4. GitHub Pages는 `gh-pages` 브랜치의 내용을 웹사이트로 게시합니다.
+
+### 수동 설정 방법
+
+1. 저장소 Settings > Pages로 이동합니다.
+2. Source에서 'Deploy from a branch'를 선택합니다.
+3. Branch 드롭다운 메뉴에서 'gh-pages'를 선택합니다.
+4. Save를 클릭합니다.
+
+### 로컬 개발 방법
+
+```bash
+# 의존성 설치
+bundle install
+
+# 로컬 서버 실행
+bundle exec jekyll serve
+```
+
+로컬 서버는 http://localhost:4000/ 에서 접속할 수 있습니다.
