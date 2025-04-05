@@ -442,6 +442,68 @@ def create_resume(request):
 
 <hr class="subsection-divider">
 
+<!-- 서버 호스팅 선택 및 배포 Section -->
+<div class="section">
+  <h2 data-en="Server Hosting Selection and Deployment" data-ko="서버 호스팅 선택 및 배포"></h2>
+  <p data-en="The process of selecting and configuring the most suitable hosting service for the application's requirements." data-ko="애플리케이션 요구사항에 가장 적합한 호스팅 서비스를 선택하고 구성하는 과정입니다."></p>
+
+  <hr class="subsection-divider">
+
+  <div class="section">
+    <h3 data-en="Hosting Service Selection" data-ko="호스팅 서비스 선택"></h3>
+    <p data-en="After evaluating several hosting options including Netlify, Firebase, and Render, we selected Render for the following reasons:" data-ko="Netlify, Firebase, Render 등 여러 호스팅 옵션을 평가한 후, 다음과 같은 이유로 Render를 선택했습니다:"></p>
+
+    <div class="comparison-table">
+      <table>
+        <thead>
+          <tr>
+            <th data-en="Criteria" data-ko="기준"></th>
+            <th data-en="Render" data-ko="Render"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-en="Free Plan" data-ko="무료 플랜"></td>
+            <td data-en="Offers free plan with usage limits" data-ko="사용량 제한이 있는 무료 플랜 제공"></td>
+          </tr>
+          <tr>
+            <td data-en="Dynamic Processing" data-ko="동적 처리"></td>
+            <td data-en="Supports continuously running web services, providing stable performance for heavy tasks like LLM processing and web crawling" data-ko="지속 실행 가능한 웹서비스 제공으로 LLM 처리 및 웹 크롤링과 같은 무거운 작업도 안정적으로 처리 가능"></td>
+          </tr>
+          <tr>
+            <td data-en="Execution Time/Memory Limits" data-ko="실행 시간/메모리 제한"></td>
+            <td data-en="Allows long-running processes with higher resource options available in standard plans" data-ko="장시간 처리 가능하며 표준 플랜에서 더 높은 리소스 옵션 제공"></td>
+          </tr>
+          <tr>
+            <td data-en="Custom Domain Support" data-ko="커스텀 도메인 지원"></td>
+            <td data-en="Supports custom domains with free SSL" data-ko="무료 SSL이 포함된 커스텀 도메인 지원"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p data-en="Render was specifically chosen for its ability to handle resource-intensive backend operations like web crawling and LLM processing, which are core functionalities of CVFactory." data-ko="Render는 특히 CVFactory의 핵심 기능인 웹 크롤링 및 LLM 처리와 같은 리소스 집약적인 백엔드 작업을 처리할 수 있는 능력 때문에 선택되었습니다."></p>
+  </div>
+
+  <hr class="subsection-divider">
+
+  <div class="section">
+    <h3 data-en="Deployment Process" data-ko="배포 과정"></h3>
+    <p data-en="The application deployment on Render included the following key steps:" data-ko="Render에서의 애플리케이션 배포에는 다음과 같은 주요 단계가 포함되었습니다:"></p>
+    
+    <ol>
+      <li data-en="GitHub Integration: Connected the project repository to Render for automatic deployments" data-ko="GitHub 통합: 자동 배포를 위해 프로젝트 저장소를 Render에 연결"></li>
+      <li data-en="Environment Configuration: Set up all necessary environment variables in Render's secure environment" data-ko="환경 구성: Render의 보안 환경에서 모든 필요한 환경 변수 설정"></li>
+      <li data-en="Service Setup: Configured a Web Service with appropriate Python runtime and dependencies" data-ko="서비스 설정: 적절한 Python 런타임 및 종속성으로 웹 서비스 구성"></li>
+      <li data-en="Resource Allocation: Optimized resource allocation to balance performance and cost" data-ko="리소스 할당: 성능과 비용의 균형을 맞추기 위한 리소스 할당 최적화"></li>
+    </ol>
+    
+    <p data-en="The deployment strategy includes monitoring usage to ensure we stay within free tier limits while providing sufficient performance for the application." data-ko="배포 전략에는 애플리케이션에 충분한 성능을 제공하면서 무료 티어 한도 내에서 유지할 수 있도록 사용량을 모니터링하는 것이 포함됩니다."></p>
+  </div>
+</div>
+
+<hr class="subsection-divider">
+
 <!-- Future Improvements Section -->
 <div class="section">
   <h2 data-en="Future Improvements" data-ko="향후 개선 사항"></h2>
