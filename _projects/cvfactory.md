@@ -374,49 +374,65 @@ def create_resume(request):
     
     <details class="challenge-item">
       <summary>
-        <h3 data-en="Recent System Integration Improvements" data-ko="최근 시스템 통합 개선사항"></h3>
+        <h3 data-en="Environment Variable Integration and Security Enhancement" data-ko="환경 변수 통합 및 보안 강화"></h3>
       </summary>
       <div class="challenge-content">
         <div class="challenge-description">
-          <h4 data-en="Challenge Summary" data-ko="도전 과제 요약"></h4>
-          <p data-en="Several concurrent issues were causing instability in the resume generation system: CSRF token mismanagement between frontend and backend, Groq API token limit overflows, and cross-domain security constraints." data-ko="여러 동시 문제로 인해 자기소개서 생성 시스템이 불안정했습니다: 프론트엔드와 백엔드 간의 CSRF 토큰 관리 문제, Groq API 토큰 한도 초과, 크로스 도메인 보안 제약 조건."></p>
+          <h4 data-en="Problem" data-ko="문제"></h4>
+          <p data-en="Multiple security issues were identified during the security audit: exposed sensitive information in Git (Django secret key, OAuth credentials), disabled CSRF protection, enabled debug mode in production, and excessively verbose logging that could leak sensitive data." data-ko="보안 감사 중 여러 보안 문제가 확인되었습니다: Git에 노출된 민감한 정보(Django 시크릿 키, OAuth 자격 증명), 비활성화된 CSRF 보호, 프로덕션 환경에서의 디버그 모드 활성화, 그리고 민감한 데이터가 유출될 수 있는 과도한 로깅 등이 있었습니다."></p>
           
-          <h4 data-en="Comprehensive Solution" data-ko="종합적인 해결책"></h4>
-          <p data-en="Implemented a multi-faceted approach focusing on three key areas:" data-ko="세 가지 주요 영역에 중점을 둔 다면적 접근 방식을 구현했습니다:"></p>
-          
-          <ol>
-            <li data-en="<strong>Frontend-Backend CSRF Integration:</strong> Modified script.js to properly fetch and utilize CSRF tokens for API requests, eliminating 403 errors in production." data-ko="<strong>프론트엔드-백엔드 CSRF 통합:</strong> API 요청에 대한 CSRF 토큰을 올바르게 가져오고 활용하도록 script.js를 수정하여 프로덕션 환경에서 403 오류를 제거했습니다."></li>
-            <li data-en="<strong>API Service Optimization:</strong> Restructured groq_service.py to break down large API calls into smaller, more manageable functions that respect token limits, resolving 'Request too large' errors." data-ko="<strong>API 서비스 최적화:</strong> 큰 API 호출을 토큰 한도를 준수하는 더 작고 관리하기 쉬운 함수로 분할하도록 groq_service.py를 재구성하여 '요청이 너무 큽니다' 오류를 해결했습니다."></li>
-            <li data-en="<strong>Backend Security Enhancement:</strong> Refactored views.py with proper decorator ordering (@ensure_csrf_cookie before @csrf_protect) and comprehensive error handling for better debugging and security." data-ko="<strong>백엔드 보안 강화:</strong> 적절한 데코레이터 순서(@ensure_csrf_cookie가 @csrf_protect보다 먼저)와 더 나은 디버깅 및 보안을 위한 포괄적인 오류 처리로 views.py를 리팩토링했습니다."></li>
-          </ol>
-          
-          <h4 data-en="Implementation Process" data-ko="구현 과정"></h4>
-          <p data-en="The process followed a systematic debugging and resolution approach:" data-ko="체계적인 디버깅 및 해결 접근 방식을 따랐습니다:"></p>
+          <h4 data-en="Solution" data-ko="해결책"></h4>
+          <p data-en="Implemented a comprehensive security improvement plan:" data-ko="포괄적인 보안 개선 계획을 구현했습니다:"></p>
           
           <ol>
-            <li data-en="<strong>Log Analysis:</strong> Identified recurring error patterns in error.log, pinpointing CSRF issues and API token overflows" data-ko="<strong>로그 분석:</strong> error.log에서 반복되는 오류 패턴을 식별하여 CSRF 문제와 API 토큰 오버플로우 지점을 정확히 파악했습니다"></li>
-            <li data-en="<strong>Code Review:</strong> Examined frontend-backend integration points, discovering mismatches in token handling" data-ko="<strong>코드 검토:</strong> 프론트엔드-백엔드 통합 지점을 검토하여 토큰 처리의 불일치를 발견했습니다"></li>
-            <li data-en="<strong>Incremental Testing:</strong> Made targeted changes to each component, verifying fixes individually before system-wide testing" data-ko="<strong>점진적 테스트:</strong> 각 구성 요소에 대한 대상 변경을 수행하고 시스템 전체 테스트 전에 수정 사항을 개별적으로 확인했습니다"></li>
-            <li data-en="<strong>Final Validation:</strong> Confirmed resolution with successful resume generation through multiple complete system tests" data-ko="<strong>최종 검증:</strong> 여러 완전한 시스템 테스트를 통한 성공적인 자기소개서 생성으로 해결을 확인했습니다"></li>
+            <li data-en="Environment variable consolidation: Integrated scattered environment variables (.env, secretkey.env, groq.env) into a single .env file for better security management" data-ko="환경 변수 통합: 분산된 환경 변수(.env, secretkey.env, groq.env)를 단일 .env 파일로 통합하여 보안 관리 개선"></li>
+            <li data-en="Strengthened .gitignore settings: Explicitly excluded all sensitive files to prevent accidental commits" data-ko=".gitignore 설정 강화: 실수로 인한 커밋을 방지하기 위해 모든 민감한 파일을 명시적으로 제외"></li>
+            <li data-en="Enhanced CSRF protection: Replaced @csrf_exempt with @csrf_protect and fixed CSRF token setup in API endpoints" data-ko="CSRF 보호 강화: @csrf_exempt를 @csrf_protect로 대체하고 API 엔드포인트에서 CSRF 토큰 설정 수정"></li>
+            <li data-en="Removed hardcoded secrets: Eliminated default hardcoded secret keys in settings.py" data-ko="하드코딩된 시크릿 제거: settings.py에서 기본 하드코딩된 시크릿 키 제거"></li>
           </ol>
           
-          <h4 data-en="Results and Impact" data-ko="결과 및 영향"></h4>
-          <p data-en="The comprehensive solution delivered significant improvements:" data-ko="종합적인 해결책으로 상당한 개선을 이루었습니다:"></p>
+          <div class="code-snippet">
+{% highlight diff %}
+# .gitignore 개선
++ *.env
++ .env
++ .env.*
++ secretkey.env
++ groq.env
++ *secret*.env
++ *api_key*.env
++ cvfactory/*.env
+
+# settings.py 환경 변수 로드 개선
+- load_dotenv(dotenv_path=BASE_DIR / "secretkey.env")
+- SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-7q@k&$)+32d7r8nvr!sy3em4y^m19)58yf8)&_je+e&2f)parw")
++ load_dotenv(dotenv_path=BASE_DIR / ".env")
++ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
+# API 엔드포인트 CSRF 보호 개선
+- @csrf_exempt  # CSRF 보호를 비활성화 (개발 환경에서만 사용)
++ @csrf_protect  # CSRF 보호 활성화
+{% endhighlight %}
+          </div>
+
+          <h4 data-en="Results" data-ko="결과"></h4>
+          <p data-en="The security improvements yielded several benefits:" data-ko="보안 개선으로 다음과 같은 이점을 얻었습니다:"></p>
           
           <ul>
-            <li data-en="<strong>Stability:</strong> Eliminated unpredictable behavior in resume generation process" data-ko="<strong>안정성:</strong> 자기소개서 생성 과정에서 예측할 수 없는 동작을 제거했습니다"></li>
-            <li data-en="<strong>Performance:</strong> Optimized API usage, reducing token consumption and speeding up generation" data-ko="<strong>성능:</strong> API 사용을 최적화하여 토큰 소비를 줄이고 생성 속도를 높였습니다"></li>
-            <li data-en="<strong>Security:</strong> Properly implemented CSRF protection according to Django best practices" data-ko="<strong>보안:</strong> Django 모범 사례에 따라 CSRF 보호를 적절히 구현했습니다"></li>
-            <li data-en="<strong>Reliability:</strong> System now consistently handles various inputs without errors" data-ko="<strong>신뢰성:</strong> 시스템이 이제 오류 없이 다양한 입력을 일관되게 처리합니다"></li>
+            <li data-en="Enhanced API endpoint security with proper CSRF protection" data-ko="적절한 CSRF 보호로 API 엔드포인트 보안 강화"></li>
+            <li data-en="Eliminated risk of exposing sensitive credentials in version control" data-ko="버전 관리에서 민감한 자격 증명이 노출될 위험 제거"></li>
+            <li data-en="Better environment variable management through consolidation" data-ko="통합을 통한 환경 변수 관리 개선"></li>
+            <li data-en="Maintained full application functionality with improved security" data-ko="보안이 향상된 상태에서 전체 애플리케이션 기능 유지"></li>
           </ul>
           
-          <h4 data-en="Code Changes Summary" data-ko="코드 변경 요약"></h4>
-          <p data-en="Key files modified in this improvement:" data-ko="이 개선에서 수정된 주요 파일:"></p>
+          <h4 data-en="Additional Security Recommendations" data-ko="추가 보안 권장사항"></h4>
+          <p data-en="For future improvements:" data-ko="향후 개선 사항:"></p>
           
           <ul>
-            <li data-en="<strong>frontend/script.js</strong>: Enhanced CSRF token handling in API requests" data-ko="<strong>frontend/script.js</strong>: API 요청에서 CSRF 토큰 처리 강화"></li>
-            <li data-en="<strong>api/views.py</strong>: Improved request handling with proper decorator ordering" data-ko="<strong>api/views.py</strong>: 적절한 데코레이터 순서로 요청 처리 개선"></li>
-            <li data-en="<strong>api/groq_service.py</strong>: Restructured API calls to respect token limits" data-ko="<strong>api/groq_service.py</strong>: 토큰 한도를 준수하도록 API 호출 재구성"></li>
+            <li data-en="Configure proper Django logging to prevent sensitive data leakage" data-ko="민감한 데이터 유출을 방지하는 적절한 Django 로깅 구성"></li>
+            <li data-en="Implement proper authentication and authorization for sensitive API endpoints" data-ko="민감한 API 엔드포인트에 대한 적절한 인증 및 권한 부여 구현"></li>
+            <li data-en="Set up proper CORS restrictions in production environments" data-ko="프로덕션 환경에서 적절한 CORS 제한 설정"></li>
+            <li data-en="Implement environment-specific configuration (dev/prod) to ensure DEBUG=False in production" data-ko="프로덕션에서 DEBUG=False를 보장하기 위한 환경별 구성(개발/프로덕션) 구현"></li>
           </ul>
         </div>
       </div>
