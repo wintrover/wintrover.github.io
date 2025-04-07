@@ -170,6 +170,74 @@ def create_resume(request):
 
     <details class="challenge-item">
       <summary>
+        <h3 data-en="Environment Variable Integration and Security Enhancement" data-ko="환경 변수 통합 및 보안 강화"></h3>
+      </summary>
+      <div class="challenge-content">
+        <div class="challenge-description">
+          <h4 data-en="Problem" data-ko="문제"></h4>
+          <p data-en="Multiple security issues were identified during the security audit: exposed sensitive information in Git (Django secret key, OAuth credentials), disabled CSRF protection, enabled debug mode in production, and excessively verbose logging that could leak sensitive data." data-ko="보안 감사 중 여러 보안 문제가 확인되었습니다: Git에 노출된 민감한 정보(Django 시크릿 키, OAuth 자격 증명), 비활성화된 CSRF 보호, 프로덕션 환경에서의 디버그 모드 활성화, 그리고 민감한 데이터가 유출될 수 있는 과도한 로깅 등이 있었습니다."></p>
+          
+          <h4 data-en="Solution" data-ko="해결책"></h4>
+          <p data-en="Implemented a comprehensive security improvement plan:" data-ko="포괄적인 보안 개선 계획을 구현했습니다:"></p>
+          
+          <ol>
+            <li data-en="Environment variable consolidation: Integrated scattered environment variables (.env, secretkey.env, groq.env) into a single .env file for better security management" data-ko="환경 변수 통합: 분산된 환경 변수(.env, secretkey.env, groq.env)를 단일 .env 파일로 통합하여 보안 관리 개선"></li>
+            <li data-en="Strengthened .gitignore settings: Explicitly excluded all sensitive files to prevent accidental commits" data-ko=".gitignore 설정 강화: 실수로 인한 커밋을 방지하기 위해 모든 민감한 파일을 명시적으로 제외"></li>
+            <li data-en="Enhanced CSRF protection: Replaced @csrf_exempt with @csrf_protect and fixed CSRF token setup in API endpoints" data-ko="CSRF 보호 강화: @csrf_exempt를 @csrf_protect로 대체하고 API 엔드포인트에서 CSRF 토큰 설정 수정"></li>
+            <li data-en="Removed hardcoded secrets: Eliminated default hardcoded secret keys in settings.py" data-ko="하드코딩된 시크릿 제거: settings.py에서 기본 하드코딩된 시크릿 키 제거"></li>
+          </ol>
+          
+          <div class="code-snippet">
+{% highlight diff %}
+# .gitignore 개선
++ *.env
++ .env
++ .env.*
++ secretkey.env
++ groq.env
++ *secret*.env
++ *api_key*.env
++ cvfactory/*.env
+
+# settings.py 환경 변수 로드 개선
+- load_dotenv(dotenv_path=BASE_DIR / "secretkey.env")
+- SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-7q@k&$)+32d7r8nvr!sy3em4y^m19)58yf8)&_je+e&2f)parw")
++ load_dotenv(dotenv_path=BASE_DIR / ".env")
++ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
+# API 엔드포인트 CSRF 보호 개선
+- @csrf_exempt  # CSRF 보호를 비활성화 (개발 환경에서만 사용)
++ @csrf_protect  # CSRF 보호 활성화
+{% endhighlight %}
+          </div>
+
+          <h4 data-en="Results" data-ko="결과"></h4>
+          <p data-en="The security improvements yielded several benefits:" data-ko="보안 개선으로 다음과 같은 이점을 얻었습니다:"></p>
+          
+          <ul>
+            <li data-en="Enhanced API endpoint security with proper CSRF protection" data-ko="적절한 CSRF 보호로 API 엔드포인트 보안 강화"></li>
+            <li data-en="Eliminated risk of exposing sensitive credentials in version control" data-ko="버전 관리에서 민감한 자격 증명이 노출될 위험 제거"></li>
+            <li data-en="Better environment variable management through consolidation" data-ko="통합을 통한 환경 변수 관리 개선"></li>
+            <li data-en="Maintained full application functionality with improved security" data-ko="보안이 향상된 상태에서 전체 애플리케이션 기능 유지"></li>
+          </ul>
+          
+          <h4 data-en="Additional Security Recommendations" data-ko="추가 보안 권장사항"></h4>
+          <p data-en="For future improvements:" data-ko="향후 개선 사항:"></p>
+          
+          <ul>
+            <li data-en="Configure proper Django logging to prevent sensitive data leakage" data-ko="민감한 데이터 유출을 방지하는 적절한 Django 로깅 구성"></li>
+            <li data-en="Implement proper authentication and authorization for sensitive API endpoints" data-ko="민감한 API 엔드포인트에 대한 적절한 인증 및 권한 부여 구현"></li>
+            <li data-en="Set up proper CORS restrictions in production environments" data-ko="프로덕션 환경에서 적절한 CORS 제한 설정"></li>
+            <li data-en="Implement environment-specific configuration (dev/prod) to ensure DEBUG=False in production" data-ko="프로덕션에서 DEBUG=False를 보장하기 위한 환경별 구성(개발/프로덕션) 구현"></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <hr class="subsection-divider">
+
+    <details class="challenge-item">
+      <summary>
         <h3 data-en="Groq API Token Limit Overflow" data-ko="Groq API 토큰 한도 초과 문제"></h3>
       </summary>
       <div class="challenge-content">
@@ -374,65 +442,138 @@ def create_resume(request):
     
     <details class="challenge-item">
       <summary>
-        <h3 data-en="Environment Variable Integration and Security Enhancement" data-ko="환경 변수 통합 및 보안 강화"></h3>
+        <h3 data-en="Groq API Client Initialization Error" data-ko="Groq API 클라이언트 초기화 오류"></h3>
       </summary>
       <div class="challenge-content">
         <div class="challenge-description">
           <h4 data-en="Problem" data-ko="문제"></h4>
-          <p data-en="Multiple security issues were identified during the security audit: exposed sensitive information in Git (Django secret key, OAuth credentials), disabled CSRF protection, enabled debug mode in production, and excessively verbose logging that could leak sensitive data." data-ko="보안 감사 중 여러 보안 문제가 확인되었습니다: Git에 노출된 민감한 정보(Django 시크릿 키, OAuth 자격 증명), 비활성화된 CSRF 보호, 프로덕션 환경에서의 디버그 모드 활성화, 그리고 민감한 데이터가 유출될 수 있는 과도한 로깅 등이 있었습니다."></p>
+          <p data-en="The Groq API client failed to initialize in the production environment, producing the error '__init__() got an unexpected keyword argument 'proxies''. This prevented the core AI functionality from working, as multiple initialization attempts consistently failed with the same proxies parameter error." data-ko="프로덕션 환경에서 Groq API 클라이언트가 초기화되지 않고 '__init__() got an unexpected keyword argument 'proxies'' 오류가 발생했습니다. 여러 초기화 시도가 동일한 proxies 파라미터 오류로 계속 실패하여 핵심 AI 기능이 작동하지 않았습니다."></p>
           
           <h4 data-en="Solution" data-ko="해결책"></h4>
-          <p data-en="Implemented a comprehensive security improvement plan:" data-ko="포괄적인 보안 개선 계획을 구현했습니다:"></p>
+          <p data-en="Implemented a comprehensive solution with two key components:" data-ko="두 가지 핵심 구성 요소가 있는 포괄적인 해결책을 구현했습니다:"></p>
           
           <ol>
-            <li data-en="Environment variable consolidation: Integrated scattered environment variables (.env, secretkey.env, groq.env) into a single .env file for better security management" data-ko="환경 변수 통합: 분산된 환경 변수(.env, secretkey.env, groq.env)를 단일 .env 파일로 통합하여 보안 관리 개선"></li>
-            <li data-en="Strengthened .gitignore settings: Explicitly excluded all sensitive files to prevent accidental commits" data-ko=".gitignore 설정 강화: 실수로 인한 커밋을 방지하기 위해 모든 민감한 파일을 명시적으로 제외"></li>
-            <li data-en="Enhanced CSRF protection: Replaced @csrf_exempt with @csrf_protect and fixed CSRF token setup in API endpoints" data-ko="CSRF 보호 강화: @csrf_exempt를 @csrf_protect로 대체하고 API 엔드포인트에서 CSRF 토큰 설정 수정"></li>
-            <li data-en="Removed hardcoded secrets: Eliminated default hardcoded secret keys in settings.py" data-ko="하드코딩된 시크릿 제거: settings.py에서 기본 하드코딩된 시크릿 키 제거"></li>
+            <li data-en="<strong>Original client patching:</strong> Created a custom patched initialization method for the Groq client that intercepts and removes the problematic 'proxies' parameter before passing arguments to the original initialization method" data-ko="<strong>원본 클라이언트 패치:</strong> 문제가 되는 'proxies' 파라미터를 가로채서 제거한 후 원본 초기화 메서드에 인수를 전달하는 Groq 클라이언트용 사용자 정의 패치 초기화 메서드 생성"></li>
+            <li data-en="<strong>Fallback HTTP client:</strong> Added a fallback implementation using httpx that directly interfaces with the Groq API without the problematic client if the patched approach fails" data-ko="<strong>대체 HTTP 클라이언트:</strong> 패치된 접근 방식이 실패할 경우 문제가 있는 클라이언트 없이 Groq API와 직접 인터페이스하는 httpx를 사용한 대체 구현 추가"></li>
           </ol>
           
           <div class="code-snippet">
-{% highlight diff %}
-# .gitignore 개선
-+ *.env
-+ .env
-+ .env.*
-+ secretkey.env
-+ groq.env
-+ *secret*.env
-+ *api_key*.env
-+ cvfactory/*.env
-
-# settings.py 환경 변수 로드 개선
-- load_dotenv(dotenv_path=BASE_DIR / "secretkey.env")
-- SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-7q@k&$)+32d7r8nvr!sy3em4y^m19)58yf8)&_je+e&2f)parw")
-+ load_dotenv(dotenv_path=BASE_DIR / ".env")
-+ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-
-# API 엔드포인트 CSRF 보호 개선
-- @csrf_exempt  # CSRF 보호를 비활성화 (개발 환경에서만 사용)
-+ @csrf_protect  # CSRF 보호 활성화
+{% highlight python %}
+# 패치된 초기화 메서드 구현
+try:
+    # 원본 클래스를 직접 패치하여 proxies 문제 해결
+    import types
+    from groq import Client
+    from groq._client import Groq as OriginalGroq
+    
+    # 원본 __init__ 메서드 가져오기
+    original_init = OriginalGroq.__init__
+    
+    # 패치 적용 전에 클래스 정보 출력
+    groq_logger.debug(f"OriginalGroq 클래스: {OriginalGroq}")
+    groq_logger.debug(f"original_init 메서드: {original_init}")
+    groq_logger.debug(f"original_init 파라미터: {inspect.signature(original_init)}")
+    
+    # 모든 인자를 받되 proxies 인자를 무시하는 새로운 __init__ 함수 정의
+    def patched_init(self, *args, **kwargs):
+        # 원본 kwargs 로깅
+        groq_logger.debug(f"patched_init 호출 kwargs: {kwargs}")
+        
+        # proxies 파라미터 제거
+        if 'proxies' in kwargs:
+            groq_logger.info(f"proxies 파라미터 제거됨: {kwargs['proxies']}")
+            del kwargs['proxies']
+            
+        # 수정된 kwargs 로깅
+        groq_logger.debug(f"수정된 kwargs: {kwargs}")
+        
+        try:
+            result = original_init(self, *args, **kwargs)
+            groq_logger.info("원본 __init__ 함수 호출 성공")
+            return result
+        except Exception as e:
+            groq_logger.error(f"원본 __init__ 함수 호출 중 오류 발생: {str(e)}")
+            groq_logger.debug(f"오류 상세: {traceback.format_exc()}")
+            raise
+    
+    # 패치 적용
+    groq_logger.info("groq.Client 클래스 패치 적용")
+    OriginalGroq.__init__ = patched_init
+    
+    # 패치 적용 후 클라이언트 초기화 시도
+    groq_logger.info("패치된 클래스로 클라이언트 초기화 시도")
+    
+    # 최소한의 필수 인자만으로 초기화 시도
+    client_params = {"api_key": api_key}
+    groq_logger.debug(f"클라이언트 초기화 파라미터: {client_params}")
+    
+    client = Client(**client_params)
+    groq_logger.info("Groq 클라이언트 초기화 성공 (패치 방식)")
+    
+except Exception as e:
+    groq_logger.error(f"Groq 클라이언트 초기화 실패: {str(e)}")
+    
+    # 대체 초기화 방법 시도
+    groq_logger.info("대체 초기화 방법 시도")
+    try:
+        # httpx를 사용한 대체 클라이언트 설정
+        import httpx
+        groq_logger.info("httpx를 사용한 대체 클라이언트 설정 시도")
+        
+        # 사용자 정의 클래스 생성
+        class SimpleGroqClient:
+            def __init__(self, api_key):
+                self.api_key = api_key
+                self.base_url = "https://api.groq.com/openai/v1"
+                self.client = httpx.Client(
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    timeout=60.0
+                )
+                self.chat = SimpleGroqChatCompletions(self)
+        
+        # 새로운 클라이언트 생성
+        client = SimpleGroqClient(api_key)
+        groq_logger.info("대체 클라이언트 초기화 성공")
+            
+    except Exception as alt_e:
+        groq_logger.error(f"대체 초기화 방법도 실패: {str(alt_e)}")
+        groq_logger.warning("이 오류로 인해 AI 기능이 제한됩니다.")
+        # 클라이언트 객체 None으로 설정
+        client = None
 {% endhighlight %}
           </div>
 
-          <h4 data-en="Results" data-ko="결과"></h4>
-          <p data-en="The security improvements yielded several benefits:" data-ko="보안 개선으로 다음과 같은 이점을 얻었습니다:"></p>
+          <h4 data-en="Enhanced Dependencies Management" data-ko="향상된 의존성 관리"></h4>
+          <p data-en="Added httpx dependency with specific version constraints to prevent compatibility issues:" data-ko="호환성 문제를 방지하기 위해 특정 버전 제약이 있는 httpx 의존성을 추가했습니다:"></p>
           
+          <div class="code-snippet">
+{% highlight diff %}
+# requirements.txt
+  # AI API
+  # openai>=1.0.0  # OpenAI API 대신 Groq 사용
+  groq>=0.4.0,<0.5.0  # 실행 환경과 호환되는 버전 범위 지정
++ httpx>=0.24.0,<0.25.0  # 대체 HTTP 클라이언트 (Groq API 직접 호출용)
+{% endhighlight %}
+          </div>
+
+          <h4 data-en="Results and Verification" data-ko="결과 및 검증"></h4>
+          <p data-en="After deploying the changes to production:" data-ko="변경 사항을 프로덕션에 배포한 후:"></p>
           <ul>
-            <li data-en="Enhanced API endpoint security with proper CSRF protection" data-ko="적절한 CSRF 보호로 API 엔드포인트 보안 강화"></li>
-            <li data-en="Eliminated risk of exposing sensitive credentials in version control" data-ko="버전 관리에서 민감한 자격 증명이 노출될 위험 제거"></li>
-            <li data-en="Better environment variable management through consolidation" data-ko="통합을 통한 환경 변수 관리 개선"></li>
-            <li data-en="Maintained full application functionality with improved security" data-ko="보안이 향상된 상태에서 전체 애플리케이션 기능 유지"></li>
+            <li data-en="Successfully initialized the Groq API client with the patched approach" data-ko="패치된 접근 방식으로 Groq API 클라이언트 초기화 성공"></li>
+            <li data-en="Logs confirmed the removal of the problematic 'proxies' parameter" data-ko="로그에서 문제가 되는 'proxies' 파라미터가 제거되었음을 확인"></li>
+            <li data-en="Core AI functionality resumed working properly" data-ko="핵심 AI 기능이 올바르게 작동 재개"></li>
+            <li data-en="The fallback mechanism provides added reliability if future issues occur" data-ko="대체 메커니즘은 향후 문제가 발생할 경우 추가적인 안정성 제공"></li>
           </ul>
           
-          <h4 data-en="Additional Security Recommendations" data-ko="추가 보안 권장사항"></h4>
-          <p data-en="For future improvements:" data-ko="향후 개선 사항:"></p>
-          
+          <h4 data-en="Long-term Improvements" data-ko="장기적인 개선 사항"></h4>
+          <p data-en="To ensure continued reliability:" data-ko="지속적인 안정성을 보장하기 위해:"></p>
           <ul>
-            <li data-en="Configure proper Django logging to prevent sensitive data leakage" data-ko="민감한 데이터 유출을 방지하는 적절한 Django 로깅 구성"></li>
-            <li data-en="Implement proper authentication and authorization for sensitive API endpoints" data-ko="민감한 API 엔드포인트에 대한 적절한 인증 및 권한 부여 구현"></li>
-            <li data-en="Set up proper CORS restrictions in production environments" data-ko="프로덕션 환경에서 적절한 CORS 제한 설정"></li>
-            <li data-en="Implement environment-specific configuration (dev/prod) to ensure DEBUG=False in production" data-ko="프로덕션에서 DEBUG=False를 보장하기 위한 환경별 구성(개발/프로덕션) 구현"></li>
+            <li data-en="Added comprehensive logging throughout the initialization process" data-ko="초기화 과정 전반에 걸쳐 포괄적인 로깅 추가"></li>
+            <li data-en="Created a version-pinned dependency strategy to avoid future compatibility issues" data-ko="향후 호환성 문제를 방지하기 위한 버전 고정 의존성 전략 마련"></li>
+            <li data-en="Implemented a reliable fallback mechanism that can operate independently of the main client" data-ko="주 클라이언트와 독립적으로 작동할 수 있는 안정적인 대체 메커니즘 구현"></li>
           </ul>
         </div>
       </div>
