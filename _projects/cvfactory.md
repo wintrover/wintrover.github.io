@@ -7,6 +7,7 @@ ko_description: 원시 데이터에서 전문적인 자기소개서를 생성하
 dev_period: In progress
 ko_dev_period: 진행 중
 github_link: https://github.com/wintrover/CVFactory
+website_link: https://cvfactory.dev
 skills: 
   - Python
   - Django
