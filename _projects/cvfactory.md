@@ -15,6 +15,14 @@ skills:
   - Selenium
 ---
 
+<!-- Demo Information Section -->
+<div class="section">
+  <h2 data-en="Demo" data-ko="데모"></h2>
+  <p data-en="You can access and test the demo of this project at <a href='https://cvfactory.dev' target='_blank'>cvfactory.dev</a>." data-ko="이 프로젝트의 데모는 <a href='https://cvfactory.dev' target='_blank'>cvfactory.dev</a>에서 접근하고 테스트할 수 있습니다."></p>
+</div>
+
+<hr class="subsection-divider">
+
 <style>
 /* 세부 항목 스타일 */
 details.challenge-item {
