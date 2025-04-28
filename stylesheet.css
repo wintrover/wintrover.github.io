@@ -41,8 +41,7 @@ a:hover {
 /* Typography */
 h1, h2, h3, h4, h5 {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  margin-top: 35px;
-  margin-bottom: 10px;
+  margin: 0;
 }
 
 h5.period {
@@ -55,7 +54,6 @@ h1 {
 
 h2 {
   font-size: 26px;
-  margin-top: 0;
 }
 
 h3 {
@@ -64,7 +62,7 @@ h3 {
 
 p {
   font-size: 18px;
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 strong {
@@ -211,12 +209,17 @@ table[style*="height:120px"] img {
   display: flex;
   align-items: center;
   height: 120px; /* Explicitly set height */
+  margin-bottom: 0;
 }
 
 .project-item a {
   text-decoration: none; /* 밑줄 제거 */
   color: #1772d0; /* 링크 색상 */
   font-weight: bold; /* 강조 */
+}
+
+.project-item a:hover papertitle {
+  color: #f09228; /* 호버 시 주황색으로 변경 */
 }
 
 .project-item h6 {
@@ -235,6 +238,10 @@ table[style*="height:120px"] img {
   color: #1772d0;
   text-decoration: none;
   font-weight: bold;
+}
+
+.project-link:hover {
+  color: #f09228; /* 호버 시 주황색으로 변경 */
 }
 
 /* 구분선 스타일 정의 */
@@ -598,7 +605,7 @@ html[lang="ko"] [data-en-only] {
 .profile-section, .project-item, .study-item {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 0;
 }
 
 .profile-text {
