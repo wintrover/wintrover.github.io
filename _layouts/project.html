@@ -2,30 +2,36 @@
 layout: default
 ---
 
-<div class="project-container">
-  <div class="project-content">
-    <div class="project-item">
-      <h1 class="project-title" data-en="{{ page.title }}" data-ko="{{ page.ko_title | default: page.title }}">{{ page.title }}</h1>
-      {% if page.github_link %}
-      <a href="{{ page.github_link }}" target="_blank" class="project-link">GitHub</a>
-      {% endif %}
-    </div>
-    <h5 class="period" data-en="development period : {{ page.dev_period }}" data-ko="개발 기간 : {{ page.ko_dev_period | default: page.dev_period }}">development period : {{ page.dev_period }}</h5>
+<div class="main-container">
+  <div class="main-content">
+    <!-- Project Title -->
+    <h1 class="project-title text-center" data-en="{{ page.title }}" data-ko="{{ page.ko_title | default: page.title }}">{{ page.title }}</h1>
+    <!-- GitHub Link (optional) -->
+    {% if page.github_link %}
+      <p class="text-center"><a href="{{ page.github_link }}" target="_blank" class="project-link">GitHub</a></p>
+    {% endif %}
+    <!-- Development Period -->
+    <p class="text-center period" data-en="Development Period: {{ page.dev_period }}" data-ko="개발 기간: {{ page.ko_dev_period | default: page.dev_period }}">Development Period: {{ page.dev_period }}</p>
 
-    <hr class="section-divider">
+    <hr> <!-- Standard horizontal rule -->
 
+    <!-- YouTube Embed (optional) -->
     {% if page.youtube_embed %}
-    <iframe 
-      class="youtube-embed" 
-      src="{{ page.youtube_embed }}" 
-      title="{{ page.title }}_Demo" 
-      frameborder="0" 
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-      referrerpolicy="strict-origin-when-cross-origin" 
-      allowfullscreen>
-    </iframe>
+      <div class="youtube-container" style="text-align: center; margin-bottom: 20px;">
+        <iframe 
+          class="youtube-embed" 
+          src="{{ page.youtube_embed }}" 
+          title="{{ page.title }}_Demo" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          referrerpolicy="strict-origin-when-cross-origin" 
+          allowfullscreen>
+        </iframe>
+      </div>
+      <hr> <!-- Optional separator after video -->
     {% endif %}
 
+    <!-- Main Content from Markdown -->
     {{ content }}
   </div>
 </div> 
