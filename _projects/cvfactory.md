@@ -19,7 +19,6 @@ skills:
 <div class="section-heading">
   <h2 data-en="Demo" data-ko="데모"></h2>
 </div>
-<hr>
 <p data-en="You can access and test the demo of this project at <a href='https://cvfactory.dev' target='_blank'>cvfactory.dev</a>." data-ko="이 프로젝트의 데모는 <a href='https://cvfactory.dev' target='_blank'>cvfactory.dev</a>에서 접근하고 테스트할 수 있습니다."></p>
 
 <!-- Project Logo -->
@@ -27,13 +26,10 @@ skills:
   <img src="{{ site.baseurl }}/assets/images/CVFactory_logo.png" alt="자소서공장 로고">
 </div>
 
-<hr>
-
 <!-- Development Process Section -->
 <div class="section-heading">
   <h2 data-en="Development Process and Overview" data-ko="개발 과정 및 개요"></h2>
 </div>
-<hr>
 <p data-en="Key features and components of the automated personal statement generation tool." data-ko="자동화된 자기소개서 생성 도구의 주요 기능 및 구성 요소"></p>
 
 <!-- 주요 기능 섹션 -->
@@ -46,13 +42,10 @@ skills:
   </ul>
 </div>
 
-<hr>
-
 <!-- Development Journey Section -->
 <div class="section-heading">
   <h2 data-en="Development Journey" data-ko="개발 여정"></h2>
 </div>
-<hr>
 <p data-en="The project was developed to streamline the personal statement creation process, especially for job seekers who need to highlight specific achievements and qualifications." data-ko="이 프로젝트는 특히 특정 성과와 자격을 강조해야 하는 구직자를 위해 자기소개서 작성 과정을 간소화하기 위해 개발되었습니다."></p>
 
 <div class="dev-timeline">
@@ -70,13 +63,10 @@ skills:
   </div>
 </div>
 
-<hr>
-
 <!-- Technical Challenges and Solutions Section -->
 <div class="section-heading">
   <h2 data-en="Technical Challenges and Solutions" data-ko="기술적 도전과 해결 과정"></h2>
 </div>
-<hr>
 <p data-en="Key challenges faced during development and the innovative solutions implemented." data-ko="개발 과정에서 직면한 주요 도전 과제와 구현된 혁신적인 해결책입니다."></p>
 
 <div class="challenges">
@@ -118,8 +108,6 @@ def create_resume(request):
       </div>
     </div>
   </details>
-
-  <hr>
 
   <details class="challenge-item">
     <summary>
@@ -186,8 +174,6 @@ def create_resume(request):
       </div>
     </div>
   </details>
-
-  <hr>
 
   <details class="challenge-item">
     <summary>
@@ -268,8 +254,6 @@ def generate_resume(job_description, user_story, company_info=""):
     </div>
   </details>
 
-  <hr>
-
   <details class="challenge-item">
     <summary>
       <h3 data-en="Frontend-Backend CSRF Token Integration" data-ko="프론트엔드-백엔드 CSRF 토큰 통합 문제"></h3>
@@ -346,8 +330,6 @@ async function generateResume() {
       </div>
     </div>
   </details>
-
-  <hr>
 
   <details class="challenge-item">
     <summary>
@@ -489,24 +471,17 @@ except Exception as e:
   </details>
 </div>
 
-<hr>
-
 <!-- 서버 호스팅 선택 및 배포 Section -->
 <div class="section-heading">
   <h2 data-en="Server Hosting Selection and Deployment" data-ko="서버 호스팅 선택 및 배포"></h2>
 </div>
-<hr>
 <p data-en="The process of selecting and configuring the most suitable hosting service for the application's requirements." data-ko="애플리케이션 요구사항에 가장 적합한 호스팅 서비스를 선택하고 구성하는 과정입니다."></p>
-
-<hr>
 
 <div class="section">
   <h3 data-en="Hosting Service: Netlify" data-ko="호스팅 서비스: Netlify"></h3>
   <p data-en="Netlify was chosen as the hosting service due to its ease of use, continuous deployment support, and integration with GitHub." data-ko="Netlify는 GitHub과의 통합 및 지속적인 배포 지원, 사용 편의성 등으로 인해 호스팅 서비스로 선택되었습니다."></p>
   <p data-en="Netlify provides a seamless deployment process, automatic SSL/TLS certificate management, and a global CDN for fast content delivery." data-ko="Netlify는 원활한 배포 프로세스, 자동 SSL/TLS 인증서 관리, 전 세계 CDN을 통한 빠른 콘텐츠 전달을 제공합니다."></p>
 </div>
-
-<hr>
 
 <div class="section">
   <h3 data-en="Deployment Process" data-ko="배포 과정"></h3>
@@ -519,13 +494,10 @@ except Exception as e:
   </ol>
 </div>
 
-<hr>
-
 <!-- Future Improvements Section -->
 <div class="section-heading">
   <h2 data-en="Future Improvements" data-ko="향후 개선 사항"></h2>
 </div>
-<hr>
 
 <ul class="future-items">
   <li data-en="AI-powered content suggestions for more persuasive statements" data-ko="더 설득력 있는 내용을 위한 AI 기반 콘텐츠 제안"></li>

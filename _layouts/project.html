@@ -4,16 +4,19 @@ layout: default
 
 <div class="main-container">
   <div class="main-content">
-    <!-- Project Title -->
-    <h1 class="project-title text-center" data-en="{{ page.title }}" data-ko="{{ page.ko_title | default: page.title }}">{{ page.title }}</h1>
-    <!-- GitHub Link (optional) -->
-    {% if page.github_link %}
-      <p class="text-center"><a href="{{ page.github_link }}" target="_blank" class="project-link">GitHub</a></p>
-    {% endif %}
+    <!-- Project Title and Link Container -->
+    <div class="project-title-container">
+      <h1 class="project-title" data-en="{{ page.title }}" data-ko="{{ page.ko_title | default: page.title }}" style="display: inline-block; margin-right: 5px; margin-bottom: 0;">
+        {{ page.title }}
+      </h1>
+      {% if page.github_link %}
+        <span class="github-link-inline" style="display: inline-block; vertical-align: baseline;">
+          <a href="{{ page.github_link }}" target="_blank" class="project-link" style="font-size: 0.9em;">GitHub</a>
+        </span>
+      {% endif %}
+    </div>
     <!-- Development Period -->
-    <p class="text-center period" data-en="Development Period: {{ page.dev_period }}" data-ko="개발 기간: {{ page.ko_dev_period | default: page.dev_period }}">Development Period: {{ page.dev_period }}</p>
-
-    <hr> <!-- Standard horizontal rule -->
+    <p class="period" data-en="Development Period: {{ page.dev_period }}" data-ko="개발 기간: {{ page.ko_dev_period | default: page.dev_period }}">Development Period: {{ page.dev_period }}</p>
 
     <!-- YouTube Embed (optional) -->
     {% if page.youtube_embed %}
@@ -28,7 +31,6 @@ layout: default
           allowfullscreen>
         </iframe>
       </div>
-      <hr> <!-- Optional separator after video -->
     {% endif %}
 
     <!-- Main Content from Markdown -->
