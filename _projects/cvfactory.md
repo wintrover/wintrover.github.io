@@ -23,65 +23,9 @@ skills:
 
 <hr class="subsection-divider">
 
-<style>
-/* 세부 항목 스타일 */
-details.challenge-item {
-  margin-bottom: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-details.challenge-item summary {
-  padding: 15px;
-  cursor: pointer;
-  position: relative;
-  background-color: #f8f9fa;
-  transition: background-color 0.3s;
-  list-style: none;
-}
-
-details.challenge-item summary::-webkit-details-marker {
-  display: none;
-}
-
-details.challenge-item summary::after {
-  content: '\25BC';
-  font-size: 0.8em;
-  color: #555;
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: transform 0.3s;
-}
-
-details.challenge-item[open] summary::after {
-  transform: translateY(-50%) rotate(180deg);
-}
-
-details.challenge-item summary:hover {
-  background-color: #f0f0f0;
-}
-
-details.challenge-item[open] summary {
-  border-bottom: 1px solid #e0e0e0;
-}
-
-details.challenge-item .challenge-content {
-  padding: 20px;
-}
-
-details.challenge-item summary h3 {
-  margin: 0;
-  display: inline;
-}
-</style>
-
 <!-- Project Logo -->
-<div class="logo-container" style="text-align: center; margin-bottom: 30px;">
-  <img src="{{ site.baseurl }}/images/CVFactory_logo.png" alt="자소서공장 로고" style="max-width: 200px;">
+<div class="logo-container">
+  <img src="{{ site.baseurl }}/images/CVFactory_logo.png" alt="자소서공장 로고">
 </div>
 
 <!-- Development Process Section -->

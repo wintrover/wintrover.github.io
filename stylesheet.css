@@ -640,3 +640,90 @@ html[lang="ko"] [data-en-only] {
 .section-heading {
   /* Styles for headings if needed */
 }
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+/* Component-specific adjustments from inline styles */
+.profile-image img {
+  width: 100%;
+  max-width: 75%;
+  display: inline-block; /* Ensure text-align works */
+}
+
+/* YouTube Embed */
+.youtube-embed {
+  display: block; /* block 요소로 만들어 중앙 정렬 등 가능하게 함 */
+  margin: 20px auto; /* 위아래 여백 및 중앙 정렬 */
+  width: 80%; /* 너비 조정 (필요에 따라 변경) */
+  max-width: 720px; /* 최대 너비 설정 */
+  aspect-ratio: 16 / 9; /* 16:9 비율 유지 */
+  height: auto; /* 높이는 비율에 따라 자동 조절 */
+}
+
+/* Project Page Specific Styles (from cvfactory.md) */
+/* 세부 항목 스타일 (challenge-item) */
+details.challenge-item {
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+details.challenge-item summary {
+  padding: 15px;
+  cursor: pointer;
+  position: relative;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s;
+  list-style: none;
+}
+
+details.challenge-item summary::-webkit-details-marker {
+  display: none;
+}
+
+details.challenge-item summary::after {
+  content: '\25BC';
+  font-size: 0.8em;
+  color: #555;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s;
+}
+
+details.challenge-item[open] summary::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+details.challenge-item summary:hover {
+  background-color: #f0f0f0;
+}
+
+details.challenge-item[open] summary {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+details.challenge-item .challenge-content {
+  padding: 20px;
+}
+
+details.challenge-item summary h3 {
+  margin: 0;
+  display: inline;
+}
+
+/* Logo Container */
+.logo-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo-container img {
+  max-width: 200px;
+}

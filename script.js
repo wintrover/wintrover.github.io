@@ -35,7 +35,30 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'scale(1)';
         });
     });
+
+    // project.html 레이아웃에서 네비게이션에 뒤로가기 버튼 추가
+    addBackButtonToNavigation();
 });
+
+// project.html 레이아웃에서 네비게이션에 뒤로가기 버튼 추가
+function addBackButtonToNavigation() {
+  const navigationDiv = document.querySelector('.navigation');
+  if (navigationDiv && window.location.pathname.startsWith('/projects/')) { // 프로젝트 페이지에서만 실행
+    // site.baseurl 값을 가져올 방법이 필요합니다. Jekyll 변수는 JS에서 직접 접근 불가.
+    // 여기서는 상대 경로를 사용합니다.
+    navigationDiv.innerHTML = '<a href="../" class="back-button" data-en="← Back to Previous page" data-ko="← 이전 페이지로 돌아가기">← Back to Previous page</a>';
+    // 언어 설정 함수 호출하여 버튼 텍스트 업데이트 필요
+    const currentLang = localStorage.getItem('language') || 'en';
+    const backButton = navigationDiv.querySelector('.back-button');
+    if (backButton) {
+      if (currentLang === 'en' && backButton.hasAttribute('data-en')) {
+        backButton.innerHTML = backButton.getAttribute('data-en');
+      } else if (currentLang === 'ko' && backButton.hasAttribute('data-ko')) {
+        backButton.innerHTML = backButton.getAttribute('data-ko');
+      }
+    }
+  }
+}
 
 // 언어 감지 및 설정 함수
 function getUserLanguage() {
