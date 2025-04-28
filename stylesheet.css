@@ -41,12 +41,12 @@ a:hover {
 /* Typography */
 h1, h2, h3, h4, h5 {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-top: 35px;
+  margin-bottom: 10px;
 }
 
 h5.period {
-  margin: 0px;
+  margin: 0;
 }
 
 h1 {
@@ -172,12 +172,12 @@ img {
   display: block;
 }
 
-/* 프로젝트 카드 스타일 */
+/* 프로젝트 카드 스타일 (테이블 기반 - 제거) */
+/*
 table[style*="height:120px"] {
   height: 150px !important;
   display: table;
   margin-bottom: 25px !important;
-  /* border-bottom: 1px solid #eeeeee; */ /* 하단 경계선 제거 */
 }
 
 table[style*="height:120px"] td {
@@ -205,11 +205,12 @@ table[style*="height:120px"] img {
   margin: 0 auto;
   display: block;
 }
+*/
 
 .project-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  height: 120px; /* Explicitly set height */
 }
 
 .project-item a {
@@ -219,7 +220,7 @@ table[style*="height:120px"] img {
 }
 
 .project-item h6 {
-  margin: 0; /* 기본 마진 제거 */
+  margin: 0;
   font-size: 14px; /* 글꼴 크기 조정 */
 }
 
@@ -239,7 +240,7 @@ table[style*="height:120px"] img {
 /* 구분선 스타일 정의 */
 .section-divider {
   border: 0;
-  border-top: 2px solid #333333; /* 메인 주제 구분선 (진한 회색) */
+  border-top: 2px solid #333333;
   margin: 30px 0;
   transition: all 0.3s ease;
 }
@@ -250,7 +251,7 @@ table[style*="height:120px"] img {
 
 .subsection-divider {
   border: 0;
-  border-top: 1px dashed #999999; /* 소주제 구분선 (밝은 회색 점선) */
+  border-top: 1px dashed #999999;
   margin: 20px 0;
   transition: all 0.3s ease;
 }
@@ -318,7 +319,7 @@ body {
   position: relative;
   display: block; /* inline-block에서 block으로 변경 */
   width: 100%;
-  margin: 10px 0; /* 상하 마진 추가 */
+  margin: 10px 0; /* Removed margin */
 }
 
 .code-container pre {
@@ -527,7 +528,7 @@ code:not(.hljs) {
 .language-toggle-container {
   position: static;
   z-index: 1000;
-  margin-right: 20px; /* 오른쪽에서 안쪽으로 여백 추가 */
+  margin-right: 20px;
 }
 
 .language-toggle-btn {
@@ -595,9 +596,9 @@ html[lang="ko"] [data-en-only] {
 }
 
 .profile-section, .project-item, .study-item {
-  display: flex; /* Use flexbox for layout */
-  align-items: center; /* vertical-align:middle equivalent */
-  margin-bottom: 15px; /* Adjust as needed */
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .profile-text {
@@ -617,9 +618,19 @@ html[lang="ko"] [data-en-only] {
 }
 
 .project-image {
-  flex: 0 0 150px; /* Fixed width for the image */
-  max-width: 150px; /* Max width for the image */
-  text-align: right; /* Align image to the right */
+  flex: 0 0 150px; /* Keep fixed width */
+  max-width: 150px; /* Keep max width */
+  height: 120px;
+  text-align: right; /* Align inline content right */
+}
+
+.project-image img {
+  display: inline-block; /* Allow text-align to work */
+  vertical-align: middle; /* Align vertically if needed */
+  max-height: 100%;    /* Limit height based on parent (120px) */
+  max-width: 100%;     /* Prevent horizontal overflow */
+  width: auto;         /* Adjust width based on height */
+  object-fit: contain;
 }
 
 .study-text {
