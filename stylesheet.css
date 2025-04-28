@@ -587,7 +587,7 @@ html[lang="ko"] [data-en-only] {
 .main-container {
   /* Equivalent to the outer table's width/centering if any */
   margin: 0 auto; /* Center the container if needed */
-  max-width: 960px; /* Or whatever max-width your table had */
+  max-width: 800px; /* Reduced from 960px to 5/6 */
 }
 
 .main-content {
