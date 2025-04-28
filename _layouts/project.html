@@ -2,32 +2,30 @@
 layout: default
 ---
 
-<table class="main-table">
-  <tr>
-    <td>
-      <div class="project-item">
-        <h1 class="project-title" data-en="{{ page.title }}" data-ko="{{ page.ko_title | default: page.title }}">{{ page.title }}</h1>
-        {% if page.github_link %}
-        <a href="{{ page.github_link }}" target="_blank" class="project-link">GitHub</a>
-        {% endif %}
-      </div>
-      <h5 class="period" data-en="development period : {{ page.dev_period }}" data-ko="개발 기간 : {{ page.ko_dev_period | default: page.dev_period }}">development period : {{ page.dev_period }}</h5>
-
-      <hr class="section-divider">
-
-      {% if page.youtube_embed %}
-      <iframe 
-        class="youtube-embed" 
-        src="{{ page.youtube_embed }}" 
-        title="{{ page.title }}_Demo" 
-        frameborder="0" 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-        referrerpolicy="strict-origin-when-cross-origin" 
-        allowfullscreen>
-      </iframe>
+<div class="project-container">
+  <div class="project-content">
+    <div class="project-item">
+      <h1 class="project-title" data-en="{{ page.title }}" data-ko="{{ page.ko_title | default: page.title }}">{{ page.title }}</h1>
+      {% if page.github_link %}
+      <a href="{{ page.github_link }}" target="_blank" class="project-link">GitHub</a>
       {% endif %}
+    </div>
+    <h5 class="period" data-en="development period : {{ page.dev_period }}" data-ko="개발 기간 : {{ page.ko_dev_period | default: page.dev_period }}">development period : {{ page.dev_period }}</h5>
 
-      {{ content }}
-    </td>
-  </tr>
-</table> 
+    <hr class="section-divider">
+
+    {% if page.youtube_embed %}
+    <iframe 
+      class="youtube-embed" 
+      src="{{ page.youtube_embed }}" 
+      title="{{ page.title }}_Demo" 
+      frameborder="0" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+      referrerpolicy="strict-origin-when-cross-origin" 
+      allowfullscreen>
+    </iframe>
+    {% endif %}
+
+    {{ content }}
+  </div>
+</div> 

@@ -73,18 +73,16 @@ strong {
   margin-top: 15px;
 }
 
-.main-table {
-  width: 100%;
+.project-container {
+  width: 100%; /* Ensure it takes full width */
   max-width: 1000px;
-  border-spacing: 0;
-  border-collapse: collapse;
   margin: 60px auto 0;
-  table-layout: fixed;
+  box-sizing: border-box; /* Include padding/border in element's total width/height */
 }
 
-.main-table td {
-  padding: 0;
-  box-sizing: border-box;
+.project-content {
+  /* Add padding or other styles if needed */
+  padding: 0; /* Replicate td padding: 0 */
 }
 
 /* Components */
