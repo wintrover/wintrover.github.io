@@ -578,3 +578,50 @@ html[lang="ko"] [data-en-only] {
   display: flex;
   align-items: center;
 }
+
+/* Styles moved from index.html for div-based layout */
+.main-container {
+  /* Equivalent to the outer table's width/centering if any */
+  margin: 0 auto; /* Center the container if needed */
+  max-width: 960px; /* Or whatever max-width your table had */
+}
+
+.main-content {
+  /* Equivalent to the td containing all the content */
+}
+
+.profile-section, .project-item, .study-item {
+  display: flex; /* Use flexbox for layout */
+  align-items: center; /* vertical-align:middle equivalent */
+  margin-bottom: 20px; /* Adjust as needed */
+}
+
+.profile-text {
+  flex: 0 0 63%; /* Equivalent to width:63% */
+  padding-right: 20px; /* Add some spacing between text and image */
+}
+
+.profile-image {
+  flex: 0 0 40%; /* Equivalent to width:40% */
+  max-width: 40%; /* Equivalent to max-width:40% */
+  text-align: right; /* Equivalent to text-align:right */
+}
+
+.project-text {
+  flex: 1; /* Let text take available space */
+  padding-right: 20px; /* Spacing between text and image */
+}
+
+.project-image {
+  flex: 0 0 150px; /* Fixed width for the image */
+  max-width: 150px; /* Max width for the image */
+  text-align: right; /* Align image to the right */
+}
+
+.study-text {
+  /* Styles for the study item if needed */
+}
+
+.section-heading {
+  /* Styles for headings if needed */
+}
