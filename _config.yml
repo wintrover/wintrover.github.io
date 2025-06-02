@@ -1,130 +1,148 @@
 # Site
-repository: Git repository where your resume will be hosted, only required if you are hosting on GitHub (eg. sproogen/modern-resume-theme)
-# favicon: Directory of your favicon (eg. images/favicon.ico)(optional)
+repository: wintrover/wintrover.github.io # 사용자님의 GitHub 저장소 경로
+# favicon: images/favicon.ico # 필요시 파비콘 경로 지정
 
 # Content configuration version
 version: 2
 
 # Personal info
-name: Your Name
-title: Your job title
-email: Your email (optional)
-# email_title: Email (Email title override)
-phone: Your phone number (optional)
-# phone_title: Phone (Phone title override)
-website: Your website (eg. https://google.com)(optional)
-# website_title: Web (Website title override)
+name: Su Hyok Yun # 기존 title에서 가져옴
+title: Software Developer # 예시 직함, 본인에 맞게 수정
+email: your-email@example.com # 실제 이메일 주소로 변경해주세요.
+# email_title: Email
+# phone: Your phone number (optional)
+# phone_title: Phone
+website: https://wintrover.github.io # 기존 url에서 가져옴
+# website_title: Web
 
 # Dark Mode (true/false/never)
-darkmode: false
+darkmode: false # 기본값 유지 또는 취향에 따라 변경
 
 # Social links
-twitter_username: jekyllrb
-github_username:  jekyll
-stackoverflow_username: "00000001"
-dribbble_username: jekyll
-facebook_username: jekyll
-flickr_username: jekyll
-instagram_username: jekyll
-linkedin_username: jekyll
-xing_username: jekyll
-pinterest_username: jekyll
-youtube_username: jekyll
-orcid_username: 0000-0000-0000-0000
-googlescholar_username: D847cGsAAAAJ
+# twitter_username:
+github_username: wintrover # 사용자님의 GitHub ID
+# stackoverflow_username:
+# dribbble_username:
+# facebook_username:
+# flickr_username:
+# instagram_username:
+# linkedin_username: # LinkedIn 사용자명 입력
+# xing_username:
+# pinterest_username:
+# youtube_username:
+# orcid_username:
+# googlescholar_username:
 
 # Additional icon links
-additional_links:
-- title: Link name
-  icon: Font Awesome brand icon name (eg. fab fa-twitter) (https://fontawesome.com/icons?d=gallery&s=brands&m=free)
-  url: Link url (eg. https://google.com)
-# - title: another link
-#   icon: font awesome brand icon name (eg. fab fa-twitter) (https://fontawesome.com/icons?d=gallery&s=brands&m=free)
+# additional_links:
+# - title: Link name
+#   icon: Font Awesome brand icon name (eg. fab fa-twitter) (https://fontawesome.com/icons?d=gallery&s=brands&m=free)
 #   url: Link url (eg. https://google.com)
 
 # Google Analytics and Tag Manager
-# Using more than one of these may cause issues with reporting
 # gtm: "GTM-0000000"
 # gtag: "UA-00000000-0"
 # google_analytics: "UA-00000000-0"
 
 # About Section
-# about_title: About Me (Use this to override about section title)
-about_profile_image: Directory of profile image (eg. images/profile.jpg)
-about_content: | # this will include new lines to allow paragraphs
-  Write an awesome description about yourself here, this supports markdown, so you can add [links](http://foobar.com) and highlight things <mark>like this</mark>.
-
-  You can even add paragraphs by using empty lines like this and add anything else [markdown](https://www.markdownguide.org/getting-started#what-is-markdown) supports such as
-    - Lists
-    - Tables
-    - <a href="google.com">Links</a>
-    - Images ![alt text](/images/landscape-trees.jpg "Trees")
+# about_title: About Me
+about_profile_image: assets/images/profile.jpg # 프로필 이미지 경로 예시, 실제 이미지 경로로 수정하거나 이미지를 추가해주세요.
+about_content: | # Markdown 형식으로 자신을 소개해주세요.
+  안녕하세요! Su Hyok Yun 입니다.
+  이곳은 저의 개인 포트폴리오 웹사이트입니다.
+  방문해주셔서 감사합니다.
+  (이곳에 더 자세한 자기소개를 Markdown 형식으로 작성해주세요.)
 
 content:
-  - title: Projects # Title for the section
-    layout: list # Type of content section (list/text)
-    content:
-      - layout: left
-        border: weak  # Value of `weak` will display a weak border below this item. # Any 
-                      # other value (or no value) means no border will be displayed
-        title: Project name
-        link: Link to project (eg. sproogen.github.io/modern-resume-theme)(optional)
-        link_text: Link Text
-        additional_links:
-          - title:  Github page for project (eg. sproogen/modern-resume-theme)
-            icon: fab fa-github
-            url: Link to project (eg. sproogen.github.io/modern-resume-theme)(optional)
-          - title:  Github page for project (eg. sproogen/modern-resume-theme)
-            icon: fab fa-github
-            url: Link to project (eg. sproogen.github.io/modern-resume-theme)(optional)
-        quote: >
-          Short overview of the project (optional)
-        description: | # this will include new lines to allow paragraphs
-          Description about the work on/with the project
-  - title: Experience
+  - title: Projects # 기존 _projects 컬렉션 내용을 여기에 통합
     layout: list
     content:
-      - layout: right
-        title: Company name
-        sub_title: Job title
-        caption: Date Range (eg. November 2016 - present)
-        link: Link to company (optional)
-        quote: >
-          Short description of the company (optional)
-        description: | # this will include new lines to allow paragraphs
-          Description of role
-  - title: Education
-    layout: list
-    content:
-      - layout: top-right
-        title: Institution name
-        sub_title: Qualifications (eg. BA Performing Arts)
-        caption: Date Range (eg. 2016 - 2019)
-        quote: >
-          Short institution or course description (optional)
-        description: | # this will include new lines to allow paragraphs
-          Description of qualification
-  - title: A Little More About Me
-    layout: text
-    content: | # this will include new lines to allow paragraphs
-      This is where you can write a little more about yourself. You could title this section **Interests** and include some of your other interests.
+      # _projects 폴더의 내용을 기반으로 아래 항목들을 채워주세요.
+      # 예시:
+      # - layout: left # 또는 top, right 등 테마가 지원하는 레이아웃
+      #   title: 프로젝트 명칭 1
+      #   # link: /projects/project-file-name-1 # 해당 프로젝트의 상세 페이지 링크 (필요시)
+      #   # additional_links:
+      #   #   - title: GitHub Repository
+      #   #     icon: fab fa-github
+      #   #     url: https://github.com/wintrover/project-repo-1
+      #   quote: >
+      #     프로젝트에 대한 간략한 한 줄 요약
+      #   description: |
+      #     - 프로젝트에서 수행한 역할 및 주요 기능
+      #     - 사용 기술 스택
+      #     - 성과 및 배운 점
 
-      Or you could title it **Skills** and write a bit more about things that make you more desirable, like *leadership* or *teamwork*
+  - title: Experience # 경력 사항
+    layout: list
+    content:
+      # 경력 사항이 있다면 아래 형식으로 추가해주세요.
+      # - layout: right
+      #   title: 회사명
+      #   sub_title: 직책
+      #   caption: 근무 기간 (예: 2020.03 - 현재)
+      #   # link: 회사 웹사이트 링크 (선택 사항)
+      #   # quote: >
+      #   #   회사에 대한 간략한 소개 (선택 사항)
+      #   description: |
+      #     - 담당했던 주요 업무 및 프로젝트
+      #     - 사용했던 기술 및 도구
+      #     - 구체적인 성과 (수치화 가능하면 좋음)
+
+  - title: Education # 학력 사항
+    layout: list
+    content:
+      # 학력 사항을 아래 형식으로 추가해주세요.
+      # - layout: top-right
+      #   title: 학교명
+      #   sub_title: 전공 및 학위 (예: 컴퓨터공학 학사)
+      #   caption: 재학 기간 (예: 2015.03 - 2019.02)
+      #   # quote: >
+      #   #   학교 또는 학과에 대한 간략한 소개 (선택 사항)
+      #   description: |
+      #     - 주요 학습 내용 및 수강 과목
+      #     - 관련 프로젝트 또는 논문
+      #     - 학점 또는 성적 (선택 사항)
+
+  - title: Skills # 보유 기술
+    layout: text # 또는 list 형식으로도 가능
+    content: | # Markdown으로 자유롭게 기술
+      **Programming Languages:**
+      - Python
+      - Java
+      - JavaScript
+
+      **Frameworks & Libraries:**
+      - Spring Boot
+      - React
+      - Node.js
+
+      **Databases:**
+      - MySQL
+      - PostgreSQL
+
+      **Tools:**
+      - Git & GitHub
+      - Docker
+      - Jenkins
+
+      **(기타 본인이 자신있는 기술들을 추가해주세요)**
 
 # Footer
 footer_show_references: true
-# references_title: References on request (Override references text)
+# references_title: References on request
 
 # Build settings
-# theme: modern-resume-theme (Use this is you are hosting your resume yourself)
-# remote_theme: sproogen/modern-resume-theme (Use this if you are hosting your resume on GitHub)
+# theme: modern-resume-theme # 로컬에서 직접 테마를 수정/개발하는 경우가 아니면 주석 처리
+remote_theme: sproogen/modern-resume-theme # GitHub 호스팅 시 권장되는 방식
 
 sass:
   sass_dir: _sass
   style: compressed
 
 plugins:
- - jekyll-seo-tag
+ - jekyll-feed # 기존 플러그인 유지
+ - jekyll-seo-tag # 기존 플러그인 유지
 
 exclude : [
   "Gemfile",
