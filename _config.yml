@@ -16,7 +16,7 @@ website: https://wintrover.github.io # 기존 url에서 가져옴
 # website_title: Web
 
 # Dark Mode (true/false/never)
-darkmode: false # 기본값 유지 또는 취향에 따라 변경
+darkmode: never # 기본값 유지 또는 취향에 따라 변경
 
 # Social links
 # twitter_username:
