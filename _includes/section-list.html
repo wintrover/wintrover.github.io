@@ -1,6 +1,6 @@
 {% for item in include.content %}
   <div class="row clearfix layout layout-{{item.layout | default: 'left'}} border-{{item.border | default: 'no'}}">
-    <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details details-centered">
+    <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
       <div class="project-title-group">
         <h4 id="{{ item.title | slugify }}" class="project-title">{{ item.title }}</h4>
         {% if item.logo %}
