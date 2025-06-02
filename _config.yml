@@ -7,7 +7,7 @@ version: 2
 
 # Personal info
 name: Su Hyok Yun # 기존 title에서 가져옴
-title: Software Developer # 예시 직함, 본인에 맞게 수정
+title: Software Developer # 실제 직함으로 변경해주세요.
 email: your-email@example.com # 실제 이메일 주소로 변경해주세요.
 # email_title: Email
 # phone: Your phone number (optional)
@@ -26,7 +26,7 @@ github_username: wintrover # 사용자님의 GitHub ID
 # facebook_username:
 # flickr_username:
 # instagram_username:
-# linkedin_username: # LinkedIn 사용자명 입력
+linkedin_username: # 여기에 LinkedIn 사용자명을 입력해주세요.
 # xing_username:
 # pinterest_username:
 # youtube_username:
@@ -46,32 +46,93 @@ github_username: wintrover # 사용자님의 GitHub ID
 
 # About Section
 # about_title: About Me
-about_profile_image: assets/images/profile.jpg # 프로필 이미지 경로 예시, 실제 이미지 경로로 수정하거나 이미지를 추가해주세요.
+about_profile_image: assets/images/profile.png # wintrover.github.io_new/assets/images/profile.png 를 사용한다고 가정, 필요시 경로 수정 또는 이미지 복사
 about_content: | # Markdown 형식으로 자신을 소개해주세요.
   안녕하세요! Su Hyok Yun 입니다.
   이곳은 저의 개인 포트폴리오 웹사이트입니다.
   방문해주셔서 감사합니다.
-  (이곳에 더 자세한 자기소개를 Markdown 형식으로 작성해주세요.)
+  (wintrover.github.io_new/README.md 등의 내용을 참고하여 더 자세한 자기소개를 Markdown 형식으로 작성해주세요.)
 
 content:
-  - title: Projects # 기존 _projects 컬렉션 내용을 여기에 통합
+  - title: Projects
     layout: list
     content:
-      # _projects 폴더의 내용을 기반으로 아래 항목들을 채워주세요.
-      # 예시:
-      # - layout: left # 또는 top, right 등 테마가 지원하는 레이아웃
-      #   title: 프로젝트 명칭 1
-      #   # link: /projects/project-file-name-1 # 해당 프로젝트의 상세 페이지 링크 (필요시)
-      #   # additional_links:
-      #   #   - title: GitHub Repository
-      #   #     icon: fab fa-github
-      #   #     url: https://github.com/wintrover/project-repo-1
-      #   quote: >
-      #     프로젝트에 대한 간략한 한 줄 요약
-      #   description: |
-      #     - 프로젝트에서 수행한 역할 및 주요 기능
-      #     - 사용 기술 스택
-      #     - 성과 및 배운 점
+      - layout: top-middle # 레이아웃은 top, left, right, top-left, top-right, top-middle 중 선택
+        title: Face Recognition Dating App (소담연)
+        # link: /projects/sodamyeon # sodamyeon.md 파일이 있다면 해당 경로로
+        additional_links:
+          - title: GitHub Repository
+            icon: fab fa-github
+            url: https://github.com/Suyangdaekun/Sodamyeon.git
+          - title: YouTube Demo
+            icon: fab fa-youtube
+            url: https://www.youtube.com/embed/OM7OZrjQ1wo
+        quote: >
+          A senior dating app that leverages face reading and astrology-based matching algorithms. (관상학과 천문학 기반 매칭 알고리즘을 활용한 노인 데이팅 앱)
+        description: |
+          **Dev Period:** 2 weeks
+          **Skills:** Mediapipe, Flask, Socket, Firebase
+
+          **Key Features & Challenges:**
+          - Developed facial landmark recognition system, comparing Mediapipe, dlib, and FAN for accuracy.
+          - Addressed CUDA memory issues and version conflicts using Docker and dynamic device detection.
+          - Created a physiognomy analysis algorithm based on facial ratios and alignment preprocessing.
+          - Solved multi-device compatibility issues with resolution normalization and server-side processing options.
+          - Implemented robust real-time messaging with Socket.IO and Firebase.
+          - Designed a senior-friendly UI/UX with larger touch targets and simplified navigation.
+          - **Results:** Landmark detection accuracy improved to 94%, senior task completion to 92%, processing time reduced to 0.7s.
+
+      - layout: top-middle
+        title: Deep Fake Detect App
+        # link: /projects/deepfake
+        additional_links:
+          - title: GitHub Repository
+            icon: fab fa-github
+            url: https://github.com/wintrover/DeepFakeDetectApp
+          - title: YouTube Demo
+            icon: fab fa-youtube
+            url: https://www.youtube.com/embed/O3X-rWDxpi8
+        quote: >
+          A mobile application that uses deep learning models to detect deepfake images and videos. (딥러닝 모델을 사용하여 딥페이크 이미지와 비디오를 감지하는 모바일 애플리케이션)
+        description: |
+          **Dev Period:** 2 weeks
+          **Skills:** ONNX, Kotlin, YOLO11, EfficientNet
+
+          **Key Features & Challenges:**
+          - Balanced model performance (EfficientNet-Lite0) and app size (16MB after quantization) for mobile deployment.
+          - Resolved OOM errors by implementing bitmap recycling and ONNX tensor release.
+          - Improved face detection accuracy from 30% miss rate to 94% using YOLO11n-Face and box expansion.
+          - Enhanced UI responsiveness by migrating inference to coroutines and adding progress UI.
+          - Fixed ONNX Runtime version mismatches by re-exporting models with specific opset versions.
+          - **Results:** Model size 4.2MB, inference time 350ms, 91% accuracy on FaceForensics++. App crash rate reduced from 15% to 0.2%.
+
+      - layout: top-middle
+        title: CVFactory (자소서공장)
+        # link: /projects/cvfactory
+        additional_links:
+          - title: GitHub Repository
+            icon: fab fa-github
+            url: https://github.com/wintrover/CVFactory
+          - title: Live Demo
+            icon: fas fa-external-link-alt
+            url: https://cvfactory.dev
+        quote: >
+          An automated personal statement generation tool that creates professional documents from raw data. (원시 데이터에서 전문적인 자기소개서를 생성하는 자동화된 자소서 생성 도구)
+        description: |
+          **Dev Period:** In progress (진행 중)
+          **Skills:** Python, Django, Groq API, Selenium
+
+          **Key Features & Challenges:**
+          - Automated job posting and company information crawlers using Selenium and BeautifulSoup.
+          - Django backend with REST API for data management and user requests.
+          - Integrated Groq API for generating personalized cover letters.
+          - Addressed CSRF protection middleware issues in Django.
+          - Enhanced security by managing environment variables and strengthening .gitignore.
+          - Solved Groq API token limit overflows with a multi-stage API call approach.
+          - Fixed frontend-backend CSRF token integration.
+          - Resolved Groq API client initialization errors with patched methods and fallback HTTP client.
+          - Deployed on Netlify for continuous integration and delivery.
+          - **Future Improvements:** AI content suggestions, keyword optimization, job platform integration.
 
   - title: Experience # 경력 사항
     layout: list
