@@ -21,5 +21,25 @@ h4.project-title {
 }
 
 .content {
-  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.content p,
+.content ul,
+.content li,
+.content h1,
+.content h2,
+.content h3,
+.content h4,
+.content h5,
+.content h6 {
+  text-align: left;
+  width: auto;
+  max-width: 100%;
+}
+
+.content ul {
+  padding-left: 20px;
 }
