@@ -58,7 +58,7 @@ content:
     layout: list
     content:
       - layout: left
-        title: CVFactory (자소서공장)
+        title: CVFactory
         logo: assets/images/CVFactory_logo.png
         # link: /projects/cvfactory
         additional_links:
@@ -85,7 +85,7 @@ content:
           - **향후 개선:** AI 콘텐츠 추천, 키워드 최적화, 채용 플랫폼 연동.
 
       - layout: left
-        title: Face Recognition Dating App (소담연)
+        title: Face Recognition Dating App
         logo: assets/images/sodamyeon_logo.png
         # link: /projects/sodamyeon # sodamyeon.md 파일이 있다면 해당 경로로
         additional_links:
