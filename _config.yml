@@ -12,7 +12,7 @@ email: wintrover@gmail.com
 # email_title: Email
 # phone: Your phone number (optional)
 # phone_title: Phone
-website: https://wintrover.github.io # 기존 url에서 가져옴
+# website: https://wintrover.github.io # 기존 url에서 가져옴
 # website_title: Web
 
 # Dark Mode (true/false/never)
@@ -26,7 +26,7 @@ github_username: wintrover # 사용자님의 GitHub ID
 # facebook_username:
 # flickr_username:
 # instagram_username:
-linkedin_username: # 여기에 LinkedIn 사용자명을 입력해주세요.
+linkedin_username: https://www.linkedin.com/in/suhyok-yun-1934b713a/
 # xing_username:
 # pinterest_username:
 # youtube_username:
