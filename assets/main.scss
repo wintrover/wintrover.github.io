@@ -3,3 +3,10 @@
 ---
 
 @import 'modern-resume-theme';
+
+.project-logo {
+  max-width: 50px; // 로고 최대 너비
+  max-height: 50px; // 로고 최대 높이
+  margin-right: 10px; // 제목과의 오른쪽 마진
+  vertical-align: middle; // 세로 정렬
+}

@@ -59,6 +59,7 @@ content:
     content:
       - layout: top-middle # 레이아웃은 top, left, right, top-left, top-right, top-middle 중 선택
         title: Face Recognition Dating App (소담연)
+        logo: assets/images/sodamyeon_logo.png
         # link: /projects/sodamyeon # sodamyeon.md 파일이 있다면 해당 경로로
         additional_links:
           - title: GitHub Repository
@@ -84,6 +85,7 @@ content:
 
       - layout: top-middle
         title: Deep Fake Detect App
+        logo: assets/images/bluecheck_logo.png
         # link: /projects/deepfake
         additional_links:
           - title: GitHub Repository
@@ -108,6 +110,7 @@ content:
 
       - layout: top-middle
         title: CVFactory (자소서공장)
+        logo: assets/images/CVFactory_logo.png
         # link: /projects/cvfactory
         additional_links:
           - title: GitHub Repository
