@@ -57,6 +57,35 @@ content:
   - title: Projects
     layout: list
     content:
+      - layout: top-middle
+        title: CVFactory (자소서공장)
+        logo: assets/images/CVFactory_logo.png
+        # link: /projects/cvfactory
+        additional_links:
+          - title: GitHub Repository
+            icon: fab fa-github
+            url: https://github.com/wintrover/CVFactory
+          - title: Live Demo
+            icon: fas fa-external-link-alt
+            url: https://cvfactory.dev
+        quote: >
+          An automated personal statement generation tool that creates professional documents from raw data. (원시 데이터에서 전문적인 자기소개서를 생성하는 자동화된 자소서 생성 도구)
+        description: |
+          **Dev Period:** In progress (진행 중)
+          **Skills:** Python, Django, Groq API, Selenium
+
+          **Key Features & Challenges:**
+          - Automated job posting and company information crawlers using Selenium and BeautifulSoup.
+          - Django backend with REST API for data management and user requests.
+          - Integrated Groq API for generating personalized cover letters.
+          - Addressed CSRF protection middleware issues in Django.
+          - Enhanced security by managing environment variables and strengthening .gitignore.
+          - Solved Groq API token limit overflows with a multi-stage API call approach.
+          - Fixed frontend-backend CSRF token integration.
+          - Resolved Groq API client initialization errors with patched methods and fallback HTTP client.
+          - Deployed on Netlify for continuous integration and delivery.
+          - **Future Improvements:** AI content suggestions, keyword optimization, job platform integration.
+
       - layout: top-middle # 레이아웃은 top, left, right, top-left, top-right, top-middle 중 선택
         title: Face Recognition Dating App (소담연)
         logo: assets/images/sodamyeon_logo.png
@@ -107,35 +136,6 @@ content:
           - Enhanced UI responsiveness by migrating inference to coroutines and adding progress UI.
           - Fixed ONNX Runtime version mismatches by re-exporting models with specific opset versions.
           - **Results:** Model size 4.2MB, inference time 350ms, 91% accuracy on FaceForensics++. App crash rate reduced from 15% to 0.2%.
-
-      - layout: top-middle
-        title: CVFactory (자소서공장)
-        logo: assets/images/CVFactory_logo.png
-        # link: /projects/cvfactory
-        additional_links:
-          - title: GitHub Repository
-            icon: fab fa-github
-            url: https://github.com/wintrover/CVFactory
-          - title: Live Demo
-            icon: fas fa-external-link-alt
-            url: https://cvfactory.dev
-        quote: >
-          An automated personal statement generation tool that creates professional documents from raw data. (원시 데이터에서 전문적인 자기소개서를 생성하는 자동화된 자소서 생성 도구)
-        description: |
-          **Dev Period:** In progress (진행 중)
-          **Skills:** Python, Django, Groq API, Selenium
-
-          **Key Features & Challenges:**
-          - Automated job posting and company information crawlers using Selenium and BeautifulSoup.
-          - Django backend with REST API for data management and user requests.
-          - Integrated Groq API for generating personalized cover letters.
-          - Addressed CSRF protection middleware issues in Django.
-          - Enhanced security by managing environment variables and strengthening .gitignore.
-          - Solved Groq API token limit overflows with a multi-stage API call approach.
-          - Fixed frontend-backend CSRF token integration.
-          - Resolved Groq API client initialization errors with patched methods and fallback HTTP client.
-          - Deployed on Netlify for continuous integration and delivery.
-          - **Future Improvements:** AI content suggestions, keyword optimization, job platform integration.
 
   - title: Experience # 경력 사항
     layout: list
