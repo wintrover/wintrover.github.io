@@ -4,20 +4,34 @@
 
 @import 'modern-resume-theme';
 
+.details-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center; // 내부 텍스트 요소들도 중앙 정렬
+}
+
 .project-title-group {
   display: flex; // 플렉스 컨테이너로 설정
   align-items: center; // 세로 중앙 정렬
+  justify-content: center; // 그룹 내 아이템(제목, 로고)을 중앙으로 정렬
+  width: 100%; // 부모(details-centered)의 align-items:center 적용을 위해 필요할 수 있음
   margin-bottom: 0.5rem; // 제목 아래쪽의 다른 내용과의 간격
 }
 
 .project-logo {
   max-width: 40px; // 로고 최대 너비 약간 줄임
   max-height: 40px; // 로고 최대 높이 약간 줄임
-  margin-right: 8px; // 제목과의 오른쪽 마진 약간 줄임
-  // vertical-align: middle; // flex 사용 시 이 속성은 필요 없을 수 있음
+  margin-left: 8px; // 오른쪽에서 왼쪽으로 변경
+  order: 1; // 로고가 제목보다 뒤에 오도록 순서 지정 (flex 아이템 순서)
 }
 
 h4.project-title {
   margin-bottom: 0; // project-title-group에서 마진을 관리하므로 h4 자체 마진 제거
-  // 필요에 따라 font-size 등 조절
+  order: 0; // 제목이 로고보다 앞에 오도록 순서 지정
+}
+
+// details-centered 내부의 다른 p 태그들도 중앙 정렬이 필요하면 추가
+.details-centered p {
+  text-align: center;
 }
