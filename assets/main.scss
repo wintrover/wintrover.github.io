@@ -4,6 +4,15 @@
 
 @import 'modern-resume-theme';
 
+.container {
+  width: 70% !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
 .project-title-group {
   display: flex; 
   align-items: center; 
