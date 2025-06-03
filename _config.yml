@@ -145,7 +145,7 @@ content:
           - ONNX 런타임 버전 문제 해결.
 
           <!-- -->
-          **성과:** 모델 4.2MB, 추론 350ms, 정확도 91%(FaceForensics++ 기준).
+          **성과:** 모델 4.2MB, 추론 350ms, 정확도 91%(FaceForensics++ 데이터셋 기준).
 
   - title: Experience # 경력 사항
     layout: list
