@@ -67,6 +67,7 @@
     padding: 0;
     margin-right: 100px;
     width: 30%;
+    max-width: 40%;
 
     p {
       margin-bottom: 3px;
@@ -144,6 +145,7 @@
 
   .details, .content {
     width: 100%;
+    max-width: 60%;
   }
 }
 
