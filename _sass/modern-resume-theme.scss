@@ -64,6 +64,7 @@
     text-align: left;
     justify-content: center;
     vertical-align: middle;
+    padding: 0;
 
     p {
       margin-bottom: 3px;
@@ -129,7 +130,7 @@
   }
 
   .details {
-    margin-bottom: 2rem;
+    margin-bottom: 0;
   }
 }
 
