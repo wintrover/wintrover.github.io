@@ -23,7 +23,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0' # 또는 Gemfile에 명시된 Ruby 버전 사용
+          ruby-version: '2.7' # Ruby 버전을 2.7로 변경
           bundler-cache: false # 'bundle install' 자동 실행 비활성화
 
       - name: Install dependencies
