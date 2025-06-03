@@ -24,7 +24,12 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.0' # 또는 Gemfile에 명시된 Ruby 버전 사용
-          bundler-cache: true # 'bundle install' 자동 실행
+          bundler-cache: false # 'bundle install' 자동 실행 비활성화
+
+      - name: Install dependencies
+        run: |
+          bundle config unset deployment || true # deployment 모드 설정 해제 (오류 무시)
+          bundle install --jobs 4 --retry 3
 
       - name: Setup Pages
         id: pages
