@@ -154,7 +154,7 @@ content:
     layout: list
     content:
       - layout: right
-        title: 주식회사 포크
+        title: FOCC INC
         sub_title: 사업전략팀
         caption: 2024년 2월 - 2024년 7월
         description: |
@@ -162,7 +162,7 @@ content:
           - 시장 동향 및 경쟁 환경 분석을 통해 전략적 의사 결정을 내리는 능력 입증.
           - 회사 전략 기획에 기여하여 2024년 6월 한국관광공사 관광벤처기업으로 선정되었으며, 내년 상반기까지 300% 이상 매출 성장(40억 원)을 목표로 견고한 사업 기반 구축을 적극 지원.
       - layout: right
-        title: 인사이트 마케팅랩스
+        title: Insight Marketing Labs
         sub_title: 영업팀 · 프리랜서
         caption: 2022년 10월 - 2023년 12월
         description: |
@@ -170,14 +170,14 @@ content:
           - 고객의 요구와 문제점을 깊이 이해하고 맞춤형 컨설팅 솔루션 제공.
           - 30개의 신규 기업 고객 확보(연 매출 15% 증가) 및 효과적인 문제 해결과 관계 구축을 통해 85% 이상의 계약 갱신율 유지하며显著한 사업 성장 달성.
       - layout: right
-        title: 이아이시스템즈
+        title: EISystems
         sub_title: 프론트엔드 웹 개발자
         caption: 2021년 11월 - 2022년 10월
         description: |
           - 프론트엔드 웹 개발 프로젝트에 참여하고 고객 애플리케이션 시스템 유지보수 지원.
           - 소프트웨어 개발 수명주기에 대한 실무 경험과 소프트웨어 시스템 구축 및 유지보수 방식에 대한 이해 습득.
       - layout: right
-        title: 비즈캠
+        title: VizCam
         sub_title: 기술 지원
         caption: 2020년 5월 - 2021년 10월
         description: |
