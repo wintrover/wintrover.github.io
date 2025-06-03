@@ -25,6 +25,7 @@ jobs:
         with:
           ruby-version: '2.7' # Ruby 버전을 2.7로 변경
           bundler-cache: false # 'bundle install' 자동 실행 비활성화
+          rubygems: 'latest' # RubyGems를 최신 버전으로 업데이트
 
       - name: Install dependencies
         run: |
