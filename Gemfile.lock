@@ -272,7 +272,9 @@ GEM
     zeitwerk (2.6.18)
 
 PLATFORMS
+  ruby
   x64-mingw32
+  x86_64-linux
 
 DEPENDENCIES
   html-proofer (~> 3.9)
