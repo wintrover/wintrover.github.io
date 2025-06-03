@@ -72,20 +72,20 @@ content:
           웹 스크래핑, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서를 생성하는 자동화 도구입니다.
         dev_info: |
           **개발 기간:** 진행 중 <br/>
-          **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), HTML, CSS, JavaScript, Docker, Docker Compose, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, SQLite/PostgreSQL, Gunicorn, Whitenoise, Cloudflare
+          **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
         description: |
           **주요 기능 및 도전 과제:**
-          - **Backend (CVFactory Server):**
-            - Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).
-            - FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.
-            - Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축.
-          - **Frontend (CVFactory Web):**
-            - Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).
-          - **공통 및 인프라:**
-            - Docker/Docker Compose 기반 애플리케이션 컨테이너화.
-            - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
+            - **Backend (CVFactory Server):**
+              - Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).
+              - FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.
+              - Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축.
+            - **Frontend (CVFactory Web):**
+              - Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).
+            - **공통 및 인프라:**
+              - Docker 기반 애플리케이션 컨테이너화.
+              - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
 
-          **향후 개선:** 로그인 및 개인 설정 추가, FaaS 도입으로 크롤링 성능 최적화, 회사 홈페이지 크롤링 지원 기능 추가
+            **향후 개선:** 로그인 및 개인 설정 추가, FaaS 도입으로 크롤링 성능 최적화, 회사 홈페이지 크롤링 지원 기능 추가
 
       - layout: left
         title: Face Recognition Dating App
