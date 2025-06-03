@@ -79,7 +79,7 @@ content:
               - Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).
               - FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.
               - Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축.
-            - **Frontend (CVFactory Web):**
+            - **Frontend (CVFactory):**
               - Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).
             - **공통 및 인프라:**
               - Docker 기반 애플리케이션 컨테이너화.
