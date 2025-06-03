@@ -102,7 +102,7 @@ content:
           관상학과 천문학 기반 매칭 알고리즘을 활용한 시니어 데이팅 앱입니다.
         dev_info: |
           **개발 기간:** 2주 <br/>
-          **사용 기술:** Mediapipe, Flask, Socket, Firebase
+          **사용 기술:** Mediapipe, Firebase
         description: |
           **주요 기능 및 성과:**
           - 얼굴 랜드마크 인식 시스템 개발 (Mediapipe 등 정확도 비교).
