@@ -133,7 +133,7 @@ content:
             icon: fab fa-youtube
             url: https://www.youtube.com/embed/O3X-rWDxpi8
         quote: >
-          딥러닝 모델을 사용하여 딥페이크 이미지와 비디오를 감지하는 모바일 애플리케이션입니다.
+          딥러닝 모델을 사용하여 딥페이크 이미지를 감지하는 모바일 애플리케이션입니다.
         dev_info: |
           **개발 기간:** 2주 <br/>
           **사용 기술:** ONNX, Kotlin, YOLO11, EfficientNet
