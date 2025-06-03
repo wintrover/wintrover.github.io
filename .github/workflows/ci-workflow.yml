@@ -3,7 +3,7 @@ name: Deploy Jekyll site to GitHub Pages
 on:
   push:
     branches:
-      - main # 저장소의 기본 브랜치명으로 수정 (예: master, main)
+      - develop # 저장소의 기본 브랜치명으로 수정 (예: master, main)
   workflow_dispatch: # 수동 실행 옵션
 
 jobs:
