@@ -70,10 +70,10 @@ content:
             url: https://cvfactory.dev
         quote: >
           웹 스크래핑, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서를 생성하는 자동화 도구입니다.
-        description: |
-          **개발 기간:** 진행 중
+        dev_info: |
+          **개발 기간:** 진행 중 <br/>
           **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), HTML, CSS, JavaScript, Docker, Docker Compose, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, SQLite/PostgreSQL, Gunicorn, Whitenoise, Cloudflare
-
+        description: |
           **주요 기능 및 도전 과제:**
           - **Backend (CVFactory Server):**
             - Playwright와 BeautifulSoup를 이용한 웹 페이지 정보 비동기 스크래핑 및 HTML 파싱 (iframe 재귀 탐색 포함).
@@ -106,10 +106,10 @@ content:
             url: https://www.youtube.com/embed/OM7OZrjQ1wo
         quote: >
           관상학과 천문학 기반 매칭 알고리즘을 활용한 시니어 데이팅 앱입니다.
-        description: |
-          **개발 기간:** 2주
+        dev_info: |
+          **개발 기간:** 2주 <br/>
           **사용 기술:** Mediapipe, Flask, Socket, Firebase
-
+        description: |
           **주요 기능 및 성과:**
           - 얼굴 랜드마크 인식 시스템 개발 (Mediapipe 등 정확도 비교).
           - 관상 분석 알고리즘 개발 및 적용.
@@ -131,10 +131,10 @@ content:
             url: https://www.youtube.com/embed/O3X-rWDxpi8
         quote: >
           딥러닝 모델을 사용하여 딥페이크 이미지와 비디오를 감지하는 모바일 애플리케이션입니다.
-        description: |
-          **개발 기간:** 2주
+        dev_info: |
+          **개발 기간:** 2주 <br/>
           **사용 기술:** ONNX, Kotlin, YOLO11, EfficientNet
-
+        description: |
           **주요 기능 및 성과:**
           - 모바일 최적화 딥페이크 탐지 모델 개발 (EfficientNet-Lite0, ONNX).
           - 얼굴 감지 정확도 향상 (YOLO11n-Face, 30% → 94%).

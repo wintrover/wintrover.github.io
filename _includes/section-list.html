@@ -1,6 +1,13 @@
 {% for item in include.content %}
   <div class="row clearfix layout layout-{{item.layout | default: 'left'}} border-{{item.border | default: 'no'}}">
     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
+      <p class="no-print aditional-links">
+        {% for link in item.additional_links %}
+          {% include a.html href=link.url class="" %}
+            <i class="{{ link.icon }}" title="{{ link.title | escape }}"></i>
+          </a>
+        {% endfor %}
+      </p>
       <div class="project-title-group">
         <h4 id="{{ item.title | slugify }}" class="project-title">{{ item.title }}</h4>
         {% if item.logo %}
@@ -19,13 +26,9 @@
       {%- if item.quote -%}
         <p class="quote">{{ item.quote }}</p>
       {%- endif -%}
-      <p class="no-print aditional-links">
-        {% for link in item.additional_links %}
-          {% include a.html href=link.url class="" %}
-            <i class="{{ link.icon }}" title="{{ link.title | escape }}"></i>
-          </a>
-        {% endfor %}
-      </p>
+      {%- if item.dev_info -%}
+        {{ item.dev_info | strip | markdownify }}
+      {%- endif -%}
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
       {{ item.description | strip | markdownify }}
