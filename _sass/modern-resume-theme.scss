@@ -57,7 +57,6 @@
   margin-top: 3rem;
   display: flex;
   flex-direction: row;
-  gap: 100px;
 
   .details {
     display: flex;
@@ -66,6 +65,7 @@
     justify-content: center;
     vertical-align: middle;
     padding: 0;
+    margin-right: 100px;
     width: 40%;
 
     p {
