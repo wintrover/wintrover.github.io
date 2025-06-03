@@ -87,7 +87,7 @@ content:
 
             **향후 개선:** 로그인 및 개인 설정 추가, FaaS 도입으로 크롤링 성능 최적화, 회사 홈페이지 크롤링 지원 기능 추가
             **성과:**
-            - 동적 크롤링으로 iframe 크롤링 및 cohere를 통한 rag화 성공
+            - 동적 크롤링으로 iframe 크롤링 및 cohere를 통한 RAG화 성공
             - google cloud run을 통한 안정적인 배포 완료
 
       - layout: left
