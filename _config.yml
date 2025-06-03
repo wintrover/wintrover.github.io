@@ -140,7 +140,7 @@ content:
           - 얼굴 감지 정확도 향상 (YOLO11n-Face, 30% → 50%).
           - OOM 오류 해결 및 UI 응답성 개선.
           - ONNX 런타임 버전 문제 해결.
-          - **성과:** 모델 4.2MB, 추론 350ms, 정확도 91%(FaceForensics++ 기준), 앱 충돌률 0.2%.
+          - **성과:** 모델 4.2MB, 추론 350ms, 정확도 91%(FaceForensics++ 기준).
 
   - title: Experience # 경력 사항
     layout: list
