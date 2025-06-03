@@ -75,12 +75,12 @@ content:
           **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
         description: |
           **주요 기능 및 도전 과제:**
+            - **Frontend (CVFactory):**
+              - Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).
             - **Backend (CVFactory Server):**
               - Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).
               - FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.
               - Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축.
-            - **Frontend (CVFactory):**
-              - Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).
             - **공통 및 인프라:**
               - Docker 기반 애플리케이션 컨테이너화.
               - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
