@@ -66,8 +66,7 @@
     vertical-align: middle;
     padding: 0;
     margin-right: 100px;
-    width: 30%;
-    max-width: 40%;
+    width: 40%;
 
     p {
       margin-bottom: 3px;
@@ -102,10 +101,6 @@
       font-size: 1.5rem;
     }
 
-    .sub-title {
-      font-size: 1.1em;
-    }
-
     h4 {
       margin-bottom: 0.1rem;
       font-weight: 500;
@@ -122,6 +117,10 @@
         font-weight: 500;
       }
     }
+  }
+
+  .content {
+    width: 60%;
   }
 }
 
@@ -149,7 +148,6 @@
 
   .details, .content {
     width: 100%;
-    max-width: 60%;
   }
 }
 

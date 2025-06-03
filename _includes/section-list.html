@@ -14,7 +14,7 @@
           <img src="{{ item.logo | relative_url }}" alt="{{ item.title }} logo" class="project-logo">
         {% endif %}
       </div>
-      {%- if item.sub_title -%}<p class="sub-title"><b>{{ item.sub_title }}</b></p>{%- endif -%}
+      {%- if item.sub_title -%}<p><b>{{ item.sub_title }}</b></p>{%- endif -%}
       {%- if item.caption -%}<p>{{ item.caption }}</p>{%- endif -%}
 
       {%- if item.link -%}
