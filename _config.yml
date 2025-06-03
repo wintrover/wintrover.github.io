@@ -153,18 +153,37 @@ content:
   - title: Experience # 경력 사항
     layout: list
     content:
-      # 경력 사항이 있다면 아래 형식으로 추가해주세요.
-      # - layout: right
-      #   title: 회사명
-      #   sub_title: 직책
-      #   caption: 근무 기간 (예: 2020.03 - 현재)
-      #   # link: 회사 웹사이트 링크 (선택 사항)
-      #   # quote: >
-      #   #   회사에 대한 간략한 소개 (선택 사항)
-      #   description: |
-      #     - 담당했던 주요 업무 및 프로젝트
-      #     - 사용했던 기술 및 도구
-      #     - 구체적인 성과 (수치화 가능하면 좋음)
+      - layout: right
+        title: FOCC INC
+        sub_title: Business Strategy Department
+        caption: 2024년 2월 - 2024년 7월
+        description: |
+          - Supported business strategy and investor relations for a senior-customized travel platform startup.
+          - Demonstrated ability to analyze market trends and competitive landscapes to inform strategic decisions.
+          - Contributed to the company's strategic planning, leading to its selection as a tourism venture by the Korea Tourism Organization in June 2024, and actively supported the establishment of a robust business foundation aiming for a 300%+ revenue growth to 4 billion KRW by the first half of next year.
+      - layout: right
+        title: Insight Marketing Labs
+        sub_title: Sales Team · Freelancer
+        caption: 2022년 10월 - 2023년 12월
+        description: |
+          - Led field sales and business development efforts for an SEO startup, directly engaging with corporate clients.
+          - Cultivated strong understanding of client needs and pain points, providing tailored consulting solutions.
+          - Achieved significant business growth by acquiring 30 new corporate clients (15% annual revenue increase) and maintaining an 85%+ contract renewal rate through effective problem-solving and relationship building.
+      - layout: right
+        title: EISystems
+        sub_title: Frontend Web Developer
+        caption: 2021년 11월 - 2022년 10월
+        description: |
+          - Contributed to frontend web development projects and provided system maintenance support for client applications.
+          - Gained practical experience in the software development lifecycle and understanding of how software systems are built and maintained.
+      - layout: right
+        title: VizCam
+        sub_title: Technical Support
+        caption: 2020년 5월 - 2021년 10월
+        description: |
+          - Provided technical support and communication for machine vision software, acting as a crucial liaison between overseas engineers and local clients.
+          - Enhanced technical understanding and troubleshooting skills by resolving complex technical issues.
+          - Facilitated smooth communication through technical translation and real-time interpretation, effectively bridging technical and non-technical stakeholders and improving project efficiency (30% timeline reduction, 90%+ customer satisfaction).
 
   - title: Education # 학력 사항
     layout: list
