@@ -186,15 +186,21 @@ content:
   - title: Education # 학력 사항
     layout: list
     content:
-      - layout: top-right # 기존 예시 레이아웃 유지
+      - layout: top-right
         title: Intel AI for Future Workforce
         sub_title: 응용 AI 애플리케이션 개발자 과정
         caption: 2024년 10월 - 2025년 4월
         description: |
           - 6개월 과정의 인텔 AI 미래 인력 양성 프로그램을 성공적으로 수료했습니다.
           - Python, PyTorch, TensorFlow를 포함한 핵심 기술을 습득하며 AI 및 앱 개발 분야에서 실질적인 경험을 쌓았습니다.
-          - 심도 있는 프로젝트와 해커톤을 통해 배포 가능한 AI 솔루션(예: CVFactory)을 개발했습니다.
-          - **동아리와 학회:** 팀 프로젝트 및 해커톤 참여
+          - 심도 있는 프로젝트와 해커톤을 통해 배포 가능한 AI 솔루션을 개발했습니다.
+
+      - layout: top-right
+        title: 한라대학교
+        sub_title: Electrical Electronic Engineering Bachelor's degree
+        caption: 2013년 3월 - 2020년 2월
+        description: |
+          Electrical Electronic Engineering Bachelor's degree
 
   - title: Skills # 보유 기술
     layout: text # 또는 list 형식으로도 가능
