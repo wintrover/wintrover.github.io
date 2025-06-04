@@ -5,29 +5,29 @@
 @import 'modern-resume-theme';
 
 .container {
-  width: 60% !important;
-  max-width: none !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
+  width: 60%;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
   padding-left: 15px;
   padding-right: 15px;
 }
 
 @media (max-width: 1200px) {
   .container {
-    width: 75% !important;
+    width: 75%;
   }
 }
 
 @media (max-width: 900px) {
   .container {
-    width: 90% !important;
+    width: 90%;
   }
 }
 
 @media (max-width: 768px) {
   .container {
-    width: 90% !important;
+    width: 90%;
   }
 }
 
@@ -73,7 +73,7 @@ h4.project-title {
 }
 
 .quote {
-  margin: 0 !important;
-  padding: 0 !important;
-  font-size: 1.4em !important;
+  margin: 0;
+  padding: 0;
+  font-size: 1.4em;
 }
