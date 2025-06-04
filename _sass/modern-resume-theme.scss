@@ -133,6 +133,11 @@
 .layout-left, .layout-right {
   @media screen and (max-width: 767px) {
     flex-direction: column;
+
+    .details,
+    .content {
+      width: 100%;
+    }
   }
 
   .details {
