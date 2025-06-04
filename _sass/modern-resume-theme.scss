@@ -206,5 +206,6 @@ p.quote {
 @media screen and (max-width: 400px) {
   .details {
     margin: 0 !important;
+    max-width: none !important;
   }
 }
