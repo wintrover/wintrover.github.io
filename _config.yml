@@ -188,14 +188,14 @@ content:
     content:
       - layout: top-right # 기존 예시 레이아웃 유지
         title: Intel AI for Future Workforce
-        sub_title: Applied AI Application Development Certificate in AI Convergence Solution Expert
+        sub_title: 인공지능 융합 솔루션 전문가를 위한 응용 AI 애플리케이션 개발 수료증
         caption: 2024년 10월 - 2025년 4월
         description: |
-          - Successfully completed the Intel AI for Future Workforce program, a rigorous 6-month bootcamp.
-          - I gained practical experience in AI and App Development, mastering core technologies including Python, PyTorch, and TensorFlow.
-          - Through in-depth projects and a hackathon, I developed deployable AI solutions (e.g., [mention your specific project/role briefly]).
-          - This program also provided extensive career support and a chance to participate in the Intel Global Impact Festival.
-          - **동아리와 학회:** Team Projects & Hackathon Participation
+          - 6개월 과정의 인텔 AI 미래 인력 양성 프로그램을 성공적으로 수료했습니다.
+          - Python, PyTorch, TensorFlow를 포함한 핵심 기술을 습득하며 AI 및 앱 개발 분야에서 실질적인 경험을 쌓았습니다.
+          - 심도 있는 프로젝트와 해커톤을 통해 배포 가능한 AI 솔루션(예: CVFactory)을 개발했습니다.
+          - 이 프로그램은 또한 광범위한 경력 지원과 인텔 글로벌 임팩트 페스티벌에 참여할 기회를 제공했습니다.
+          - **동아리와 학회:** 팀 프로젝트 및 해커톤 참여
 
   - title: Skills # 보유 기술
     layout: text # 또는 list 형식으로도 가능
