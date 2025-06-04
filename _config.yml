@@ -72,7 +72,7 @@ content:
             icon: fas fa-external-link-alt
             url: https://cvfactory.dev
         quote: >
-          웹 스크래핑, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서를 생성하는 자동화 도구입니다.
+          채용공고 웹 크롤링, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서 생성을 자동화하는 SaaS 서비스입니다.
         dev_info: |
           **개발 기간:** 진행 중 <br/>
           **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
@@ -166,9 +166,9 @@ content:
         sub_title: 영업팀 · 프리랜서
         caption: 2022년 10월 - 2023년 12월
         description: |
-          - SEO 스타트업의 현장 영업 및 사업 개발 업무 주도, 기업 고객과 직접 소통.
+          - SEO 스타트업의 현장 영업 및 사업 개발 업무 주도, 현장 고객과 직접 소통.
           - 고객의 요구와 문제점을 깊이 이해하고 맞춤형 컨설팅 솔루션 제공.
-          - 30개의 신규 기업 고객 확보(연 매출 15% 증가) 및 효과적인 문제 해결과 관계 구축을 통해 85% 이상의 계약 갱신율 유지하며显著한 사업 성장 달성.
+          - 30개의 신규 기업 고객 확보(연 매출 15% 증가) 및 효과적인 문제 해결과 관계 구축을 통해 85% 이상의 계약 갱신율 유지하며 견고한 사업 성장 달성.
       - layout: right
         title: EISystems
         sub_title: 프론트엔드 웹 개발자
