@@ -202,3 +202,9 @@ p.quote {
     margin-top: 1rem;
   }
 }
+
+@media screen and (max-width: 400px) {
+  .details {
+    margin: 0 !important;
+  }
+}
