@@ -186,17 +186,16 @@ content:
   - title: Education # 학력 사항
     layout: list
     content:
-      # 학력 사항을 아래 형식으로 추가해주세요.
-      # - layout: top-right
-      #   title: 학교명
-      #   sub_title: 전공 및 학위 (예: 컴퓨터공학 학사)
-      #   caption: 재학 기간 (예: 2015.03 - 2019.02)
-      #   # quote: >
-      #   #   학교 또는 학과에 대한 간략한 소개 (선택 사항)
-      #   description: |
-      #     - 주요 학습 내용 및 수강 과목
-      #     - 관련 프로젝트 또는 논문
-      #     - 학점 또는 성적 (선택 사항)
+      - layout: top-right # 기존 예시 레이아웃 유지
+        title: Intel AI for Future Workforce
+        sub_title: Applied AI Application Development Certificate in AI Convergence Solution Expert
+        caption: 2024년 10월 - 2025년 4월
+        description: |
+          - Successfully completed the Intel AI for Future Workforce program, a rigorous 6-month bootcamp.
+          - I gained practical experience in AI and App Development, mastering core technologies including Python, PyTorch, and TensorFlow.
+          - Through in-depth projects and a hackathon, I developed deployable AI solutions (e.g., [mention your specific project/role briefly]).
+          - This program also provided extensive career support and a chance to participate in the Intel Global Impact Festival.
+          - **동아리와 학회:** Team Projects & Hackathon Participation
 
   - title: Skills # 보유 기술
     layout: text # 또는 list 형식으로도 가능
