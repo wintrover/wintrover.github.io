@@ -186,7 +186,7 @@ content:
   - title: Education # 학력 사항
     layout: list
     content:
-      - layout: right
+      - layout: left
         title: Intel AI for Future Workforce
         sub_title: 응용 AI 애플리케이션 개발자 과정
         caption: 2024년 10월 - 2025년 4월
@@ -197,37 +197,50 @@ content:
 
       - layout: right
         title: 한라대학교
-        sub_title: Electrical Electronic Engineering Bachelor's degree
+        sub_title: 전기전자공학 학사 학위
         caption: 2013년 3월 - 2020년 2월
         description: |
-          Electrical Electronic Engineering Bachelor's degree
+          - 전기 및 전자 공학 분야의 핵심 이론과 실험·실습 교육을 이수했습니다.
+          - 스마트 전기에너지, ICT 전자부품/제품, 지능형 자동차 전장시스템 등 다양한 심화 트랙을 통해 전문성을 강화했습니다.
+          - 캡스톤 디자인 프로젝트 및 다수의 산학 연계 프로그램을 통해 실무 역량을 배양했습니다.
 
   - title: Skills # 보유 기술
     layout: text # 또는 list 형식으로도 가능
     content: | # Markdown으로 자유롭게 기술
       **Programming Languages:**
       - Python
-      - Java
       - JavaScript
+      - Kotlin
 
       **Frameworks & Libraries:**
-      - Spring Boot
-      - React
-      - Node.js
+      - Django
+      - FastAPI
+      - Celery
+      - Playwright
+      - BeautifulSoup
+      - Langchain (Groq API, Cohere Embeddings, FAISS)
+      - Mediapipe
+      - Firebase
+      - ONNX
+      - EfficientNet
+      - YOLO (YOLO11)
+      - PyTorch
+      - TensorFlow
 
-      **Databases:**
-      - MySQL
+      **Databases & Data Stores:**
       - PostgreSQL
+      - Upstash Redis
 
-      **Tools:**
-      - Git & GitHub
+      **Cloud & DevOps Tools:**
       - Docker
-      - Jenkins
-
-      **(기타 본인이 자신있는 기술들을 추가해주세요)**
+      - Git & GitHub
+      - GitHub Actions
+      - Google Cloud Run
+      - Northflank
+      - Cloudflare
 
 # Footer
-footer_show_references: true
+footer_show_references: false
 # references_title: References on request
 
 # Build settings
