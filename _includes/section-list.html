@@ -9,15 +9,12 @@
   {%- assign title_key = section_type_slug | append: "_" | append: item_id_str | append: "_title" -%}
   {%- assign item_title = site.data[site.active_lang].strings[title_key] | default: item.title -%}
 
-  {%- if item.sub_title -%}
-    {%- assign sub_title_key = section_type_slug | append: "_" | append: item_id_str | append: "_sub_title" -%}
-    {%- assign item_sub_title = site.data[site.active_lang].strings[sub_title_key] | default: item.sub_title -%}
-  {%- endif -%}
+  {%- comment %} Always try to assign sub_title and caption from _data files {%- endcomment %}
+  {%- assign sub_title_key = section_type_slug | append: "_" | append: item_id_str | append: "_sub_title" -%}
+  {%- assign item_sub_title = site.data[site.active_lang].strings[sub_title_key] -%}
 
-  {%- if item.caption -%}
-    {%- assign caption_key = section_type_slug | append: "_" | append: item_id_str | append: "_caption" -%}
-    {%- assign item_caption = site.data[site.active_lang].strings[caption_key] | default: item.caption -%}
-  {%- endif -%}
+  {%- assign caption_key = section_type_slug | append: "_" | append: item_id_str | append: "_caption" -%}
+  {%- assign item_caption = site.data[site.active_lang].strings[caption_key] -%}
 
   {%- comment %} Quote, Dev Info, Description {%- endcomment -%}
   {%- assign quote_key = section_type_slug | append: "_" | append: item_id_str | append: "_quote" -%}

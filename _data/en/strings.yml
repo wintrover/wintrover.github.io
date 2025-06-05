@@ -47,4 +47,123 @@ project_cvfactory_description: |
     - Successful dynamic crawling for iframes and RAG implementation with Cohere.
     - Stable deployment completed via Google Cloud Run.
 project_cvfactory_link_github: "GitHub Repository"
-project_cvfactory_link_demo: "Live Demo" 
+project_cvfactory_link_demo: "Live Demo"
+
+# Face Recognition Dating App Project Details
+projects_face_recognition_dating_app_title: "Face Recognition Dating App"
+projects_face_recognition_dating_app_quote: "A senior dating app using physiognomy and astrology-based matching algorithms."
+projects_face_recognition_dating_app_dev_info: |
+  **Development Period:** 2 weeks <br/>
+  **Technologies:** Mediapipe, Firebase
+projects_face_recognition_dating_app_description: |
+  **Key Features & Achievements:**
+  - Developed facial landmark recognition system (compared accuracy with Mediapipe, etc.).
+  - Developed and applied physiognomy analysis algorithm.
+  - Implemented real-time messaging (Socket.IO, Firebase).
+  - Designed senior-friendly UI/UX.
+  - Resolved Docker-based CUDA memory/version issues, multi-device compatibility.
+
+  **Achievements:** Landmark accuracy 94%, senior usability 92%, processing speed 0.7s.
+projects_face_recognition_dating_app_link_github: "GitHub Repository"
+projects_face_recognition_dating_app_link_youtube_demo: "YouTube Demo"
+
+# Deep Fake Detect App Project Details
+projects_deep_fake_detect_app_title: "Deep Fake Detect App"
+projects_deep_fake_detect_app_quote: "A mobile application that detects deepfake images using deep learning models."
+projects_deep_fake_detect_app_dev_info: |
+  **Development Period:** 2 weeks <br/>
+  **Technologies:** ONNX, Kotlin, YOLOv11, EfficientNet
+projects_deep_fake_detect_app_description: |
+  **Key Features & Achievements:**
+  - Developed mobile-optimized deepfake detection model (EfficientNet-Lite0, ONNX).
+  - Improved face detection accuracy (YOLOv11n-Face, 30% → 50%).
+  - Resolved OOM errors and improved UI responsiveness.
+  - Resolved ONNX runtime version issues.
+
+  **Achievements:** Model size 4.2MB, inference 350ms, accuracy 91% (FaceForensics++ dataset).
+projects_deep_fake_detect_app_link_github: "GitHub Repository"
+projects_deep_fake_detect_app_link_youtube_demo: "YouTube Demo"
+
+# Experience Section Details
+experience_focc_inc_title: "FOCC INC"
+experience_focc_inc_sub_title: "Business Strategy Team"
+experience_focc_inc_caption: "February 2024 - July 2024"
+experience_focc_inc_description: |
+  - Supported business strategy and IR for a senior-focused travel platform startup.
+  - Demonstrated ability to make strategic decisions by analyzing market trends and competitive landscape.
+  - Contributed to company strategy planning, leading to selection as a Korea Tourism Organization tourism venture company in June 2024, and actively supported building a solid business foundation aiming for over 300% revenue growth (KRW 4 billion) by the first half of next year.
+
+experience_insight_marketing_labs_title: "Insight Marketing Labs"
+experience_insight_marketing_labs_sub_title: "Sales Team · Freelancer"
+experience_insight_marketing_labs_caption: "October 2022 - December 2023"
+experience_insight_marketing_labs_description: |
+  - Led on-site sales and business development for an SEO startup, communicating directly with field customers.
+  - Deeply understood customer needs and problems, providing customized consulting solutions.
+  - Secured 30 new corporate clients (15% annual revenue increase) and achieved solid business growth by maintaining over 85% contract renewal rate through effective problem-solving and relationship building.
+
+experience_eisystems_title: "EISystems"
+experience_eisystems_sub_title: "Front-end Web Developer"
+experience_eisystems_caption: "January 2022 - September 2022"
+experience_eisystems_description: |
+  - Participated in front-end web development projects and supported customer application system maintenance.
+  - Gained practical experience in the software development life cycle and understanding of software system construction and maintenance methods.
+
+experience_vizcam_title: "VizCam"
+experience_vizcam_sub_title: "Technical Support"
+experience_vizcam_caption: "May 2020 - October 2021"
+experience_vizcam_description: |
+  - Handled machine vision software technical support and communication, acting as a key communication channel between overseas engineers and domestic customers.
+  - Improved technical understanding and problem-solving skills by resolving complex technical issues.
+  - Facilitated smooth communication through technical translation and real-time interpretation, effectively bridging the gap between technical and non-technical stakeholders, thereby improving project efficiency (project duration reduced by 30%, customer satisfaction over 90%).
+
+# Education Section Details
+education_intel_ai_for_future_workforce_title: "Intel AI for Future Workforce"
+education_intel_ai_for_future_workforce_sub_title: "Applied AI Application Developer Course"
+education_intel_ai_for_future_workforce_caption: "October 2024 - April 2025"
+education_intel_ai_for_future_workforce_description: |
+  - Gained practical experience in AI and app development by acquiring core skills including Python, PyTorch, and TensorFlow.
+  - Developed deployable AI solutions through in-depth projects and hackathons.
+  - Proactively led projects, mediating team conflicts and teaching GitHub usage.
+  - Ultimately succeeded in deploying AI solutions by leading projects, mediating team conflicts, and teaching GitHub usage.
+
+education_halla_university_title: "Halla University"
+education_halla_university_sub_title: "Bachelor of Electrical and Electronic Engineering"
+education_halla_university_caption: "March 2013 - February 2020"
+education_halla_university_description: |
+  - Completed core theoretical and experimental/practical education in electrical and electronic engineering.
+  - Gained experience in C programming and ICT electronic component/product control using Arduino.
+  - Cultivated practical skills through capstone design projects and numerous industry-academia linked programs.
+
+# Skills Section Content
+skills_content_md: |
+  **Programming Languages:**
+  - Python
+  - JavaScript
+  - Kotlin
+
+  **Frameworks & Libraries:**
+  - Django
+  - FastAPI
+  - Celery
+  - Playwright
+  - BeautifulSoup
+  - Langchain (Groq API, Cohere Embeddings, FAISS)
+  - Mediapipe
+  - Firebase
+  - ONNX
+  - EfficientNet
+  - YOLO (YOLOv11)
+  - PyTorch
+  - TensorFlow
+
+  **Databases & Data Stores:**
+  - PostgreSQL
+  - Upstash Redis
+
+  **Cloud & DevOps Tools:**
+  - Docker
+  - Git & GitHub
+  - GitHub Actions
+  - Google Cloud Run
+  - Northflank
+  - Cloudflare 

@@ -1,26 +1,27 @@
 # Site
-repository: wintrover/wintrover.github.io # 사용자님의 GitHub 저장소 경로
-# favicon: images/favicon.ico # 필요시 파비콘 경로 지정
+repository: wintrover/wintrover.github.io
+# favicon: images/favicon.ico
 
 # Content configuration version
 version: 2
 
 # Personal info
-name: 윤수혁 # 기존 title에서 가져옴
+# name, title, etc., are now primarily managed via _data/[lang]/strings.yml (e.g., site_title)
+name: 윤수혁
 title: AI developer
 email: wintrover@gmail.com
 # email_title: Email
 # phone: Your phone number (optional)
 # phone_title: Phone
-# website: https://wintrover.github.io # 기존 url에서 가져옴
+# website: https://wintrover.github.io
 # website_title: Web
 
 # Dark Mode (true/false/never)
-darkmode: never # 기본값 유지 또는 취향에 따라 변경
+darkmode: never
 
 # Social links
 # twitter_username:
-github_username: wintrover # 사용자님의 GitHub ID
+github_username: wintrover
 # stackoverflow_username:
 # dribbble_username:
 # facebook_username:
@@ -45,167 +46,67 @@ linkedin_username: suhyok-yun-1934b713a
 # google_analytics: "UA-00000000-0"
 
 # About Section
-# about_title: About Me
-about_profile_image: assets/images/profile.png # wintrover.github.io_new/assets/images/profile.png 를 사용한다고 가정, 필요시 경로 수정 또는 이미지 복사
+about_profile_image: assets/images/profile.png
+# about_content: is now managed by about_content_md in _data/[lang]/strings.yml
 
 content:
-  - title: Projects
+  - title: Projects # This section title is now managed by section_title_projects in _data
     layout: list
     content:
       - layout: left
         id: cvfactory
-        title: CVFactory # This will also be moved to _data later for i18n
         logo: assets/images/CVFactory_logo.png
-        # link: /projects/cvfactory
         additional_links:
           - data_key_id: github
-            title: GitHub Repository # This text is now sourced from _data
             icon: fab fa-github
             url: https://github.com/wintrover/CVFactory
           - data_key_id: demo
-            title: Live Demo # This text is now sourced from _data
             icon: fas fa-external-link-alt
             url: https://cvfactory.dev
       - layout: left
-        title: Face Recognition Dating App # Needs id and text moved to _data
+        id: face_recognition_dating_app
         logo: assets/images/sodamyeon_logo.png
-        # link: /projects/sodamyeon # sodamyeon.md 파일이 있다면 해당 경로로
         additional_links:
-          - title: GitHub Repository
+          - data_key_id: github
             icon: fab fa-github
             url: https://github.com/Suyangdaekun/Sodamyeon.git
-          - title: YouTube Demo
+          - data_key_id: youtube_demo
             icon: fab fa-youtube
             url: https://www.youtube.com/embed/OM7OZrjQ1wo
-        quote: >
-          관상학과 천문학 기반 매칭 알고리즘을 활용한 시니어 데이팅 앱입니다.
-        dev_info: |
-          **개발 기간:** 2주 <br/>
-          **사용 기술:** Mediapipe, Firebase
-        description: |
-          **주요 기능 및 성과:**
-          - 얼굴 랜드마크 인식 시스템 개발 (Mediapipe 등 정확도 비교).
-          - 관상 분석 알고리즘 개발 및 적용.
-          - 실시간 메시징 기능 구현 (Socket.IO, Firebase).
-          - 시니어 친화적 UI/UX 설계.
-          - Docker 기반 CUDA 메모리/버전 문제, 다중 장치 호환성 해결.
-
-          **성과:** 랜드마크 정확도 94%, 시니어 사용성 92%, 처리 속도 0.7초.
-
       - layout: left
-        title: Deep Fake Detect App
+        id: deep_fake_detect_app
         logo: assets/images/bluecheck_logo.png
-        # link: /projects/deepfake
         additional_links:
-          - title: GitHub Repository
+          - data_key_id: github
             icon: fab fa-github
             url: https://github.com/wintrover/DeepFakeDetectApp
-          - title: YouTube Demo
+          - data_key_id: youtube_demo
             icon: fab fa-youtube
             url: https://www.youtube.com/embed/O3X-rWDxpi8
-        quote: >
-          딥러닝 모델을 사용하여 딥페이크 이미지를 감지하는 모바일 애플리케이션입니다.
-        dev_info: |
-          **개발 기간:** 2주 <br/>
-          **사용 기술:** ONNX, Kotlin, YOLO11, EfficientNet
-        description: |
-          **주요 기능 및 성과:**
-          - 모바일 최적화 딥페이크 탐지 모델 개발 (EfficientNet-Lite0, ONNX).
-          - 얼굴 감지 정확도 향상 (YOLO11n-Face, 30% → 50%).
-          - OOM 오류 해결 및 UI 응답성 개선.
-          - ONNX 런타임 버전 문제 해결.
 
-          **성과:** 모델 4.2MB, 추론 350ms, 정확도 91%(FaceForensics++ 데이터셋 기준).
-
-  - title: Experience # 경력 사항
+  - title: Experience # This section title is now managed by section_title_experience in _data
     layout: list
     content:
       - layout: right
-        title: FOCC INC
-        sub_title: 사업전략팀
-        caption: 2024년 2월 - 2024년 7월
-        description: |
-          - 시니어 맞춤 여행 플랫폼 스타트업의 사업 전략 및 IR 지원.
-          - 시장 동향 및 경쟁 환경 분석을 통해 전략적 의사 결정을 내리는 능력 입증.
-          - 회사 전략 기획에 기여하여 2024년 6월 한국관광공사 관광벤처기업으로 선정되었으며, 내년 상반기까지 300% 이상 매출 성장(40억 원)을 목표로 견고한 사업 기반 구축을 적극 지원.
+        id: focc_inc
       - layout: right
-        title: Insight Marketing Labs
-        sub_title: 영업팀 · 프리랜서
-        caption: 2022년 10월 - 2023년 12월
-        description: |
-          - SEO 스타트업의 현장 영업 및 사업 개발 업무 주도, 현장 고객과 직접 소통.
-          - 고객의 요구와 문제점을 깊이 이해하고 맞춤형 컨설팅 솔루션 제공.
-          - 30개의 신규 기업 고객 확보(연 매출 15% 증가) 및 효과적인 문제 해결과 관계 구축을 통해 85% 이상의 계약 갱신율 유지하며 견고한 사업 성장 달성.
+        id: insight_marketing_labs
       - layout: right
-        title: EISystems
-        sub_title: 프론트엔드 웹 개발자
-        caption: 2022년 1월 - 2022년 9월
-        description: |
-          - 프론트엔드 웹 개발 프로젝트에 참여하고 고객 애플리케이션 시스템 유지보수 지원.
-          - 소프트웨어 개발 수명주기에 대한 실무 경험과 소프트웨어 시스템 구축 및 유지보수 방식에 대한 이해 습득.
+        id: eisystems
       - layout: right
-        title: VizCam
-        sub_title: 기술 지원
-        caption: 2020년 5월 - 2021년 10월
-        description: |
-          - 머신 비전 소프트웨어 기술 지원 및 커뮤니케이션 담당, 해외 엔지니어와 국내 고객 간의 핵심적인 소통창구 역할 수행.
-          - 복잡한 기술 문제 해결을 통해 기술 이해도 및 문제 해결 능력 향상.
-          - 기술 번역 및 실시간 통역을 통해 원활한 의사소통을 촉진하고, 기술 및 비기술 이해관계자 간의 간극을 효과적으로 메워 프로젝트 효율성 향상(프로젝트 기간 30% 단축, 고객 만족도 90% 이상 달성).
+        id: vizcam
 
-  - title: Education # 학력 사항
+  - title: Education # This section title is now managed by section_title_education in _data
     layout: list
     content:
       - layout: left
-        title: Intel AI for Future Workforce
-        sub_title: 응용 AI 애플리케이션 개발자 과정
-        caption: 2024년 10월 - 2025년 4월
-        description: |
-          - Python, PyTorch, TensorFlow를 포함한 핵심 기술을 습득하며 AI 및 앱 개발 분야에서 실질적인 경험을 쌓았습니다.
-          - 팀원의 갈등을 중재하고 깃허브 사용법을 가르치며 주도적으로 프로젝트를 리드하여 AI 솔루션을 배포하는데 까지 성공했습니다.
-
+        id: intel_ai_for_future_workforce
       - layout: right
-        title: 한라대학교
-        sub_title: 전기전자공학 학사 학위
-        caption: 2013년 3월 - 2020년 2월
-        description: |
-          - 전기 및 전자 공학 분야의 핵심 이론과 실험·실습 교육을 이수했습니다.
-          - C 프로그래밍, 아두이노를 활용한 ICT 전자부품/제품 제어 경험을 쌓았습니다.
-          - 캡스톤 디자인 프로젝트 및 다수의 산학 연계 프로그램을 통해 실무 역량을 배양했습니다.
+        id: halla_university
 
-  - title: Skills # 보유 기술
-    layout: text # 또는 list 형식으로도 가능
-    content: | # Markdown으로 자유롭게 기술
-      **Programming Languages:**
-      - Python
-      - JavaScript
-      - Kotlin
-
-      **Frameworks & Libraries:**
-      - Django
-      - FastAPI
-      - Celery
-      - Playwright
-      - BeautifulSoup
-      - Langchain (Groq API, Cohere Embeddings, FAISS)
-      - Mediapipe
-      - Firebase
-      - ONNX
-      - EfficientNet
-      - YOLO (YOLO11)
-      - PyTorch
-      - TensorFlow
-
-      **Databases & Data Stores:**
-      - PostgreSQL
-      - Upstash Redis
-
-      **Cloud & DevOps Tools:**
-      - Docker
-      - Git & GitHub
-      - GitHub Actions
-      - Google Cloud Run
-      - Northflank
-      - Cloudflare
+  - title: Skills # This section title is now managed by section_title_skills in _data
+    layout: text
+    content: # Content is managed by skills_content_md in _data/[lang]/strings.yml
 
 # Footer
 footer_show_references: false
@@ -213,15 +114,15 @@ footer_show_references: false
 
 # Build settings
 # theme: modern-resume-theme # 로컬에서 직접 테마를 수정/개발하는 경우가 아니면 주석 처리
-remote_theme: sproogen/modern-resume-theme # GitHub 호스팅 시 권장되는 방식
+remote_theme: sproogen/modern-resume-theme
 
 sass:
   sass_dir: _sass
   style: compressed
 
 plugins:
- - jekyll-feed # 기존 플러그인 유지
- - jekyll-seo-tag # 기존 플러그인 유지
+ - jekyll-feed
+ - jekyll-seo-tag
  - jekyll-polyglot
 
 exclude : [
@@ -237,21 +138,16 @@ exclude : [
   "docker-compose.yml",
   ]
 
-url: "http://localhost:4000" # 사이트 URL 설정 추가
+url: "http://localhost:4000"
 
-# jekyll-polyglot 설정
-languages: ["ko"] # 임시로 한국어만 설정
+# jekyll-polyglot settings
+languages: ["ko", "en"]
 default_lang: "ko"
 exclude_from_localization: ["assets/", "lib/"]
 parallel_localization: false
 
-# 프로필 섹션 설정
-profile:
-  name: "윤수혁"
-  title: "AI Developer"
-  image_path: "assets/images/profile.png"
-  social_links:
-    - platform: github
-      url: "https://github.com/wintrover"
-    - platform: linkedin
-      url: "https://www.linkedin.com/in/suhyok-yun-1934b713a"
+# The following 'profile' section seems to be a duplicate or misconfigured,
+# as 'name' is already defined at the top and should be handled by _data files.
+# It should be reviewed or removed if redundant.
+# profile:
+#   name: "윤수혁"
