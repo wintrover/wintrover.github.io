@@ -5,24 +5,29 @@
       <h2>{{ site.title | escape }}</h2>
     </div>
     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 header-right">
-      <div class="language-switcher no-print">
-        {% for lang_item in site.languages %}
-          {%- assign lang_name_key = "lang_switcher_" | append: lang_item -%}
-          {%- assign lang_name = site.data[site.active_lang].strings[lang_name_key] | default: lang_item -%}
+      {%- comment -%} Language switcher: single button to switch to the other language {%- endcomment -%}
+      {%- assign target_lang_code = nil -%}
+      {%- for lang_code_item in site.languages -%}
+        {%- if lang_code_item != site.active_lang -%}
+          {%- assign target_lang_code = lang_code_item -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
 
-          {%- if lang_item == site.active_lang -%}
-            <span class="current-lang button button--sacnite button--round-l button--disabled">{{ lang_name }}</span>
-          {%- else -%}
-            {%- assign lang_url_path_prefix = "" -%}
-            {%- if lang_item != site.default_lang -%}
-              {%- assign lang_url_path_prefix = "/" | append: lang_item -%}
-            {%- endif -%}
-            <a {% static_href %}href="{{ site.baseurl }}{{ lang_url_path_prefix }}{{ page.url | remove_first: site.baseurl | remove_first: ('/' | append: site.active_lang) }}"{% endstatic_href %} class="button button--sacnite button--round-l" hreflang="{{ lang_item }}" lang="{{ lang_item }}">
-              {{ lang_name }}
-            </a>
-          {%- endif -%}
-        {% endfor %}
+      {%- if target_lang_code -%}
+        {%- assign target_lang_name_key = "lang_switcher_" | append: target_lang_code -%}
+        {%- assign target_lang_display_name = site.data[site.active_lang].strings[target_lang_name_key] | default: target_lang_code -%}
+
+        {%- comment %} Use jekyll-polyglot's relocalize_url filter for robust URL generation {%- endcomment %}
+        {%- assign target_url = page.url | relocalize_url: target_lang_code -%}
+
+      <div class="language-switcher no-print">
+        <a {% static_href %}href="{{ target_url | relative_url }}"{% endstatic_href %} class="button button--sacnite button--round-l" hreflang="{{ target_lang_code }}" lang="{{ target_lang_code }}">
+          {{ target_lang_display_name }}
+        </a>
       </div>
+      {%- endif -%}
+
       <ul class="icons no-print">
         {%- if site.dribbble_username -%}
           <li>
