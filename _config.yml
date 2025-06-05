@@ -47,58 +47,27 @@ linkedin_username: suhyok-yun-1934b713a
 # About Section
 # about_title: About Me
 about_profile_image: assets/images/profile.png # wintrover.github.io_new/assets/images/profile.png 를 사용한다고 가정, 필요시 경로 수정 또는 이미지 복사
-about_content: | # Markdown 형식으로 자신을 소개해주세요.
-  성과 중심의 AI 개발자 지망생으로, LLM 및 NLP 분야에 관심이 많습니다.<br/>
-  저는 전기전자공학부를 졸업 후, 기술 지원, 프론트엔드 개발 등 기술적인 분야 뿐만 아니라<br/>
-  영업 및 비즈니스 전략 등 다양한 경험을 통해 효과적인 의사소통, 비즈니스 감각을 갖추었습니다.<br/>
-  또한, Intel 개발자 과정에서 아래 소개드릴 프로젝트들을 통해 LLM, 컴퓨터 비전 양 분야를 넘나들며 <br/>
-  다양한 딥러닝 모델을 구축하고 실제 서비스 배포까지 폭넓은 경험을 쌓았습니다.<br/>
-  저는 이러한 Python 및 관련 AI/ML 프레임워크 경험을 통한 기술력과, <br/>
-  탄탄한 고객중심의 사고방식으로 UX를 혁신하여 영향력 있는 AI 솔루션을 구축하고 싶은 야망이 있습니다.<br/>
 
 content:
   - title: Projects
     layout: list
     content:
       - layout: left
-        title: CVFactory
+        id: cvfactory
+        title: CVFactory # This will also be moved to _data later for i18n
         logo: assets/images/CVFactory_logo.png
         # link: /projects/cvfactory
         additional_links:
-          - title: GitHub Repository
+          - data_key_id: github
+            title: GitHub Repository # This text is now sourced from _data
             icon: fab fa-github
             url: https://github.com/wintrover/CVFactory
-          - title: Live Demo
+          - data_key_id: demo
+            title: Live Demo # This text is now sourced from _data
             icon: fas fa-external-link-alt
             url: https://cvfactory.dev
-        quote: >
-          채용공고 웹 크롤링, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서 생성을 자동화하는 SaaS 서비스입니다.
-        dev_info: |
-          **개발 기간:** 진행 중 <br/>
-          **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
-        description: |
-          **주요 기능 및 도전 과제:**
-            - **Frontend (CVFactory):**
-              - Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).
-            - **Backend (CVFactory Server):**
-              - Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).
-              - FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.
-              - Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축.
-            - **공통 및 인프라:**
-              - Docker 기반 애플리케이션 컨테이너화.
-              - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
-
-            **향후 개선:**
-            - 로그인 및 개인 설정 추가
-            - FaaS 도입으로 크롤링 성능 최적화
-            - 회사 홈페이지 크롤링 지원 기능 추가
-
-            **성과:**
-            - 동적 크롤링으로 iframe 크롤링 및 cohere를 통한 RAG화 성공
-            - Google Cloud Run을 통한 안정적인 배포 완료
-
       - layout: left
-        title: Face Recognition Dating App
+        title: Face Recognition Dating App # Needs id and text moved to _data
         logo: assets/images/sodamyeon_logo.png
         # link: /projects/sodamyeon # sodamyeon.md 파일이 있다면 해당 경로로
         additional_links:
@@ -253,6 +222,7 @@ sass:
 plugins:
  - jekyll-feed # 기존 플러그인 유지
  - jekyll-seo-tag # 기존 플러그인 유지
+ - jekyll-polyglot
 
 exclude : [
   "Gemfile",
@@ -266,3 +236,22 @@ exclude : [
   "scripts/",
   "docker-compose.yml",
   ]
+
+url: "http://localhost:4000" # 사이트 URL 설정 추가
+
+# jekyll-polyglot 설정
+languages: ["ko"] # 임시로 한국어만 설정
+default_lang: "ko"
+exclude_from_localization: ["assets/", "lib/"]
+parallel_localization: false
+
+# 프로필 섹션 설정
+profile:
+  name: "윤수혁"
+  title: "AI Developer"
+  image_path: "assets/images/profile.png"
+  social_links:
+    - platform: github
+      url: "https://github.com/wintrover"
+    - platform: linkedin
+      url: "https://www.linkedin.com/in/suhyok-yun-1934b713a"

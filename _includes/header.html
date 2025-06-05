@@ -5,6 +5,24 @@
       <h2>{{ site.title | escape }}</h2>
     </div>
     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 header-right">
+      <div class="language-switcher no-print">
+        {% for lang_item in site.languages %}
+          {%- assign lang_name_key = "lang_switcher_" | append: lang_item -%}
+          {%- assign lang_name = site.data[site.active_lang].strings[lang_name_key] | default: lang_item -%}
+
+          {%- if lang_item == site.active_lang -%}
+            <span class="current-lang button button--sacnite button--round-l button--disabled">{{ lang_name }}</span>
+          {%- else -%}
+            {%- assign lang_url_path_prefix = "" -%}
+            {%- if lang_item != site.default_lang -%}
+              {%- assign lang_url_path_prefix = "/" | append: lang_item -%}
+            {%- endif -%}
+            <a {% static_href %}href="{{ site.baseurl }}{{ lang_url_path_prefix }}{{ page.url | remove_first: site.baseurl | remove_first: ('/' | append: site.active_lang) }}"{% endstatic_href %} class="button button--sacnite button--round-l" hreflang="{{ lang_item }}" lang="{{ lang_item }}">
+              {{ lang_name }}
+            </a>
+          {%- endif -%}
+        {% endfor %}
+      </div>
       <ul class="icons no-print">
         {%- if site.dribbble_username -%}
           <li>

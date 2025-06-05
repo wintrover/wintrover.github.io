@@ -1,0 +1,169 @@
+# _data/ko/strings.yml
+site_title: "윤수혁 | AI 개발자"
+nav_home: "소개"
+nav_projects: "프로젝트"
+nav_experience: "경력"
+nav_education: "학력"
+nav_skills: "기술"
+lang_switcher_en: "English"
+lang_switcher_ko: "한국어"
+about_title: "소개"
+about_content_md: |-
+  성과 중심의 AI 개발자 지망생으로, LLM 및 NLP 분야에 관심이 많습니다.<br/>
+  저는 전기전자공학부를 졸업 후, 기술 지원, 프론트엔드 개발 등 기술적인 분야 뿐만 아니라<br/>
+  영업 및 비즈니스 전략 등 다양한 경험을 통해 효과적인 의사소통, 비즈니스 감각을 갖추었습니다.<br/>
+  또한, Intel 개발자 과정에서 아래 소개드릴 프로젝트들을 통해 LLM, 컴퓨터 비전 양 분야를 넘나들며 <br/>
+  다양한 딥러닝 모델을 구축하고 실제 서비스 배포까지 폭넓은 경험을 쌓았습니다.<br/>
+  저는 이러한 Python 및 관련 AI/ML 프레임워크 경험을 통한 기술력과, <br/>
+  탄탄한 고객중심의 사고방식으로 UX를 혁신하여 영향력 있는 AI 솔루션을 구축하고 싶은 야망이 있습니다.<br/>
+
+section_title_projects: "프로젝트"
+section_title_experience: "경력"
+section_title_education: "학력"
+section_title_skills: "보유 기술"
+
+# CVFactory Project Details
+projects_cvfactory_title: "CVFactory"
+projects_cvfactory_quote: "채용공고 웹 크롤링, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서 생성을 자동화하는 SaaS 서비스입니다."
+projects_cvfactory_dev_info: |
+  **개발 기간:** 진행 중 <br/>
+  **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
+projects_cvfactory_description: |
+  **주요 기능 및 도전 과제:**
+    - **Frontend (CVFactory):**
+      - Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).
+    - **Backend (CVFactory Server):**
+      - Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).
+      - FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.
+      - Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축.
+    - **공통 및 인프라:**
+      - Docker 기반 애플리케이션 컨테이너화.
+      - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
+
+    **향후 개선:**
+    - 로그인 및 개인 설정 추가
+    - FaaS 도입으로 크롤링 성능 최적화
+    - 회사 홈페이지 크롤링 지원 기능 추가
+
+    **성과:**
+    - 동적 크롤링으로 iframe 크롤링 및 cohere를 통한 RAG화 성공
+    - Google Cloud Run을 통한 안정적인 배포 완료
+projects_cvfactory_link_github: "GitHub Repository"
+projects_cvfactory_link_demo: "Live Demo"
+
+# Face Recognition Dating App Project Details
+projects_face_recognition_dating_app_title: "Face Recognition Dating App"
+projects_face_recognition_dating_app_quote: "관상학과 천문학 기반 매칭 알고리즘을 활용한 시니어 데이팅 앱입니다."
+projects_face_recognition_dating_app_dev_info: |
+  **개발 기간:** 2주 <br/>
+  **사용 기술:** Mediapipe, Firebase
+projects_face_recognition_dating_app_description: |
+  **주요 기능 및 성과:**
+  - 얼굴 랜드마크 인식 시스템 개발 (Mediapipe 등 정확도 비교).
+  - 관상 분석 알고리즘 개발 및 적용.
+  - 실시간 메시징 기능 구현 (Socket.IO, Firebase).
+  - 시니어 친화적 UI/UX 설계.
+  - Docker 기반 CUDA 메모리/버전 문제, 다중 장치 호환성 해결.
+
+  **성과:** 랜드마크 정확도 94%, 시니어 사용성 92%, 처리 속도 0.7초.
+projects_face_recognition_dating_app_link_github: "GitHub Repository"
+projects_face_recognition_dating_app_link_youtube_demo: "YouTube Demo"
+
+# Deep Fake Detect App Project Details
+projects_deep_fake_detect_app_title: "Deep Fake Detect App"
+projects_deep_fake_detect_app_quote: "딥러닝 모델을 사용하여 딥페이크 이미지를 감지하는 모바일 애플리케이션입니다."
+projects_deep_fake_detect_app_dev_info: |
+  **개발 기간:** 2주 <br/>
+  **사용 기술:** ONNX, Kotlin, YOLO11, EfficientNet
+projects_deep_fake_detect_app_description: |
+  **주요 기능 및 성과:**
+  - 모바일 최적화 딥페이크 탐지 모델 개발 (EfficientNet-Lite0, ONNX).
+  - 얼굴 감지 정확도 향상 (YOLO11n-Face, 30% → 50%).
+  - OOM 오류 해결 및 UI 응답성 개선.
+  - ONNX 런타임 버전 문제 해결.
+
+  **성과:** 모델 4.2MB, 추론 350ms, 정확도 91%(FaceForensics++ 데이터셋 기준).
+projects_deep_fake_detect_app_link_github: "GitHub Repository"
+projects_deep_fake_detect_app_link_youtube_demo: "YouTube Demo"
+
+# Experience Section Details
+experience_focc_inc_title: "FOCC INC"
+experience_focc_inc_sub_title: "사업전략팀"
+experience_focc_inc_caption: "2024년 2월 - 2024년 7월"
+experience_focc_inc_description: |
+  - 시니어 맞춤 여행 플랫폼 스타트업의 사업 전략 및 IR 지원.
+  - 시장 동향 및 경쟁 환경 분석을 통해 전략적 의사 결정을 내리는 능력 입증.
+  - 회사 전략 기획에 기여하여 2024년 6월 한국관광공사 관광벤처기업으로 선정되었으며, 내년 상반기까지 300% 이상 매출 성장(40억 원)을 목표로 견고한 사업 기반 구축을 적극 지원.
+
+experience_insight_marketing_labs_title: "Insight Marketing Labs"
+experience_insight_marketing_labs_sub_title: "영업팀 · 프리랜서"
+experience_insight_marketing_labs_caption: "2022년 10월 - 2023년 12월"
+experience_insight_marketing_labs_description: |
+  - SEO 스타트업의 현장 영업 및 사업 개발 업무 주도, 현장 고객과 직접 소통.
+  - 고객의 요구와 문제점을 깊이 이해하고 맞춤형 컨설팅 솔루션 제공.
+  - 30개의 신규 기업 고객 확보(연 매출 15% 증가) 및 효과적인 문제 해결과 관계 구축을 통해 85% 이상의 계약 갱신율 유지하며 견고한 사업 성장 달성.
+
+experience_eisystems_title: "EISystems"
+experience_eisystems_sub_title: "프론트엔드 웹 개발자"
+experience_eisystems_caption: "2022년 1월 - 2022년 9월"
+experience_eisystems_description: |
+  - 프론트엔드 웹 개발 프로젝트에 참여하고 고객 애플리케이션 시스템 유지보수 지원.
+  - 소프트웨어 개발 수명주기에 대한 실무 경험과 소프트웨어 시스템 구축 및 유지보수 방식에 대한 이해 습득.
+
+experience_vizcam_title: "VizCam"
+experience_vizcam_sub_title: "기술 지원"
+experience_vizcam_caption: "2020년 5월 - 2021년 10월"
+experience_vizcam_description: |
+  - 머신 비전 소프트웨어 기술 지원 및 커뮤니케이션 담당, 해외 엔지니어와 국내 고객 간의 핵심적인 소통창구 역할 수행.
+  - 복잡한 기술 문제 해결을 통해 기술 이해도 및 문제 해결 능력 향상.
+  - 기술 번역 및 실시간 통역을 통해 원활한 의사소통을 촉진하고, 기술 및 비기술 이해관계자 간의 간극을 효과적으로 메워 프로젝트 효율성 향상(프로젝트 기간 30% 단축, 고객 만족도 90% 이상 달성).
+
+# Education Section Details
+education_intel_ai_for_future_workforce_title: "Intel AI for Future Workforce"
+education_intel_ai_for_future_workforce_sub_title: "응용 AI 애플리케이션 개발자 과정"
+education_intel_ai_for_future_workforce_caption: "2024년 10월 - 2025년 4월"
+education_intel_ai_for_future_workforce_description: |
+  - Python, PyTorch, TensorFlow를 포함한 핵심 기술을 습득하며 AI 및 앱 개발 분야에서 실질적인 경험을 쌓았습니다.
+  - 팀원의 갈등을 중재하고 깃허브 사용법을 가르치며 주도적으로 프로젝트를 리드하여 AI 솔루션을 배포하는데 까지 성공했습니다.
+
+education_halla_university_title: "한라대학교"
+education_halla_university_sub_title: "전기전자공학 학사 학위"
+education_halla_university_caption: "2013년 3월 - 2020년 2월"
+education_halla_university_description: |
+  - 전기 및 전자 공학 분야의 핵심 이론과 실험·실습 교육을 이수했습니다.
+  - C 프로그래밍, 아두이노를 활용한 ICT 전자부품/제품 제어 경험을 쌓았습니다.
+  - 캡스톤 디자인 프로젝트 및 다수의 산학 연계 프로그램을 통해 실무 역량을 배양했습니다.
+
+# Skills Section Content
+skills_content_md: |
+  **Programming Languages:**
+  - Python
+  - JavaScript
+  - Kotlin
+
+  **Frameworks & Libraries:**
+  - Django
+  - FastAPI
+  - Celery
+  - Playwright
+  - BeautifulSoup
+  - Langchain (Groq API, Cohere Embeddings, FAISS)
+  - Mediapipe
+  - Firebase
+  - ONNX
+  - EfficientNet
+  - YOLO (YOLO11)
+  - PyTorch
+  - TensorFlow
+
+  **Databases & Data Stores:**
+  - PostgreSQL
+  - Upstash Redis
+
+  **Cloud & DevOps Tools:**
+  - Docker
+  - Git & GitHub
+  - GitHub Actions
+  - Google Cloud Run
+  - Northflank
+  - Cloudflare 

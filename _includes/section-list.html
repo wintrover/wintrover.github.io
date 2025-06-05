@@ -1,39 +1,75 @@
+{%- comment %} section.title은 _layouts/default.html에서 current_section_config.title 로 전달됩니다. {%- endcomment -%}
+{%- assign section_type_from_config = include.current_section_config.title | default: "unknown_section" -%} {%- comment %} _layouts/default.html 로부터 올바르게 current_section_config 객체가 전달되었는지 확인 필요 {%- endcomment -%}
+{%- assign section_type_slug = section_type_from_config | downcase | replace: ' ', '_' -%}
+
 {% for item in include.content %}
+  {%- assign item_id_str = item.id | default: "default_item" -%}
+
+  {%- comment %} Title, Sub-title, Caption (sub_title과 caption은 item에 있을 경우에만 처리) {%- endcomment -%}
+  {%- assign title_key = section_type_slug | append: "_" | append: item_id_str | append: "_title" -%}
+  {%- assign item_title = site.data[site.active_lang].strings[title_key] | default: item.title -%}
+
+  {%- if item.sub_title -%}
+    {%- assign sub_title_key = section_type_slug | append: "_" | append: item_id_str | append: "_sub_title" -%}
+    {%- assign item_sub_title = site.data[site.active_lang].strings[sub_title_key] | default: item.sub_title -%}
+  {%- endif -%}
+
+  {%- if item.caption -%}
+    {%- assign caption_key = section_type_slug | append: "_" | append: item_id_str | append: "_caption" -%}
+    {%- assign item_caption = site.data[site.active_lang].strings[caption_key] | default: item.caption -%}
+  {%- endif -%}
+
+  {%- comment %} Quote, Dev Info, Description {%- endcomment -%}
+  {%- assign quote_key = section_type_slug | append: "_" | append: item_id_str | append: "_quote" -%}
+  {%- assign item_quote = site.data[site.active_lang].strings[quote_key] | default: item.quote -%}
+
+  {%- assign dev_info_key = section_type_slug | append: "_" | append: item_id_str | append: "_dev_info" -%}
+  {%- assign item_dev_info = site.data[site.active_lang].strings[dev_info_key] | default: item.dev_info -%}
+
+  {%- assign description_key = section_type_slug | append: "_" | append: item_id_str | append: "_description" -%}
+  {%- assign item_description = site.data[site.active_lang].strings[description_key] | default: item.description -%}
+
   <div class="row clearfix layout layout-{{item.layout | default: 'left'}} border-{{item.border | default: 'no'}}">
     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
       <p class="no-print aditional-links">
-        {% for link in item.additional_links %}
-          {% include a.html href=link.url class="" %}
-            <i class="{{ link.icon }}" title="{{ link.title | escape }}"></i>
+        {% for link_item in item.additional_links %}
+          {%- if link_item.data_key_id -%}
+            {%- assign additional_link_title_key = section_type_slug | append: "_" | append: item_id_str | append: "_link_" | append: link_item.data_key_id -%}
+            {%- assign additional_link_title = site.data[site.active_lang].strings[additional_link_title_key] | default: link_item.title -%}
+          {%- else -%}
+            {%- assign additional_link_title = link_item.title -%} {%- comment %} data_key_id가 없으면 기존 title 사용 (번역 안됨) {%- endcomment -%}
+          {%- endif -%}
+          <a href="{{ link_item.url | relative_url }}" class="" title="{{ additional_link_title | escape }}">
+            <i class="{{ link_item.icon }}"></i>
           </a>
         {% endfor %}
       </p>
       <div class="project-title-group">
-        <h4 id="{{ item.title | slugify }}" class="project-title">{{ item.title }}</h4>
+        <h4 id="{{ item_title | slugify }}" class="project-title">{{ item_title }}</h4>
         {% if item.logo %}
-          <img src="{{ item.logo | relative_url }}" alt="{{ item.title }} logo" class="project-logo">
+          <img src="{{ item.logo | relative_url }}" alt="{{ item_title }} logo" class="project-logo">
         {% endif %}
       </div>
       <div class="text-right">
-        {%- if item.sub_title -%}<p><b>{{ item.sub_title }}</b></p>{%- endif -%}
-        {%- if item.caption -%}<p>{{ item.caption }}</p>{%- endif -%}
+        {%- if item_sub_title -%}<p><b>{{ item_sub_title }}</b></p>{%- endif -%}
+        {%- if item_caption -%}<p>{{ item_caption }}</p>{%- endif -%}
       </div>
 
       {%- if item.link -%}
-        {% include a.html href=item.link class="link" %}
+        <a href="{{ item.link | relative_url }}" class="link">
           {%- if item.link_text -%}{{ item.link_text }}{%- else -%}{{ item.link }}{%- endif -%}
         </a>
       {%- endif -%}
 
-      {%- if item.quote -%}
-        <p class="quote">{{ item.quote }}</p>
+      {%- if item_quote -%}
+        <p class="quote">{{ item_quote | markdownify }}</p>
       {%- endif -%}
-      {%- if item.dev_info -%}
-        {{ item.dev_info | strip | markdownify }}
+      {%- if item_dev_info -%}
+        {{ item_dev_info | markdownify }}
       {%- endif -%}
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
-      {{ item.description | strip | markdownify }}
+      {{ item_description | markdownify }}
     </div>
   </div>
 {% endfor %}

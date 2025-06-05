@@ -1,0 +1,50 @@
+# _data/en/strings.yml
+site_title: "Suhyok Yun | AI Developer"
+nav_home: "About"
+nav_projects: "Projects"
+nav_experience: "Experience"
+nav_education: "Education"
+nav_skills: "Skills"
+lang_switcher_en: "English"
+lang_switcher_ko: "한국어"
+about_title: "About Me"
+about_content_md: |-
+  Results-oriented aspiring AI Developer with a strong interest in LLM and NLP fields.<br/>
+  After graduating with a degree in Electrical and Electronic Engineering, I have gained effective communication skills and business acumen through diverse experiences not only in technical fields such as technical support and front-end development, but also in sales and business strategy.<br/>
+  Furthermore, through projects in the Intel Developer Program, I have built various deep learning models across both LLM and computer vision fields, gaining extensive experience up to actual service deployment.<br/>
+  With my technical skills from Python and related AI/ML framework experience, and a solid customer-centric mindset, I have the ambition to innovate UX and build impactful AI solutions.<br/>
+  (This is a sample English translation. Please review and update.)
+
+section_title_projects: "Projects"
+section_title_experience: "Experience"
+section_title_education: "Education"
+section_title_skills: "Skills"
+
+# CVFactory Project Details
+project_cvfactory_title: "CVFactory"
+project_cvfactory_quote: "A SaaS service that automates the generation of customized cover letters for job postings using web crawling, RAG, and LLM."
+project_cvfactory_dev_info: |
+  **Development Period:** Ongoing <br/>
+  **Technologies Used:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
+project_cvfactory_description: |
+  **Key Features & Challenges:**
+    - **Frontend (CVFactory):**
+      - Django-based UI development (job posting/story input, cover letter generation/editing).
+    - **Backend (CVFactory Server):**
+      - Playwright/BeautifulSoup-based web scraping (asynchronous, iframe support).
+      - FastAPI, Celery, Upstash Redis-based asynchronous API and task processing.
+      - Langchain (Cohere Embeddings, FAISS, Groq LLM)-based RAG pipeline construction.
+    - **Common & Infrastructure:**
+      - Docker-based application containerization.
+      - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
+
+    **Future Improvements:**
+    - Add login and personal settings.
+    - Optimize crawling performance by introducing FaaS.
+    - Add support for crawling company websites.
+
+    **Achievements:**
+    - Successful dynamic crawling for iframes and RAG implementation with Cohere.
+    - Stable deployment completed via Google Cloud Run.
+project_cvfactory_link_github: "GitHub Repository"
+project_cvfactory_link_demo: "Live Demo" 

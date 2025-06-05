@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "csv"
   spec.add_runtime_dependency "bigdecimal"
   spec.add_runtime_dependency "webrick"
+  spec.add_runtime_dependency "jekyll-polyglot"
 
   spec.add_development_dependency "html-proofer", "~> 3.9"
 end
