@@ -18,11 +18,11 @@
         {%- assign target_lang_name_key = "lang_switcher_" | append: target_lang_code -%}
         {%- assign target_lang_display_name = site.data[site.active_lang].strings[target_lang_name_key] | default: target_lang_code -%}
 
-        {%- comment %} Use jekyll-polyglot's relocalize_url filter for robust URL generation {%- endcomment %}
+        {%- comment %} Use jekyll-polyglot\'s relocalize_url filter for robust URL generation {%- endcomment %}
         {%- assign target_url = page.url | relocalize_url: target_lang_code -%}
-
+        <script>console.log("DEBUG: page.url:", "{{ page.url }}", "site.active_lang:", "{{ site.active_lang }}", "target_lang_code:", "{{ target_lang_code }}", "target_url for language switcher:", "{{ target_url }}");</script>
       <div class="language-switcher no-print">
-        <a {% static_href %}href="{{ target_url }}"{% endstatic_href %} class="button button--sacnite button--round-l" hreflang="{{ target_lang_code }}" lang="{{ target_lang_code }}">
+        <a href="{{ target_url }}" class="button button--sacnite button--round-l" hreflang="{{ target_lang_code }}" lang="{{ target_lang_code }}">
           {{ target_lang_display_name }}
         </a>
       </div>
