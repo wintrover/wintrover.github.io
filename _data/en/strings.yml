@@ -1,6 +1,6 @@
 # _data/en/strings.yml
-site_title: "Suhyok Yun's Page"
-site_subtitle: AI Developer, Mostly Vision
+site_title: "Suhyok Yun | AI Developer"
+site_subtitle: AI Developer, mainly Vision
 copyright_text: "&copy; Suhyok Yun. All rights reserved."
 nav_home: "About"
 nav_projects: "Projects"
@@ -8,13 +8,13 @@ nav_experience: "Experience"
 nav_education: "Education"
 nav_skills: "Skills"
 lang_switcher_en: "English"
-lang_switcher_ko: "한국어"
+lang_switcher_ko: "Korean"
 about_title: "About Me"
 about_content_md: |-
-  Results-oriented aspiring AI Developer with a strong interest in LLM and NLP fields.<br/>
-  After graduating with a degree in Electrical and Electronic Engineering, I have gained effective communication skills and business acumen through diverse experiences not only in technical fields such as technical support and front-end development, but also in sales and business strategy.<br/>
-  Furthermore, through projects in the Intel Developer Program, I have built various deep learning models across both LLM and computer vision fields, gaining extensive experience up to actual service deployment.<br/>
-  With my technical skills from Python and related AI/ML framework experience, and a solid customer-centric mindset, I have the ambition to innovate UX and build impactful AI solutions.<br/>
+  Results-oriented aspiring AI Developer with a strong interest in LLM and NLP fields.<br />
+  After graduating with a degree in Electrical and Electronic Engineering, I have gained effective communication skills and business acumen through diverse experiences not only in technical fields such as technical support and front-end development, but also in sales and business strategy.<br />
+  Furthermore, through projects in the Intel Developer Program, I have built various deep learning models across both LLM and computer vision fields, gaining extensive experience up to actual service deployment.<br />
+  With my technical skills from Python and related AI/ML framework experience, and a solid customer-centric mindset, I have the ambition to innovate UX and build impactful AI solutions.<br />
   (This is a sample English translation. Please review and update.)
 
 section_title_projects: "Projects"
@@ -24,39 +24,39 @@ section_title_skills: "Skills"
 section_title_about: "About Me"
 
 # CVFactory Project Details
-project_cvfactory_title: "CVFactory"
-project_cvfactory_quote: "A SaaS service that automates the generation of customized cover letters for job postings using web crawling, RAG, and LLM."
-project_cvfactory_dev_info: |
-  **Development Period:** Ongoing <br/>
-  **Technologies Used:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
-project_cvfactory_description: |
+projects_cvfactory_title: "CVFactory"
+projects_cvfactory_quote: "A SaaS that automates cover letter generation tailored to job postings using web crawling, RAG, and LLMs."
+projects_cvfactory_dev_info: |
+  **Development Period:** In Progress <br/>
+  **Technologies:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
+projects_cvfactory_description: |
   **Key Features & Challenges:**
     - **Frontend (CVFactory):**
-      - Django-based UI development (job posting/story input, cover letter generation/editing).
+      - Developed Django-based UI (job posting/story input, cover letter generation/editing).
     - **Backend (CVFactory Server):**
-      - Playwright/BeautifulSoup-based web scraping (asynchronous, iframe support).
-      - FastAPI, Celery, Upstash Redis-based asynchronous API and task processing.
-      - Langchain (Cohere Embeddings, FAISS, Groq LLM)-based RAG pipeline construction.
+      - Web scraping based on Playwright/BeautifulSoup (asynchronous, iframe support).
+      - Asynchronous API and task processing based on FastAPI, Celery, Upstash Redis.
+      - Built RAG pipeline based on Langchain (Cohere Embeddings, FAISS, Groq LLM).
     - **Common & Infrastructure:**
-      - Docker-based application containerization.
+      - Application containerization based on Docker.
       - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
 
     **Future Improvements:**
-    - Add login and personal settings.
-    - Optimize crawling performance by introducing FaaS.
-    - Add support for crawling company websites.
+    - Add login and personalization features
+    - Optimize crawling performance by introducing FaaS
+    - Add support for crawling company homepages
 
     **Achievements:**
-    - Successful dynamic crawling for iframes and RAG implementation with Cohere.
-    - Stable deployment completed via Google Cloud Run.
-project_cvfactory_link_github: "GitHub Repository"
-project_cvfactory_link_demo: "Live Demo"
+    - Successfully implemented iframe crawling and RAG with Cohere through dynamic crawling
+    - Completed stable deployment via Google Cloud Run
+projects_cvfactory_link_github: "GitHub Repository"
+projects_cvfactory_link_demo: "Live Demo"
 
 # Face Recognition Dating App Project Details
 projects_face_recognition_dating_app_title: "Face Recognition Dating App"
 projects_face_recognition_dating_app_quote: "A senior dating app using physiognomy and astrology-based matching algorithms."
 projects_face_recognition_dating_app_dev_info: |
-  **Development Period:** 2 weeks <br/>
+  **Development Period:** 2 weeks <br />
   **Technologies:** Mediapipe, Firebase
 projects_face_recognition_dating_app_description: |
   **Key Features & Achievements:**
@@ -74,7 +74,7 @@ projects_face_recognition_dating_app_link_youtube_demo: "YouTube Demo"
 projects_deep_fake_detect_app_title: "Deep Fake Detect App"
 projects_deep_fake_detect_app_quote: "A mobile application that detects deepfake images using deep learning models."
 projects_deep_fake_detect_app_dev_info: |
-  **Development Period:** 2 weeks <br/>
+  **Development Period:** 2 weeks <br />
   **Technologies:** ONNX, Kotlin, YOLOv11, EfficientNet
 projects_deep_fake_detect_app_description: |
   **Key Features & Achievements:**
@@ -123,19 +123,18 @@ experience_vizcam_description: |
 education_intel_ai_for_future_workforce_title: "Intel AI for Future Workforce"
 education_intel_ai_for_future_workforce_sub_title: "Applied AI Application Developer Course"
 education_intel_ai_for_future_workforce_caption: "October 2024 - April 2025"
-education_intel_ai_for_future_workforce_description: |
-  - Gained practical experience in AI and app development by acquiring core skills including Python, PyTorch, and TensorFlow.
+education_intel_ai_for_future_workforce_description: |-
+  - Gained practical experience in AI and app development by acquiring key technologies such as Python, PyTorch, and TensorFlow.
   - Developed deployable AI solutions through in-depth projects and hackathons.
-  - Proactively led projects, mediating team conflicts and teaching GitHub usage.
-  - Ultimately succeeded in deploying AI solutions by leading projects, mediating team conflicts, and teaching GitHub usage.
+  - Led projects to successful solution deployment by mediating team conflicts and providing training on GitHub usage.
 
 education_halla_university_title: "Halla University"
 education_halla_university_sub_title: "Bachelor of Electrical and Electronic Engineering"
 education_halla_university_caption: "March 2013 - February 2020"
 education_halla_university_description: |
-  - Completed core theoretical and experimental/practical education in electrical and electronic engineering.
-  - Gained experience in C programming and ICT electronic component/product control using Arduino.
-  - Cultivated practical skills through capstone design projects and numerous industry-academia linked programs.
+  - Completed core theoretical and practical training in electrical and electronic engineering.
+  - Gained experience in controlling ICT electronic components/products using C programming and Arduino.
+  - Cultivated practical skills through capstone design projects and numerous industry-academia linkage programs.
 
 # Skills Section Content
 skills_content_md: |

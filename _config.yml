@@ -51,6 +51,7 @@ about_profile_image: assets/images/profile.png
 
 content:
   - title: Projects # This section title is now managed by section_title_projects in _data
+    id: projects
     layout: list
     content:
       - layout: left
@@ -85,6 +86,7 @@ content:
             url: https://www.youtube.com/embed/O3X-rWDxpi8
 
   - title: Experience # This section title is now managed by section_title_experience in _data
+    id: experience
     layout: list
     content:
       - layout: right
@@ -97,6 +99,7 @@ content:
         id: vizcam
 
   - title: Education # This section title is now managed by section_title_education in _data
+    id: education
     layout: list
     content:
       - layout: left
