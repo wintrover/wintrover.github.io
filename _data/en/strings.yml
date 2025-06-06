@@ -21,6 +21,7 @@ section_title_experience: "Experience"
 section_title_education: "Education"
 section_title_skills: "Skills"
 section_title_about: "About Me"
+section_title_contact: "Contact"
 
 # CVFactory Project Details
 projects_cvfactory_title: "CVFactory"
@@ -167,4 +168,6 @@ skills_content_md: |
   - GitHub Actions
   - Google Cloud Run
   - Northflank
-  - Cloudflare 
+  - Cloudflare
+
+footer_thank_you: "Thank you for reading." 

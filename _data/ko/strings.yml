@@ -169,4 +169,9 @@ skills_content_md: |
   - GitHub Actions
   - Google Cloud Run
   - Northflank
-  - Cloudflare 
+  - Cloudflare
+
+scroll_to_top: "Top"
+section_title_contact: "Contact"
+
+footer_thank_you: "읽어주셔서 감사합니다." 

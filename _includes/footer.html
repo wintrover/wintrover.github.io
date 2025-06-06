@@ -1,7 +1,6 @@
 <div class="container footer-container">
-  <p>읽어주셔서 감사합니다.
-    {%- if site.footer_show_references -%}
-      &nbsp;- {{ site.references_title | default: "References on request" }}
-    {%- endif -%}
-  </p>
+  <p>{{ site.data.strings.footer_thank_you }}</p>
+  {%- if site.footer_show_references -%}
+    &nbsp;- {{ site.references_title | default: "References on request" }}
+  {%- endif -%}
 </div>
