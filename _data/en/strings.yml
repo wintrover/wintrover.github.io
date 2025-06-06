@@ -1,5 +1,7 @@
 # _data/en/strings.yml
-site_title: "Suhyok Yun | AI Developer"
+site_title: "Suhyok Yun's Page"
+site_subtitle: AI Developer, Mostly Vision
+copyright_text: "&copy; Suhyok Yun. All rights reserved."
 nav_home: "About"
 nav_projects: "Projects"
 nav_experience: "Experience"
@@ -19,6 +21,7 @@ section_title_projects: "Projects"
 section_title_experience: "Experience"
 section_title_education: "Education"
 section_title_skills: "Skills"
+section_title_about: "About Me"
 
 # CVFactory Project Details
 project_cvfactory_title: "CVFactory"

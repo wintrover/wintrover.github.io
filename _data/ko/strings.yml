@@ -1,5 +1,7 @@
 # _data/ko/strings.yml
 site_title: "윤수혁 | AI 개발자"
+site_subtitle: AI 개발자, 주로 Vision
+copyright_text: "&copy; 윤수혁. All rights reserved."
 nav_home: "소개"
 nav_projects: "프로젝트"
 nav_experience: "경력"
@@ -7,7 +9,7 @@ nav_education: "학력"
 nav_skills: "기술"
 lang_switcher_en: "English"
 lang_switcher_ko: "한국어"
-about_title: "소개"
+about_title: "자기소개"
 about_content_md: |-
   성과 중심의 AI 개발자 지망생으로, LLM 및 NLP 분야에 관심이 많습니다.<br/>
   저는 전기전자공학부를 졸업 후, 기술 지원, 프론트엔드 개발 등 기술적인 분야 뿐만 아니라<br/>
