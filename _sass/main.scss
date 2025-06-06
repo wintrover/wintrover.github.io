@@ -1,0 +1,17 @@
+@import
+  "base/reset",
+  "base/utilities",
+  "base/typography",
+  "components/section",
+  "components/button",
+  "layout/header",
+  "layout/footer",
+  "layout/print"
+;
+
+.language-switcher {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+} 
