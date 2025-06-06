@@ -220,3 +220,14 @@ p.quote {
 .text-right {
   text-align: right;
 }
+
+.language-switcher {
+  position: fixed;
+  top: 2vw;
+  right: 2vw;
+  z-index: 9999;
+
+  a.button {
+    margin: 2vw 2vw 2vw 0 !important;
+  }
+}
