@@ -139,6 +139,7 @@ exclude : [
   ]
 
 url: "https://wintrover.github.io"
+baseurl: ""
 
 # jekyll-polyglot settings
 languages: ["ko", "en"]

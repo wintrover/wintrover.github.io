@@ -18,32 +18,8 @@
         {%- assign target_lang_name_key = "lang_switcher_" | append: target_lang_code -%}
         {%- assign target_lang_display_name = site.data[site.active_lang].strings[target_lang_name_key] | default: target_lang_code -%}
 
-        {%- comment %}
-          Language switcher logic.
-          1. Determine the base url of the current page, without any language prefix.
-          2. Construct the target url by prepending the target language prefix.
-        {%- endcomment -%}
-        {%- assign current_url = page.url -%}
-        {%- if site.active_lang != site.default_lang -%}
-          {%- assign lang_prefix = '/' | append: site.active_lang -%}
-          {%- if current_url startswith lang_prefix -%}
-            {%- assign base_url = current_url | remove_first: lang_prefix -%}
-          {%- else -%}
-            {%- assign base_url = current_url -%}
-          {%- endif -%}
-        {%- else -%}
-          {%- assign base_url = current_url -%}
-        {%- endif -%}
-        {%- if target_lang_code == site.default_lang -%}
-          {%- assign target_url = base_url -%}
-        {%- else -%}
-          {%- assign target_url = base_url | prepend: target_lang_code | prepend: '/' -%}
-        {%- endif -%}
-        {%- assign target_url = target_url | prepend: site.baseurl -%}
-        {%- if target_url == '' or target_url == '//' -%}
-          {%- assign target_url = '/' -%}
-        {%- endif -%}
-
+        {%- comment %} Use jekyll-polyglot\'s relocalize_url filter for robust URL generation {%- endcomment %}
+        {%- assign target_url = page.url | relocalize_url: target_lang_code -%}
         <script>console.log("DEBUG: page.url:", "{{ page.url }}", "site.active_lang:", "{{ site.active_lang }}", "target_lang_code:", "{{ target_lang_code }}", "target_url for language switcher:", "{{ target_url }}");</script>
       <div class="language-switcher no-print">
         <a href="{{ target_url }}" class="button button--sacnite button--round-l" hreflang="{{ target_lang_code }}" lang="{{ target_lang_code }}">
