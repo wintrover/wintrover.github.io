@@ -174,4 +174,6 @@ skills_content_md: |
 scroll_to_top: "Top"
 section_title_contact: "Contact"
 
-footer_thank_you: "읽어주셔서 감사합니다." 
+footer_thank_you: "읽어주셔서 감사합니다."
+
+author_name: "윤수혁" 
