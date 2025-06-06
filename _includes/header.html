@@ -19,17 +19,22 @@
         {%- assign target_lang_display_name = site.data[site.active_lang].strings[target_lang_name_key] | default: target_lang_code -%}
 
         {%- comment %} Use jekyll-polyglot\'s relocalize_url filter for robust URL generation {%- endcomment %}
-        {%- assign current_page_url = page.url -%}
-        {%- if site.active_lang != site.default_lang -%}
-            {%- assign lang_prefix = '/' | append: site.active_lang -%}
-            {%- assign current_page_url = page.url | remove_first: lang_prefix -%}
+        {%- if target_lang_code == site.default_lang -%}
+            {%- assign lang_path = '' -%}
+        {%- else -%}
+            {%- assign lang_path = '/' | append: target_lang_code -%}
         {%- endif -%}
 
-        {%- assign my_page_url = current_page_url | remove_first: '/' -%}
-        {%- if target_lang_code == site.default_lang -%}
-          {%- assign target_url = my_page_url | prepend: '/' | prepend: site.baseurl -%}
-        {%- else -%}
-          {%- assign target_url = my_page_url | prepend: '/' | prepend: target_lang_code | prepend: '/' | prepend: site.baseurl -%}
+        {%- assign final_page_url = page.url -%}
+        {%- if final_page_url == '/' and lang_path != '' -%}
+            {%- assign final_page_url = '' -%}
+        {%- endif -%}
+
+        {%- assign target_url = final_page_url | prepend: lang_path | prepend: site.baseurl -%}
+
+        {%- comment %} ensure trailing slash for root urls eg /en/ {%- endcomment %}
+        {%- if page.url == '/' and target_lang_code != site.default_lang -%}
+          {%- assign target_url = target_url | append: '/' -%}
         {%- endif -%}
         <script>console.log("DEBUG: page.url:", "{{ page.url }}", "site.active_lang:", "{{ site.active_lang }}", "target_lang_code:", "{{ target_lang_code }}", "target_url for language switcher:", "{{ target_url }}");</script>
       <div class="language-switcher no-print">
