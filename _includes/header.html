@@ -18,11 +18,16 @@
         {%- assign target_lang_name_key = "lang_switcher_" | append: target_lang_code -%}
         {%- assign target_lang_display_name = site.data[site.active_lang].strings[target_lang_name_key] | default: target_lang_code -%}
 
-        {%- comment %} Use jekyll-polyglot\'s relocalize_url filter for robust URL generation {%- endcomment %}
-        {%- assign target_url = page.url | relocalize_url: target_lang_code -%}
-        <script>console.log("DEBUG: page.url:", "{{ page.url }}", "site.active_lang:", "{{ site.active_lang }}", "target_lang_code:", "{{ target_lang_code }}", "target_url for language switcher:", "{{ target_url }}");</script>
+        {%- comment %} Use JavaScript for redirection to bypass Jekyll/polyglot URL rewriting {%- endcomment -%}
+        {%- assign js_target_url = "" -%}
+        {%- if target_lang_code == site.default_lang -%}
+          {%- assign js_target_url = "/" -%}
+        {%- else -%}
+          {%- assign js_target_url = "/" | append: target_lang_code | append: "/" -%}
+        {%- endif -%}
+
       <div class="language-switcher no-print">
-        <a href="{{ target_url }}" class="button button--sacnite button--round-l" hreflang="{{ target_lang_code }}" lang="{{ target_lang_code }}">
+        <a href="#" onclick="window.location.href = window.location.origin + '{{ js_target_url | escape }}'; return false;" class="button button--sacnite button--round-l" hreflang="{{ target_lang_code }}" lang="{{ target_lang_code }}">
           {{ target_lang_display_name }}
         </a>
       </div>

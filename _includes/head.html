@@ -6,6 +6,16 @@
   <title>{{ site.name }} | {{ site.title }}</title>
   {%- seo title=false -%}
 
+  <!-- End Jekyll SEO tag -->
+  {%- comment -%} Manual hreflang for better SEO with polyglot {%- endcomment -%}
+  {%- for lang in site.languages %}
+    {%- if lang == site.default_lang %}
+      <link rel="alternate" hreflang="{{ lang }}" href="{{ site.url | append: site.baseurl }}/" />
+    {%- else %}
+      <link rel="alternate" hreflang="{{ lang }}" href="{{ site.url | append: site.baseurl }}/{{ lang }}/" />
+    {%- endif -%}
+  {%- endfor %}
+
   <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
   <link rel="shortcut icon" type="image/x-icon" href="{{ site.favicon | default: '/assets/favicon.ico' | relative_url }}">
 
