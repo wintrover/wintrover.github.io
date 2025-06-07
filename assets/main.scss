@@ -33,9 +33,9 @@
     display: flex;
     justify-content: flex-start;
   }
-  .content p,
-  .content ul,
-  .content li {
+  .layout .details p,
+  .layout .details ul,
+  .layout .details li {
     text-align: left !important;
   }
 }
