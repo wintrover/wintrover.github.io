@@ -33,6 +33,11 @@
     display: flex;
     justify-content: flex-start;
   }
+  .content p,
+  .content ul,
+  .content li {
+    text-align: left;
+  }
 }
 
 .project-title-group {
