@@ -30,8 +30,8 @@
     width: 90%;
   }
   .no-print.aditional-links {
-    text-align: left;
-    display: block;
+    display: flex;
+    justify-content: flex-start;
   }
 }
 
