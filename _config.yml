@@ -60,7 +60,7 @@ content:
         additional_links:
           - data_key_id: github
             icon: fab fa-github
-            url: https://github.com/wintrover/CVFactory
+            url: https://github.com/CV-Factory
           - data_key_id: demo
             icon: fas fa-external-link-alt
             url: https://cvfactory.dev
