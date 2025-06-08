@@ -85,10 +85,12 @@ mark {
 }
 
 @media print {
+  /* 디버깅용 테두리: 각 섹션의 경계를 확인합니다. */
   .intro-container {
-    margin-bottom: 0;
+    border: 2px solid red !important;
   }
   .list-container {
-    margin-top: 20px;
+    border: 2px solid blue !important;
+    margin-top: 0 !important;
   }
 }
