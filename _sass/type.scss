@@ -56,6 +56,9 @@ h3 {
 
   @media print {
     margin-bottom: 20px;
+    page-break-before: auto;
+    page-break-after: avoid;
+    page-break-inside: avoid;
   }
 }
 
