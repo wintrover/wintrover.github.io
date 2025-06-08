@@ -274,19 +274,19 @@ body {
   .screen-only,
   .no-print,
   .no-print * {
-    display: none;
+    display: none !important;
   }
 
   /* Center the container for the print-only image */
-  .intro-container .profile-img-container {
-    width: 100%;
-    float: none;
+  .profile-img-container {
+    width: 100% !important;
+    float: none !important;
     text-align: center;
   }
 
   /* Show the dedicated print-only image and style it */
-  .intro-container .print-only {
-    display: inline-block;
+  .print-only {
+    display: inline-block !important;
     width: 150px;
     height: 150px;
     border-radius: 50%;
