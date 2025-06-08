@@ -2,7 +2,7 @@
   <h3 id="{{ site.data[site.active_lang].strings.about_title | slugify | default: 'about-me' }}">{{ site.data[site.active_lang].strings.about_title | default: "About Me" }}</h3>
   <div class="row clearfix">
     {%- if site.about_profile_image -%}
-      <div class="col-xs-12 col-sm-4 col-md-3">
+      <div class="col-xs-12 col-sm-4 col-md-3 profile-img-container">
         <span class="profile-img screen-only" style="background-image: url({{ site.about_profile_image | relative_url }})"></span>
         <img src="{{ site.about_profile_image | relative_url }}" alt="Profile Photo" class="print-only">
       </div>
