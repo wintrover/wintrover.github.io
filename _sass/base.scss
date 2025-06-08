@@ -15,6 +15,11 @@
   footer {
     display: none;
   }
+  .profile-img {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    box-shadow: none !important;
+  }
 }
 
 @import url(https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,500,500italic,400italic,300italic,100italic,700italic);
@@ -256,6 +261,29 @@ body {
 
   .no-print, .no-print * {
     display: none;
+  }
+}
+
+/* Print-specific styles */
+.print-only {
+  display: none;
+}
+
+@media print {
+  /* Hide elements that shouldn't be printed */
+  .screen-only,
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+
+  /* Show the dedicated print-only image and center it */
+  .print-only {
+    display: block !important;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 20px auto;
   }
 }
 
