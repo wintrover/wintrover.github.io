@@ -1,3 +1,27 @@
+@page {
+  margin: 2cm;
+}
+
+@media print {
+  @page {
+    @top-left { content: '' }
+    @top-center { content: '' }
+    @top-right { content: '' }
+    @bottom-left { content: '' }
+    @bottom-center { content: '' }
+    @bottom-right { content: '' }
+  }
+
+  /* To prevent sections from breaking in the middle of a page */
+  .container {
+    page-break-inside: avoid;
+  }
+
+  footer {
+    display: none;
+  }
+}
+
 @import url(https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,500,500italic,400italic,300italic,100italic,700italic);
 @import url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css);
 @import url(https://use.fontawesome.com/releases/v5.11.2/css/all.css);
