@@ -48,8 +48,10 @@
         {% endif %}
       </div>
       <div class="text-right">
-        {%- if item_sub_title -%}<p><b>{{ item_sub_title }}</b></p>{%- endif -%}
-        {%- if item_caption -%}<p>{{ item_caption }}</p>{%- endif -%}
+        <p>
+          {%- if item_sub_title -%}<b>{{ item_sub_title }}</b><br/>{%- endif -%}
+          {%- if item_caption -%}{{ item_caption }}{%- endif -%}
+        </p>
       </div>
 
       {%- if item.link -%}

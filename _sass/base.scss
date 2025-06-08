@@ -12,11 +12,6 @@
     @bottom-right { content: '' }
   }
 
-  /* To prevent sections from breaking in the middle of a page */
-  .container {
-    page-break-inside: avoid;
-  }
-
   footer {
     display: none;
   }
