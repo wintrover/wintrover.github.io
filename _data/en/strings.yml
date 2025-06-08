@@ -41,14 +41,14 @@ projects_cvfactory_description: |
       - Application containerization based on Docker.
       - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
 
+    **Achievements:**
+    - Successfully implemented iframe crawling and RAG with Cohere through dynamic crawling
+    - Completed stable deployment via Google Cloud Run
+
     **Future Improvements:**
     - Add login and personalization features
     - Optimize crawling performance by introducing FaaS
     - Add support for crawling company homepages
-
-    **Achievements:**
-    - Successfully implemented iframe crawling and RAG with Cohere through dynamic crawling
-    - Completed stable deployment via Google Cloud Run
 projects_cvfactory_link_github: "GitHub Repository"
 projects_cvfactory_link_demo: "Live Demo"
 
