@@ -86,3 +86,12 @@ mark {
   -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
   box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
 }
+
+@media print {
+  .intro-container {
+    page-break-after: avoid;
+  }
+  .list-container { // Projects, Experience, etc. sections are wrapped in this
+    page-break-before: avoid;
+  }
+}
