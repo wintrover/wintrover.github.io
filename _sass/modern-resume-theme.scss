@@ -231,3 +231,9 @@ p.quote {
     margin: 1vw 2vw 2vw 0 !important;
   }
 }
+
+@media print {
+  .list-container {
+    margin-top: 0;
+  }
+}
