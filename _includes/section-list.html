@@ -36,7 +36,7 @@
           {%- else -%}
             {%- assign additional_link_title = link_item.title -%} {%- comment %} data_key_id가 없으면 기존 title 사용 (번역 안됨) {%- endcomment -%}
           {%- endif -%}
-          <a href="{{ link_item.url | relative_url }}" class="" title="{{ additional_link_title | escape }}">
+          <a href="{{ link_item.url | relative_url }}" class="" title="{{ additional_link_title | escape }}" target="_blank" rel="noopener noreferrer">
             <i class="{{ link_item.icon }}"></i>
           </a>
         {% endfor %}
@@ -53,7 +53,7 @@
       </div>
 
       {%- if item.link -%}
-        <a href="{{ item.link | relative_url }}" class="link">
+        <a href="{{ item.link | relative_url }}" class="link" target="_blank" rel="noopener noreferrer">
           {%- if item.link_text -%}{{ item.link_text }}{%- else -%}{{ item.link }}{%- endif -%}
         </a>
       {%- endif -%}
