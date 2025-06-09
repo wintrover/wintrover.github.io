@@ -108,3 +108,11 @@ h4.project-title {
 .layout .content .project-description ul {
   font-size: 1.4rem;
 }
+
+@media print {
+  .layout-right .details,
+  .layout-right .details h4,
+  .layout-right .details p {
+    text-align: left;
+  }
+}
