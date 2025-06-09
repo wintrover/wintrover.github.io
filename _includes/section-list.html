@@ -64,15 +64,11 @@
         <p class="quote">{{ item_quote | markdownify }}</p>
       {%- endif -%}
       {%- if item_dev_info -%}
-        <div class="project-dev-info">
-          {{ item_dev_info | markdownify }}
-        </div>
+        {{ item_dev_info | markdownify }}
       {%- endif -%}
     </div>
     <div class="col-xs-12 col-sm-8 col-md-9 col-print-12 content">
-      <div class="project-description">
-        {{ item_description | markdownify }}
-      </div>
+      {{ item_description | markdownify }}
     </div>
   </div>
 {% endfor %}
