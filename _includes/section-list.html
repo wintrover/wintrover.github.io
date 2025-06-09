@@ -28,7 +28,7 @@
 
   <div class="row clearfix layout border-{{item.border | default: 'no'}}">
     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
-      <p class="no-print aditional-links">
+      <p class="no-print additional-links">
         {% for link_item in item.additional_links %}
           {%- if link_item.data_key_id -%}
             {%- assign additional_link_title_key = section_type_slug | append: "_" | append: item_id_str | append: "_link_" | append: link_item.data_key_id -%}
