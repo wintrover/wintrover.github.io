@@ -117,18 +117,7 @@
   .content {
     width: 60%;
   }
-}
 
-.layout-right {
-}
-
-.layout-right, .layout-top-right {
-  .details {
-    text-align: right;
-  }
-}
-
-.layout-left, .layout-right {
   @media screen and (max-width: 767px) {
     flex-direction: column;
 

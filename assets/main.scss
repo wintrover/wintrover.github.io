@@ -109,14 +109,6 @@ h4.project-title {
   font-size: 1.4rem;
 }
 
-@media print {
-  .layout-right .details,
-  .layout-right .details h4,
-  .layout-right .details p {
-    text-align: left;
-  }
-}
-
 .layout .details .item-sub-details p {
   text-align: left;
   font-size: 1.4rem;

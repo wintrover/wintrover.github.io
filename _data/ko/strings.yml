@@ -37,7 +37,7 @@ projects_cvfactory_description: |
       - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
       
     **성과:**
-    - 동적 크롤링으로 iframe 크롤링 및 cohere를 통한 RAG화 성공
+    - 동적 크롤링으로 iframe 크롤링 및 Cohere를 통한 RAG화 성공
     - Google Cloud Run을 통한 안정적인 배포 완료
 
     **향후 개선:**

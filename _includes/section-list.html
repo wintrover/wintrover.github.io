@@ -26,7 +26,7 @@
   {%- assign description_key = section_type_slug | append: "_" | append: item_id_str | append: "_description" -%}
   {%- assign item_description = site.data[site.active_lang].strings[description_key] | default: item.description -%}
 
-  <div class="row clearfix layout layout-{{item.layout | default: 'left'}} border-{{item.border | default: 'no'}}">
+  <div class="row clearfix layout border-{{item.border | default: 'no'}}">
     <div class="col-xs-12 col-sm-4 col-md-3 col-print-12 details">
       <p class="no-print aditional-links">
         {% for link_item in item.additional_links %}

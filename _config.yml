@@ -89,13 +89,13 @@ content:
     id: experience
     layout: list
     content:
-      - layout: right
+      - layout: left
         id: focc_inc
-      - layout: right
+      - layout: left
         id: insight_marketing_labs
-      - layout: right
+      - layout: left
         id: eisystems
-      - layout: right
+      - layout: left
         id: vizcam
 
   - title: Education # This section title is now managed by section_title_education in _data
@@ -104,7 +104,7 @@ content:
     content:
       - layout: left
         id: intel_ai_for_future_workforce
-      - layout: right
+      - layout: left
         id: halla_university
 
   - title: Skills # This section title is now managed by section_title_skills in _data
