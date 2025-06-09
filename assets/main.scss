@@ -125,3 +125,9 @@ h4.project-title {
 h3 {
   border-bottom-style: solid;
 }
+
+.layout + .layout {
+  border-top: 1px dashed #CCCCCC;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
