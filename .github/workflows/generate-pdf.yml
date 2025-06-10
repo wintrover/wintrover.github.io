@@ -1,0 +1,127 @@
+name: Generate and Publish PDF Resume
+
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+
+jobs:
+  build-and-publish-pdf:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write 
+      packages: write 
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby and Jekyll
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1' 
+          bundler-cache: true 
+
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Node.js dependencies for PDF script
+        run: npm i playwright
+
+      - name: Create PDF generation script
+        run: |
+          cat <<'EOF' > generate-pdf.js
+          const { chromium } = require('playwright');
+          const http = require('http');
+          const fs = require('fs');
+          const path = require('path');
+
+          (async () => {
+            console.log('Starting local server...');
+            const server = http.createServer((req, res) => {
+              let filePath = path.join(__dirname, '_site', req.url === '/' ? 'index.html' : req.url);
+              let extname = path.extname(filePath);
+              let contentType = 'text/html';
+              switch (extname) {
+                  case '.js': contentType = 'text/javascript'; break;
+                  case '.css': contentType = 'text/css'; break;
+                  case '.json': contentType = 'application/json'; break;
+                  case '.png': contentType = 'image/png'; break;
+                  case '.jpg': contentType = 'image/jpeg'; break;
+                  case '.woff2': contentType = 'font/woff2'; break;
+              }
+
+              fs.readFile(filePath, (error, content) => {
+                  if (error) {
+                      if(error.code == 'ENOENT'){
+                          res.writeHead(404);
+                          res.end(`File not found: ${filePath}`);
+                      }
+                      else {
+                          res.writeHead(500);
+                          res.end('Server error');
+                      }
+                  }
+                  else {
+                      res.writeHead(200, { 'Content-Type': contentType });
+                      res.end(content, 'utf-8');
+                  }
+              });
+            }).listen(8080, () => console.log('Local server running on port 8080'));
+
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            console.log('Starting PDF generation with Playwright...');
+            const browser = await chromium.launch();
+            const page = await browser.newPage();
+            
+            try {
+              await page.goto('http://localhost:8080', { waitUntil: 'networkidle' });
+              console.log('Page loaded successfully.');
+
+              await page.emulateMedia({ media: 'print' });
+              console.log('Emulating print media type.');
+              
+              await page.pdf({
+                path: 'resume.pdf',
+                format: 'A4',
+                printBackground: true,
+                margin: {
+                  top: '1.5cm',
+                  right: '1.5cm',
+                  bottom: '1.5cm',
+                  left: '1.5cm',
+                }
+              });
+              console.log('Successfully generated resume.pdf');
+            } catch (err) {
+              console.error('An error occurred during Playwright PDF generation:', err);
+              process.exit(1);
+            } finally {
+              await browser.close();
+              server.close();
+              console.log('Playwright browser and local server closed.');
+            }
+          })();
+          EOF
+
+      - name: Run Playwright script to generate PDF
+        run: node generate-pdf.js
+
+      - name: Release PDF
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest Resume PDF"
+          body: "This is the latest auto-generated resume. Download the PDF below."
+          files: resume.pdf
+          prerelease: false 

@@ -28,3 +28,7 @@
 ## 이력서 페이지
 
 [https://wintrover.github.io](https://wintrover.github.io)
+
+This theme is designed for Jekyll and hosted on GitHub Pages.
+
+[View the live demo](https://wintrover.github.io/modern-resume-theme/)
