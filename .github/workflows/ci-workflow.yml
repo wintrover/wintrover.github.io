@@ -131,12 +131,12 @@ jobs:
       - name: Release PDF
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: "Latest Resume PDF"
-          body: "This is the latest auto-generated resume."
+          tag_name: latest-${{ github.sha }}
+          name: "Resume PDF - ${{ github.sha }}"
+          body: "This is an auto-generated resume for commit ${{ github.sha }}."
           files: resume.pdf
           prerelease: false
-          make_latest: true
+          make_latest: 'legacy'
           fail_on_unmatched_files: true
       # --- PDF Generation Steps End ---
 
