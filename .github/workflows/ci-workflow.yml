@@ -104,6 +104,8 @@ jobs:
             try {
               await page.goto('http://localhost:8080', { waitUntil: 'networkidle' });
               console.log('Page loaded successfully for PDF generation.');
+              
+              await page.waitForTimeout(5000); // 5초 대기 추가
 
               await page.emulateMedia({ media: 'print' });
               console.log('Emulating print media type.');
