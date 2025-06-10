@@ -38,9 +38,6 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      - name: Check site contents
-        run: ls -R _site
-
       # --- PDF Generation Steps Start ---
       - name: Setup Node.js for Playwright
         uses: actions/setup-node@v4
@@ -121,7 +118,7 @@ jobs:
             
             try {
               await generatePdf(page, 'http://localhost:8080/en/', 'resume_en.pdf');
-              await generatePdf(page, 'http://localhost:8080/ko/', 'resume_ko.pdf');
+              await generatePdf(page, 'http://localhost:8080/', 'resume_ko.pdf');
             } catch (err) {
               console.error('An error occurred during Playwright PDF generation:', err);
               process.exit(1);
