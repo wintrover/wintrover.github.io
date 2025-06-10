@@ -113,7 +113,7 @@
       {%- endif -%}
       {%- if site.homepage -%}
         <p>
-          {{ site.homepage_title | default: "Homepage" }}: <a href="{{ site.homepage }}" target="_blank">{{ site.homepage | escape }}</a>
+          {{ site.homepage_title | default: "Homepage" }}: <a href="http://{{ site.homepage }}" target="_blank">{{ site.homepage | escape }}</a>
         </p>
       {%- endif -%}
       {%- if site.phone -%}
