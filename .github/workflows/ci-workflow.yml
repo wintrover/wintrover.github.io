@@ -128,13 +128,20 @@ jobs:
       - name: Run Playwright script to generate PDF
         run: node generate-pdf.js
       
+      - name: Upload PDF as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: resume-pdf
+          path: resume.pdf
+
       - name: Release PDF
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest-${{ github.sha }}
           name: "Resume PDF - ${{ github.sha }}"
           body: "This is an auto-generated resume for commit ${{ github.sha }}."
-          files: resume.pdf
+          files: |
+            resume.pdf
           prerelease: false
           make_latest: 'legacy'
           fail_on_unmatched_files: true
