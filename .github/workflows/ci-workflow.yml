@@ -61,7 +61,12 @@ jobs:
           (async () => {
             console.log('Starting local server for PDF generation...');
             const server = http.createServer((req, res) => {
-              let filePath = path.join(__dirname, '_site', req.url === '/' ? 'index.html' : req.url);
+              let reqPath = req.url === '/' ? '/index.html' : req.url;
+              // If the path is a directory, append /index.html
+              if (reqPath.endsWith('/')) {
+                reqPath += 'index.html';
+              }
+              let filePath = path.join(__dirname, '_site', reqPath);
               let extname = path.extname(filePath);
               let contentType = 'text/html';
               switch (extname) {
