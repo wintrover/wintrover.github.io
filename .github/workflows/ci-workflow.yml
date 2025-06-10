@@ -58,11 +58,26 @@ jobs:
           const fs = require('fs');
           const path = require('path');
 
+          const generatePdf = async (page, url, outputPath) => {
+            console.log(`Generating PDF from ${url}...`);
+            await page.goto(url, { waitUntil: 'networkidle' });
+            console.log(`Page loaded successfully from ${url}.`);
+            await page.waitForTimeout(5000); // Wait for any JS rendering
+            await page.emulateMedia({ media: 'print' });
+            console.log(`Emulating print media type for ${outputPath}.`);
+            await page.pdf({
+              path: outputPath,
+              format: 'A4',
+              printBackground: true,
+              margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' },
+            });
+            console.log(`Successfully generated ${outputPath}`);
+          };
+
           (async () => {
             console.log('Starting local server for PDF generation...');
             const server = http.createServer((req, res) => {
               let reqPath = req.url === '/' ? '/index.html' : req.url;
-              // If the path is a directory, append /index.html
               if (reqPath.endsWith('/')) {
                 reqPath += 'index.html';
               }
@@ -102,26 +117,8 @@ jobs:
             const page = await browser.newPage();
             
             try {
-              await page.goto('http://localhost:8080', { waitUntil: 'networkidle' });
-              console.log('Page loaded successfully for PDF generation.');
-              
-              await page.waitForTimeout(5000); // 5초 대기 추가
-
-              await page.emulateMedia({ media: 'print' });
-              console.log('Emulating print media type.');
-              
-              await page.pdf({
-                path: 'resume.pdf',
-                format: 'A4',
-                printBackground: true,
-                margin: {
-                  top: '1.5cm',
-                  right: '1.5cm',
-                  bottom: '1.5cm',
-                  left: '1.5cm',
-                }
-              });
-              console.log('Successfully generated resume.pdf');
+              await generatePdf(page, 'http://localhost:8080/en/', 'resume_en.pdf');
+              await generatePdf(page, 'http://localhost:8080/ko/', 'resume_ko.pdf');
             } catch (err) {
               console.error('An error occurred during Playwright PDF generation:', err);
               process.exit(1);
@@ -133,14 +130,16 @@ jobs:
           })();
           EOF
 
-      - name: Run Playwright script to generate PDF
+      - name: Run Playwright script to generate PDFs
         run: node generate-pdf.js
       
-      - name: Upload PDF as artifact
+      - name: Upload PDFs as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: resume-pdf
-          path: resume.pdf
+          name: resume-pdfs
+          path: |
+            resume_en.pdf
+            resume_ko.pdf
 
       - name: Create Release
         id: create_release
@@ -153,14 +152,24 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
+      - name: Upload English PDF to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./resume_en.pdf
+          asset_name: resume_en.pdf
+          asset_content_type: application/pdf
+          
+      - name: Upload Korean PDF to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resume.pdf
-          asset_name: resume.pdf
+          asset_path: ./resume_ko.pdf
+          asset_name: resume_ko.pdf
           asset_content_type: application/pdf
 
       # --- PDF Generation Steps End ---
