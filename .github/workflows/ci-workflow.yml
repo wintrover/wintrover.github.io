@@ -141,36 +141,25 @@ jobs:
             resume_en.pdf
             resume_ko.pdf
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Clean up old releases
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}-${{ github.sha }}
-          release_name: Release ${{ github.ref_name }}-${{ github.sha }}
-          draft: false
-          prerelease: false
+        run: |
+          gh release list --limit 100 --json tagName --jq '.[].tagName' | while read tag; do
+            echo "Deleting old release: $tag"
+            gh release delete "$tag" --yes --cleanup-tag
+          done
 
-      - name: Upload English PDF to Release
-        uses: actions/upload-release-asset@v1
+      - name: Create Latest Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./resume_en.pdf
-          asset_name: resume_en.pdf
-          asset_content_type: application/pdf
-          
-      - name: Upload Korean PDF to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./resume_ko.pdf
-          asset_name: resume_ko.pdf
-          asset_content_type: application/pdf
+        run: |
+          gh release create latest \
+            --latest \
+            --title "Latest Resume" \
+            --notes "Latest auto-generated resume PDF (English and Korean)." \
+            resume_en.pdf \
+            resume_ko.pdf
 
       # --- PDF Generation Steps End ---
 
