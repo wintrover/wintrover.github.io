@@ -38,6 +38,9 @@ jobs:
         env:
           JEKYLL_ENV: production
 
+      - name: Check site contents
+        run: ls -R _site
+
       # --- PDF Generation Steps Start ---
       - name: Setup Node.js for Playwright
         uses: actions/setup-node@v4
