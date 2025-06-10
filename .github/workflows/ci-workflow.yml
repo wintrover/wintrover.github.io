@@ -24,7 +24,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1' # Matched with generate-pdf.yml
-          bundler-cache: true # Enabled for efficiency
+          bundler-cache: false # Enabled for efficiency
 
       - name: Setup Pages
         id: pages
