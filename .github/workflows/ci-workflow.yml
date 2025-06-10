@@ -136,6 +136,8 @@ jobs:
           body: "This is the latest auto-generated resume."
           files: resume.pdf
           prerelease: false
+          make_latest: true
+          fail_on_unmatched_files: true
       # --- PDF Generation Steps End ---
 
       - name: Upload artifact for GitHub Pages
