@@ -106,7 +106,7 @@
         {% endfor %}
       </ul>
 
-      <div style="text-align: left;">
+      <div class="contact-info">
         {%- if site.email -%}
           <p>
             {{ site.email_title | default: "Email" }}: <a href="mailto:{{ site.email }}" target="_blank">{{ site.email | escape }}</a>
