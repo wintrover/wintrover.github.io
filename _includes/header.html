@@ -107,14 +107,14 @@
       </ul>
 
       <div class="contact-info">
-        {%- if site.email -%}
-          <p>
-            {{ site.email_title | default: "Email" }}: <a href="mailto:{{ site.email }}" target="_blank">{{ site.email | escape }}</a>
-          </p>
-        {%- endif -%}
         {%- if site.homepage -%}
           <p>
             {{ site.homepage_title | default: "Homepage" }}: <a href="http://{{ site.homepage }}" target="_blank">{{ site.homepage | escape }}</a>
+          </p>
+        {%- endif -%}
+        {%- if site.email -%}
+          <p>
+            {{ site.email_title | default: "Email" }}: <a href="mailto:{{ site.email }}" target="_blank">{{ site.email | escape }}</a>
           </p>
         {%- endif -%}
       </div>
