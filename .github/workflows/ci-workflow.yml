@@ -170,9 +170,17 @@ jobs:
           gh release create ${{ github.event.inputs.version }} \
             --latest \
             --title "Resume ${{ github.event.inputs.version }}" \
-            --notes "Latest auto-generated resume PDF (English and Korean)." \
+            --notes "" \
             resume_en.pdf \
             resume_ko.pdf
+
+      - name: Update Release Notes
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit ${{ github.event.inputs.version }} \
+            --notes "Latest auto-generated resume PDF (English and Korean)."
 
       # --- PDF Generation Steps End ---
 
