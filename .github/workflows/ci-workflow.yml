@@ -3,7 +3,7 @@ name: Deploy Jekyll site and Generate PDF
 on:
   push:
     branches:
-      - production
+      - main
   workflow_dispatch:
     inputs:
       version:
