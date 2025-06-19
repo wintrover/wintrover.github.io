@@ -95,8 +95,6 @@ content:
       - layout: left
         id: insight_marketing_labs
       - layout: left
-        id: eisystems
-      - layout: left
         id: vizcam
 
   - title: Education # This section title is now managed by section_title_education in _data
