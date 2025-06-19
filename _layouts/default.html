@@ -22,8 +22,9 @@
       {%- if site.version == 2 -%}
         {% for section in site.content %}
           <div class="container {{ section.layout }}-container">
-            {%- assign section_title_key = "section_title_" | append: section.title | downcase -%}
-            {%- assign translated_section_title = site.data[site.active_lang].strings[section_title_key] | default: section.title -%}
+            {%- assign section_title_key = "section_title_" | append: section.id | downcase -%}
+            {%- assign lang = page.lang | default: site.default_lang -%}
+            {%- assign translated_section_title = site.data[lang].strings[section_title_key] | default: section.title -%}
             <h3 id="{{ translated_section_title | slugify }}">{{ translated_section_title }}</h3>
             {% include {{ section.layout | prepend: "section-" | append: ".html" }} content=section.content current_section_config=section %}
           </div>
