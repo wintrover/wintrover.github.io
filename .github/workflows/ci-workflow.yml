@@ -143,6 +143,18 @@ jobs:
             resume_en.pdf
             resume_ko.pdf
 
+      - name: Update latest PDF release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest \
+            --latest \
+            --title "Latest Resume" \
+            --notes "Auto-generated resume PDFs." \
+            resume_en.pdf \
+            resume_ko.pdf
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
