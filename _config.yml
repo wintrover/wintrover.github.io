@@ -123,7 +123,6 @@ sass:
   style: compressed
 
 plugins:
- - jekyll-feed
  - jekyll-seo-tag
  - jekyll-polyglot
 
@@ -138,6 +137,11 @@ exclude : [
   "lib/",
   "scripts/",
   "docker-compose.yml",
+  "CODE_OF_CONDUCT.md",
+  "CONTRIBUTING.md",
+  "LICENSE",
+  "modern-resume-theme.gemspec",
+  "README.md",
   ]
 
 url: "https://wintrover.github.io"
