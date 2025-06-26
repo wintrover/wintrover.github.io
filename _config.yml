@@ -47,7 +47,7 @@ gtag: "G-99HN70355W"
 # google_analytics: "UA-00000000-0"
 
 # About Section
-# about_profile_image: assets/images/profile.png
+about_profile_image: assets/images/profile.png
 # about_content: is now managed by about_content_md in _data/[lang]/strings.yml
 
 content:
@@ -103,6 +103,8 @@ content:
     content:
       - layout: left
         id: intel_ai_for_future_workforce
+      - layout: left
+        id: halla_university
 
   - title: Skills # This section title is now managed by section_title_skills in _data
     layout: text
