@@ -44,7 +44,11 @@
       <div class="project-title-group">
         <h4 id="{{ item_title | slugify }}" class="project-title">{{ item_title }}</h4>
         {% if item.logo %}
-          <img src="{{ item.logo | relative_url }}" alt="{{ item_title }} logo" class="project-logo">
+          <img src="{{ item.logo | relative_url }}"
+               alt="{{ item_title }} logo"
+               class="project-logo"
+               width="80" height="80"
+               loading="lazy" decoding="async">
         {% endif %}
       </div>
       <div class="item-sub-details">
@@ -75,4 +79,16 @@
       </div>
     </div>
   </div>
+  {%- comment -%} Schema.org SoftwareApplication for each project {%- endcomment -%}
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":{{ item_title | jsonify }},
+    "applicationCategory":"AI/ML Project",
+    "operatingSystem":"Web",
+    "url":"{{ site.url }}#{{ item_title | slugify }}",
+    {% if item.logo %}"image":"{{ item.logo | absolute_url }}"{% endif %}
+  }
+  </script>
 {% endfor %}

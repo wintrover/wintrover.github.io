@@ -1,6 +1,6 @@
 # Site
 repository: wintrover/wintrover.github.io
-# favicon: images/favicon.ico
+# favicon: /assets/favicon.ico
 
 # Content configuration version
 version: 2
@@ -129,6 +129,8 @@ plugins:
  - jekyll-seo-tag
  - jekyll-polyglot
  - jekyll-sitemap
+ - jekyll-feed
+ - jekyll-multiple-language-sitemap
 
 exclude : [
   "Gemfile",
