@@ -37,15 +37,9 @@ linkedin_username: suhyok-yun-1934b713a
 
 # Additional icon links
 additional_links:
-  - title: Blog A
-    icon: fas fa-blog
-    url: https://wintrover.github.io
-  - title: Blog B
+  - title: Blog
     icon: fab fa-blogger
-    url: https://wintrover.github.io
-  - title: Blog C
-    icon: fas fa-pen
-    url: https://wintrover.github.io
+    url: https://wintrover.github.io/blog
 
 # Google Analytics and Tag Manager
 # gtm: "GTM-0000000"
