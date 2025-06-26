@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'The version for the new release (e.g., v1.1.4)'
-        required: true
 
 jobs:
   build_and_deploy:
@@ -45,23 +40,19 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      # --- PDF Generation Steps (Manual Trigger Only) ---
+      # --- PDF Generation Steps (Automatic on push) ---
       - name: Setup Node.js for Playwright
-        if: github.event_name == 'workflow_dispatch'
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Playwright recommends Node.js 18+
+          node-version: '18'
 
       - name: Install Playwright browsers
-        if: github.event_name == 'workflow_dispatch'
         run: npx playwright install --with-deps
 
       - name: Install Node.js dependencies for PDF script
-        if: github.event_name == 'workflow_dispatch'
         run: npm i playwright
 
       - name: Create PDF generation script
-        if: github.event_name == 'workflow_dispatch'
         run: |
           cat <<'EOF' > generate-pdf.js
           const { chromium } = require('playwright');
@@ -142,41 +133,15 @@ jobs:
           EOF
 
       - name: Run Playwright script to generate PDFs
-        if: github.event_name == 'workflow_dispatch'
         run: node generate-pdf.js
       
       - name: Upload PDFs as artifact
-        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: resume-pdfs
           path: |
             resume_en.pdf
             resume_ko.pdf
-
-      - name: Clean up old releases
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release list --limit 100 --json tagName --jq '.[].tagName' | while read tag; do
-            echo "Deleting old release: $tag"
-            gh release delete "$tag" --yes --cleanup-tag
-          done
-
-      - name: Create Latest Release
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create ${{ github.event.inputs.version }} \
-            --latest \
-            --title "Resume ${{ github.event.inputs.version }}" \
-            --notes "Latest auto-generated resume PDF (English and Korean)." \
-            resume_en.pdf \
-            resume_ko.pdf
-
-      # --- PDF Generation Steps End ---
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
