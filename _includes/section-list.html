@@ -79,4 +79,16 @@
       </div>
     </div>
   </div>
+  {%- comment -%} Schema.org SoftwareApplication for each project {%- endcomment -%}
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":{{ item_title | jsonify }},
+    "applicationCategory":"AI/ML Project",
+    "operatingSystem":"Web",
+    "url":"{{ site.url }}#{{ item_title | slugify }}",
+    {% if item.logo %}"image":"{{ item.logo | absolute_url }}"{% endif %}
+  }
+  </script>
 {% endfor %}

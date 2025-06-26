@@ -130,6 +130,7 @@ plugins:
  - jekyll-polyglot
  - jekyll-sitemap
  - jekyll-feed
+ - jekyll-multiple-language-sitemap
 
 exclude : [
   "Gemfile",
