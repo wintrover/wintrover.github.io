@@ -34,6 +34,9 @@ jobs:
         id: pages
         uses: actions/configure-pages@v4
 
+      - name: Ensure Linux platform in Gemfile.lock
+        run: bundle lock --add-platform x86_64-linux
+
       - name: Install dependencies
         run: bundle install
 

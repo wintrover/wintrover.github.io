@@ -24,6 +24,9 @@ jobs:
           ruby-version: '3.2'
           bundler-cache: true
 
+      - name: Ensure Linux platform in Gemfile.lock
+        run: bundle lock --add-platform x86_64-linux
+
       - name: Install dependencies
         run: |
           set -euo pipefail
