@@ -97,6 +97,13 @@ content:
       - layout: left
         id: vizcam
 
+  - title: Education # This section title is now managed by section_title_education in _data
+    id: education
+    layout: list
+    content:
+      - layout: left
+        id: intel_ai_for_future_workforce
+
   - title: Skills # This section title is now managed by section_title_skills in _data
     layout: text
     content: # Content is managed by skills_content_md in _data/[lang]/strings.yml
