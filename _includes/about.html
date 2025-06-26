@@ -3,7 +3,7 @@
   <div class="row clearfix">
     {%- if site.about_profile_image -%}
       <div class="col-xs-12 col-sm-4 col-md-3 profile-img-container">
-        <span class="profile-img screen-only" style="background-image: url({{ site.about_profile_image | relative_url }})"></span>
+        <span class="profile-img screen-only" style="background-image: url({{ site.about_profile_image | relative_url }})" role="img" aria-label="Profile Photo"></span>
         <img src="{{ site.about_profile_image | relative_url }}"
              alt="Profile Photo"
              class="print-only u-photo"

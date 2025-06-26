@@ -1,6 +1,6 @@
 # Site
 repository: wintrover/wintrover.github.io
-# favicon: images/favicon.ico
+# favicon: /assets/favicon.ico
 
 # Content configuration version
 version: 2
