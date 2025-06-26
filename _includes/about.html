@@ -4,7 +4,11 @@
     {%- if site.about_profile_image -%}
       <div class="col-xs-12 col-sm-4 col-md-3 profile-img-container">
         <span class="profile-img screen-only" style="background-image: url({{ site.about_profile_image | relative_url }})"></span>
-        <img src="{{ site.about_profile_image | relative_url }}" alt="Profile Photo" class="print-only">
+        <img src="{{ site.about_profile_image | relative_url }}"
+             alt="Profile Photo"
+             class="print-only"
+             width="200" height="200"
+             loading="lazy" decoding="async">
       </div>
     {%- endif -%}
     <div class="{{ 'col-xs-12 ' }}{%- if site.about_profile_image -%}col-sm-8 col-md-9 col-print-12{%- endif -%}">

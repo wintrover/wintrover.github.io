@@ -44,7 +44,11 @@
       <div class="project-title-group">
         <h4 id="{{ item_title | slugify }}" class="project-title">{{ item_title }}</h4>
         {% if item.logo %}
-          <img src="{{ item.logo | relative_url }}" alt="{{ item_title }} logo" class="project-logo">
+          <img src="{{ item.logo | relative_url }}"
+               alt="{{ item_title }} logo"
+               class="project-logo"
+               width="80" height="80"
+               loading="lazy" decoding="async">
         {% endif %}
       </div>
       <div class="item-sub-details">
