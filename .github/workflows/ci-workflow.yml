@@ -135,14 +135,6 @@ jobs:
       - name: Run Playwright script to generate PDFs
         run: node generate-pdf.js
       
-      - name: Upload PDFs as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: resume-pdfs
-          path: |
-            resume_en.pdf
-            resume_ko.pdf
-
       - name: Update latest PDF release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
