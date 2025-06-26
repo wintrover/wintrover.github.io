@@ -16,6 +16,9 @@ homepage: wintrover.github.io
 # phone_title: Phone
 # website: https://wintrover.github.io
 # website_title: Web
+description: "AI·LLM·컴퓨터 비전 프로젝트를 다루는 윤수혁 개발자 포트폴리오"
+image: "/assets/images/profile.png"
+logo: "/assets/images/profile.png"
 
 # Dark Mode (true/false/never)
 darkmode: never
@@ -125,6 +128,7 @@ sass:
 plugins:
  - jekyll-seo-tag
  - jekyll-polyglot
+ - jekyll-sitemap
 
 exclude : [
   "Gemfile",

@@ -6,6 +6,12 @@
       return;
     }
 
+    // 특정 봇(User-Agent)이면 리디렉션을 수행하지 않음
+    const botPattern = /bot|crawl|spider|bingpreview|slurp|facebook|twitter|linkedin|pinterest|embedly|quora|whatsapp|telegram|vkshare|facebot|outbrain/i;
+    if (botPattern.test(navigator.userAgent)) {
+      return;
+    }
+
     // 루트 경로일 때만 언어 감지 기능 실행
     if (window.location.pathname === '/') {
       const userLang = navigator.language || navigator.userLanguage;
