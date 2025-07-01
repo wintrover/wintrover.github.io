@@ -1,20 +1,17 @@
-name: Deploy Jekyll site and Generate PDF
+name: Deploy Jekyll site & Generate PDFs (parallel)
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  build_and_deploy:
+  # 1) Build the Jekyll site and upload artifact
+  build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed for softprops/action-gh-release
+      contents: read
       pages: write
       id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,8 +19,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1' # Matched with generate-pdf.yml
-          bundler-cache: false # Enabled for efficiency
+          ruby-version: '3.1'
 
       - name: Setup Pages
         id: pages
@@ -40,8 +36,40 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      # --- PDF Generation Steps (Automatic on push) ---
-      - name: Setup Node.js for Playwright
+      - name: Upload built site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  # 2) Deploy to GitHub Pages (runs in parallel with PDF)
+  deploy_pages:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # 3) Generate PDFs with Playwright
+  pdf:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download site artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: github-pages
+          path: _site
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -49,109 +77,57 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Install Node.js dependencies for PDF script
+      - name: Install Playwright package
         run: npm i playwright
 
-      - name: Create PDF generation script
+      - name: Generate PDF files
         run: |
-          cat <<'EOF' > generate-pdf.js
+          node - <<'NODE'
           const { chromium } = require('playwright');
           const http = require('http');
           const fs = require('fs');
           const path = require('path');
 
-          const generatePdf = async (page, url, outputPath) => {
-            console.log(`Generating PDF from ${url}...`);
+          const generate = async (page, url, file) => {
             await page.goto(url, { waitUntil: 'networkidle' });
-            console.log(`Page loaded successfully from ${url}.`);
-            await page.waitForTimeout(5000); // Wait for any JS rendering
             await page.emulateMedia({ media: 'print' });
-            console.log(`Emulating print media type for ${outputPath}.`);
             await page.pdf({
-              path: outputPath,
+              path: file,
               format: 'A4',
               printBackground: true,
-              margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' },
+              margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' }
             });
-            console.log(`Successfully generated ${outputPath}`);
           };
 
           (async () => {
-            console.log('Starting local server for PDF generation...');
+            // simple static server
             const server = http.createServer((req, res) => {
-              let reqPath = req.url === '/' ? '/index.html' : req.url;
-              if (reqPath.endsWith('/')) {
-                reqPath += 'index.html';
-              }
-              let filePath = path.join(__dirname, '_site', reqPath);
-              let extname = path.extname(filePath);
-              let contentType = 'text/html';
-              switch (extname) {
-                  case '.js': contentType = 'text/javascript'; break;
-                  case '.css': contentType = 'text/css'; break;
-                  case '.json': contentType = 'application/json'; break;
-                  case '.png': contentType = 'image/png'; break;
-                  case '.jpg': contentType = 'image/jpeg'; break;
-                  case '.woff2': contentType = 'font/woff2'; break;
-              }
-
-              fs.readFile(filePath, (error, content) => {
-                  if (error) {
-                      if(error.code == 'ENOENT'){
-                          res.writeHead(404, {'Content-Type': 'text/plain'});
-                          res.end(`File not found: ${filePath}`);
-                      } else {
-                          console.error(`Error reading file ${filePath}:`, error);
-                          res.writeHead(500, {'Content-Type': 'text/plain'});
-                          res.end('Server error');
-                      }
-                  } else {
-                      res.writeHead(200, { 'Content-Type': contentType });
-                      res.end(content, 'utf-8');
-                  }
+              let p = req.url === '/' ? '/index.html' : req.url;
+              if (p.endsWith('/')) p += 'index.html';
+              const filePath = path.join(__dirname, '_site', p);
+              fs.readFile(filePath, (err, content) => {
+                if (err) { res.writeHead(404); res.end(); return; }
+                res.writeHead(200);
+                res.end(content);
               });
-            }).listen(8080, () => console.log('Local server running on port 8080'));
+            }).listen(8080);
 
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            console.log('Starting PDF generation with Playwright...');
             const browser = await chromium.launch();
             const page = await browser.newPage();
-            
+
             try {
-              await generatePdf(page, 'http://localhost:8080/en/', 'resume_en.pdf');
-              await generatePdf(page, 'http://localhost:8080/', 'resume_ko.pdf');
-            } catch (err) {
-              console.error('An error occurred during Playwright PDF generation:', err);
-              process.exit(1);
+              await generate(page, 'http://localhost:8080/en/', 'resume_en.pdf');
+              await generate(page, 'http://localhost:8080/', 'resume_ko.pdf');
             } finally {
               await browser.close();
               server.close();
-              console.log('Playwright browser and local server closed.');
             }
           })();
-          EOF
+          NODE
 
-      - name: Run Playwright script to generate PDFs
-        run: node generate-pdf.js
-      
-      - name: Update latest PDF release
+      - name: Release latest PDFs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete latest --yes --cleanup-tag || true
-          gh release create latest \
-            --latest \
-            --title "Latest Resume" \
-            --notes "Auto-generated resume PDFs." \
-            resume_en.pdf \
-            resume_ko.pdf
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./_site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          gh release create latest --latest --title "Latest Resume" --notes "Auto-generated PDFs." resume_en.pdf resume_ko.pdf
