@@ -80,6 +80,9 @@ jobs:
       - name: Install Playwright package
         run: npm i playwright
 
+      - name: Checkout repository (for gh release)
+        uses: actions/checkout@v4
+
       - name: Generate PDF files
         run: |
           node - <<'NODE'
@@ -129,5 +132,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release delete latest --yes --cleanup-tag || true
-          gh release create latest --latest --title "Latest Resume" --notes "Auto-generated PDFs." resume_en.pdf resume_ko.pdf
+          REPO="$GITHUB_REPOSITORY"
+          gh release delete latest --yes --cleanup-tag --repo "$REPO" || true
+          gh release create latest --latest --title "Latest Resume" --notes "Auto-generated PDFs." --repo "$REPO" resume_en.pdf resume_ko.pdf
