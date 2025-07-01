@@ -155,7 +155,7 @@ baseurl: ""
 # jekyll-polyglot settings
 languages: ["en", "ko"]
 default_lang: "en"
-exclude_from_localization: ["assets/", "lib/"]
+exclude_from_localization: ["assets/", "lib/", "blog/"]
 parallel_localization: false
 
 # The following 'profile' section seems to be a duplicate or misconfigured,
