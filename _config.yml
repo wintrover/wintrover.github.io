@@ -153,8 +153,8 @@ url: "https://wintrover.github.io"
 baseurl: ""
 
 # jekyll-polyglot settings
-languages: ["ko", "en"]
-default_lang: "ko"
+languages: ["en", "ko"]
+default_lang: "en"
 exclude_from_localization: ["assets/", "lib/"]
 parallel_localization: false
 
