@@ -293,6 +293,7 @@ PLATFORMS
 
 DEPENDENCIES
   html-proofer (~> 3.9)
+  jekyll-feed (~> 0.17)
   modern-resume-theme!
   wdm (>= 0.1.0)
 
