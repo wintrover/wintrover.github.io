@@ -98,11 +98,19 @@
           </li>
         {%- endif -%}
         {% for link in site.additional_links %}
+          {% if link.title == 'Blog' %}
+          <li>
+            <a {% static_href %}href="/blog"{% endstatic_href %} target="_blank" class="button button--sacnite button--round-l">
+              <i class="{{ link.icon }}" title="{{ link.title | escape }}"></i>
+            </a>
+          </li>
+          {% else %}
           <li>
             {% include a.html href=link.url class="button button--sacnite button--round-l" %}
               <i class="{{ link.icon }}" title="{{ link.title | escape }}"></i>
             </a>
           </li>
+          {% endif %}
         {% endfor %}
       </ul>
 
