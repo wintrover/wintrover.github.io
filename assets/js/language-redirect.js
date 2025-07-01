@@ -14,16 +14,17 @@
 
     // 루트 경로일 때만 언어 감지 기능 실행
     if (window.location.pathname === '/') {
-      const userLang = navigator.language || navigator.userLanguage;
+      const userLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
       // console.log(`감지된 브라우저 언어: ${userLang}`);
 
-      // 브라우저 언어가 'ko'로 시작하지 않으면 영어 페이지로 리디렉션
-      if (!userLang.toLowerCase().startsWith('ko')) {
-        // console.log('영문 페이지로 리디렉션합니다.');
-        window.location.replace('/en/');
-      } else {
-        // console.log('브라우저 언어가 한국어이므로 현재 페이지를 유지합니다.');
+      // 1순위: 한국어 → /ko/로 리디렉션
+      if (userLang.startsWith('ko')) {
+        window.location.replace('/ko/');
+        return;
       }
+
+      // 한국어 외의 언어는 별도 리디렉션 없이 루트(영문) 페이지에 머무릅니다.
+      // (루트가 이미 영어이므로 추가 동작이 필요 없습니다.)
     }
     
     // 세션 동안 다시 실행되지 않도록 플래그 설정
