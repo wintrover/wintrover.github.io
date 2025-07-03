@@ -94,19 +94,20 @@ jobs:
           const generate = async (page, url, file) => {
             try {
               console.log(`Navigating to ${url} ...`);
+              // Abort external Google Fonts requests (they often fail in CI and cause blank glyphs)
+              await page.route('https://fonts.googleapis.com/*', route => route.abort());
+
+              // Inject fallback fonts *before* any style evaluation so the browser never tries to render with missing glyphs
+              await page.addInitScript(() => {
+                const style = document.createElement('style');
+                style.textContent = `*{font-family:Arial,Helvetica,sans-serif!important}`;
+                document.head.appendChild(style);
+              });
+
               await page.goto(url, { waitUntil: 'networkidle' });
 
-              // Ensure all web-fonts are loaded (prevents blank text)
-              await page.evaluate(async () => {
-                if (document.fonts && document.fonts.ready) {
-                  await document.fonts.ready;
-                }
-              });
-
-              // Force system font fallback to avoid remote Google Font blocking
-              await page.addStyleTag({
-                content: `* { font-family: Arial, Helvetica, sans-serif !important; }`
-              });
+              // Wait until the DOM finished rendering (networkidle doesn't wait for layout)
+              await page.evaluate(() => new Promise(requestAnimationFrame));
 
               // Capture a screenshot right before PDF generation for debugging
               await page.screenshot({ path: `${file}.png`, fullPage: true });
@@ -176,3 +177,13 @@ jobs:
           REPO="$GITHUB_REPOSITORY"
           gh release delete latest --yes --cleanup-tag --repo "$REPO" || true
           gh release create latest --latest --title "Latest Resume" --notes "Auto-generated PDFs." --repo "$REPO" resume_en.pdf resume_ko.pdf
+
+      - name: Upload PDF debug artifacts (screenshots & HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-debug
+          path: |
+            resume_*.png
+            resume_*.html
+            resume_*.pdf
