@@ -92,16 +92,42 @@ jobs:
           const path = require('path');
 
           const generate = async (page, url, file) => {
-            await page.goto(url, { waitUntil: 'networkidle' });
-            // Wait until all web-fonts are loaded to avoid blank text in the PDF
-            await page.evaluate(async () => { if (document.fonts) { await document.fonts.ready; } });
-            await page.emulateMedia({ media: 'print' });
-            await page.pdf({
-              path: file,
-              format: 'A4',
-              printBackground: true,
-              margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' }
-            });
+            try {
+              console.log(`Navigating to ${url} ...`);
+              await page.goto(url, { waitUntil: 'networkidle' });
+
+              // Ensure all web-fonts are loaded (prevents blank text)
+              await page.evaluate(async () => {
+                if (document.fonts && document.fonts.ready) {
+                  await document.fonts.ready;
+                }
+              });
+
+              // Wait until the body has some visible text content; helps catch totally blank pages
+              await page.waitForFunction(() => document.body && document.body.innerText.trim().length > 20, { timeout: 5000 });
+
+              await page.emulateMedia({ media: 'print' });
+
+              await page.pdf({
+                path: file,
+                format: 'A4',
+                printBackground: true,
+                margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' }
+              });
+
+              console.log(`✔ Successfully generated ${file}`);
+            } catch (err) {
+              console.error(`✘ Failed to generate ${file}:`, err);
+              // Capture screenshot & HTML for easier debugging
+              try {
+                await page.screenshot({ path: `${file}.png`, fullPage: true });
+                const html = await page.content();
+                fs.writeFileSync(`${file}.html`, html);
+              } catch (innerErr) {
+                console.error('Failed to capture debug artifacts:', innerErr);
+              }
+              throw err; // Re-throw to fail the job
+            }
           };
 
           (async () => {
