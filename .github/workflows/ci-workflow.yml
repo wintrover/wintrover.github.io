@@ -44,21 +44,21 @@ jobs:
 
       # --- PDF Generation Steps (Manual Trigger Only) ---
       - name: Setup Node.js for Playwright
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         uses: actions/setup-node@v4
         with:
           node-version: '18' # Playwright recommends Node.js 18+
 
       - name: Install Playwright browsers
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: npx playwright install --with-deps
 
       - name: Install Node.js dependencies for PDF script
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: npm i playwright
 
       - name: Create PDF generation script
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: |
           cat <<'EOF' > generate-pdf.js
           const { chromium } = require('playwright');
@@ -139,11 +139,11 @@ jobs:
           EOF
 
       - name: Run Playwright script to generate PDFs
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: node generate-pdf.js
       
       - name: Upload PDFs as artifact
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: resume-pdfs
@@ -151,35 +151,28 @@ jobs:
             resume_en.pdf
             resume_ko.pdf
 
-      - name: Clean up old releases
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Determine release tag
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: |
-          gh release list --limit 100 --json tagName --jq '.[].tagName' | while read tag; do
-            echo "Deleting old release: $tag"
-            gh release delete "$tag" --yes --cleanup-tag
-          done
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "RELEASE_TAG=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+          fi
 
-      - name: Create Latest Release
-        if: github.event_name == 'workflow_dispatch'
+      - name: Publish Resume Release
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ github.event.inputs.version }} \
+          echo "Releasing tag $RELEASE_TAG"
+          gh release delete "$RELEASE_TAG" --yes --cleanup-tag || true
+          gh release create "$RELEASE_TAG" \
             --latest \
-            --title "Resume ${{ github.event.inputs.version }}" \
-            --notes "" \
+            --title "Resume $RELEASE_TAG" \
+            --notes "Latest auto-generated resume PDF (English and Korean)." \
             resume_en.pdf \
             resume_ko.pdf
-
-      - name: Update Release Notes
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release edit ${{ github.event.inputs.version }} \
-            --notes "Latest auto-generated resume PDF (English and Korean)."
 
       # --- PDF Generation Steps End ---
 
