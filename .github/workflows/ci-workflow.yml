@@ -93,6 +93,8 @@ jobs:
 
           const generate = async (page, url, file) => {
             await page.goto(url, { waitUntil: 'networkidle' });
+            // Wait until all web-fonts are loaded to avoid blank text in the PDF
+            await page.evaluate(async () => { if (document.fonts) { await document.fonts.ready; } });
             await page.emulateMedia({ media: 'print' });
             await page.pdf({
               path: file,
@@ -120,7 +122,7 @@ jobs:
 
             try {
               await generate(page, 'http://localhost:8080/en/', 'resume_en.pdf');
-              await generate(page, 'http://localhost:8080/', 'resume_ko.pdf');
+              await generate(page, 'http://localhost:8080/ko/', 'resume_ko.pdf');
             } finally {
               await browser.close();
               server.close();
