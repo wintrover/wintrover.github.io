@@ -1,17 +1,25 @@
-name: Deploy Jekyll site & Generate PDFs (parallel)
+name: Deploy Jekyll site and Generate PDF
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version for the new release (e.g., v1.1.4)'
+        required: true
 
 jobs:
-  # 1) Build the Jekyll site and upload artifact
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write # Needed for softprops/action-gh-release
       pages: write
       id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,14 +27,12 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
+          ruby-version: '3.1' # Matched with generate-pdf.yml
+          bundler-cache: false # Enabled for efficiency
 
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-
-      - name: Ensure Linux platform in Gemfile.lock
-        run: bundle lock --add-platform x86_64-linux
 
       - name: Install dependencies
         run: bundle install
@@ -36,172 +42,152 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      - name: Upload built site artifact (for PDF job)
-        uses: actions/upload-artifact@v4
-        with:
-          name: site-build
-          path: ./_site
-
-  # 2) Deploy to GitHub Pages (runs in parallel with PDF)
-  deploy_pages:
-    needs: pdf
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  # 3) Generate PDFs with Playwright
-  pdf:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download site artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-build
-          path: _site
-
-      - name: Setup Node.js
+      # --- PDF Generation Steps (Manual Trigger Only) ---
+      - name: Setup Node.js for Playwright
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
+          node-version: '18' # Playwright recommends Node.js 18+
 
       - name: Install Playwright browsers
+        if: github.event_name == 'workflow_dispatch'
         run: npx playwright install --with-deps
 
-      - name: Install Playwright package
+      - name: Install Node.js dependencies for PDF script
+        if: github.event_name == 'workflow_dispatch'
         run: npm i playwright
 
-      - name: Generate PDF files
+      - name: Create PDF generation script
+        if: github.event_name == 'workflow_dispatch'
         run: |
-          node - <<'NODE'
+          cat <<'EOF' > generate-pdf.js
           const { chromium } = require('playwright');
           const http = require('http');
           const fs = require('fs');
           const path = require('path');
 
-          const generate = async (page, url, file) => {
-            try {
-              console.log(`Navigating to ${url} ...`);
-              // Abort external Google Fonts requests (they often fail in CI and cause blank glyphs)
-              await page.route('https://fonts.googleapis.com/*', route => route.abort());
-
-              // Inject fallback fonts *before* any style evaluation so the browser never tries to render with missing glyphs
-              await page.addInitScript(() => {
-                const style = document.createElement('style');
-                style.textContent = `*{font-family:Arial,Helvetica,sans-serif!important}`;
-                document.head.appendChild(style);
-              });
-
-              await page.goto(url, { waitUntil: 'load' });
-              // Wait until main header is rendered ensuring DOM is painted
-              try {
-                await page.waitForSelector('h1', { timeout: 10000 });
-              } catch (e) {
-                console.warn('h1 not visible within 10s, proceeding anyway.');
-              }
-              // Wait for any remaining network requests to finish
-              await page.waitForLoadState('networkidle');
-
-              // Capture a screenshot after DOM & fonts are ready
-              await page.screenshot({ path: `${file}.png`, fullPage: true });
-
-              // Attempt to ensure some visible text; ignore timeout to proceed anyway
-              try {
-                await page.waitForFunction(() => document.body && document.body.innerText.trim().length > 20, null, { timeout: 5000 });
-              } catch (_) {
-                console.warn('Body text length check timed out – continuing PDF generation.');
-              }
-
-              // Use screen media to keep all regular content visible
-              await page.emulateMedia({ media: 'screen' });
-
-              await page.pdf({
-                path: file,
-                format: 'A4',
-                printBackground: true,
-                margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' }
-              });
-
-              console.log(`✔ Successfully generated ${file}`);
-            } catch (err) {
-              console.error(`✘ Failed to generate ${file}:`, err);
-              // Capture screenshot & HTML for easier debugging
-              try {
-                await page.screenshot({ path: `${file}.png`, fullPage: true });
-                const html = await page.content();
-                fs.writeFileSync(`${file}.html`, html);
-              } catch (innerErr) {
-                console.error('Failed to capture debug artifacts:', innerErr);
-              }
-              throw err; // Re-throw to fail the job
-            }
+          const generatePdf = async (page, url, outputPath) => {
+            console.log(`Generating PDF from ${url}...`);
+            await page.goto(url, { waitUntil: 'networkidle' });
+            console.log(`Page loaded successfully from ${url}.`);
+            await page.waitForTimeout(5000); // Wait for any JS rendering
+            await page.emulateMedia({ media: 'print' });
+            console.log(`Emulating print media type for ${outputPath}.`);
+            await page.pdf({
+              path: outputPath,
+              format: 'A4',
+              printBackground: true,
+              margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' },
+            });
+            console.log(`Successfully generated ${outputPath}`);
           };
 
           (async () => {
-            // simple static server
+            console.log('Starting local server for PDF generation...');
             const server = http.createServer((req, res) => {
-              let p = req.url === '/' ? '/index.html' : req.url;
-              if (p.endsWith('/')) p += 'index.html';
-              const filePath = path.join(__dirname, '_site', p);
-              fs.readFile(filePath, (err, content) => {
-                if (err) { res.writeHead(404); res.end(); return; }
-                res.writeHead(200);
-                res.end(content);
-              });
-            }).listen(8080);
+              let reqPath = req.url === '/' ? '/index.html' : req.url;
+              if (reqPath.endsWith('/')) {
+                reqPath += 'index.html';
+              }
+              let filePath = path.join(__dirname, '_site', reqPath);
+              let extname = path.extname(filePath);
+              let contentType = 'text/html';
+              switch (extname) {
+                  case '.js': contentType = 'text/javascript'; break;
+                  case '.css': contentType = 'text/css'; break;
+                  case '.json': contentType = 'application/json'; break;
+                  case '.png': contentType = 'image/png'; break;
+                  case '.jpg': contentType = 'image/jpeg'; break;
+                  case '.woff2': contentType = 'font/woff2'; break;
+              }
 
+              fs.readFile(filePath, (error, content) => {
+                  if (error) {
+                      if(error.code == 'ENOENT'){
+                          res.writeHead(404, {'Content-Type': 'text/plain'});
+                          res.end(`File not found: ${filePath}`);
+                      } else {
+                          console.error(`Error reading file ${filePath}:`, error);
+                          res.writeHead(500, {'Content-Type': 'text/plain'});
+                          res.end('Server error');
+                      }
+                  } else {
+                      res.writeHead(200, { 'Content-Type': contentType });
+                      res.end(content, 'utf-8');
+                  }
+              });
+            }).listen(8080, () => console.log('Local server running on port 8080'));
+
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            console.log('Starting PDF generation with Playwright...');
             const browser = await chromium.launch();
             const page = await browser.newPage();
-
+            
             try {
-              await generate(page, 'http://localhost:8080/', 'resume_en.pdf');
-              await generate(page, 'http://localhost:8080/ko/', 'resume_ko.pdf');
+              await generatePdf(page, 'http://localhost:8080/en/', 'resume_en.pdf');
+              await generatePdf(page, 'http://localhost:8080/', 'resume_ko.pdf');
+            } catch (err) {
+              console.error('An error occurred during Playwright PDF generation:', err);
+              process.exit(1);
             } finally {
               await browser.close();
               server.close();
+              console.log('Playwright browser and local server closed.');
             }
           })();
-          NODE
+          EOF
 
-      - name: Release latest PDFs
+      - name: Run Playwright script to generate PDFs
+        if: github.event_name == 'workflow_dispatch'
+        run: node generate-pdf.js
+      
+      - name: Upload PDFs as artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: resume-pdfs
+          path: |
+            resume_en.pdf
+            resume_ko.pdf
+
+      - name: Clean up old releases
+        if: github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          REPO="$GITHUB_REPOSITORY"
-          gh release delete latest --yes --cleanup-tag --repo "$REPO" || true
-          gh release create latest --latest --title "Latest Resume" --notes "Auto-generated PDFs." --repo "$REPO" resume_en.pdf resume_ko.pdf
+          gh release list --limit 100 --json tagName --jq '.[].tagName' | while read tag; do
+            echo "Deleting old release: $tag"
+            gh release delete "$tag" --yes --cleanup-tag
+          done
 
-      - name: Upload PDF debug artifacts (screenshots & HTML)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pdf-debug
-          path: |
-            resume_*.png
-            resume_*.html
-            resume_*.pdf
-
-      - name: Copy debug assets into site
+      - name: Create Latest Release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p _site/pdf-debug
-          cp resume_* _site/pdf-debug/ || true
-          cp resume_*.png _site/pdf-debug/ || true
-          cp resume_*.html _site/pdf-debug/ || true
+          gh release create ${{ github.event.inputs.version }} \
+            --latest \
+            --title "Resume ${{ github.event.inputs.version }}" \
+            --notes "" \
+            resume_en.pdf \
+            resume_ko.pdf
 
-      - name: Upload final site (with debug) as Pages artifact
+      - name: Update Release Notes
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit ${{ github.event.inputs.version }} \
+            --notes "Latest auto-generated resume PDF (English and Korean)."
+
+      # --- PDF Generation Steps End ---
+
+      - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./_site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
