@@ -103,6 +103,14 @@ jobs:
                 }
               });
 
+              // Force system font fallback to avoid remote Google Font blocking
+              await page.addStyleTag({
+                content: `* { font-family: Arial, Helvetica, sans-serif !important; }`
+              });
+
+              // Capture a screenshot right before PDF generation for debugging
+              await page.screenshot({ path: `${file}.png`, fullPage: true });
+
               // Attempt to ensure some visible text; ignore timeout to proceed anyway
               try {
                 await page.waitForFunction(() => document.body && document.body.innerText.trim().length > 20, null, { timeout: 5000 });
