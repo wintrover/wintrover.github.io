@@ -147,7 +147,7 @@ jobs:
             const page = await browser.newPage();
 
             try {
-              await generate(page, 'http://localhost:8080/en/', 'resume_en.pdf');
+              await generate(page, 'http://localhost:8080/', 'resume_en.pdf');
               await generate(page, 'http://localhost:8080/ko/', 'resume_ko.pdf');
             } finally {
               await browser.close();
