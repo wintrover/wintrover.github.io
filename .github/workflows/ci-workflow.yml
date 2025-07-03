@@ -110,7 +110,8 @@ jobs:
                 console.warn('Body text length check timed out – continuing PDF generation.');
               }
 
-              await page.emulateMedia({ media: 'print' });
+              // Use screen media to keep all regular content visible
+              await page.emulateMedia({ media: 'screen' });
 
               await page.pdf({
                 path: file,
