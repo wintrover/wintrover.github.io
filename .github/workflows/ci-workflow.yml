@@ -125,8 +125,8 @@ jobs:
             const page = await browser.newPage();
             
             try {
-              await generatePdf(page, 'http://localhost:8080/en/', 'resume_en.pdf');
-              await generatePdf(page, 'http://localhost:8080/', 'resume_ko.pdf');
+              await generatePdf(page, 'http://localhost:8080/', 'resume_en.pdf');
+              await generatePdf(page, 'http://localhost:8080/ko/', 'resume_ko.pdf');
             } catch (err) {
               console.error('An error occurred during Playwright PDF generation:', err);
               process.exit(1);
