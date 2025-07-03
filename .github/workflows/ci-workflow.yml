@@ -104,12 +104,13 @@ jobs:
                 document.head.appendChild(style);
               });
 
-              await page.goto(url, { waitUntil: 'networkidle' });
+              await page.goto(url, { waitUntil: 'load' });
+              // Wait until main header is rendered ensuring DOM is painted
+              await page.waitForSelector('h1', { timeout: 10000 });
+              // Wait for any remaining network requests to finish
+              await page.waitForLoadState('networkidle');
 
-              // Wait until the DOM finished rendering (networkidle doesn't wait for layout)
-              await page.evaluate(() => new Promise(requestAnimationFrame));
-
-              // Capture a screenshot right before PDF generation for debugging
+              // Capture a screenshot after DOM & fonts are ready
               await page.screenshot({ path: `${file}.png`, fullPage: true });
 
               // Attempt to ensure some visible text; ignore timeout to proceed anyway
