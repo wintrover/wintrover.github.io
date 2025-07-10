@@ -8,7 +8,7 @@ version: 2
 # Personal info
 # name, title, etc., are now primarily managed via _data/[lang]/strings.yml (e.g., site_title)
 name: 윤수혁
-title: ML / AI Application Developer
+title: Fullstack AI Application Architect
 email: wintrover@gmail.com
 homepage: wintrover.github.io
 # email_title: Email
