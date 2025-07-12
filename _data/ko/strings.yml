@@ -23,7 +23,7 @@ projects_cvfactory_title: "CVFactory"
 projects_cvfactory_quote: "채용공고 웹 크롤링, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서 생성을 자동화하는 SaaS 서비스입니다."
 projects_cvfactory_dev_info: |
   **개발 기간:** 진행 중 <br/>
-  **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare
+  **사용 기술:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare, Sonarqube
 projects_cvfactory_description: |
   **주요 기능 및 도전 과제:**
     - **Frontend (CVFactory):**
@@ -152,6 +152,7 @@ skills_content_md: |
   - Google Cloud Run
   - Northflank
   - Cloudflare
+  - Sonarqube
 
 scroll_to_top: "Top"
 section_title_contact: "Contact"
