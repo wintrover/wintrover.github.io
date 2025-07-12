@@ -66,8 +66,8 @@ projects_face_recognition_dating_app_link_github: "GitHub Repository"
 projects_face_recognition_dating_app_link_youtube_demo: "YouTube Demo"
 
 # Deep Fake Detect App Project Details
-projects_deep_fake_detect_app_title: "데이터 엔지니어 인턴 포지션 과제"
-projects_deep_fake_detect_app_quote: "AI 스타트업 W사의 데이터 엔지니어 인턴 포지션 과제로 사이트의 엔티티 속성을 성공적으로 Airflow 기반의 ETL함으로써 완수했습니다."
+projects_deep_fake_detect_app_title: "Data Engineer Intern Position Task"
+projects_deep_fake_detect_app_quote: "AI 스타트업 ㄹ사의 데이터 엔지니어 인턴 포지션 과제로 사이트의 엔티티 속성을 성공적으로 Airflow 기반의 ETL함으로써 완수했습니다."
 projects_deep_fake_detect_app_dev_info: |
   **개발 기간:** 1주 <br/>
   **사용 기술:** Python, Docker, Apache Airflow, PostgreSQL, Playwright
