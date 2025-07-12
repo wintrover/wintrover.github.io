@@ -84,7 +84,7 @@ content:
         additional_links:
           - data_key_id: github
             icon: fab fa-github
-            url: https://github.com/wintrover/DeepFakeDetectApp
+            url: https://github.com/wintrover/DataEngineering_Airflow_ETL.git
 
   - title: Experience # This section title is now managed by section_title_experience in _data
     id: experience
