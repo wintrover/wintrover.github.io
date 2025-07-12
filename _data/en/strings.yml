@@ -40,7 +40,7 @@ projects_cvfactory_description: |
     - **Common & Infrastructure:**
       - Application containerization based on Docker.
       - GitHub Actions CI/CD (Backend: Google Cloud Run, Frontend: Northflank).
-
+      
     **Achievements:**
     - Successfully implemented iframe crawling and RAG with Cohere through dynamic crawling
     - Completed stable deployment via Google Cloud Run
@@ -70,21 +70,26 @@ projects_face_recognition_dating_app_description: |
 projects_face_recognition_dating_app_link_github: "GitHub Repository"
 projects_face_recognition_dating_app_link_youtube_demo: "YouTube Demo"
 
-# Deep Fake Detect App Project Details
-projects_deep_fake_detect_app_title: "Deep Fake Detect App"
-projects_deep_fake_detect_app_quote: "A mobile application that detects deepfake images using deep learning models."
+# Data Engineer Intern Position Task Project Details
+projects_deep_fake_detect_app_title: "Data Engineer Intern Position Task"
+projects_deep_fake_detect_app_quote: "Completed the data engineer intern position task for AI startup W company by successfully implementing Airflow-based ETL for site entity attributes."
 projects_deep_fake_detect_app_dev_info: |
-  **Development Period:** 2 weeks <br />
-  **Technologies:** ONNX, Kotlin, YOLOv11, EfficientNet
+  **Development Period:** 1 week <br />
+  **Technologies:** Python, Docker, Apache Airflow, PostgreSQL, Playwright
 projects_deep_fake_detect_app_description: |
   **Key Features & Achievements:**
-  - Developed mobile-optimized deepfake detection model (EfficientNet-Lite0, ONNX).
-  - Improved face detection accuracy (YOLOv11n-Face, 30% → 50%).
-  - Resolved OOM errors and improved UI responsiveness.
-  - Resolved ONNX runtime version issues.
+  - **Dynamic Category Detection**: Real-time identification of 16 categories via API endpoints.
+  - **Data Collection & Processing**: Automated parsing of entity details from web responses.
+  - **Database Storage**: Efficient data storage in PostgreSQL with duplicate handling.
+  - **Pipeline Orchestration**: Apache Airflow for end-to-end workflow automation.
+  - **Containerization**: Docker-based reproducible environment.
 
-  **Achievements:** Model size 4.2MB, inference 350ms, accuracy 91% (FaceForensics++ dataset).
-projects_deep_fake_detect_app_link_github: "GitHub Repository"
+  **Technical Challenges Solved:**
+  - Resolved Windows-specific log path issues
+  - Implemented table existence checks to prevent failures
+  - Fixed Docker image tag mismatches
+  - Prevented accidental data loss
+projects_deep_fake_detect_app_link_github: "https://github.com/wintrover/DataEngineering_Airflow_ETL.git"
 projects_deep_fake_detect_app_link_youtube_demo: "YouTube Demo"
 
 # Experience Section Details
@@ -165,4 +170,4 @@ skills_content_md: |
 
 footer_thank_you: "Thank you for reading."
 
-author_name: "Su Hyok Yun" 
+author_name: "Su Hyok Yun"

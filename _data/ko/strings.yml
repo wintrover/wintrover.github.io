@@ -66,21 +66,26 @@ projects_face_recognition_dating_app_link_github: "GitHub Repository"
 projects_face_recognition_dating_app_link_youtube_demo: "YouTube Demo"
 
 # Deep Fake Detect App Project Details
-projects_deep_fake_detect_app_title: "Deep Fake Detect App"
-projects_deep_fake_detect_app_quote: "딥러닝 모델을 사용하여 딥페이크 이미지를 감지하는 모바일 애플리케이션입니다."
+projects_deep_fake_detect_app_title: "데이터 엔지니어 인턴 포지션 과제"
+projects_deep_fake_detect_app_quote: "AI 스타트업 W사의 데이터 엔지니어 인턴 포지션 과제로 사이트의 엔티티 속성을 성공적으로 Airflow 기반의 ETL함으로써 완수했습니다."
 projects_deep_fake_detect_app_dev_info: |
-  **개발 기간:** 2주 <br/>
-  **사용 기술:** ONNX, Kotlin, YOLO11, EfficientNet
+  **개발 기간:** 1주 <br/>
+  **사용 기술:** Python, Docker, Apache Airflow, PostgreSQL, Playwright
 projects_deep_fake_detect_app_description: |
   **주요 기능 및 성과:**
-  - 모바일 최적화 딥페이크 탐지 모델 개발 (EfficientNet-Lite0, ONNX).
-  - 얼굴 감지 정확도 향상 (YOLO11n-Face, 30% → 50%).
-  - OOM 오류 해결 및 UI 응답성 개선.
-  - ONNX 런타임 버전 문제 해결.
+  - **동적 카테고리 탐지**: API 엔드포인트를 통한 16개 카테고리 실시간 식별
+  - **데이터 수집 및 처리**: 웹 응답에서 엔티티 상세 정보 자동 파싱
+  - **데이터베이스 저장**: 중복 처리 기능이 있는 PostgreSQL 효율적 저장
+  - **파이프라인 오케스트레이션**: Airflow를 통한 종단간 워크플로우 자동화
+  - **컨테이너화**: Docker 기반 재현 가능한 환경 구축
 
-  **성과:** 모델 4.2MB, 추론 350ms, 정확도 91%(FaceForensics++ 데이터셋 기준).
-projects_deep_fake_detect_app_link_github: "GitHub Repository"
-projects_deep_fake_detect_app_link_youtube_demo: "YouTube Demo"
+  **해결한 기술적 과제:**
+  - Windows 전용 로그 경로 문제 해결
+  - 테이블 존재 여부 확인으로 실패 방지 구현
+  - Docker 이미지 태그 불일치 수정
+  - 실수로 인한 데이터 손실 방지
+projects_deep_fake_detect_app_link_github: "https://github.com/wintrover/DataEngineering_Airflow_ETL.git"
+projects_deep_fake_detect_app_link_youtube_demo: "YouTube 데모"
 
 # Experience Section Details
 experience_focc_inc_title: "FOCC INC"
@@ -112,7 +117,7 @@ education_halla_university_title: "한라대학교"
 education_halla_university_sub_title: "전기전자공학 학사 학위"
 education_halla_university_caption: "2013년 3월 - 2020년 2월"
 education_halla_university_description: |
-  - 전기 및 전자 공학 분야의 핵심 이론과 실험·실습 교육을 이수했습니다.<br/>- C 프로그래밍, 아두이노를 활용한 ICT 전자부품/제품 제어 경험을 쌓았습니다.<br/>- 캡스톤 디자인 프로젝트 및 다수의 산학 연계 프로그램을 통해 실무 역량을 배양했습니다.
+  - 전기 및 전자 공학 분야의 핵심 이론과 실험·실습 교육을 이수했습니다.<br/>- C 프로그래밍, 아두이노를 활용한 ICT 전자부품/제품 제제어 경험을 쌓았습니다.<br/>- 캡스톤 디자인 프로젝트 및 다수의 산학 연계 프로그램을 통해 실무 역량을 배양했습니다.
 
 # Skills Section Content
 skills_content_md: |
@@ -153,4 +158,4 @@ section_title_contact: "Contact"
 
 footer_thank_you: "읽어주셔서 감사합니다."
 
-author_name: "윤수혁" 
+author_name: "윤수혁"
