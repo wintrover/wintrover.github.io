@@ -80,7 +80,7 @@ content:
             url: https://www.youtube.com/embed/OM7OZrjQ1wo
       - layout: left
         id: deep_fake_detect_app
-        logo: assets/images/bluecheck_logo.png
+        logo: assets/images/Airflow.png
         additional_links:
           - data_key_id: github
             icon: fab fa-github
