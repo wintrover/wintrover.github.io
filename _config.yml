@@ -69,6 +69,13 @@ content:
             icon: fas fa-external-link-alt
             url: https://cvfactory.dev
       - layout: left
+        id: deep_fake_detect_app
+        logo: assets/images/Airflow.png
+        additional_links:
+          - data_key_id: github
+            icon: fab fa-github
+            url: https://github.com/wintrover/DataEngineering_Airflow_ETL.git
+      - layout: left
         id: face_recognition_dating_app
         logo: assets/images/sodamyeon_logo.png
         additional_links:
@@ -78,13 +85,6 @@ content:
           - data_key_id: youtube_demo
             icon: fab fa-youtube
             url: https://www.youtube.com/embed/OM7OZrjQ1wo
-      - layout: left
-        id: deep_fake_detect_app
-        logo: assets/images/Airflow.png
-        additional_links:
-          - data_key_id: github
-            icon: fab fa-github
-            url: https://github.com/wintrover/DataEngineering_Airflow_ETL.git
 
   - title: Experience # This section title is now managed by section_title_experience in _data
     id: experience
