@@ -28,7 +28,7 @@ projects_cvfactory_title: "CVFactory"
 projects_cvfactory_quote: "A SaaS that automates cover letter generation tailored to job postings using web crawling, RAG, and LLMs."
 projects_cvfactory_dev_info: |
   **Development Period:** In Progress <br/>
-  **Technologies:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain (Groq API, Cohere Embeddings, FAISS), JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare, Sonarqube
+  **Technologies:** Python, Django, FastAPI, Celery, Playwright, BeautifulSoup, Langchain, JavaScript, Docker, GitHub Actions, Google Cloud Run (Backend), Northflank (Frontend), Upstash Redis, PostgreSQL, Cloudflare, Sonarqube
 projects_cvfactory_description: |
   **Key Features & Challenges:**
     - **Frontend (CVFactory):**
@@ -147,7 +147,7 @@ skills_content_md: |
   - Celery
   - Playwright
   - BeautifulSoup
-  - Langchain (Groq API, Cohere Embeddings, FAISS)
+  - Langchain
   - Mediapipe
   - Firebase
   - ONNX
