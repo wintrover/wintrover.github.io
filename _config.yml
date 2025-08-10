@@ -106,9 +106,7 @@ content:
       - layout: left
         id: halla_university
 
-  - title: Skills # This section title is now managed by section_title_skills in _data
-    layout: text
-    content: # Content is managed by skills_content_md in _data/[lang]/strings.yml
+
 
 # Footer
 footer_show_references: false

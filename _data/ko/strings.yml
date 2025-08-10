@@ -6,7 +6,7 @@ nav_home: "소개"
 nav_projects: "프로젝트"
 nav_experience: "경력"
 nav_education: "학력"
-nav_skills: "기술"
+
 lang_switcher_en: "English"
 lang_switcher_ko: "한국어"
 about_title: "About Me"
@@ -16,7 +16,7 @@ about_content_md: |-
 section_title_projects: "Projects"
 section_title_experience: "Experience"
 section_title_education: "Education"
-section_title_skills: "Skills"
+
 
 # CVFactory Project Details
 projects_cvfactory_title: "CVFactory"
@@ -119,40 +119,7 @@ education_halla_university_caption: "2013년 3월 - 2020년 2월"
 education_halla_university_description: |
   - 전기 및 전자 공학 분야의 핵심 이론과 실험·실습 교육을 이수했습니다.<br/>- C 프로그래밍, 아두이노를 활용한 ICT 전자부품/제품 제제어 경험을 쌓았습니다.<br/>- 캡스톤 디자인 프로젝트 및 다수의 산학 연계 프로그램을 통해 실무 역량을 배양했습니다.
 
-# Skills Section Content
-skills_content_md: |
-  **Programming Languages:**
-  - Python
-  - JavaScript
-  - Kotlin
 
-  **Frameworks & Libraries:**
-  - Django
-  - FastAPI
-  - Celery
-  - Playwright
-  - BeautifulSoup
-  - Langchain
-  - Mediapipe
-  - Firebase
-  - ONNX
-  - EfficientNet
-  - YOLO (YOLO11)
-  - PyTorch
-  - TensorFlow
-
-  **Databases & Data Stores:**
-  - PostgreSQL
-  - Upstash Redis
-
-  **Cloud & DevOps Tools:**
-  - Docker
-  - Git & GitHub
-  - GitHub Actions
-  - Google Cloud Run
-  - Northflank
-  - Cloudflare
-  - Sonarqube
 
 scroll_to_top: "Top"
 section_title_contact: "Contact"
