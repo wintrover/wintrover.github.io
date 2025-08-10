@@ -21,7 +21,7 @@
     "deep_fake_detect_app": {
       "title": "Data Engineer Intern Position Task",
       "quote": "Successfully completed the data engineer intern position task for AI startup by implementing Airflow-based ETL for site entity attributes.",
-      "description": "Key Features and Achievements:<br/>- Dynamic Category Detection: Real-time identification of 16 categories through API endpoints<br/>- Data Collection and Processing: Automatic parsing of entity details from web responses<br/>- Database Storage: Efficient PostgreSQL storage with duplicate handling capabilities<br/>- Pipeline Orchestration: End-to-end workflow automation through Airflow"
+      "description": "Dynamic Category Detection: Real-time identification of 16 categories through API endpoints<br/>- Data Collection and Processing: Automatic parsing of entity details from web responses<br/>- Database Storage: Efficient PostgreSQL storage with duplicate handling capabilities<br/>- Pipeline Orchestration: End-to-end workflow automation through Airflow"
     },
     "face_recognition_dating_app": {
       "title": "Face Recognition Dating App",
