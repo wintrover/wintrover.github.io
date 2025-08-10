@@ -26,8 +26,11 @@ AI 개발자 윤수혁의 개인 포트폴리오 웹사이트입니다.
 ├── _layouts/              # Jekyll 레이아웃
 ├── _sass/                 # SCSS 스타일시트
 ├── assets/                # 정적 자산 (이미지, JS, CSS)
-├── blog/                  # 블로그 섹션
-├── ko/                    # 한국어 페이지
+│   ├── images/           # 이미지 파일
+│   └── js/               # JavaScript 파일
+├── pages/                 # 페이지 파일들
+│   ├── ko/               # 한국어 페이지
+│   └── blog/             # 블로그 페이지
 ├── .github/               # GitHub Actions 워크플로우
 ├── _config.yml            # Jekyll 설정
 └── index.md               # 메인 페이지

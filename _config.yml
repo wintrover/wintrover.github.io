@@ -128,6 +128,8 @@ plugins:
  - jekyll-sitemap
  - jekyll-feed
 
+include: ["pages/"]
+
 exclude : [
   "Gemfile",
   "Gemfile.lock",
@@ -136,7 +138,6 @@ exclude : [
   "vendor/cache/",
   "vendor/gems/",
   "vendor/ruby/",
-  "lib/",
   "scripts/",
   "docker-compose.yml",
   "CODE_OF_CONDUCT.md",
@@ -152,7 +153,7 @@ baseurl: ""
 # jekyll-polyglot settings
 languages: ["en", "ko"]
 default_lang: "en"
-exclude_from_localization: ["assets/", "lib/", "blog/"]
+exclude_from_localization: ["assets/", "pages/blog/"]
 parallel_localization: false
 
 # The following 'profile' section seems to be a duplicate or misconfigured,

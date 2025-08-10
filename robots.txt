@@ -1,10 +1,4 @@
 User-agent: *
 Allow: /
 
-User-agent: GPTBot
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-Sitemap: https://wintrover.github.io/sitemap.xml 
+Sitemap: https://wintrover.github.io/sitemap.xml
