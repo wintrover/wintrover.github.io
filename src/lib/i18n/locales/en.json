@@ -16,7 +16,7 @@
     "cvfactory": {
       "title": "CVFactory",
       "quote": "SaaS service that automates the generation of customized cover letters using job posting web crawling, RAG, and LLM.",
-      "description": "Key Features and Challenges:<br/>- Frontend (CVFactory): Django-based UI development (job posting/story input, cover letter generation/editing).<br/>- Backend (CVFactory Server): Web scraping based on Playwright/BeautifulSoup (asynchronous, iframe support).<br/>- Asynchronous API and task processing based on FastAPI, Celery, Upstash Redis.<br/>- RAG pipeline construction based on Langchain (Cohere Embeddings, FAISS, Groq LLM)."
+      "description": "<br/>- Frontend (CVFactory): Django-based UI development (job posting/story input, cover letter generation/editing).<br/>- Backend (CVFactory Server): Web scraping based on Playwright/BeautifulSoup (asynchronous, iframe support).<br/>- Asynchronous API and task processing based on FastAPI, Celery, Upstash Redis.<br/>- RAG pipeline construction based on Langchain (Cohere Embeddings, FAISS, Groq LLM)."
     },
     "deep_fake_detect_app": {
       "title": "Data Engineer Intern Position Task",
@@ -26,7 +26,7 @@
     "face_recognition_dating_app": {
       "title": "Face Recognition Dating App",
       "quote": "Senior dating app utilizing physiognomy and astronomy-based matching algorithms.",
-      "description": "Key Features and Achievements:<br/>- Facial landmark recognition system development (accuracy comparison with Mediapipe, etc.).<br/>- Physiognomy analysis algorithm development and application.<br/>- Real-time messaging feature implementation (Socket.IO, Firebase).<br/>- Senior-friendly UI/UX design.<br/>Results: 94% landmark accuracy, 92% senior usability, 0.7-second processing speed."
+      "description": "<br/>- Facial landmark recognition system development (accuracy comparison with Mediapipe, etc.).<br/>- Physiognomy analysis algorithm development and application.<br/>- Real-time messaging feature implementation (Socket.IO, Firebase).<br/>- Senior-friendly UI/UX design.<br/>Results: 94% landmark accuracy, 92% senior usability, 0.7-second processing speed."
     }
   },
   "experience": {
