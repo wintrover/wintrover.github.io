@@ -1,5 +1,6 @@
 <script>
   import { _ } from 'svelte-i18n';
+  import { base } from '$app/paths';
 </script>
 
 <!-- Modified about section with horizontal layout -->
@@ -8,7 +9,7 @@
     <div class="col-xs-12">
       <div class="about-layout">
         <div class="profile-section">
-          <img class="profile-img" src="/assets/images/profile.png" alt="Profile" />
+          <img class="profile-img" src="{base}/assets/images/profile.png" alt="Profile" />
         </div>
         <div class="content-section">
           <p>{@html $_('about_content')}</p>

@@ -1,10 +1,11 @@
 <script>
   import { _ } from "svelte-i18n";
+  import { base } from '$app/paths';
 
   const projects = [
     {
       id: "cvfactory",
-      logo: "/assets/images/CVFactory_logo.png",
+      logo: `${base}/assets/images/CVFactory_logo.png`,
       links: [
         {
           type: "github",
@@ -22,7 +23,7 @@
     },
     {
       id: "deep_fake_detect_app",
-      logo: "/assets/images/Airflow.png",
+      logo: `${base}/assets/images/Airflow.png`,
       links: [
         {
           type: "github",
@@ -34,7 +35,7 @@
     },
     {
       id: "face_recognition_dating_app",
-      logo: "/assets/images/sodamyeon_logo.png",
+      logo: `${base}/assets/images/sodamyeon_logo.png`,
       links: [
         {
           type: "github",
