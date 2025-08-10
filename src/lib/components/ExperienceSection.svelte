@@ -14,7 +14,7 @@
     <div class="col-xs-12">
       <h3>{$_('section_title_experience')}</h3>
       <div class="list-container">
-        {#each experiences as exp}
+        {#each experiences as exp, index}
           <div class="layout">
             <div class="details">
               <h4>{$_(`experience.${exp.id}.title`)}</h4>
@@ -25,7 +25,9 @@
               <p>{@html $_(`experience.${exp.id}.description`)}</p>
             </div>
           </div>
-          <div class="border-weak"></div>
+          {#if index < experiences.length - 1}
+            <div class="border-weak"></div>
+          {/if}
         {/each}
       </div>
     </div>

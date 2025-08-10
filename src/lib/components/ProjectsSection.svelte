@@ -60,7 +60,7 @@
     <div class="col-xs-12">
       <h3>{$_("section_title_projects")}</h3>
       <div class="list-container">
-        {#each projects as project}
+        {#each projects as project, index}
           <div class="layout">
             <div class="details">
               <div class="project-links">
@@ -89,7 +89,9 @@
               <p>{@html $_(`projects.${project.id}.description`)}</p>
             </div>
           </div>
-          <div class="border-weak"></div>
+          {#if index < projects.length - 1}
+            <div class="border-weak"></div>
+          {/if}
         {/each}
       </div>
     </div>
