@@ -1,5 +1,5 @@
 {
-  "site_title": "윤수혁 | AI 개발자",
+  "site_title": "wintrover's resume",
   "site_subtitle": "Fullstack AI Application Architect",
   "nav_home": "소개",
   "nav_projects": "프로젝트",
@@ -8,7 +8,7 @@
   "lang_switcher_en": "English",
   "lang_switcher_ko": "한국어",
   "about_title": "About Me",
-  "about_content": "성과 중심의 AI 개발자 지망생으로, LLM 및 NLP 분야에 관심이 많습니다.<br/> 저는 전기전자공학부를 졸업 후, 기술 지원 등 기술적인 분야 뿐만 아니라<br/> 영업 및 비즈니스 전략 등 다양한 경험을 통해 효과적인 의사소통, 비즈니스 감각을 갖추었습니다.<br/> 또한, Intel 개발자 과정에서 아래 소개드릴 프로젝트들을 통해 LLM, 컴퓨터 비전 양 분야를 넘나들며 <br/> 다양한 딥러닝 모델을 구축하고 실제 서비스 배포까지 폭넓은 경험을 쌓았습니다.<br/> 저는 이러한 Python 및 관련 AI/ML 프레임워크 경험을 통한 기술력과, <br/> 탄탄한 고객중심의 사고방식으로 UX를 혁신하여 영향력 있는 AI 솔루션을 구축하고 싶은 야망이 있습니다.<br/>",
+  "about_content": "성과 중심의 개발자로, LLM 및 NLP 분야에 관심이 많습니다.<br/> 저는 전기전자공학부를 졸업 후, 기술 지원 등 기술적인 분야 뿐만 아니라<br/> 영업 및 비즈니스 전략 등 다양한 경험을 통해 효과적인 의사소통, 비즈니스 감각을 갖추었습니다.<br/> 또한, Intel 개발자 과정에서 아래 소개드릴 프로젝트들을 통해 LLM, 컴퓨터 비전 양 분야를 넘나들며 <br/> 다양한 딥러닝 모델을 구축하고 실제 서비스 배포까지 폭넓은 경험을 쌓았습니다.<br/> 저는 이러한 Python 및 관련 AI/ML 프레임워크 경험을 통한 기술력과, <br/> 탄탄한 고객중심의 사고방식으로 UX를 혁신하여 영향력 있는 AI 솔루션을 구축하고 싶은 야망이 있습니다.<br/>",
   "section_title_projects": "Projects",
   "section_title_experience": "Experience",
   "section_title_education": "Education",
@@ -16,17 +16,17 @@
     "cvfactory": {
       "title": "CVFactory",
       "quote": "채용공고 웹 크롤링, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서 생성을 자동화하는 SaaS 서비스입니다.",
-      "description": "**주요 기능 및 도전 과제:**<br/>- **Frontend (CVFactory):** Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).<br/>- **Backend (CVFactory Server):** Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).<br/>- FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.<br/>- Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축."
+      "description": "주요 기능 및 도전 과제:<br/>- Frontend (CVFactory): Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).<br/>- Backend (CVFactory Server): Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).<br/>- FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.<br/>- Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축."
     },
     "deep_fake_detect_app": {
       "title": "Data Engineer Intern Position Task",
       "quote": "AI 스타트업 ㄹ사의 데이터 엔지니어 인턴 포지션 과제로 사이트의 엔티티 속성을 성공적으로 Airflow 기반의 ETL함으로써 완수했습니다.",
-      "description": "**주요 기능 및 성과:**<br/>- **동적 카테고리 탐지**: API 엔드포인트를 통한 16개 카테고리 실시간 식별<br/>- **데이터 수집 및 처리**: 웹 응답에서 엔티티 상세 정보 자동 파싱<br/>- **데이터베이스 저장**: 중복 처리 기능이 있는 PostgreSQL 효율적 저장<br/>- **파이프라인 오케스트레이션**: Airflow를 통한 종단간 워크플로우 자동화"
+      "description": "주요 기능 및 성과:<br/>- 동적 카테고리 탐지: API 엔드포인트를 통한 16개 카테고리 실시간 식별<br/>- 데이터 수집 및 처리: 웹 응답에서 엔티티 상세 정보 자동 파싱<br/>- 데이터베이스 저장: 중복 처리 기능이 있는 PostgreSQL 효율적 저장<br/>- 파이프라인 오케스트레이션: Airflow를 통한 종단간 워크플로우 자동화"
     },
     "face_recognition_dating_app": {
       "title": "Face Recognition Dating App",
       "quote": "관상학과 천문학 기반 매칭 알고리즘을 활용한 시니어 데이팅 앱입니다.",
-      "description": "**주요 기능 및 성과:**<br/>- 얼굴 랜드마크 인식 시스템 개발 (Mediapipe 등 정확도 비교).<br/>- 관상 분석 알고리즘 개발 및 적용.<br/>- 실시간 메시징 기능 구현 (Socket.IO, Firebase).<br/>- 시니어 친화적 UI/UX 설계.<br/>**성과:** 랜드마크 정확도 94%, 시니어 사용성 92%, 처리 속도 0.7초."
+      "description": "주요 기능 및 성과:<br/>- 얼굴 랜드마크 인식 시스템 개발 (Mediapipe 등 정확도 비교).<br/>- 관상 분석 알고리즘 개발 및 적용.<br/>- 실시간 메시징 기능 구현 (Socket.IO, Firebase).<br/>- 시니어 친화적 UI/UX 설계.<br/>성과: 랜드마크 정확도 94%, 시니어 사용성 92%, 처리 속도 0.7초."
     }
   },
   "experience": {

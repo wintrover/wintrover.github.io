@@ -1,5 +1,5 @@
 {
-  "site_title": "Suhyok Yun | AI Developer",
+  "site_title": "wintrover's resume",
   "site_subtitle": "Fullstack AI Application Architect",
   "nav_home": "About",
   "nav_projects": "Projects",
@@ -8,7 +8,7 @@
   "lang_switcher_en": "English",
   "lang_switcher_ko": "한국어",
   "about_title": "About Me",
-  "about_content": "Performance-driven AI developer with strong interests in LLM and NLP fields.<br/> After graduating from Electrical and Electronic Engineering, I have gained effective communication skills and business acumen through various experiences in technical support, sales, and business strategy.<br/> Additionally, through the Intel developer program, I have gained extensive experience across both LLM and computer vision fields through the projects introduced below,<br/> building various deep learning models and deploying actual services.<br/> I have the ambition to build impactful AI solutions by innovating UX with my technical skills gained through Python and related AI/ML framework experience,<br/> and a solid customer-centered mindset.<br/>",
+  "about_content": "Performance-driven developer with strong interests in LLM and NLP fields.<br/> After graduating from Electrical and Electronic Engineering, I have gained effective communication skills and business acumen through various experiences in technical support, sales, and business strategy.<br/> Additionally, through the Intel developer program, I have gained extensive experience across both LLM and computer vision fields through the projects introduced below,<br/> building various deep learning models and deploying actual services.<br/> I have the ambition to build impactful AI solutions by innovating UX with my technical skills gained through Python and related AI/ML framework experience,<br/> and a solid customer-centered mindset.<br/>",
   "section_title_projects": "Projects",
   "section_title_experience": "Experience",
   "section_title_education": "Education",
@@ -16,17 +16,17 @@
     "cvfactory": {
       "title": "CVFactory",
       "quote": "SaaS service that automates the generation of customized cover letters using job posting web crawling, RAG, and LLM.",
-      "description": "**Key Features and Challenges:**<br/>- **Frontend (CVFactory):** Django-based UI development (job posting/story input, cover letter generation/editing).<br/>- **Backend (CVFactory Server):** Web scraping based on Playwright/BeautifulSoup (asynchronous, iframe support).<br/>- Asynchronous API and task processing based on FastAPI, Celery, Upstash Redis.<br/>- RAG pipeline construction based on Langchain (Cohere Embeddings, FAISS, Groq LLM)."
+      "description": "Key Features and Challenges:<br/>- Frontend (CVFactory): Django-based UI development (job posting/story input, cover letter generation/editing).<br/>- Backend (CVFactory Server): Web scraping based on Playwright/BeautifulSoup (asynchronous, iframe support).<br/>- Asynchronous API and task processing based on FastAPI, Celery, Upstash Redis.<br/>- RAG pipeline construction based on Langchain (Cohere Embeddings, FAISS, Groq LLM)."
     },
     "deep_fake_detect_app": {
       "title": "Data Engineer Intern Position Task",
       "quote": "Successfully completed the data engineer intern position task for AI startup by implementing Airflow-based ETL for site entity attributes.",
-      "description": "**Key Features and Achievements:**<br/>- **Dynamic Category Detection**: Real-time identification of 16 categories through API endpoints<br/>- **Data Collection and Processing**: Automatic parsing of entity details from web responses<br/>- **Database Storage**: Efficient PostgreSQL storage with duplicate handling capabilities<br/>- **Pipeline Orchestration**: End-to-end workflow automation through Airflow"
+      "description": "Key Features and Achievements:<br/>- Dynamic Category Detection: Real-time identification of 16 categories through API endpoints<br/>- Data Collection and Processing: Automatic parsing of entity details from web responses<br/>- Database Storage: Efficient PostgreSQL storage with duplicate handling capabilities<br/>- Pipeline Orchestration: End-to-end workflow automation through Airflow"
     },
     "face_recognition_dating_app": {
       "title": "Face Recognition Dating App",
       "quote": "Senior dating app utilizing physiognomy and astronomy-based matching algorithms.",
-      "description": "**Key Features and Achievements:**<br/>- Facial landmark recognition system development (accuracy comparison with Mediapipe, etc.).<br/>- Physiognomy analysis algorithm development and application.<br/>- Real-time messaging feature implementation (Socket.IO, Firebase).<br/>- Senior-friendly UI/UX design.<br/>**Results:** 94% landmark accuracy, 92% senior usability, 0.7-second processing speed."
+      "description": "Key Features and Achievements:<br/>- Facial landmark recognition system development (accuracy comparison with Mediapipe, etc.).<br/>- Physiognomy analysis algorithm development and application.<br/>- Real-time messaging feature implementation (Socket.IO, Firebase).<br/>- Senior-friendly UI/UX design.<br/>Results: 94% landmark accuracy, 92% senior usability, 0.7-second processing speed."
     }
   },
   "experience": {

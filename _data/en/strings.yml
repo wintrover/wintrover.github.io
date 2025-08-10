@@ -1,6 +1,6 @@
 # _data/en/strings.yml
-site_title: "Suhyok Yun | AI Developer"
-site_subtitle: AI Developer, mainly Vision
+site_title: "wintrover's resume"
+site_subtitle: mainly Vision
 copyright_text: "&copy; Suhyok Yun. All rights reserved."
 nav_home: "About"
 nav_projects: "Projects"
@@ -11,7 +11,7 @@ lang_switcher_en: "English"
 lang_switcher_ko: "Korean"
 about_title: "About Me"
 about_content_md: |-
-  Results-oriented aspiring AI Developer with a strong interest in LLM and NLP fields.<br />
+  Results-oriented developer with a strong interest in LLM and NLP fields.<br />
   After graduating with a degree in Electrical and Electronic Engineering, I have gained effective communication skills and business acumen through diverse experiences not only in technical fields such as technical support and front-end development, but also in sales and business strategy.<br />
   Furthermore, through projects in the Intel Developer Program, I have built various deep learning models across both LLM and computer vision fields, gaining extensive experience up to actual service deployment.<br />
   With my technical skills from Python and related AI/ML framework experience, and a solid customer-centric mindset, I have the ambition to innovate UX and build impactful AI solutions.<br />
