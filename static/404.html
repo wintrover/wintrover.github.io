@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>윤수혁 포트폴리오</title>
+    <script>
+        // GitHub Pages SPA 라우팅을 위한 리다이렉트
+        const path = window.location.pathname.slice(1);
+        if (path) {
+            window.location.replace(
+                window.location.origin + '/wintrover.github.io/?/' + path
+            );
+        } else {
+            window.location.replace(window.location.origin + '/wintrover.github.io/');
+        }
+    </script>
+</head>
+<body>
+    <p>리다이렉트 중...</p>
+</body>
+</html>

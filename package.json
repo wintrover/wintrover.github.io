@@ -1,0 +1,28 @@
+{
+  "name": "wintrover-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "윤수혁의 개인 포트폴리오 웹사이트 - Svelte로 구축",
+  "author": "윤수혁 <wintrover@gmail.com>",
+  "homepage": "https://wintrover.github.io",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.5",
+    "@sveltejs/kit": "^2.8.0",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "svelte": "^4.2.19",
+    "svelte-check": "^4.0.0",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0"
+  },
+  "dependencies": {
+    "svelte-i18n": "^4.0.0"
+  }
+}

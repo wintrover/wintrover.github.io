@@ -5,90 +5,91 @@
 ## 🌐 웹사이트
 
 - **메인 사이트**: [wintrover.github.io](https://wintrover.github.io)
-- **한국어**: [wintrover.github.io/ko](https://wintrover.github.io/ko)
-- **English**: [wintrover.github.io](https://wintrover.github.io)
+- **한국어/English**: 언어 전환 지원
 
 ## 🛠 기술 스택
 
-- **Static Site Generator**: Jekyll
-- **Theme**: Modern Resume Theme (Customized)
+- **Frontend Framework**: SvelteKit
+- **Static Site Generator**: SvelteKit with Static Adapter
 - **Hosting**: GitHub Pages
-- **Languages**: HTML, SCSS, JavaScript
-- **Internationalization**: Jekyll Polyglot
+- **Languages**: Svelte, TypeScript, CSS
+- **Internationalization**: svelte-i18n
 
 ## 📁 프로젝트 구조
 
 ```
-├── _data/                  # 데이터 파일
-│   ├── en/                # 영어 콘텐츠
-│   └── ko/                # 한국어 콘텐츠
-├── _includes/             # Jekyll include 파일
-├── _layouts/              # Jekyll 레이아웃
-├── _sass/                 # SCSS 스타일시트
-├── assets/                # 정적 자산 (이미지, JS, CSS)
-│   ├── images/           # 이미지 파일
-│   └── js/               # JavaScript 파일
-├── pages/                 # 페이지 파일들
-│   ├── ko/               # 한국어 페이지
-│   └── blog/             # 블로그 페이지
-├── .github/               # GitHub Actions 워크플로우
-├── _config.yml            # Jekyll 설정
-└── index.md               # 메인 페이지
+├── src/
+│   ├── lib/
+│   │   ├── components/          # Svelte 컴포넌트
+│   │   ├── i18n/               # 다국어 지원
+│   │   └── utils/              # 유틸리티 함수
+│   ├── routes/                 # SvelteKit 라우트
+│   ├── app.html               # HTML 템플릿
+│   └── app.css                # 글로벌 스타일
+├── static/                     # 정적 자산
+│   └── assets/                # 이미지 등
+├── .github/                    # GitHub Actions
+└── package.json               # 프로젝트 설정
 ```
 
 ## 🚀 로컬 개발
 
 ### 필요 조건
-- Ruby (>= 2.7)
-- Bundler
+- Node.js (>= 18)
+- npm
 
 ### 설치 및 실행
 ```bash
 # 의존성 설치
-bundle install
+npm install
 
-# 로컬 서버 실행
-bundle exec jekyll serve
+# 개발 서버 실행
+npm run dev
 
-# 다국어 지원으로 실행
-bundle exec jekyll serve --config _config.yml
+# 빌드
+npm run build
+
+# 프리뷰
+npm run preview
 ```
 
-## 📝 콘텐츠 수정
+## 🚀 주요 기능
 
-### 개인 정보 수정
-- `_config.yml`: 기본 설정 및 개인 정보
-- `_data/en/strings.yml`: 영어 콘텐츠
-- `_data/ko/strings.yml`: 한국어 콘텐츠
-
-### 프로젝트 추가
-1. `_config.yml`의 `content.projects` 섹션에 새 프로젝트 ID 추가
-2. `_data/[lang]/strings.yml`에 해당 프로젝트 정보 추가
-
-### 경력 추가
-1. `_config.yml`의 `content.experience` 섹션에 새 경력 ID 추가
-2. `_data/[lang]/strings.yml`에 해당 경력 정보 추가
+- **반응형 디자인**: 모든 디바이스에서 최적화된 경험
+- **다국어 지원**: 한국어/영어 실시간 전환
+- **모던한 UI/UX**: 깔끔하고 직관적인 인터페이스
+- **빠른 로딩**: SvelteKit의 최적화된 성능
+- **SEO 최적화**: 검색 엔진 친화적 구조
+- **정적 사이트 생성**: GitHub Pages 호환
 
 ## 🌍 다국어 지원
 
-이 웹사이트는 Jekyll Polyglot을 사용하여 한국어와 영어를 지원합니다.
+`svelte-i18n`을 사용하여 구현된 다국어 지원:
+- 한국어 (기본)
+- 영어
+- 실시간 언어 전환
+- 브라우저 언어 자동 감지
 
-- 기본 언어: 영어 (`en`)
-- 지원 언어: 한국어 (`ko`)
+## 🔧 커스터마이징
 
-## 📊 SEO 및 분석
+### 개인 정보 수정
+`src/lib/i18n/locales/` 폴더의 언어별 JSON 파일을 수정하세요.
 
-- **Google Analytics**: 설정됨
-- **SEO 최적화**: Jekyll SEO Tag 플러그인 사용
-- **Sitemap**: 자동 생성
-- **RSS Feed**: 자동 생성
+### 스타일 수정
+- `src/app.css`: 글로벌 스타일
+- 각 컴포넌트의 `<style>` 섹션: 컴포넌트별 스타일
 
-## 🔧 배포
+### 새 섹션 추가
+1. `src/lib/components/`에 새 컴포넌트 생성
+2. `src/routes/+page.svelte`에 컴포넌트 추가
+3. 다국어 텍스트를 `src/lib/i18n/locales/`에 추가
 
-GitHub Pages를 통해 자동 배포됩니다.
+## 🔄 배포
 
-- `main` 브랜치: 프로덕션 배포
-- `develop` 브랜치: 개발 브랜치
+GitHub Pages를 통한 자동 배포:
+1. `main` 브랜치에 푸시
+2. GitHub Actions가 자동으로 빌드 및 배포
+3. `gh-pages` 브랜치에 정적 파일 생성
 
 ## 📄 라이선스
 
