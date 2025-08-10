@@ -93,29 +93,30 @@ projects_deep_fake_detect_app_link_github: "https://github.com/wintrover/DataEng
 projects_deep_fake_detect_app_link_youtube_demo: "YouTube Demo"
 
 # Experience Section Details
-experience_focc_inc_title: "FOCC INC"
-experience_focc_inc_sub_title: "Business Strategy Team · Freelancer"
-experience_focc_inc_caption: "January 2024 - July 2024"
+experience_focc_inc_title: "SMBholdings Inc."
+experience_focc_inc_sub_title: "Fullstack AI Application Architect · Full-time"
+experience_focc_inc_caption: "July 2025 - Present"
 experience_focc_inc_description: |
-  - Supported business strategy and IR for a senior-focused travel platform startup.
-  - Demonstrated ability to make strategic decisions by analyzing market trends and competitive landscape.
-  - Contributed to company strategy planning, leading to selection as a Korea Tourism Organization tourism venture company in June 2024, and actively supported building a solid business foundation aiming for over 300% revenue growth (KRW 4 billion) by the first half of next year.
+  - Architected and developed an AI-based facial recognition KYC system for Web3 fintech services, including SMB Wallet and the Mastercard Club.
+  - Integrated AI models for secure identity verification and real-time authentication, enhancing platform security.
+  - Designed and implemented robust security protocols for biometric data, ensuring data integrity and user trust.
+  - Led the technical direction to combine AI, Web3, and fintech, strengthening the company's core business model.
 
 experience_insight_marketing_labs_title: "Insight Marketing Labs"
 experience_insight_marketing_labs_sub_title: "Sales Team · Freelancer"
-experience_insight_marketing_labs_caption: "December 2021 - November 2023"
+experience_insight_marketing_labs_caption: "December 2022 - June 2024"
 experience_insight_marketing_labs_description: |
-  - Led on-site sales and business development for an SEO startup, communicating directly with field customers.
-  - Deeply understood customer needs and problems, providing customized consulting solutions.
-  - Secured 30 new corporate clients (15% annual revenue increase) and achieved solid business growth by maintaining over 85% contract renewal rate through effective problem-solving and relationship building.
+  - Led field sales and business development efforts for an SEO startup, directly engaging with corporate clients.
+  - Cultivated strong understanding of client needs and pain points, providing tailored consulting solutions.
+  - Achieved significant business growth by acquiring 3 new corporate clients (15% annual revenue increase) and maintaining an 85%+ contract renewal rate through effective problem-solving and relationship building.
 
 experience_vizcam_title: "VizCam"
-experience_vizcam_sub_title: "Technical Support"
-experience_vizcam_caption: "June 2020 - August 2021"
+experience_vizcam_sub_title: "Technical Support · Full-time"
+experience_vizcam_caption: "December 2020 - August 2022"
 experience_vizcam_description: |
-  - Handled machine vision software technical support and communication, acting as a key communication channel between overseas engineers and domestic customers.
-  - Improved technical understanding and problem-solving skills by resolving complex technical issues.
-  - Facilitated smooth communication through technical translation and real-time interpretation, effectively bridging the gap between technical and non-technical stakeholders, thereby improving project efficiency (project duration reduced by 30%, customer satisfaction over 90%).
+  - Provided technical support and communication for machine vision software, acting as a crucial liaison between overseas engineers and local clients.
+  - Enhanced technical understanding and troubleshooting skills by resolving complex technical issues.
+  - Facilitated smooth communication through technical translation and real-time interpretation, effectively bridging technical and non-technical stakeholders and improving project efficiency (30% timeline reduction, 90%+ customer satisfaction).
 
 # Education Section Details
 education_intel_ai_for_future_workforce_title: "Intel AI for Future Workforce"
