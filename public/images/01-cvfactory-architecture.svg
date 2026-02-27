@@ -1,0 +1,83 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; fill: #2c3e50; }
+      .component { font-family: Arial, sans-serif; font-size: 14px; fill: #34495e; }
+      .arrow { stroke: #3498db; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .box { fill: #ecf0f1; stroke: #34495e; stroke-width: 2; rx: 8; }
+      .frontend { fill: #e8f5e8; stroke: #27ae60; }
+      .backend { fill: #fff2e8; stroke: #e67e22; }
+      .database { fill: #e8f2ff; stroke: #3498db; }
+      .external { fill: #f8e8ff; stroke: #9b59b6; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="title">CVFactory Architecture</text>
+
+  <!-- User Browser -->
+  <rect x="50" y="80" width="120" height="60" class="box frontend" />
+  <text x="110" y="105" text-anchor="middle" class="component">User Browser</text>
+  <text x="110" y="125" text-anchor="middle" class="component">(HTML/CSS/JS)</text>
+
+  <!-- Django Frontend -->
+  <rect x="250" y="80" width="120" height="60" class="box backend" />
+  <text x="310" y="105" text-anchor="middle" class="component">Django</text>
+  <text x="310" y="125" text-anchor="middle" class="component">Frontend</text>
+
+  <!-- FastAPI Service -->
+  <rect x="450" y="80" width="120" height="60" class="box backend" />
+  <text x="510" y="105" text-anchor="middle" class="component">FastAPI</text>
+  <text x="510" y="125" text-anchor="middle" class="component">Service</text>
+
+  <!-- Database -->
+  <rect x="250" y="200" width="120" height="60" class="box database" />
+  <text x="310" y="225" text-anchor="middle" class="component">Database</text>
+  <text x="310" y="245" text-anchor="middle" class="component">(SQLite/PostgreSQL)</text>
+
+  <!-- AI Provider -->
+  <rect x="630" y="80" width="120" height="60" class="box external" />
+  <text x="690" y="105" text-anchor="middle" class="component">AI Provider</text>
+  <text x="690" y="125" text-anchor="middle" class="component">(OpenAI)</text>
+
+  <!-- Docker Container -->
+  <rect x="200" y="320" width="400" height="120" class="box" stroke-dasharray="5,5" />
+  <text x="400" y="345" text-anchor="middle" class="component">Docker Container</text>
+
+  <!-- Northflank -->
+  <rect x="450" y="350" width="120" height="60" class="box external" />
+  <text x="510" y="375" text-anchor="middle" class="component">Northflank</text>
+  <text x="510" y="395" text-anchor="middle" class="component">Deployment</text>
+
+  <!-- Cloudflare -->
+  <rect x="250" y="350" width="120" height="60" class="box external" />
+  <text x="310" y="375" text-anchor="middle" class="component">Cloudflare</text>
+  <text x="310" y="395" text-anchor="middle" class="component">CDN</text>
+
+  <!-- Arrows -->
+  <line x1="170" y1="110" x2="240" y2="110" class="arrow" />
+  <text x="205" y="105" text-anchor="middle" style="font-size: 12px; fill: #7f8c8d;">HTTP</text>
+
+  <line x1="370" y1="110" x2="440" y2="110" class="arrow" />
+  <text x="405" y="105" text-anchor="middle" style="font-size: 12px; fill: #7f8c8d;">API</text>
+
+  <line x1="570" y1="110" x2="620" y2="110" class="arrow" />
+  <text x="595" y="105" text-anchor="middle" style="font-size: 12px; fill: #7f8c8d;">LLM</text>
+
+  <line x1="310" y1="150" x2="310" y2="190" class="arrow" />
+  <text x="330" y="175" style="font-size: 12px; fill: #7f8c8d;">Data</text>
+
+  <line x1="310" y1="270" x2="310" y2="340" class="arrow" />
+  <text x="330" y="305" style="font-size: 12px; fill: #7f8c8d;">Cache</text>
+
+  <line x1="510" y1="150" x2="510" y2="340" class="arrow" />
+  <text x="530" y="245" style="font-size: 12px; fill: #7f8c8d;">Deploy</text>
+
+  <!-- Data Flow Labels -->
+  <text x="400" y="500" text-anchor="middle" style="font-size: 14px; fill: #2c3e50; font-weight: bold;">Data Flow:</text>
+  <text x="400" y="520" text-anchor="middle" style="font-size: 12px; fill: #7f8c8d;">User → Django → FastAPI → AI Provider → Response</text>
+  <text x="400" y="540" text-anchor="middle" style="font-size: 12px; fill: #7f8c8d;">Deployed via Docker on Northflank with Cloudflare CDN</text>
+</svg>

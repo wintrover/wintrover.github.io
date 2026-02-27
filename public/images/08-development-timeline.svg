@@ -1,0 +1,88 @@
+<svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .timeline-bg { fill: #f5f5f5; stroke: #ddd; stroke-width: 1; }
+      .phase1 { fill: #ffcdd2; }
+      .phase2 { fill: #fff3e0; }
+      .phase3 { fill: #e1f5fe; }
+      .phase4 { fill: #c8e6c9; }
+      .text { font-family: Arial, sans-serif; font-size: 11px; }
+      .title { font-size: 16px; font-weight: bold; text-anchor: middle; }
+      .phase-title { font-size: 13px; font-weight: bold; }
+      .timeline-line { stroke: #333; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <!-- Title -->
+  <text x="450" y="25" class="title">Face Recognition Project Development Timeline</text>
+
+  <!-- Timeline Line -->
+  <line x1="50" y1="60" x2="850" y2="60" class="timeline-line" />
+
+  <!-- Phase 1: 초기 설계 -->
+  <g>
+    <rect x="50" y="80" width="180" height="80" class="timeline-bg phase1" />
+    <text x="60" y="100" class="phase-title">Phase 1: Initial Design</text>
+    <text x="60" y="120" class="text">• Project Direction Setting</text>
+    <text x="60" y="135" class="text">• YOLOv12 Review → Data Issues</text>
+    <text x="60" y="150" class="text">• OpenCV Direction Change</text>
+    <circle cx="140" cy="60" r="4" fill="#f44336" />
+  </g>
+
+  <!-- Phase 2: 기능 구현 -->
+  <g>
+    <rect x="250" y="80" width="180" height="80" class="timeline-bg phase2" />
+    <text x="260" y="100" class="phase-title">Phase 2: Feature Implementation</text>
+    <text x="260" y="120" class="text">• MediaPipe Integration</text>
+    <text x="260" y="135" class="text">• Canny Edge Detection</text>
+    <text x="260" y="150" class="text">• Auto Capture Feature</text>
+    <circle cx="340" cy="60" r="4" fill="#ff9800" />
+  </g>
+
+  <!-- Phase 3: 프레임워크 전환 -->
+  <g>
+    <rect x="450" y="80" width="180" height="80" class="timeline-bg phase3" />
+    <text x="460" y="100" class="phase-title">Phase 3: Algorithm Enhancement</text>
+    <text x="460" y="120" class="text">• React Migration Review</text>
+    <text x="460" y="135" class="text">• Douglas-Peucker Issues</text>
+    <text x="460" y="150" class="text">• Bounding Box Algorithm</text>
+    <circle cx="540" cy="60" r="4" fill="#2196f3" />
+  </g>
+
+  <!-- Phase 4: 시스템 안정화 -->
+  <g>
+    <rect x="650" y="80" width="180" height="80" class="timeline-bg phase4" />
+    <text x="660" y="100" class="phase-title">Phase 4: System Stabilization</text>
+    <text x="660" y="120" class="text">• MediaPipe Loading Error Fix</text>
+    <text x="660" y="135" class="text">• Complete OpenCV.js Removal</text>
+    <text x="660" y="150" class="text">• Direct Canvas API Implementation</text>
+    <circle cx="740" cy="60" r="4" fill="#4caf50" />
+  </g>
+
+  <!-- Key Achievements -->
+  <g>
+    <rect x="50" y="200" width="780" height="120" class="timeline-bg" style="fill: #f9f9f9;" />
+    <text x="60" y="220" class="phase-title">Key Achievements and Technical Challenges</text>
+
+    <text x="60" y="245" class="text">🔴 Issues:</text>
+    <text x="130" y="245" class="text">YOLOv12 data acquisition difficulties, Douglas-Peucker accuracy issues, MediaPipe loading errors</text>
+
+    <text x="60" y="265" class="text">🟡 Turning Points:</text>
+    <text x="130" y="265" class="text">OpenCV → MediaPipe, Douglas-Peucker → Bounding Box, React review → Vanilla JS retention</text>
+
+    <text x="60" y="285" class="text">🟢 Solutions:</text>
+    <text x="130" y="285" class="text">Complete OpenCV.js removal, direct Canvas API implementation, significant system stability improvement</text>
+
+    <text x="60" y="305" class="text">✅ Final Results:</text>
+    <text x="130" y="305" class="text">Loading speed improvement, stable face recognition, KYC server error resolution, quality check logic optimization</text>
+  </g>
+
+  <!-- Progress Arrow -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+    </marker>
+  </defs>
+  <line x1="50" y1="180" x2="830" y2="180" stroke="#333" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="440" y="195" class="text" text-anchor="middle">Development Progress Direction</text>
+</svg>

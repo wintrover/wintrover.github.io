@@ -1,0 +1,102 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .node { fill: #f9f9f9; stroke: #333; stroke-width: 2; }
+      .label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .edge { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrowhead { fill: #666; }
+      .user { fill: #4285f4; }
+      .frontend { fill: #34a853; }
+      .backend { fill: #ea4335; }
+      .google { fill: #fbbc04; }
+      .database { fill: #9aa0a6; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrowhead" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="30" class="label" font-size="16" font-weight="bold">Google OAuth 2.0 Authentication Flow</text>
+
+  <!-- User -->
+  <rect x="50" y="80" width="100" height="60" rx="10" class="node user"/>
+  <text x="100" y="105" class="label" fill="white" font-weight="bold">User</text>
+  <text x="100" y="120" class="label" fill="white" font-size="10">Browser</text>
+
+  <!-- Frontend -->
+  <rect x="200" y="80" width="100" height="60" rx="10" class="node frontend"/>
+  <text x="250" y="105" class="label" fill="white" font-weight="bold">Frontend</text>
+  <text x="250" y="120" class="label" fill="white" font-size="10">React/Vue</text>
+
+  <!-- Backend -->
+  <rect x="350" y="80" width="100" height="60" rx="10" class="node backend"/>
+  <text x="400" y="105" class="label" fill="white" font-weight="bold">Backend</text>
+  <text x="400" y="120" class="label" fill="white" font-size="10">Django/FastAPI</text>
+
+  <!-- Google OAuth -->
+  <rect x="500" y="80" width="120" height="60" rx="10" class="node google"/>
+  <text x="560" y="105" class="label" fill="white" font-weight="bold">Google OAuth</text>
+  <text x="560" y="120" class="label" fill="white" font-size="10">Authorization Server</text>
+
+  <!-- Database -->
+  <rect x="650" y="80" width="100" height="60" rx="10" class="node database"/>
+  <text x="700" y="105" class="label" fill="white" font-weight="bold">Database</text>
+  <text x="700" y="120" class="label" fill="white" font-size="10">User Storage</text>
+
+  <!-- Flow Steps -->
+  <!-- 1. Login Request -->
+  <path d="M 100 160 L 250 180" class="edge"/>
+  <text x="175" y="165" class="label" font-size="10">1. Login Request</text>
+
+  <!-- 2. Redirect to Google -->
+  <path d="M 250 200 L 560 200" class="edge"/>
+  <text x="405" y="195" class="label" font-size="10">2. Redirect to Google OAuth</text>
+
+  <!-- 3. User Authorization -->
+  <path d="M 560 220 L 100 240" class="edge"/>
+  <text x="330" y="235" class="label" font-size="10">3. User Grants Permission</text>
+
+  <!-- 4. Authorization Code -->
+  <path d="M 100 260 L 250 280" class="edge"/>
+  <text x="175" y="275" class="label" font-size="10">4. Authorization Code</text>
+
+  <!-- 5. Send Code to Backend -->
+  <path d="M 250 300 L 400 320" class="edge"/>
+  <text x="325" y="315" class="label" font-size="10">5. Send Code</text>
+
+  <!-- 6. Exchange for Tokens -->
+  <path d="M 400 340 L 560 360" class="edge"/>
+  <text x="480" y="355" class="label" font-size="10">6. Exchange for Tokens</text>
+
+  <!-- 7. Access & Refresh Tokens -->
+  <path d="M 560 380 L 400 400" class="edge"/>
+  <text x="480" y="395" class="label" font-size="10">7. Access &amp; Refresh Tokens</text>
+
+  <!-- 8. Get User Info -->
+  <path d="M 400 420 L 560 440" class="edge"/>
+  <text x="480" y="435" class="label" font-size="10">8. Get User Info</text>
+
+  <!-- 9. User Data -->
+  <path d="M 560 460 L 400 480" class="edge"/>
+  <text x="480" y="475" class="label" font-size="10">9. User Profile Data</text>
+
+  <!-- 10. Store User -->
+  <path d="M 400 500 L 700 520" class="edge"/>
+  <text x="550" y="515" class="label" font-size="10">10. Store/Update User</text>
+
+  <!-- 11. JWT Token -->
+  <path d="M 400 540 L 250 560" class="edge"/>
+  <text x="325" y="555" class="label" font-size="10">11. JWT Token</text>
+
+  <!-- 12. Success Response -->
+  <path d="M 250 580 L 100 580" class="edge"/>
+  <text x="175" y="575" class="label" font-size="10">12. Login Success</text>
+
+  <!-- Security Notes -->
+  <rect x="50" y="480" width="150" height="80" rx="5" fill="#fff3cd" stroke="#856404"/>
+  <text x="125" y="500" class="label" font-size="11" font-weight="bold">Security Features:</text>
+  <text x="125" y="515" class="label" font-size="10">• PKCE Protection</text>
+  <text x="125" y="530" class="label" font-size="10">• Refresh Token Rotation</text>
+  <text x="125" y="545" class="label" font-size="10">• Secure HTTP Only</text>
+</svg>

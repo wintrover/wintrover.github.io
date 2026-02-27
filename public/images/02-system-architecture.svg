@@ -1,0 +1,55 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .node { fill: #f9f9f9; stroke: #333; stroke-width: 2; }
+      .label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .edge { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrowhead { fill: #666; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrowhead" />
+    </marker>
+  </defs>
+
+  <!-- Django -->
+  <rect x="50" y="50" width="100" height="60" rx="5" class="node" fill="#092e20"/>
+  <text x="100" y="85" class="label" fill="white">Django</text>
+
+  <!-- FastAPI -->
+  <rect x="200" y="50" width="100" height="60" rx="5" class="node" fill="#009688"/>
+  <text x="250" y="85" class="label" fill="white">FastAPI</text>
+
+  <!-- Celery -->
+  <rect x="350" y="50" width="100" height="60" rx="5" class="node" fill="#37b24d"/>
+  <text x="400" y="85" class="label" fill="white">Celery</text>
+
+  <!-- Redis -->
+  <rect x="500" y="50" width="100" height="60" rx="5" class="node" fill="#dc2626"/>
+  <text x="550" y="85" class="label" fill="white">Redis</text>
+
+  <!-- OpenAI GPT-4o -->
+  <rect x="125" y="200" width="150" height="60" rx="5" class="node" fill="#10a37f"/>
+  <text x="200" y="235" class="label" fill="white">OpenAI GPT-4o</text>
+
+  <!-- Playwright -->
+  <rect x="325" y="200" width="150" height="60" rx="5" class="node" fill="#2d8a3e"/>
+  <text x="400" y="235" class="label" fill="white">Playwright</text>
+
+  <!-- Database -->
+  <rect x="200" y="350" width="100" height="60" rx="5" class="node" fill="#336791"/>
+  <text x="250" y="385" class="label" fill="white">Database</text>
+
+  <!-- File Storage -->
+  <rect x="350" y="350" width="100" height="60" rx="5" class="node" fill="#ff6b35"/>
+  <text x="400" y="385" class="label" fill="white">File Storage</text>
+
+  <!-- Connections -->
+  <path d="M 150 80 L 200 80" class="edge"/>
+  <path d="M 300 80 L 350 80" class="edge"/>
+  <path d="M 450 80 L 500 80" class="edge"/>
+  <path d="M 250 110 L 200 200" class="edge"/>
+  <path d="M 400 110 L 400 200" class="edge"/>
+  <path d="M 200 260 L 250 350" class="edge"/>
+  <path d="M 400 260 L 400 350" class="edge"/>
+  <path d="M 100 110 L 100 300 L 200 350" class="edge"/>
+</svg>

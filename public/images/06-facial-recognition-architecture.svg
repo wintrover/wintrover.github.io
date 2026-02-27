@@ -1,0 +1,160 @@
+<svg width="900" height="700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; fill: #2c3e50; }
+      .subtitle { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #34495e; }
+      .component { font-family: Arial, sans-serif; font-size: 13px; fill: #2c3e50; }
+      .small-text { font-family: Arial, sans-serif; font-size: 11px; fill: #7f8c8d; }
+      .arrow { stroke: #3498db; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .box { fill: #ecf0f1; stroke: #34495e; stroke-width: 2; rx: 8; }
+      .frontend { fill: #e8f5e8; stroke: #27ae60; }
+      .backend { fill: #fff2e8; stroke: #e67e22; }
+      .ai { fill: #f8e8ff; stroke: #9b59b6; }
+      .data { fill: #e8f2ff; stroke: #3498db; }
+      .process { fill: #fff8e8; stroke: #f39c12; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" class="title">Facial Recognition System Architecture</text>
+
+  <!-- Phase 1: Core Technology -->
+  <text x="150" y="70" class="subtitle">Phase 1: Core Technology</text>
+
+  <!-- Webcam Input -->
+  <rect x="50" y="90" width="100" height="50" class="box frontend" />
+  <text x="100" y="110" text-anchor="middle" class="component">Webcam</text>
+  <text x="100" y="125" text-anchor="middle" class="component">Input</text>
+
+  <!-- Deepface -->
+  <rect x="200" y="90" width="100" height="50" class="box ai" />
+  <text x="250" y="110" text-anchor="middle" class="component">Deepface</text>
+  <text x="250" y="125" text-anchor="middle" class="component">ArcFace</text>
+
+  <!-- MediaPipe -->
+  <rect x="350" y="90" width="100" height="50" class="box ai" />
+  <text x="400" y="110" text-anchor="middle" class="component">MediaPipe</text>
+  <text x="400" y="125" text-anchor="middle" class="component">3D Landmarks</text>
+
+  <!-- Phase 2: Web Implementation -->
+  <text x="150" y="200" class="subtitle">Phase 2: Web Implementation</text>
+
+  <!-- Browser -->
+  <rect x="50" y="220" width="120" height="60" class="box frontend" />
+  <text x="110" y="245" text-anchor="middle" class="component">Web Browser</text>
+  <text x="110" y="260" text-anchor="middle" class="component">MediaPipe Web</text>
+
+  <!-- Express.js Backend -->
+  <rect x="220" y="220" width="120" height="60" class="box backend" />
+  <text x="280" y="245" text-anchor="middle" class="component">Express.js</text>
+  <text x="280" y="260" text-anchor="middle" class="component">WebSocket</text>
+
+  <!-- Real-time Processing -->
+  <rect x="390" y="220" width="120" height="60" class="box process" />
+  <text x="450" y="240" text-anchor="middle" class="component">Real-time</text>
+  <text x="450" y="255" text-anchor="middle" class="component">Processing</text>
+  <text x="450" y="270" text-anchor="middle" class="small-text">5.5 FPS</text>
+
+  <!-- Phase 3: KYC System -->
+  <text x="150" y="330" class="subtitle">Phase 3: KYC System</text>
+
+  <!-- User Guidance -->
+  <rect x="50" y="350" width="100" height="80" class="box frontend" />
+  <text x="100" y="375" text-anchor="middle" class="component">User</text>
+  <text x="100" y="390" text-anchor="middle" class="component">Guidance</text>
+  <text x="100" y="405" text-anchor="middle" class="small-text">Look left</text>
+  <text x="100" y="420" text-anchor="middle" class="small-text">Look right</text>
+
+  <!-- Angle Detection -->
+  <rect x="200" y="350" width="100" height="80" class="box process" />
+  <text x="250" y="375" text-anchor="middle" class="component">Angle</text>
+  <text x="250" y="390" text-anchor="middle" class="component">Detection</text>
+  <text x="250" y="405" text-anchor="middle" class="small-text">Yaw: ±30°</text>
+  <text x="250" y="420" text-anchor="middle" class="small-text">Pitch/Roll</text>
+
+  <!-- Video Capture -->
+  <rect x="350" y="350" width="100" height="80" class="box data" />
+  <text x="400" y="375" text-anchor="middle" class="component">Video</text>
+  <text x="400" y="390" text-anchor="middle" class="component">Capture</text>
+  <text x="400" y="405" text-anchor="middle" class="small-text">Multi-frame</text>
+  <text x="400" y="420" text-anchor="middle" class="small-text">Storage</text>
+
+  <!-- Quality Assessment -->
+  <rect x="500" y="350" width="100" height="80" class="box process" />
+  <text x="550" y="375" text-anchor="middle" class="component">Quality</text>
+  <text x="550" y="390" text-anchor="middle" class="component">Assessment</text>
+  <text x="550" y="405" text-anchor="middle" class="small-text">Face regions</text>
+  <text x="550" y="420" text-anchor="middle" class="small-text">Similarity</text>
+
+  <!-- Phase 4: Performance Optimization -->
+  <text x="150" y="480" class="subtitle">Phase 4: Optimization</text>
+
+  <!-- Memory Management -->
+  <rect x="50" y="500" width="120" height="60" class="box process" />
+  <text x="110" y="525" text-anchor="middle" class="component">Memory</text>
+  <text x="110" y="540" text-anchor="middle" class="component">Management</text>
+
+  <!-- Landmark Rendering -->
+  <rect x="220" y="500" width="120" height="60" class="box process" />
+  <text x="280" y="520" text-anchor="middle" class="component">Landmark</text>
+  <text x="280" y="535" text-anchor="middle" class="component">Rendering</text>
+  <text x="280" y="550" text-anchor="middle" class="small-text">478 points</text>
+
+  <!-- Error Handling -->
+  <rect x="390" y="500" width="120" height="60" class="box process" />
+  <text x="450" y="525" text-anchor="middle" class="component">Error</text>
+  <text x="450" y="540" text-anchor="middle" class="component">Handling</text>
+
+  <!-- Technology Stack -->
+  <rect x="650" y="90" width="200" height="200" class="box" stroke-dasharray="5,5" />
+  <text x="750" y="115" text-anchor="middle" class="subtitle">Technology Stack</text>
+
+  <text x="670" y="140" class="component">Frontend:</text>
+  <text x="670" y="155" class="small-text">• MediaPipe Web</text>
+  <text x="670" y="170" class="small-text">• WebRTC</text>
+  <text x="670" y="185" class="small-text">• Canvas API</text>
+
+  <text x="670" y="210" class="component">Backend:</text>
+  <text x="670" y="225" class="small-text">• Express.js</text>
+  <text x="670" y="240" class="small-text">• WebSocket</text>
+  <text x="670" y="255" class="small-text">• Docker</text>
+
+  <text x="670" y="270" class="component">AI/ML:</text>
+  <text x="670" y="285" class="small-text">• Deepface (ArcFace)</text>
+
+  <!-- Arrows -->
+  <line x1="150" y1="115" x2="190" y2="115" class="arrow" />
+  <line x1="300" y1="115" x2="340" y2="115" class="arrow" />
+
+  <line x1="170" y1="250" x2="210" y2="250" class="arrow" />
+  <line x1="340" y1="250" x2="380" y2="250" class="arrow" />
+
+  <line x1="150" y1="390" x2="190" y2="390" class="arrow" />
+  <line x1="300" y1="390" x2="340" y2="390" class="arrow" />
+  <line x1="450" y1="390" x2="490" y2="390" class="arrow" />
+
+  <line x1="170" y1="530" x2="210" y2="530" class="arrow" />
+  <line x1="340" y1="530" x2="380" y2="530" class="arrow" />
+
+  <!-- Performance Metrics -->
+  <rect x="650" y="350" width="200" height="150" class="box" fill="#f8f9fa" />
+  <text x="750" y="375" text-anchor="middle" class="subtitle">Performance Metrics</text>
+
+  <text x="670" y="400" class="component">Processing Speed:</text>
+  <text x="670" y="415" class="small-text">• 5.5 FPS real-time</text>
+
+  <text x="670" y="435" class="component">Accuracy:</text>
+  <text x="670" y="450" class="small-text">• Multi-environment</text>
+  <text x="670" y="465" class="small-text">• Various lighting</text>
+
+  <text x="670" y="485" class="component">Features:</text>
+  <text x="670" y="500" class="small-text">• 478 landmark points</text>
+
+  <!-- Data Flow -->
+  <text x="450" y="630" text-anchor="middle" style="font-size: 14px; fill: #2c3e50; font-weight: bold;">Data Flow:</text>
+  <text x="450" y="650" text-anchor="middle" style="font-size: 12px; fill: #7f8c8d;">Webcam → MediaPipe → Angle Detection → Quality Assessment → KYC Completion</text>
+  <text x="450" y="670" text-anchor="middle" style="font-size: 12px; fill: #7f8c8d;">Real-time processing with 5.5 FPS performance optimization</text>
+</svg>

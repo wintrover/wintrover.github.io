@@ -1,0 +1,34 @@
+{
+	"categories": {
+		"project": {
+			"name": "Project",
+			"description": "개인 프로젝트 관련 포스트",
+			"slug": "project",
+			"color": "#28a745",
+			"icon": "💻"
+		},
+		"company": {
+			"name": "Company Work",
+			"description": "회사 업무 관련 포스트",
+			"slug": "company",
+			"color": "#6f42c1",
+			"icon": "🏢"
+		},
+		"tutorial": {
+			"name": "Tutorial",
+			"description": "개발 가이드 및 튜토리얼",
+			"slug": "tutorial",
+			"color": "#0366d6",
+			"icon": "📚"
+		},
+		"general": {
+			"name": "General",
+			"description": "일반적인 주제의 포스트",
+			"slug": "general",
+			"color": "#6c757d",
+			"icon": "📝"
+		}
+	},
+	"defaultCategory": "General",
+	"autoAssignByFolder": true
+}
