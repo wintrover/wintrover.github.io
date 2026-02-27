@@ -1,0 +1,93 @@
+name: Pages Build & Deploy + Dev.to Drafts (Centralized)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install
+        run: npm ci
+      - name: Install Chrome for Puppeteer
+        run: npx puppeteer browsers install chrome
+      - name: Generate Mermaid images
+        env:
+          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/blog
+        run: npx tsx scripts/generate-images-ci.ts
+      - name: Build for Pages
+        run: npm run build:github
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  devto:
+    runs-on: ubuntu-latest
+    needs: deploy
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install
+        run: npm ci
+      - name: Upload changed posts to Dev.to
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/blog
+          BLOG_IMAGE_ABS_MODE: pages
+        run: |
+          FROM="${{ github.event.before }}"
+          TO="${{ github.sha }}"
+          if [ -z "$FROM" ]; then FROM="$(git rev-parse HEAD~1)"; fi
+          CHANGED=$(git diff --name-only "$FROM" "$TO" | grep -E '^src/posts/.+\.md$' || true)
+          if [ -z "$CHANGED" ]; then
+            LATEST=$(find src/posts -type f -name '*.md' | sort -r | head -n 1)
+            if [ -z "$LATEST" ]; then echo "No posts found"; exit 0; fi
+            echo "No posts changed; publishing latest: $LATEST"
+            npx tsx scripts/post-to-dev.ts "$LATEST"
+            exit 0
+          fi
+          for f in $CHANGED; do
+            echo "Publishing $f"
+            npx tsx scripts/post-to-dev.ts "$f"
+          done
