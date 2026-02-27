@@ -1,0 +1,20 @@
+{
+	"$schema": "https://help.stryker-mutator.io/rs/stryker-config.schema.json",
+	"packageManager": "npm",
+	"reporters": ["html", "clear-text", "progress"],
+	"testRunner": "vitest",
+	"coverageAnalysis": "off",
+	"ignoreStatic": false,
+	"concurrency": 4,
+	"inPlace": true,
+	"files": ["**/*", "!node_modules/**/*", "!.stryker-tmp/**/*", "!dist/**/*"],
+	"mutate": [
+		"src/lib/utils.ts",
+		"src/lib/postLoader.ts",
+		"src/lib/markdown.ts"
+	],
+	"vitest": {
+		"configFile": "vite.config.ts"
+	},
+	"disableTypeChecks": false
+}

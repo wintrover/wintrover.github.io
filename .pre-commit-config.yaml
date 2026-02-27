@@ -1,0 +1,44 @@
+repos:
+-   repo: builtin
+    hooks:
+    -   id: trailing-whitespace
+        priority: 0
+    -   id: end-of-file-fixer
+        priority: 0
+    -   id: check-yaml
+        priority: 0
+    -   id: check-added-large-files
+        priority: 0
+
+-   repo: https://github.com/biomejs/pre-commit
+    rev: v2.3.10
+    hooks:
+    -   id: biome-check
+        priority: 0
+
+-   repo: local
+    hooks:
+    -   id: typescript-typecheck
+        name: typescript-typecheck
+        entry: bun run typecheck
+        language: system
+        pass_filenames: false
+        files: ^src/
+        types_or: [ts, tsx]
+        priority: 0
+    -   id: knip
+        name: knip
+        entry: bun run knip
+        language: system
+        pass_filenames: false
+        files: ^src/
+        types_or: [ts, tsx, javascript, jsx, json]
+        priority: 0
+    -   id: dependency-cruiser
+        name: dependency-cruiser
+        entry: bun run depcruise
+        language: system
+        pass_filenames: false
+        files: ^src/
+        types_or: [ts, tsx, javascript, jsx]
+        priority: 0
