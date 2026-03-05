@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { get } from "svelte/store";
 import { describe, expect, test, vi } from "vitest";
 import * as postLoader from "../src/lib/postLoader";
@@ -16,6 +17,28 @@ describe("selectedCategory store", () => {
 	test("값을 변경할 수 있어야 함", () => {
 		selectedCategory.set("project");
 		expect(get(selectedCategory)).toBe("project");
+	});
+
+	test("PBT: 임의의 문자열로도 값을 변경할 수 있어야 함", () => {
+		fc.assert(
+			fc.property(
+				fc.oneof(
+					fc.constant("all"),
+					fc.string({
+						unit: fc.constantFrom(
+							..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+						),
+						minLength: 1,
+						maxLength: 20,
+					}),
+				),
+				(value) => {
+					selectedCategory.set(value);
+					expect(get(selectedCategory)).toBe(value);
+				},
+			),
+			{ numRuns: 50 },
+		);
 	});
 });
 

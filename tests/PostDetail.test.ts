@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
+import fc from "fast-check";
 import { push } from "svelte-spa-router";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import PostDetail from "../src/components/PostDetail.svelte";
@@ -24,6 +25,15 @@ vi.mock("mermaid", () => ({
 }));
 
 describe("PostDetail Component", () => {
+	const safeSlug = (minLength: number, maxLength: number) =>
+		fc.string({
+			unit: fc.constantFrom(
+				..."abcdefghijklmnopqrstuvwxyz0123456789-".split(""),
+			),
+			minLength,
+			maxLength,
+		});
+
 	const mockPost = {
 		fileName: "detailed-post",
 		title: "Detailed Post",
@@ -357,4 +367,24 @@ describe("PostDetail Component", () => {
 		expect(renderSpy).toHaveBeenCalled();
 		consoleSpy.mockRestore();
 	}, 20000);
+
+	test("PBT: loadPostBySlug가 null이면 Post not found를 표시해야 함", async () => {
+		await fc.assert(
+			fc.asyncProperty(safeSlug(1, 24), async (slug) => {
+				document.body.innerHTML = "";
+				vi.clearAllMocks();
+
+				vi.mocked(postLoader.loadPostBySlug).mockResolvedValueOnce(null);
+
+				const { unmount } = render(PostDetail, { params: { slug } });
+
+				await waitFor(() => {
+					expect(screen.getByText("Post not found")).toBeInTheDocument();
+				});
+
+				unmount();
+			}),
+			{ numRuns: 25 },
+		);
+	});
 });

@@ -1,4 +1,11 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
+import {
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from "@testing-library/svelte";
+import fc from "fast-check";
 import { tick } from "svelte";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import * as postLoader from "../src/lib/postLoader";
@@ -82,6 +89,7 @@ describe("App.svelte", () => {
 	});
 
 	afterEach(() => {
+		cleanup();
 		vi.unstubAllGlobals();
 	});
 
@@ -230,24 +238,81 @@ describe("App.svelte", () => {
 
 		getBoundingClientRectSpy.mockRestore();
 	});
-});
 
-test("포스트 로딩 에러 시 에러 메시지 표시 확인", async () => {
-	const error = new Error("Failed to load posts");
-	const errorPromise = Promise.reject(error);
-	errorPromise.catch(() => {});
+	test("PBT: 모바일 폭에서는 사이드바가 기본적으로 접혀있어야 함", async () => {
+		await fc.assert(
+			fc.asyncProperty(fc.integer({ min: 0, max: 767 }), async (width) => {
+				cleanup();
+				vi.mocked(postLoader.loadAllPosts).mockResolvedValue([]);
+				vi.mocked(posts).set([]);
+				Object.defineProperty(window, "innerWidth", {
+					writable: true,
+					configurable: true,
+					value: width,
+				});
+				window.dispatchEvent(new Event("resize"));
 
-	vi.mocked(posts).set(errorPromise as any);
+				render(App);
 
-	render(App);
-	await tick();
+				await waitFor(() => {
+					const appContainers = document.querySelectorAll("#app-container");
+					const appContainer = appContainers[appContainers.length - 1] as
+						| HTMLElement
+						| undefined;
+					expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(
+						true,
+					);
+				});
+			}),
+			{ numRuns: 25 },
+		);
+	});
 
-	await waitFor(
-		() => {
-			expect(
-				screen.getByText(/Error loading posts:[\s\S]*Failed to load posts/i),
-			).toBeInTheDocument();
-		},
-		{ timeout: 2000 },
-	);
+	test("PBT: 데스크톱 폭에서는 초기 상태가 접힘이 아니어야 함", async () => {
+		await fc.assert(
+			fc.asyncProperty(fc.integer({ min: 768, max: 5000 }), async (width) => {
+				cleanup();
+				vi.mocked(postLoader.loadAllPosts).mockResolvedValue([]);
+				vi.mocked(posts).set([]);
+				Object.defineProperty(window, "innerWidth", {
+					writable: true,
+					configurable: true,
+					value: width,
+				});
+				window.dispatchEvent(new Event("resize"));
+
+				render(App);
+				await tick();
+
+				const appContainers = document.querySelectorAll("#app-container");
+				const appContainer = appContainers[appContainers.length - 1] as
+					| HTMLElement
+					| undefined;
+				expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(
+					false,
+				);
+			}),
+			{ numRuns: 25 },
+		);
+	});
+
+	test("포스트 로딩 에러 시 에러 메시지 표시 확인", async () => {
+		const error = new Error("Failed to load posts");
+		const errorPromise = Promise.reject(error);
+		errorPromise.catch(() => {});
+
+		vi.mocked(posts).set(errorPromise as any);
+
+		render(App);
+		await tick();
+
+		await waitFor(
+			() => {
+				expect(
+					screen.getByText(/Error loading posts:[\s\S]*Failed to load posts/i),
+				).toBeInTheDocument();
+			},
+			{ timeout: 2000 },
+		);
+	});
 });

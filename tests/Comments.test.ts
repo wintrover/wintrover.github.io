@@ -1,4 +1,5 @@
 import { render, waitFor } from "@testing-library/svelte";
+import fc from "fast-check";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import Comments from "../src/components/Comments.svelte";
 
@@ -21,10 +22,67 @@ vi.mock("../src/lib/giscus-config", () => ({
 }));
 
 describe("Comments Component", () => {
+	const safeToken = (minLength: number, maxLength: number) =>
+		fc.string({
+			unit: fc.constantFrom(
+				..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+			),
+			minLength,
+			maxLength,
+		});
+
 	beforeEach(() => {
 		document.head.innerHTML = "";
 		document.body.innerHTML = "";
 		vi.clearAllMocks();
+	});
+
+	test("PBT: 필수 설정(repo/repoId/categoryId) 유무에 따라 스크립트 삽입 여부가 결정되어야 함", async () => {
+		await fc.assert(
+			fc.asyncProperty(
+				fc.oneof(fc.constant(""), safeToken(1, 16)),
+				fc.oneof(fc.constant(""), safeToken(1, 16)),
+				fc.oneof(fc.constant(""), safeToken(1, 16)),
+				async (repo, repoId, categoryId) => {
+					document.head.innerHTML = "";
+					document.body.innerHTML = "";
+					vi.clearAllMocks();
+
+					const consoleSpy = vi
+						.spyOn(console, "error")
+						.mockImplementation(() => {});
+
+					render(Comments, { repo, repoId, categoryId });
+
+					if (!repo || !repoId || !categoryId) {
+						await waitFor(() => {
+							expect(consoleSpy).toHaveBeenCalledWith(
+								expect.stringContaining(
+									"Missing required Giscus configuration",
+								),
+								expect.any(Object),
+							);
+						});
+						expect(
+							document.querySelector(
+								'script[src="https://giscus.app/client.js"]',
+							),
+						).not.toBeInTheDocument();
+					} else {
+						await waitFor(() => {
+							expect(
+								document.querySelector(
+									'script[src="https://giscus.app/client.js"]',
+								),
+							).toBeInTheDocument();
+						});
+					}
+
+					consoleSpy.mockRestore();
+				},
+			),
+			{ numRuns: 25 },
+		);
 	});
 
 	test("기본 렌더링 확인", () => {

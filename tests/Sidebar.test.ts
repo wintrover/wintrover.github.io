@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
+import fc from "fast-check";
 import { get, writable } from "svelte/store";
 import { push } from "svelte-spa-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -19,6 +20,15 @@ vi.mock("svelte-spa-router", () => ({
 }));
 
 describe("Sidebar Component", () => {
+	const safeText = (minLength: number, maxLength: number) =>
+		fc.string({
+			unit: fc.constantFrom(
+				..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+			),
+			minLength,
+			maxLength,
+		});
+
 	const mockPosts = [
 		{ title: "Post 1", category: "Project", tags: ["Svelte"], slug: "post-1" },
 		{
@@ -101,5 +111,61 @@ describe("Sidebar Component", () => {
 		expect(toggleSpy).toHaveBeenCalled();
 
 		document.removeEventListener("toggle-sidebar", toggleSpy);
+	});
+
+	test("PBT: 카테고리 카운트가 posts와 일치해야 함", () => {
+		fc.assert(
+			fc.property(
+				fc.array(
+					fc.record({
+						title: safeText(1, 12),
+						category: fc.oneof(
+							fc.constant(undefined),
+							fc.constant(""),
+							fc.constantFrom(
+								"Project",
+								"Company Work",
+								"Tech",
+								"Life",
+								"General",
+							),
+						),
+						tags: fc.array(safeText(1, 10), {
+							maxLength: 4,
+						}),
+						slug: safeText(1, 12),
+					}),
+					{ minLength: 0, maxLength: 20 },
+				),
+				(generated) => {
+					document.body.innerHTML = "";
+					posts.set(generated as any);
+					selectedCategory.set("all");
+					vi.clearAllMocks();
+
+					const { unmount } = render(Sidebar);
+
+					expect(
+						screen.getByText(new RegExp(`All Posts \\(${generated.length}\\)`)),
+					).toBeInTheDocument();
+
+					const counts = new Map<string, number>();
+					for (const p of generated as any[]) {
+						if (!p.category) continue;
+						counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
+					}
+
+					for (const [cat, count] of counts.entries()) {
+						const escaped = cat.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+						expect(
+							screen.getByText(new RegExp(`${escaped} \\(${count}\\)`)),
+						).toBeInTheDocument();
+					}
+
+					unmount();
+				},
+			),
+			{ numRuns: 50 },
+		);
 	});
 });

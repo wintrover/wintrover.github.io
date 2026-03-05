@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, test, vi } from "vitest";
 import { loadAllPosts, loadPostBySlug } from "../src/lib/postLoader";
 
@@ -23,6 +24,39 @@ describe("postLoader", () => {
 		expect(post).not.toBeNull();
 		expect(post?.slug).toBe(targetPost.slug);
 		expect(post?.title).toBe(targetPost.title);
+	});
+
+	test("PBT: loadAllPosts는 date 기준 내림차순으로 정렬되어야 함", async () => {
+		await fc.assert(
+			fc.asyncProperty(
+				fc.uniqueArray(fc.integer({ min: 0, max: 20000 }), {
+					minLength: 2,
+					maxLength: 12,
+				}),
+				async (dayOffsets) => {
+					const base = new Date("2000-01-01T00:00:00.000Z").getTime();
+					const modules: Record<string, string> = {};
+
+					for (let i = 0; i < dayOffsets.length; i++) {
+						const date = new Date(base + dayOffsets[i] * 24 * 60 * 60 * 1000)
+							.toISOString()
+							.split("T")[0];
+						modules[`posts/p${i}.md`] =
+							`---\ntitle: p${i}\ndate: ${date}\n---\nBody ${i}`;
+					}
+
+					const posts = await loadAllPosts(modules);
+					expect(posts).toHaveLength(dayOffsets.length);
+
+					for (let i = 0; i < posts.length - 1; i++) {
+						const current = new Date(posts[i].date).getTime();
+						const next = new Date(posts[i + 1].date).getTime();
+						expect(current).toBeGreaterThanOrEqual(next);
+					}
+				},
+			),
+			{ numRuns: 50 },
+		);
 	});
 
 	test("Metadata fallback logic - All cases for coverage", async () => {

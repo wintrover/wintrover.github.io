@@ -1,9 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
+import fc from "fast-check";
 import { get } from "svelte/store";
 import { push } from "svelte-spa-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import BlogList from "../src/components/BlogList.svelte";
 import * as postLoader from "../src/lib/postLoader";
+import { slugify } from "../src/lib/utils";
 import { selectedCategory } from "../src/stores/category";
 
 // Mock postLoader
@@ -17,6 +19,15 @@ vi.mock("svelte-spa-router", () => ({
 }));
 
 describe("BlogList Component", () => {
+	const safeText = (minLength: number, maxLength: number) =>
+		fc.string({
+			unit: fc.constantFrom(
+				..."abcdefghijklmnopqrstuvwxyz0123456789".split(""),
+			),
+			minLength,
+			maxLength,
+		});
+
 	const mockPosts = [
 		{
 			title: "Post 1",
@@ -198,5 +209,101 @@ describe("BlogList Component", () => {
 
 		// 카테고리 배지나 요약이 없어야 함
 		expect(screen.queryByText("Excerpt")).not.toBeInTheDocument();
+	});
+
+	test("PBT: category 파라미터는 해당 카테고리의 포스트만 렌더링해야 함", async () => {
+		await fc.assert(
+			fc.asyncProperty(
+				fc.uniqueArray(safeText(1, 12), {
+					minLength: 2,
+					maxLength: 8,
+				}),
+				fc
+					.tuple(
+						fc.constantFrom("Tech", "Life", "Project", "Company Work"),
+						fc.constantFrom("Tech", "Life", "Project", "Company Work"),
+					)
+					.filter(([a, b]) => a !== b),
+				fc.nat({ max: 100 }),
+				async (titles, categoryPair, idx) => {
+					document.body.innerHTML = "";
+					const [catA, catB] = categoryPair;
+					const posts = titles.map((title, i) => ({
+						title,
+						slug: `post-${i}`,
+						category: i % 2 === 0 ? catA : catB,
+						date: "2023-01-01",
+						excerpt: `Excerpt ${i}`,
+					}));
+
+					const chosen = posts[idx % posts.length].category;
+					const chosenSlug = slugify(chosen);
+
+					vi.mocked(postLoader.loadAllPosts).mockResolvedValue(posts as any);
+					selectedCategory.set("all");
+
+					const { unmount } = render(BlogList, {
+						params: { category: chosenSlug },
+					});
+
+					const expected = posts.find((p) => p.category === chosen);
+					if (!expected)
+						throw new Error("Unexpected: no post for chosen category");
+
+					await waitFor(() => {
+						expect(screen.getByText(expected.title)).toBeInTheDocument();
+					});
+
+					for (const post of posts) {
+						if (post.category === chosen) {
+							expect(screen.getByText(post.title)).toBeInTheDocument();
+						} else {
+							expect(screen.queryByText(post.title)).not.toBeInTheDocument();
+						}
+					}
+
+					expect(get(selectedCategory)).toBe(chosen);
+					unmount();
+				},
+			),
+			{ numRuns: 25 },
+		);
+	});
+
+	test("PBT: 존재하지 않는 카테고리는 빈 목록과 selectedCategory=all", async () => {
+		await fc.assert(
+			fc.asyncProperty(
+				fc.uniqueArray(safeText(1, 12), {
+					minLength: 1,
+					maxLength: 8,
+				}),
+				async (titles) => {
+					document.body.innerHTML = "";
+					const posts = titles.map((title, i) => ({
+						title,
+						slug: `post-${i}`,
+						category: "Tech",
+						date: "2023-01-01",
+						excerpt: `Excerpt ${i}`,
+					}));
+
+					vi.mocked(postLoader.loadAllPosts).mockResolvedValue(posts as any);
+					selectedCategory.set("all");
+
+					const { unmount } = render(BlogList, {
+						params: { category: "unknown-category" },
+					});
+
+					await waitFor(() => {
+						expect(
+							screen.getByText("No posts found in this category."),
+						).toBeInTheDocument();
+					});
+					expect(get(selectedCategory)).toBe("all");
+					unmount();
+				},
+			),
+			{ numRuns: 25 },
+		);
 	});
 });
