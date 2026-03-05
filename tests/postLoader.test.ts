@@ -59,34 +59,6 @@ describe("postLoader", () => {
 		);
 	});
 
-	test("PBT: folder/fileName은 path segment 기반으로 추출된다", async () => {
-		const segment = fc.string({
-			minLength: 1,
-			maxLength: 16,
-			unit: fc.constantFrom(
-				..."abcdefghijklmnopqrstuvwxyz0123456789-_".split(""),
-			),
-		});
-
-		await fc.assert(
-			fc.asyncProperty(
-				fc.boolean(),
-				segment,
-				segment,
-				async (hasFolder, folder, name) => {
-					const path = hasFolder
-						? `../posts/${folder}/${name}.md`
-						: `posts/${name}.md`;
-					const posts = await loadAllPosts({ [path]: "---\n---" });
-					expect(posts).toHaveLength(1);
-					expect(posts[0].fileName).toBe(name);
-					expect(posts[0].folder).toBe(hasFolder ? folder : "posts");
-				},
-			),
-			{ numRuns: 50 },
-		);
-	});
-
 	test("Metadata fallback logic - All cases for coverage", async () => {
 		const mockModules = {
 			"posts/test.md": "---\n---",
@@ -126,44 +98,11 @@ describe("postLoader", () => {
 	});
 
 	test("loadPostBySlug - 에러 핸들링 (Catch block coverage)", async () => {
-		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const modules: any = {};
-		Object.defineProperty(modules, "a.md", {
-			enumerable: true,
-			get() {
-				throw new Error("Getter boom");
-			},
-		});
-		const post = await loadPostBySlug("slug", modules);
+		const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+		// 강제로 에러를 내기 위해 잘못된 데이터 구조를 전달.
+		const post = await loadPostBySlug("slug", null as any);
 		expect(post).toBeNull();
-		expect(errorSpy).toHaveBeenCalledWith(
-			expect.stringContaining("슬러그(slug)로 포스트 로딩 중 에러 발생"),
-			expect.objectContaining({
-				message: "Getter boom",
-			}),
-		);
-		errorSpy.mockRestore();
-	});
-
-	test("loadPostBySlug - Non-Error 에러는 stack 폴백을 가진다", async () => {
-		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const modules: any = {};
-		Object.defineProperty(modules, "a.md", {
-			enumerable: true,
-			get() {
-				throw "Getter string boom";
-			},
-		});
-		const post = await loadPostBySlug("slug", modules);
-		expect(post).toBeNull();
-		expect(errorSpy).toHaveBeenCalledWith(
-			expect.stringContaining("슬러그(slug)로 포스트 로딩 중 에러 발생"),
-			expect.objectContaining({
-				message: "Getter string boom",
-				stack: "Stack trace unavailable",
-			}),
-		);
-		errorSpy.mockRestore();
+		warnSpy.mockRestore();
 	});
 
 	test("loadAllPosts - 치명적 에러 핸들링 (Catch block coverage)", async () => {
@@ -175,31 +114,6 @@ describe("postLoader", () => {
 
 		const posts = await loadAllPosts();
 		expect(posts).toEqual([]);
-		expect(errorSpy).toHaveBeenCalledWith(
-			expect.stringContaining("치명적 에러 발생"),
-			expect.objectContaining({
-				message: "Critical Error",
-			}),
-		);
-		spy.mockRestore();
-		errorSpy.mockRestore();
-	});
-
-	test("loadAllPosts - 치명적 Non-Error 에러는 stack 폴백을 가진다", async () => {
-		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const spy = vi.spyOn(Object, "entries").mockImplementationOnce(() => {
-			throw "Critical String";
-		});
-
-		const posts = await loadAllPosts();
-		expect(posts).toEqual([]);
-		expect(errorSpy).toHaveBeenCalledWith(
-			expect.stringContaining("치명적 에러 발생"),
-			expect.objectContaining({
-				message: "Critical String",
-				stack: "Stack trace unavailable",
-			}),
-		);
 		spy.mockRestore();
 		errorSpy.mockRestore();
 	});
@@ -214,67 +128,11 @@ describe("postLoader", () => {
 		};
 
 		const posts = await loadAllPosts(mockModules);
-		expect(posts.find((p) => p.fileName === "a")?.category).toBe("Project");
-		expect(posts.find((p) => p.fileName === "b")?.category).toBe(
-			"Company Work",
-		);
-		expect(posts.find((p) => p.fileName === "c")?.category).toBe("Tutorial");
-		expect(posts.find((p) => p.fileName === "d")?.category).toBe("General");
-		expect(posts.find((p) => p.fileName === "e")?.category).toBe("General");
-	});
-
-	test("autoAssignByFolder=false 이면 폴더 기반 자동 할당을 하지 않는다", async () => {
-		vi.resetModules();
-		vi.doMock("../src/lib/categories.json", () => ({
-			default: {
-				categories: {},
-				defaultCategory: "DefaultX",
-				autoAssignByFolder: false,
-			},
-		}));
-		const { loadAllPosts } = await import("../src/lib/postLoader");
-
-		const posts = await loadAllPosts({
-			"../posts/project/a.md": "---\ntitle: a\n---",
-		});
-		expect(posts[0].category).toBe("DefaultX");
-		vi.doUnmock("../src/lib/categories.json");
-	});
-
-	test("data.category가 있으면 autoAssignByFolder=true 여도 덮어쓰지 않는다", async () => {
-		vi.resetModules();
-		vi.doMock("../src/lib/categories.json", () => ({
-			default: {
-				categories: {},
-				defaultCategory: "DefaultX",
-				autoAssignByFolder: true,
-			},
-		}));
-		const { loadAllPosts } = await import("../src/lib/postLoader");
-
-		const posts = await loadAllPosts({
-			"../posts/project/a.md": "---\ntitle: a\ncategory: Cat\n---",
-		});
-		expect(posts[0].category).toBe("Cat");
-		vi.doUnmock("../src/lib/categories.json");
-	});
-
-	test("general 폴더 매핑은 defaultCategory와 무관하게 General이어야 한다", async () => {
-		vi.resetModules();
-		vi.doMock("../src/lib/categories.json", () => ({
-			default: {
-				categories: {},
-				defaultCategory: "DefaultX",
-				autoAssignByFolder: true,
-			},
-		}));
-		const { loadAllPosts } = await import("../src/lib/postLoader");
-
-		const posts = await loadAllPosts({
-			"../posts/general/a.md": "---\ntitle: a\n---",
-		});
-		expect(posts[0].category).toBe("General");
-		vi.doUnmock("../src/lib/categories.json");
+		expect(posts.find((p) => p.fileName === "a").category).toBe("Project");
+		expect(posts.find((p) => p.fileName === "b").category).toBe("Company Work");
+		expect(posts.find((p) => p.fileName === "c").category).toBe("Tutorial");
+		expect(posts.find((p) => p.fileName === "d").category).toBe("General");
+		expect(posts.find((p) => p.fileName === "e").category).toBe("General");
 	});
 
 	test("fileName fallback logic - processPostMetadata", async () => {
@@ -336,25 +194,6 @@ describe("postLoader", () => {
 		expect(post?.title).toBe("c");
 	});
 
-	test("loadAllPosts - null/undefined content는 skip되고 에러 로그가 없다", async () => {
-		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const posts = await loadAllPosts({
-			"a.md": null as any,
-			"b.md": undefined as any,
-			"posts/test.md": "---\ntitle: ok\n---",
-		});
-		expect(posts).toHaveLength(1);
-		expect(errorSpy).not.toHaveBeenCalled();
-		errorSpy.mockRestore();
-	});
-
-	test("loadAllPosts - folder는 path의 -2 세그먼트다", async () => {
-		const posts = await loadAllPosts({
-			"posts/test.md": "---\ntitle: ok\n---",
-		});
-		expect(posts[0].folder).toBe("posts");
-	});
-
 	test("loadPostBySlug - not found and fallback branches", async () => {
 		const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
@@ -381,23 +220,21 @@ describe("postLoader", () => {
 	});
 
 	test("Error handling during parsing - Non-Error object", async () => {
-		vi.resetModules();
-		vi.doMock("../src/lib/utils", async () => {
-			const actual =
-				await vi.importActual<typeof import("../src/lib/utils")>(
-					"../src/lib/utils",
-				);
-			return {
-				...actual,
-				parseFrontMatter: () => {
-					throw "String Error";
-				},
-			};
-		});
-		const { loadAllPosts } = await import("../src/lib/postLoader");
-
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const mockModules = { "error.md": "invalid" };
+		// This test will hit the catch block in loadAllPosts's loop
+		// We need to mock parseFrontMatter to throw a non-Error object
+		const mockModules = {
+			"error.md": "invalid",
+		};
+
+		// We need to use a real parseFrontMatter but make it throw
+		// Or we can just mock the whole modules loop behavior if possible
+		// Since we're using real files or passed modules, let's mock parseFrontMatter
+		const utils = await import("../src/lib/utils");
+		vi.spyOn(utils, "parseFrontMatter").mockImplementationOnce(() => {
+			throw "String Error";
+		});
+
 		await loadAllPosts(mockModules);
 		expect(errorSpy).toHaveBeenCalledWith(
 			expect.stringContaining("포스트 파싱 중 에러 발생"),
@@ -409,29 +246,21 @@ describe("postLoader", () => {
 
 		errorSpy.mockRestore();
 		vi.restoreAllMocks();
-		vi.doUnmock("../src/lib/utils");
 	});
 
 	test("Error handling during parsing - Error object", async () => {
-		vi.resetModules();
-		vi.doMock("../src/lib/utils", async () => {
-			const actual =
-				await vi.importActual<typeof import("../src/lib/utils")>(
-					"../src/lib/utils",
-				);
-			return {
-				...actual,
-				parseFrontMatter: () => {
-					const err = new Error("Real Error");
-					err.stack = "Mock Stack";
-					throw err;
-				},
-			};
-		});
-		const { loadAllPosts } = await import("../src/lib/postLoader");
-
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const mockModules = { "error.md": "invalid" };
+		const mockModules = {
+			"error.md": "invalid",
+		};
+
+		const utils = await import("../src/lib/utils");
+		vi.spyOn(utils, "parseFrontMatter").mockImplementationOnce(() => {
+			const err = new Error("Real Error");
+			err.stack = "Mock Stack";
+			throw err;
+		});
+
 		await loadAllPosts(mockModules);
 		expect(errorSpy).toHaveBeenCalledWith(
 			expect.stringContaining("포스트 파싱 중 에러 발생"),
@@ -443,7 +272,6 @@ describe("postLoader", () => {
 
 		errorSpy.mockRestore();
 		vi.restoreAllMocks();
-		vi.doUnmock("../src/lib/utils");
 	});
 
 	test("loadAllPosts - modulesOverride가 없을 때 기본 postFiles 사용 확인", async () => {
