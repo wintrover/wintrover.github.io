@@ -30,6 +30,7 @@ _site/
 .jekyll-metadata
 
 # Environment
+.env
 .env.vite/
 
 # Coverage
