@@ -1,5 +1,5 @@
 import path from "node:path";
-import { convertMermaidToImage } from "./scripts/mermaid-to-image.ts";
+import { convertMermaidToImage } from "./mermaid-to-image.ts";
 
 const outputDir = "public/images";
 
