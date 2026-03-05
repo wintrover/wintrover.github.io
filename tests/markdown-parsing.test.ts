@@ -16,23 +16,23 @@ describe("parseMarkdown", () => {
 		const cases = [
 			{
 				md: "![a](../assets/images/09/wandb-lfw-insightface-arcface.svg)",
-				expect: "/blog/images/09-wandb-lfw-insightface-arcface.svg",
+				expect: "/images/09-wandb-lfw-insightface-arcface.svg",
 			},
 			{
 				md: "![a](/assets/images/09/wandb-lfw-insightface-arcface.svg)",
-				expect: "/blog/images/09-wandb-lfw-insightface-arcface.svg",
+				expect: "/images/09-wandb-lfw-insightface-arcface.svg",
 			},
 			{
 				md: "![a](assets/images/09/wandb-lfw-insightface-arcface.svg)",
-				expect: "/blog/images/09-wandb-lfw-insightface-arcface.svg",
+				expect: "/images/09-wandb-lfw-insightface-arcface.svg",
 			},
 			{
 				md: "![a](/blog/assets/images/09/wandb-lfw-insightface-arcface.svg)",
-				expect: "/blog/images/09-wandb-lfw-insightface-arcface.svg",
+				expect: "/images/09-wandb-lfw-insightface-arcface.svg",
 			},
 			{
 				md: '<img src="/assets/images/09/wandb-lfw-insightface-arcface.svg" alt="a" />',
-				expect: "/blog/images/09-wandb-lfw-insightface-arcface.svg",
+				expect: "/images/09-wandb-lfw-insightface-arcface.svg",
 			},
 		];
 
@@ -56,12 +56,12 @@ describe("parseMarkdown", () => {
 			{
 				kind: "path-normalize",
 				md: "![special](assets/images/01/../02/test.png)",
-				expect: "/blog/images/02-test.png",
+				expect: "/images/02-test.png",
 			},
 			{
 				kind: "already-abs",
 				md: "![abs](/blog/images/already.png)",
-				expect: "/blog/images/already.png",
+				expect: "/images/already.png",
 			},
 		);
 

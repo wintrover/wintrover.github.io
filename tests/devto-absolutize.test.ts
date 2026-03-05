@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { absolutizeSrc } from "../scripts/post-to-dev";
 
 describe("absolutizeSrc", () => {
-	const base = "https://wintrover.github.io/blog";
+	const base = "https://wintrover.github.io";
 
 	test("원격 URL 및 data URI는 유지", () => {
 		expect(absolutizeSrc("https://example.com/x.png", base)).toBe(
@@ -16,26 +16,26 @@ describe("absolutizeSrc", () => {
 
 	test("절대 경로 처리 (/assets/images/)", () => {
 		expect(absolutizeSrc("/assets/images/a.png", base)).toBe(
-			"https://wintrover.github.io/blog/images/a.png",
+			"https://wintrover.github.io/images/a.png",
 		);
 		expect(absolutizeSrc("/blog/assets/images/a.png", base)).toBe(
-			"https://wintrover.github.io/blog/images/a.png",
+			"https://wintrover.github.io/images/a.png",
 		);
 	});
 
 	test("상대 경로 처리 (assets/images/)", () => {
 		expect(absolutizeSrc("assets/images/a.png", base)).toBe(
-			"https://wintrover.github.io/blog/images/a.png",
+			"https://wintrover.github.io/images/a.png",
 		);
 	});
 
 	test("베이스 URL 끝에 슬래시가 있는 경우 처리", () => {
-		const baseWithSlash = "https://wintrover.github.io/blog/";
+		const baseWithSlash = "https://wintrover.github.io/";
 		expect(absolutizeSrc("/assets/images/a.png", baseWithSlash)).toBe(
-			"https://wintrover.github.io/blog/images/a.png",
+			"https://wintrover.github.io/images/a.png",
 		);
 		expect(absolutizeSrc("assets/images/a.png", baseWithSlash)).toBe(
-			"https://wintrover.github.io/blog/images/a.png",
+			"https://wintrover.github.io/images/a.png",
 		);
 	});
 

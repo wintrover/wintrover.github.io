@@ -33,7 +33,7 @@ jobs:
         run: npx puppeteer browsers install chrome
       - name: Generate Mermaid images
         env:
-          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/blog
+          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io
         run: npx tsx scripts/generate-images-ci.ts
       - name: Build for Pages
         run: npm run build:github
@@ -73,7 +73,7 @@ jobs:
       - name: Upload changed posts to Dev.to
         env:
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
-          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/blog
+          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io
           BLOG_IMAGE_ABS_MODE: pages
         run: |
           FROM="${{ github.event.before }}"

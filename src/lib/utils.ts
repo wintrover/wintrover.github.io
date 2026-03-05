@@ -1,4 +1,4 @@
-const BASE = "/blog/";
+const BASE = import.meta.env.BASE_URL ?? "/";
 
 function joinBase(p: unknown) {
 	return `${String(BASE).replace(/\/$/, "")}/${String(p).replace(/^\//, "")}`;
@@ -43,6 +43,7 @@ export function normalizeImageSrc(src: any) {
 		p = p.slice(1);
 	}
 
+	p = p.replace(/^blog\//, "");
 	p = resolveRelativePath(p);
 
 	if (p.startsWith("assets/images/")) {

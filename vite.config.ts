@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => ({
 			),
 		},
 	},
-	base: "/blog/",
+	base: "/",
 	build: {
 		outDir: "dist",
 		copyPublicDir: true,
@@ -61,7 +61,7 @@ export default defineConfig(({ mode }) => ({
 			noExternal: ["svelte-spa-router"],
 		},
 		env: {
-			BASE_URL: "/blog/",
+			BASE_URL: "/",
 		},
 	},
 	server: {

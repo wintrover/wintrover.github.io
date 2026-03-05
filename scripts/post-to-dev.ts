@@ -6,27 +6,19 @@ import { processMermaidDiagrams } from "./mermaid-to-image";
 
 function normalizePublicBaseUrl(url: string) {
 	try {
-		if (typeof url !== "string" || !url)
-			return "https://wintrover.github.io/blog";
+		if (typeof url !== "string" || !url) return "https://wintrover.github.io/";
 		const trimmed = url.trim().replace(/["']/g, "");
 		const u = new URL(
 			trimmed.startsWith("http")
 				? trimmed
 				: `https://${trimmed.replace(/^\/*/, "")}`,
 		);
-		if (!u.pathname.endsWith("/blog")) {
-			if (u.pathname === "/") {
-				u.pathname = "/blog/";
-			} else if (!u.pathname.includes("/blog")) {
-				u.pathname = `${u.pathname.replace(/\/$/, "")}/blog/`;
-			}
-		}
 		if (!u.pathname.endsWith("/")) {
 			u.pathname = `${u.pathname}/`;
 		}
 		return u.toString();
 	} catch {
-		return "https://wintrover.github.io/blog";
+		return "https://wintrover.github.io/";
 	}
 }
 
@@ -61,7 +53,6 @@ export function absolutizeSrc(src: string, publicBaseUrl: string) {
 			return trimmed;
 		const baseUrl = normalizePublicBaseUrl(publicBaseUrl);
 		const base = new URL(baseUrl);
-		const underBlog = base.pathname.replace(/\/+$/, "").endsWith("/blog");
 		if (
 			/^(?:public\/)?images\//.test(trimmed) ||
 			/^(?:\/)(?:public\/)?images\//.test(trimmed) ||
@@ -113,12 +104,7 @@ export function absolutizeSrc(src: string, publicBaseUrl: string) {
 			}
 			return `https://raw.githubusercontent.com/${ghRepo}/refs/heads/main/${repoPath}`;
 		}
-		let p;
-		if (underBlog) {
-			p = assetPath.replace(/^\/+/, "");
-		} else {
-			p = `/blog/${assetPath.replace(/^\/+/, "")}`;
-		}
+		const p = `/${assetPath.replace(/^\/+/, "").replace(/^blog\//i, "")}`;
 		const abs = new URL(p, base).toString();
 		return abs;
 	} catch {
@@ -170,7 +156,7 @@ export async function absolutizeImagesInMarkdown(
 async function postToDev(filePath: string) {
 	const devtoApiKey = process.env.DEVTO_API_KEY;
 	const publicBaseUrlRaw =
-		process.env.BLOG_PUBLIC_BASE_URL || "https://wintrover.github.io/blog";
+		process.env.BLOG_PUBLIC_BASE_URL || "https://wintrover.github.io/";
 	const publicBaseUrl = normalizePublicBaseUrl(publicBaseUrlRaw);
 	if (!devtoApiKey) {
 		console.error("DEVTO_API_KEY is not set.");

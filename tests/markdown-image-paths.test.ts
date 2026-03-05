@@ -17,27 +17,25 @@ describe("normalizeImageSrc", () => {
 
 	test("절대 경로에 BASE_URL 접두 (Equivalence Partitioning: Absolute Path)", () => {
 		expect(normalizeImageSrc("/assets/images/test.jpg")).toBe(
-			"/blog/images/test.jpg",
+			"/images/test.jpg",
 		);
-		expect(normalizeImageSrc("/images/test.png")).toBe("/blog/images/test.png");
-		expect(normalizeImageSrc("/favicon.ico")).toBe("/blog/favicon.ico");
+		expect(normalizeImageSrc("/images/test.png")).toBe("/images/test.png");
+		expect(normalizeImageSrc("/favicon.ico")).toBe("/favicon.ico");
 	});
 
 	test("상대 경로에 BASE_URL 접두 (Equivalence Partitioning: Relative Path)", () => {
 		expect(normalizeImageSrc("assets/images/test.jpg")).toBe(
-			"/blog/images/test.jpg",
+			"/images/test.jpg",
 		);
-		expect(normalizeImageSrc("images/test.png")).toBe("/blog/images/test.png");
-		expect(normalizeImageSrc("test.jpg")).toBe("/blog/test.jpg");
+		expect(normalizeImageSrc("images/test.png")).toBe("/images/test.png");
+		expect(normalizeImageSrc("test.jpg")).toBe("/test.jpg");
 	});
 
 	test("이전 하드코딩된 /blog/ 및 BASE_URL 중복 처리", () => {
 		expect(normalizeImageSrc("/blog/assets/images/test.jpg")).toBe(
-			"/blog/images/test.jpg",
+			"/images/test.jpg",
 		);
-		expect(normalizeImageSrc("/blog/images/test.png")).toBe(
-			"/blog/images/test.png",
-		);
+		expect(normalizeImageSrc("/blog/images/test.png")).toBe("/images/test.png");
 	});
 
 	test("PBT: 상대 경로의 . / .. / 빈 세그먼트는 정규화된다", () => {
@@ -61,7 +59,7 @@ describe("normalizeImageSrc", () => {
 					const prefix = parts.join("/");
 					const src = `${prefix ? `${prefix}/` : ""}images/${f}`;
 					const out = normalizeImageSrc(src);
-					expect(out.startsWith("/blog/")).toBe(true);
+					expect(out.startsWith("/")).toBe(true);
 					expect(out.includes("/./")).toBe(false);
 					expect(out.includes("/../")).toBe(false);
 					expect(out.includes("assets/images")).toBe(false);
@@ -98,9 +96,9 @@ describe("normalizeImageSrc", () => {
 				const src = `assets/images/${d}/${f}`;
 				const out = normalizeImageSrc(src);
 				if (/^\d{2}$/.test(d)) {
-					expect(out).toBe(`/blog/images/${d}-${f}`);
+					expect(out).toBe(`/images/${d}-${f}`);
 				} else {
-					expect(out).toBe(`/blog/images/${f}`);
+					expect(out).toBe(`/images/${f}`);
 				}
 			}),
 		);

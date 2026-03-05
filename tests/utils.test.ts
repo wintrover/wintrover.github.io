@@ -45,7 +45,7 @@ describe("normalizeImageSrc", () => {
 
 	test("Line 46 coverage: p is not empty after BASE removal", () => {
 		// p starts with BASE, then we slice it. The remaining p goes to resolveRelativePath.
-		expect(normalizeImageSrc("/blog/test.png")).toBe("/blog/test.png");
+		expect(normalizeImageSrc("/blog/test.png")).toBe("/test.png");
 	});
 
 	test("절대 URL 유지 (EP: Absolute URL)", () => {
@@ -65,36 +65,30 @@ describe("normalizeImageSrc", () => {
 	});
 
 	test("BASE 경로 제거 및 재부착 (EP: With BASE Prefix)", () => {
-		expect(normalizeImageSrc("/blog/images/test.png")).toBe(
-			"/blog/images/test.png",
-		);
+		expect(normalizeImageSrc("/blog/images/test.png")).toBe("/images/test.png");
 	});
 
 	test("루트 경로 처리 (EP: Root-relative)", () => {
-		expect(normalizeImageSrc("/images/test.png")).toBe("/blog/images/test.png");
+		expect(normalizeImageSrc("/images/test.png")).toBe("/images/test.png");
 	});
 
 	test("상대 경로 및 경로 정규화 (EP: Path Traversal)", () => {
-		expect(normalizeImageSrc("./images/test.png")).toBe(
-			"/blog/images/test.png",
-		);
-		expect(normalizeImageSrc("../images/test.png")).toBe(
-			"/blog/images/test.png",
-		);
-		expect(normalizeImageSrc("a/../b/c.png")).toBe("/blog/b/c.png");
+		expect(normalizeImageSrc("./images/test.png")).toBe("/images/test.png");
+		expect(normalizeImageSrc("../images/test.png")).toBe("/images/test.png");
+		expect(normalizeImageSrc("a/../b/c.png")).toBe("/b/c.png");
 		// Line 14 coverage: 빈 파트 및 현재 디렉토리 기호 처리
-		expect(normalizeImageSrc("/a//b/./c.png")).toBe("/blog/a/b/c.png");
+		expect(normalizeImageSrc("/a//b/./c.png")).toBe("/a/b/c.png");
 	});
 
 	test("Legacy Assets 경로 변환 (EP: Legacy Assets)", () => {
 		expect(normalizeImageSrc("assets/images/01/arch.svg")).toBe(
-			"/blog/images/01-arch.svg",
+			"/images/01-arch.svg",
 		);
 		expect(normalizeImageSrc("assets/images/other/test.png")).toBe(
-			"/blog/images/test.png",
+			"/images/test.png",
 		);
 		expect(normalizeImageSrc("assets/images/simple.png")).toBe(
-			"/blog/images/simple.png",
+			"/images/simple.png",
 		);
 	});
 
@@ -105,13 +99,13 @@ describe("normalizeImageSrc", () => {
 				if (src === "") {
 					expect(out).toBe("");
 				} else {
-					expect(out).toBe("/blog/");
+					expect(out).toBe("/");
 				}
 			}),
 		);
 	});
 
-	test("PBT: 비절대 경로는 /blog/ 프리픽스를 갖고 안정적이다", () => {
+	test("PBT: 비절대 경로는 / 프리픽스를 갖고 안정적이다", () => {
 		const nonAbsolutePath = fc
 			.string()
 			.filter((s) => s.length > 0 && !/^(https?:\/\/|data:)/i.test(s));
@@ -120,7 +114,7 @@ describe("normalizeImageSrc", () => {
 			fc.property(nonAbsolutePath, (src) => {
 				const out = normalizeImageSrc(src);
 				expect(typeof out).toBe("string");
-				expect(out.startsWith("/blog/")).toBe(true);
+				expect(out.startsWith("/")).toBe(true);
 				expect(normalizeImageSrc(out)).toBe(out);
 			}),
 			{ numRuns: 200 },
