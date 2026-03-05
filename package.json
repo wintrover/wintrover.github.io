@@ -8,7 +8,7 @@
 		"preview": "vite preview",
 		"build:github": "vite build --base=/blog/",
 		"preview:github": "vite preview --base=/blog/",
-		"deploy:github": "npm run build:github && tsx deploy-github.ts",
+		"deploy:github": "npm run build:github && tsx scripts/deploy-github.ts",
 		"test": "vitest run",
 		"test:coverage": "vitest run --coverage",
 		"post:devto": "tsx scripts/post-to-dev.ts",
