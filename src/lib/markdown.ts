@@ -1,6 +1,7 @@
 import { marked } from "marked";
 import mermaid from "mermaid";
 import { postFiles } from "./glob";
+import { logError } from "./log";
 import { normalizeImageSrc, parseFrontMatter } from "./utils";
 
 export async function loadPost(
@@ -21,39 +22,39 @@ export async function loadPost(
 		const content = await response.text();
 		return parseMarkdown(content);
 	} catch (error) {
-		console.error("❌ [markdown] 포스트 로딩 중 에러 발생:", {
+		logError("markdown", "포스트 로딩 중 에러 발생", {
 			slug,
 			filePath,
-			message: error instanceof Error ? error.message : String(error),
-			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
 			error,
 		});
 		return null;
 	}
 }
 
+export function renderMarkdownBody(markdownBody: string) {
+	const htmlRaw = marked.parse(markdownBody, { async: false }) as string;
+
+	return htmlRaw.replace(/<img\b[^>]*>/g, (tag: string) =>
+		tag.replace(
+			/\bsrc\s*=\s*(["'])([^"']+)\1/,
+			(_full: string, q: string, src: string) =>
+				`src=${q}${normalizeImageSrc(src)}${q}`,
+		),
+	);
+}
+
 export function parseMarkdown(content: string) {
 	try {
 		const { data: frontMatter, content: markdownBody } =
 			parseFrontMatter(content);
-		const htmlRaw = marked.parse(markdownBody, { async: false }) as string;
-
-		const html = htmlRaw.replace(/<img\b[^>]*>/g, (tag: string) =>
-			tag.replace(
-				/\bsrc\s*=\s*(["'])([^"']+)\1/,
-				(_full: string, q: string, src: string) =>
-					`src=${q}${normalizeImageSrc(src)}${q}`,
-			),
-		);
+		const html = renderMarkdownBody(markdownBody);
 
 		return {
 			frontMatter,
 			html,
 		};
 	} catch (error) {
-		console.error("❌ [markdown] 마크다운 파싱 중 에러 발생:", {
-			message: error instanceof Error ? error.message : String(error),
-			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+		logError("markdown", "마크다운 파싱 중 에러 발생", {
 			error,
 		});
 		return {

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { logError } from "../src/lib/log";
 import { convertMermaidToImage } from "./mermaid-to-image.ts";
 
 const outputDir = "public/images";
@@ -202,7 +203,7 @@ flowchart LR
 
 		console.log("All images generated successfully!");
 	} catch (error) {
-		console.error("Error generating images:", error);
+		logError("generate-blog-images", "이미지 생성 실패", { error });
 	}
 }
 

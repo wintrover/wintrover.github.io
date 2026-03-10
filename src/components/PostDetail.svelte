@@ -2,6 +2,7 @@
 import mermaid from "mermaid";
 import { onMount, tick } from "svelte";
 import { push } from "svelte-spa-router";
+import { logError } from "../lib/log";
 import { loadPostBySlug } from "../lib/postLoader";
 import { formatDate, slugify } from "../lib/utils";
 import Comments from "./Comments.svelte";
@@ -52,7 +53,7 @@ async function loadPostData(slug: string) {
 			setupCodeBlockButtons();
 		}, 500);
 	} catch (error) {
-		console.error("❌ [PostDetail] 포스트 데이터 로딩 중 에러 발생:", {
+		logError("PostDetail", "포스트 데이터 로딩 중 에러 발생", {
 			slug,
 			paramsState: {
 				params,
@@ -69,8 +70,6 @@ async function loadPostData(slug: string) {
 						search: window.location.search,
 					}
 				: "SSR",
-			message: error instanceof Error ? error.message : String(error),
-			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
 			error,
 		});
 		loading = false;
@@ -186,12 +185,7 @@ function setupCodeBlockButtons() {
 							showCopyToast(pre);
 						})
 						.catch((err) => {
-							console.error("❌ [PostDetail] 클립보드 복사 실패:", {
-								message: err instanceof Error ? err.message : String(err),
-								stack:
-									err instanceof Error ? err.stack : "Stack trace unavailable",
-								error: err,
-							});
+							logError("PostDetail", "클립보드 복사 실패", { error: err });
 						});
 				}
 			});
@@ -212,11 +206,9 @@ async function setupMermaidDiagrams() {
 			element.innerHTML = svg;
 			element.setAttribute("data-rendered", "true");
 		} catch (error) {
-			console.error("❌ [PostDetail] Mermaid 렌더링 중 에러 발생:", {
+			logError("PostDetail", "Mermaid 렌더링 중 에러 발생", {
 				elementId: id,
 				mermaidCode: code,
-				message: error instanceof Error ? error.message : String(error),
-				stack: error instanceof Error ? error.stack : "Stack trace unavailable",
 				error,
 			});
 			element.innerHTML =

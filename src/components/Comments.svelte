@@ -1,6 +1,7 @@
 <script lang="ts">
 import { afterUpdate, onDestroy, onMount, tick } from "svelte";
 import { giscusConfig } from "../lib/giscus-config";
+import { logError } from "../lib/log";
 
 // Use configuration or allow override via props
 export let repo = giscusConfig.repo;
@@ -49,7 +50,7 @@ function handleMessage(event: MessageEvent) {
 
 	// Handle specific error messages from Giscus (Advanced Usage)
 	if ("error" in giscusData) {
-		console.error("❌ Giscus Error:", giscusData.error);
+		logError("Comments", "Giscus Error", { error: giscusData.error });
 		return;
 	}
 
@@ -64,13 +65,14 @@ async function loadGiscus() {
 
 	// Check if all required values are present
 	if (!repo || !repoId || !categoryId) {
-		console.error("❌ Missing required Giscus configuration:", {
+		logError("Comments", "Missing required Giscus configuration", {
 			repo,
 			repoId,
 			category,
 			categoryId,
 			mapping,
 			term,
+			error: new Error("Missing required Giscus configuration"),
 		});
 		return;
 	}
@@ -98,7 +100,9 @@ async function loadGiscus() {
 
 	// script.onerror handling
 	script.onerror = () => {
-		console.error("❌ Failed to load Giscus script");
+		logError("Comments", "Failed to load Giscus script", {
+			error: new Error("Failed to load Giscus script"),
+		});
 		giscusLoaded = false;
 	};
 
