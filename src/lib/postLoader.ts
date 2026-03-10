@@ -20,7 +20,12 @@ function processPostMetadata(
 	data: Record<string, any>,
 	markdownBody: string,
 ) {
-	const fileName = path.split("/").pop()?.replace(".md", "") || "";
+	const rawPathParts = path.split("/");
+	const pathParts = Array.isArray(rawPathParts) ? rawPathParts : [];
+	const fileNamePart =
+		pathParts.length > 0 ? pathParts[pathParts.length - 1] : "";
+	const fileName = fileNamePart.replace(".md", "");
+	const folder = pathParts[pathParts.length - 2];
 	let category = data.category;
 	if ((categoryConfig as any).autoAssignByFolder && !category) {
 		category = determineCategoryFromPath(path);
@@ -29,6 +34,7 @@ function processPostMetadata(
 	const { html: htmlContent } = parseMarkdown(markdownBody);
 
 	return {
+		...data,
 		fileName,
 		slug: slugify(data.title || fileName || ""),
 		title: data.title || fileName,
@@ -36,9 +42,8 @@ function processPostMetadata(
 		category: category || (categoryConfig as any).defaultCategory,
 		tags: data.tags || [],
 		excerpt: data.excerpt || data.description || "",
-		folder: path.split("/")[path.split("/").length - 2],
+		folder,
 		html: htmlContent,
-		...data,
 	};
 }
 

@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import {
 	formatDate,
 	normalizeImageSrc,
@@ -87,9 +87,286 @@ describe("normalizeImageSrc", () => {
 		expect(normalizeImageSrc("assets/images/other/test.png")).toBe(
 			"/images/test.png",
 		);
+		expect(normalizeImageSrc("assets/images/other/a/b.png")).toBe(
+			"/images/a/b.png",
+		);
 		expect(normalizeImageSrc("assets/images/simple.png")).toBe(
 			"/images/simple.png",
 		);
+	});
+
+	test("BASE 오버라이드로 startsWith(base) 분기 커버", () => {
+		const prev = (globalThis as any).__WINTR_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = "/x/";
+		try {
+			expect(normalizeImageSrc("/x/y.png")).toBe("/x/y.png");
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prev;
+		}
+	});
+
+	test("BASE 오버라이드가 빈 문자열이면 기본 BASE로 폴백된다", () => {
+		const prev = (globalThis as any).__WINTR_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = "";
+		try {
+			expect(normalizeImageSrc("/blog/test.png")).toBe("/test.png");
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prev;
+		}
+	});
+
+	test("__WINTR_ENV_BASE_URL__ 오버라이드는 getBase에 적용된다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = "/z/";
+		try {
+			expect(normalizeImageSrc("images/a.png")).toBe("/z/images/a.png");
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+		}
+	});
+
+	test("__WINTR_ENV_BASE_URL__가 빈 문자열이면 '/'로 폴백된다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = "";
+		try {
+			expect(normalizeImageSrc("/blog/test.png")).toBe("/test.png");
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+		}
+	});
+
+	test("BASE_URL 환경값을 사용해 상대 경로를 prefix 한다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		const prevProcessBaseUrl = process.env.BASE_URL;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
+		process.env.BASE_URL = "/v/";
+		try {
+			expect(normalizeImageSrc("images/a.png")).toBe("/v/images/a.png");
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			process.env.BASE_URL = prevProcessBaseUrl;
+		}
+	});
+
+	test("process가 없어도 예외 없이 동작한다", () => {
+		const prev = (globalThis as any).__WINTR_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		vi.stubGlobal("process", undefined as any);
+		try {
+			expect(() => normalizeImageSrc("images/a.png")).not.toThrow();
+		} finally {
+			vi.unstubAllGlobals();
+			(globalThis as any).__WINTR_BASE_URL__ = prev;
+		}
+	});
+
+	test("process.env.BASE_URL이 string이 아니면 무시한다", () => {
+		const prev = (globalThis as any).__WINTR_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		vi.stubGlobal("process", { env: { BASE_URL: 123 } } as any);
+		try {
+			expect(normalizeImageSrc("images/a.png")).toBe("/images/a.png");
+		} finally {
+			vi.unstubAllGlobals();
+			(globalThis as any).__WINTR_BASE_URL__ = prev;
+		}
+	});
+
+	test("process.env.BASE_URL이 빈 문자열이면 import.meta.env 또는 기본값으로 폴백된다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(
+			globalThis as any,
+			"__WINTR_IMPORT_META_ENV__",
+		);
+		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_IMPORT_META_ENV__ = { BASE_URL: "/" };
+		vi.stubGlobal("process", { env: { BASE_URL: "" } } as any);
+		try {
+			expect(normalizeImageSrc("/blog/images/a.png")).toBe("/images/a.png");
+		} finally {
+			vi.unstubAllGlobals();
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			if (hadMetaEnv) {
+				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+			} else {
+				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+			}
+		}
+	});
+
+	test("process.env가 없으면 예외 없이 동작한다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", { env: undefined } as any);
+		try {
+			expect(() => normalizeImageSrc("images/a.png")).not.toThrow();
+		} finally {
+			vi.unstubAllGlobals();
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+		}
+	});
+
+	test("__WINTR_IMPORT_META_ENV__ BASE_URL이 있으면 이를 사용한다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(
+			globalThis as any,
+			"__WINTR_IMPORT_META_ENV__",
+		);
+		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", { env: { BASE_URL: undefined } } as any);
+		try {
+			(globalThis as any).__WINTR_IMPORT_META_ENV__ = { BASE_URL: "/m/" };
+			expect(normalizeImageSrc("images/a.png")).toBe("/m/images/a.png");
+		} finally {
+			vi.unstubAllGlobals();
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			if (hadMetaEnv) {
+				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+			} else {
+				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+			}
+		}
+	});
+
+	test("__WINTR_IMPORT_META_ENV__ BASE_URL이 빈 문자열이면 '/'로 폴백된다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(
+			globalThis as any,
+			"__WINTR_IMPORT_META_ENV__",
+		);
+		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", { env: { BASE_URL: undefined } } as any);
+		try {
+			(globalThis as any).__WINTR_IMPORT_META_ENV__ = { BASE_URL: "" };
+			expect(normalizeImageSrc("/blog/images/a.png")).toBe("/images/a.png");
+		} finally {
+			vi.unstubAllGlobals();
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			if (hadMetaEnv) {
+				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+			} else {
+				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+			}
+		}
+	});
+
+	test("__WINTR_IMPORT_META_ENV__ BASE_URL이 string이 아니면 무시한다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(
+			globalThis as any,
+			"__WINTR_IMPORT_META_ENV__",
+		);
+		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", { env: { BASE_URL: undefined } } as any);
+		try {
+			(globalThis as any).__WINTR_IMPORT_META_ENV__ = { BASE_URL: ["x"] };
+			expect(() => normalizeImageSrc("images/a.png")).not.toThrow();
+			expect(normalizeImageSrc("images/a.png")).toBe("/images/a.png");
+		} finally {
+			vi.unstubAllGlobals();
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			if (hadMetaEnv) {
+				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+			} else {
+				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+			}
+		}
+	});
+
+	test("__WINTR_IMPORT_META_ENV__가 undefined면 '/'로 폴백된다", () => {
+		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
+		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(
+			globalThis as any,
+			"__WINTR_IMPORT_META_ENV__",
+		);
+		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
+		(globalThis as any).__WINTR_BASE_URL__ = undefined;
+		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", { env: { BASE_URL: undefined } } as any);
+		try {
+			(globalThis as any).__WINTR_IMPORT_META_ENV__ = undefined;
+			expect(normalizeImageSrc("/blog/images/a.png")).toBe("/images/a.png");
+		} finally {
+			vi.unstubAllGlobals();
+			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
+			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			if (hadMetaEnv) {
+				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+			} else {
+				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+			}
+		}
+	});
+
+	test("BASE가 trailing slash가 없어도 정상 결합된다", () => {
+		const prev = (globalThis as any).__WINTR_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = "/x";
+		try {
+			expect(normalizeImageSrc("images/a.png")).toBe("/x/images/a.png");
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prev;
+		}
+	});
+
+	test("BASE가 다른 경우 root-relative는 leading slash를 제거 후 결합된다", () => {
+		const prev = (globalThis as any).__WINTR_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = "/x/";
+		try {
+			expect(normalizeImageSrc("/images/a.png")).toBe("/x/images/a.png");
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prev;
+		}
+	});
+
+	test("blog 프리픽스는 경로 시작에서만 제거된다", () => {
+		const prev = (globalThis as any).__WINTR_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = "/";
+		try {
+			expect(normalizeImageSrc("a/blog/test.png")).toBe("/a/blog/test.png");
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prev;
+		}
+	});
+
+	test("Legacy assets 폴더가 2자리 숫자가 아니면 filename만 남는다", () => {
+		const prev = (globalThis as any).__WINTR_BASE_URL__;
+		(globalThis as any).__WINTR_BASE_URL__ = "/";
+		try {
+			expect(normalizeImageSrc("assets/images/012/arch.svg")).toBe(
+				"/images/arch.svg",
+			);
+		} finally {
+			(globalThis as any).__WINTR_BASE_URL__ = prev;
+		}
 	});
 
 	test("PBT: 빈 문자열 및 루트 경로 처리", () => {
@@ -128,6 +405,11 @@ describe("formatDate", () => {
 		expect(result).toMatch(/2023\.\s*10\.\s*26\./);
 	});
 
+	test("월/일은 2자리로 포맷팅된다", () => {
+		const result = formatDate("2023-01-02");
+		expect(result).toMatch(/2023\.\s*01\.\s*02\./);
+	});
+
 	test("PBT: Invalid Date 입력은 Invalid Date를 반환", () => {
 		const invalidDateString = fc
 			.string()
@@ -161,6 +443,10 @@ describe("truncateText", () => {
 
 	test("공백만 있는 경우 처리 (Line 67)", () => {
 		expect(truncateText("   ", 5)).toBe("");
+	});
+
+	test("wordLimit=0이고 공백만 있는 경우 ... 를 붙이지 않는다", () => {
+		expect(truncateText("   ", 0)).toBe("");
 	});
 
 	test("HTML 태그 제거 확인 (EP: HTML Content)", () => {
@@ -281,6 +567,12 @@ describe("parseFrontMatter", () => {
 		const md = "---\ntitle: 'Single Quote'\n---\n";
 		const { data } = parseFrontMatter(md);
 		expect(data.title).toBe("Single Quote");
+	});
+
+	test('따옴표가 비어있어도 값은 언쿼트된다 (BVA: "")', () => {
+		const md = '---\ntitle: ""\n---\n';
+		const { data } = parseFrontMatter(md);
+		expect(data.title).toBe("");
 	});
 
 	test("태그 구분자(쉼표, 공백) 및 빈 태그 처리 (EP: Tags Split)", () => {
@@ -415,6 +707,100 @@ describe("parseFrontMatter", () => {
 				expect(data.key).toBe(`"${s}`);
 			}),
 		);
+	});
+
+	test("PBT: 싱글 쿼트가 짝이 맞지 않으면 값은 그대로 보존된다", () => {
+		const raw = fc.string({
+			unit: fc.constantFrom(
+				..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+			),
+			minLength: 1,
+			maxLength: 40,
+		});
+
+		fc.assert(
+			fc.property(raw, (s) => {
+				const md = `---\nkey: '${s}\n---\n`;
+				const { data } = parseFrontMatter(md);
+				expect(data.key).toBe(`'${s}`);
+			}),
+		);
+	});
+
+	test("닫는 더블쿼트만 있으면 언쿼트하지 않는다", () => {
+		const md = '---\nkey: a"\n---\n';
+		const { data } = parseFrontMatter(md);
+		expect(data.key).toBe('a"');
+	});
+
+	test("닫는 delimiter가 없으면 FrontMatter로 취급하지 않는다", () => {
+		const md = "---\ntitle: a\nBody";
+		const { data, content } = parseFrontMatter(md);
+		expect(data).toEqual({});
+		expect(content).toBe(md);
+	});
+
+	test("delimiter 라인이 정확히 --- 로 시작하지 않으면 파싱하지 않는다", () => {
+		const md = "x---\ntitle: a\n---\nBody";
+		const { data, content } = parseFrontMatter(md);
+		expect(data).toEqual({});
+		expect(content).toBe(md);
+	});
+
+	test("delimiter 라인이 ---로 시작하지만 뒤에 문자가 있으면 파싱하지 않는다", () => {
+		const md = "---x\ntitle: a\n---\nBody";
+		const { data, content } = parseFrontMatter(md);
+		expect(data).toEqual({});
+		expect(content).toBe(md);
+	});
+
+	test("delimiter 라인 앞 공백이 있으면 파싱하지 않는다", () => {
+		const md = " ---\ntitle: a\n---\nBody";
+		const { data, content } = parseFrontMatter(md);
+		expect(data).toEqual({});
+		expect(content).toBe(md);
+	});
+
+	test("키가 #로 끝나도 주석이 아니다", () => {
+		const md = "---\na#: 1\n---\n";
+		const { data } = parseFrontMatter(md);
+		expect(data["a#"]).toBe(1);
+	});
+
+	test("앞에 공백이 있어도 #으로 시작하면 주석으로 무시된다", () => {
+		const md = "---\n  #a: 1\n---\n";
+		const { data } = parseFrontMatter(md);
+		expect(data).toEqual({});
+	});
+
+	test("앞에 공백이 있는 : 라인은 무시된다", () => {
+		const md = "---\n  : 1\n---\n";
+		const { data } = parseFrontMatter(md);
+		expect(data).toEqual({});
+	});
+
+	test("값이 단일 따옴표 문자면 그대로 유지된다", () => {
+		const md = '---\nkey: "\n---\n';
+		const { data } = parseFrontMatter(md);
+		expect(data.key).toBe('"');
+	});
+
+	test("값이 2글자이고 따옴표로 감싸지지 않으면 그대로 유지된다", () => {
+		const md = "---\nkey: ab\n---\n";
+		const { data } = parseFrontMatter(md);
+		expect(data.key).toBe("ab");
+	});
+
+	test("double로 시작하고 single로 끝나는 값은 언쿼트되지 않는다", () => {
+		const md = "---\nkey: \"a'\n---\n";
+		const { data } = parseFrontMatter(md);
+		expect(data.key).toBe("\"a'");
+	});
+
+	test("body의 줄바꿈은 보존된다", () => {
+		const md = "---\ntitle: a\n---\na\nb\n";
+		const { content } = parseFrontMatter(md);
+		expect(content).toBe("a\nb");
 	});
 
 	test("PBT: :로 시작하는 라인은 무시된다", () => {

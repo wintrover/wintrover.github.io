@@ -3,8 +3,13 @@ import mermaid from "mermaid";
 import { postFiles } from "./glob";
 import { normalizeImageSrc, parseFrontMatter } from "./utils";
 
-export async function loadPost(slug: string) {
-	const filePath = (postFiles as Record<string, string>)[slug];
+export async function loadPost(
+	slug: string,
+	modulesOverride?: Record<string, unknown>,
+) {
+	const filePath = (modulesOverride ?? (postFiles as Record<string, string>))[
+		slug
+	];
 	if (typeof filePath !== "string" || !filePath) {
 		return null;
 	}
@@ -33,15 +38,12 @@ export function parseMarkdown(content: string) {
 			parseFrontMatter(content);
 		const htmlRaw = marked.parse(markdownBody, { async: false }) as string;
 
-		const html = htmlRaw.replace(
-			/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
-			(m: string, src: string) => {
-				const fixed = normalizeImageSrc(src);
-				return m.replace(
-					/src=(["'])([^"']+)\1/,
-					(_full: string, q: string) => `src=${q}${fixed}${q}`,
-				);
-			},
+		const html = htmlRaw.replace(/<img\b[^>]*>/g, (tag: string) =>
+			tag.replace(
+				/\bsrc\s*=\s*(["'])([^"']+)\1/,
+				(_full: string, q: string, src: string) =>
+					`src=${q}${normalizeImageSrc(src)}${q}`,
+			),
 		);
 
 		return {

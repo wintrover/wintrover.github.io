@@ -4,6 +4,7 @@
 		"allowJs": true,
 		"checkJs": false,
 		"strict": true,
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"types": ["vite/client", "node", "vitest/globals"]

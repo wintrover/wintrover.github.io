@@ -48,10 +48,10 @@ export default defineConfig(({ mode }) => ({
 			reporter: ["text", "json", "html"],
 			all: true,
 			thresholds: {
-				lines: 0,
-				functions: 0,
-				branches: 0,
-				statements: 0,
+				lines: 90,
+				functions: 80,
+				branches: 80,
+				statements: 90,
 			},
 		},
 		deps: {
