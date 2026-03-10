@@ -1,8 +1,12 @@
 {
 	"$schema": "https://help.stryker-mutator.io/rs/stryker-config.schema.json",
 	"packageManager": "npm",
-	"reporters": ["html", "clear-text", "progress"],
+	"reporters": ["html", "json", "clear-text", "progress"],
 	"testRunner": "vitest",
+	"plugins": [
+		"@stryker-mutator/vitest-runner",
+		"@stryker-mutator/typescript-checker"
+	],
 	"coverageAnalysis": "off",
 	"ignoreStatic": false,
 	"concurrency": 4,

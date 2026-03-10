@@ -1,7 +1,37 @@
-const BASE = "/blog/";
+function getBase() {
+	const fromGlobal = (globalThis as any).__WINTR_BASE_URL__;
+	if (typeof fromGlobal === "string" && fromGlobal.length > 0)
+		return fromGlobal;
 
-function joinBase(p: unknown) {
-	return `${String(BASE).replace(/\/$/, "")}/${String(p).replace(/^\//, "")}`;
+	const envOverride = (globalThis as any).__WINTR_ENV_BASE_URL__;
+	if (typeof envOverride === "string" && envOverride.length > 0)
+		return envOverride;
+
+	const baseFromProcess = (globalThis as any).process?.env?.BASE_URL;
+	if (typeof baseFromProcess === "string" && baseFromProcess.length > 0)
+		return baseFromProcess;
+
+	const hasGlobalMetaEnv = Object.hasOwn(
+		globalThis as any,
+		"__WINTR_IMPORT_META_ENV__",
+	);
+	const metaEnv = hasGlobalMetaEnv
+		? (globalThis as any).__WINTR_IMPORT_META_ENV__
+		: (import.meta as any).env;
+	const baseFromEnv = metaEnv?.BASE_URL;
+	if (typeof baseFromEnv === "string" && baseFromEnv.length > 0)
+		return baseFromEnv;
+
+	return "/";
+}
+
+function stripTrailingSlash(s: string) {
+	return s.endsWith("/") ? s.slice(0, -1) : s;
+}
+
+function joinBase(base: string, p: string) {
+	const b = stripTrailingSlash(base);
+	return `${b}/${p}`;
 }
 
 function resolveRelativePath(p: string) {
@@ -9,17 +39,16 @@ function resolveRelativePath(p: string) {
 	const stack: string[] = [];
 	for (const part of parts) {
 		if (part === "..") {
-			if (stack.length > 0) stack.pop();
+			stack.pop();
 		} else if (part !== "." && part !== "") {
 			stack.push(part);
 		}
 	}
-	const result = stack.join("/");
-	return p.startsWith("/") ? `/${result}` : result;
+	return stack.join("/");
 }
 
 function flattenLegacyAssetsPath(p: string) {
-	const rest = p.replace(/^assets\/images\//, "");
+	const rest = p.slice("assets/images/".length);
 	const parts = rest.split("/");
 	if (parts.length >= 2) {
 		const first = parts[0];
@@ -36,11 +65,10 @@ export function normalizeImageSrc(src: any) {
 	if (!src || typeof src !== "string") return src;
 	if (/^(https?:\/\/|data:)/i.test(src)) return src;
 
+	const base = getBase();
 	let p = src;
-	if (p.startsWith(BASE)) {
-		p = p.slice(BASE.length);
-	} else if (p.startsWith("/")) {
-		p = p.slice(1);
+	if (p.startsWith(base)) {
+		p = p.slice(base.length);
 	}
 
 	p = resolveRelativePath(p);
@@ -49,7 +77,7 @@ export function normalizeImageSrc(src: any) {
 		p = flattenLegacyAssetsPath(p);
 	}
 
-	return joinBase(p);
+	return joinBase(base, p);
 }
 
 export function formatDate(dateString: string) {
@@ -64,38 +92,31 @@ export function formatDate(dateString: string) {
 export function truncateText(text: string, wordLimit = 30) {
 	if (!text) return "";
 	const stripped = text.replace(/<[^>]*>/g, "");
-	const words = stripped.split(/\s+/).filter(Boolean);
+	const words = stripped.match(/\S+/g) ?? [];
 	if (words.length <= wordLimit) return stripped.trim();
 	return `${words.slice(0, wordLimit).join(" ")}...`;
 }
 
 export function slugify(text: string) {
 	if (!text) return "";
-	return text
-		.toLowerCase()
-		.replace(/[^\w\s-]/g, "")
-		.replace(/\s+/g, "-")
-		.replace(/-+/g, "-")
-		.replace(/^-+|-+$/g, "");
+	const tokens = text.toLowerCase().match(/[a-z0-9_]+/g);
+	return tokens ? tokens.join("-") : "";
 }
 
 export function parseFrontMatter(content: string) {
 	const lines = content.split(/\r?\n/);
 	const delimiter = /^---\s*$/;
-	if (lines.length === 0 || !delimiter.test(lines[0] ?? "")) {
+	if (!delimiter.test(lines[0])) {
 		return { data: {}, content };
 	}
 
-	let endIndex = -1;
-	for (let i = 1; i < lines.length; i++) {
-		if (delimiter.test(lines[i] ?? "")) {
-			endIndex = i;
-			break;
-		}
-	}
-	if (endIndex === -1) {
+	const endIndexAfterFirstLine = lines
+		.slice(1)
+		.findIndex((line) => delimiter.test(line));
+	if (endIndexAfterFirstLine === -1) {
 		return { data: {}, content };
 	}
+	const endIndex = endIndexAfterFirstLine + 1;
 
 	const frontMatterLines = lines.slice(1, endIndex);
 	const body = lines
@@ -106,35 +127,40 @@ export function parseFrontMatter(content: string) {
 	const data: Record<string, any> = {};
 	for (const line of frontMatterLines) {
 		const trimmed = line.trim();
-		if (trimmed && !trimmed.startsWith("#")) {
-			const colonIndex = trimmed.indexOf(":");
-			if (colonIndex > 0) {
-				const key = trimmed.substring(0, colonIndex).trim();
-				let value = trimmed.substring(colonIndex + 1).trim();
-				if (
-					(value.startsWith('"') && value.endsWith('"')) ||
-					(value.startsWith("'") && value.endsWith("'"))
-				) {
-					value = value.slice(1, -1);
-				}
+		if (trimmed.startsWith("#")) continue;
 
-				if (key === "tags") {
-					let tagValue = value;
-					if (tagValue.startsWith("[") && tagValue.endsWith("]")) {
-						tagValue = tagValue.slice(1, -1);
-					}
-					data[key] = tagValue.split(/[,\s]+/).filter(Boolean);
-				} else if (value === "true") {
-					data[key] = true;
-				} else if (value === "false") {
-					data[key] = false;
-				} else if (value !== "" && !Number.isNaN(Number(value))) {
-					data[key] = Number(value);
-				} else {
-					data[key] = value;
-				}
+		const colonIndex = trimmed.indexOf(":");
+		if (colonIndex <= 0) continue;
+
+		const key = trimmed.slice(0, colonIndex).trim();
+		let value = trimmed.slice(colonIndex + 1).trim();
+		if (value.length >= 2) {
+			const first = value[0];
+			const last = value[value.length - 1];
+			if ((first === `"` && last === `"`) || (first === `'` && last === `'`)) {
+				value = value.slice(1, -1);
 			}
 		}
+
+		if (key === "tags") {
+			data[key] = value.match(/[a-zA-Z0-9_-]+/g) ?? [];
+			continue;
+		}
+
+		if (value === "true") {
+			data[key] = true;
+			continue;
+		}
+		if (value === "false") {
+			data[key] = false;
+			continue;
+		}
+		const asNumber = Number(value);
+		if (value !== "" && !Number.isNaN(asNumber)) {
+			data[key] = asNumber;
+			continue;
+		}
+		data[key] = value;
 	}
 
 	return { data, content: body };

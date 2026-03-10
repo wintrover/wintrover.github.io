@@ -42,3 +42,10 @@ repos:
         files: ^src/
         types_or: [ts, tsx, javascript, jsx]
         priority: 0
+    -   id: vitest-coverage
+        name: vitest-coverage
+        entry: bun run test:coverage
+        language: system
+        pass_filenames: false
+        always_run: true
+        priority: 0

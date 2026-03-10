@@ -14,7 +14,8 @@
 		"post:devto": "tsx scripts/post-to-dev.ts",
 		"mcp:code-index": "code-index-mcp",
 		"typecheck": "tsc --noEmit",
-		"lint": "uvx prek run --all-files",
+		"lint": "bun x prek run --all-files",
+		"prepare": "node -e \"const fs=require('node:fs'); if (fs.existsSync('.git')) { require('node:child_process').execSync('bun x prek install --overwrite --hook-type pre-commit', { stdio: 'inherit' }); }\"",
 		"stryker": "stryker run",
 		"knip": "knip",
 		"depcruise": "depcruise src"
