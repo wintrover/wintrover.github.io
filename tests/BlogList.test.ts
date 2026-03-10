@@ -4,6 +4,7 @@ import { get } from "svelte/store";
 import { push } from "svelte-spa-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import BlogList from "../src/components/BlogList.svelte";
+import type { Post } from "../src/lib/postLoader";
 import * as postLoader from "../src/lib/postLoader";
 import { slugify } from "../src/lib/utils";
 import { selectedCategory } from "../src/stores/category";
@@ -30,20 +31,28 @@ describe("BlogList Component", () => {
 
 	const mockPosts = [
 		{
+			fileName: "post-1",
 			title: "Post 1",
 			slug: "post-1",
 			category: "Tech",
 			date: "2023-10-01",
+			tags: [],
 			excerpt: "Excerpt 1",
+			html: "",
+			content: "",
 		},
 		{
+			fileName: "post-2",
 			title: "Post 2",
 			slug: "post-2",
 			category: "Life",
 			date: "2023-10-02",
+			tags: [],
 			excerpt: "Excerpt 2",
+			html: "",
+			content: "",
 		},
-	];
+	] satisfies Post[];
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -96,7 +105,7 @@ describe("BlogList Component", () => {
 
 		await waitFor(() => {
 			expect(consoleSpy).toHaveBeenCalledWith(
-				expect.stringContaining("❌ [BlogList] 포스트 목록 로딩 중 에러 발생:"),
+				expect.stringContaining("❌ [BlogList] 포스트 목록 로딩 중 에러 발생"),
 				expect.any(Object),
 			);
 			expect(
@@ -162,7 +171,7 @@ describe("BlogList Component", () => {
 
 		await waitFor(() => {
 			expect(consoleSpy).toHaveBeenCalledWith(
-				expect.stringContaining("❌ [BlogList] 포스트 목록 로딩 중 에러 발생:"),
+				expect.stringContaining("❌ [BlogList] 포스트 목록 로딩 중 에러 발생"),
 				expect.objectContaining({ message: "String error" }),
 			);
 			expect(
@@ -194,11 +203,16 @@ describe("BlogList Component", () => {
 	test("포스트에 카테고리나 요약이 없을 때도 정상 렌더링되어야 함", async () => {
 		vi.mocked(postLoader.loadAllPosts).mockResolvedValue([
 			{
+				fileName: "no-meta",
 				title: "No Meta Post",
 				slug: "no-meta",
 				date: "2023-10-01",
-				// category, excerpt 누락
-			},
+				category: "",
+				tags: [],
+				excerpt: "",
+				html: "",
+				content: "",
+			} satisfies Post,
 		]);
 
 		render(BlogList);

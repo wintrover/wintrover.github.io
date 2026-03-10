@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import dotenv from "dotenv";
 import matter from "gray-matter";
+import { logError } from "../src/lib/log";
 import { processMermaidDiagrams } from "./mermaid-to-image";
 
 function normalizePublicBaseUrl(url: string) {
@@ -159,7 +160,9 @@ async function postToDev(filePath: string) {
 		process.env.BLOG_PUBLIC_BASE_URL || "https://wintrover.github.io/";
 	const publicBaseUrl = normalizePublicBaseUrl(publicBaseUrlRaw);
 	if (!devtoApiKey) {
-		console.error("DEVTO_API_KEY is not set.");
+		logError("post-to-dev", "DEVTO_API_KEY is not set.", {
+			error: new Error("DEVTO_API_KEY is not set."),
+		});
 		process.exit(1);
 	}
 	try {
@@ -288,11 +291,14 @@ async function postToDev(filePath: string) {
 			);
 		} else {
 			const error = (await response.json()) as any;
-			console.error("Failed to create draft:", error);
+			logError("post-to-dev", "Failed to create draft", {
+				apiError: error,
+				error: new Error("Failed to create draft"),
+			});
 			process.exit(1);
 		}
 	} catch (error) {
-		console.error("An error occurred:", error);
+		logError("post-to-dev", "An error occurred", { error });
 		process.exit(1);
 	}
 }
@@ -322,7 +328,10 @@ async function downloadAndHostUCloudImage(
 		const baseUrl = normalizePublicBaseUrl(publicBaseUrl);
 		return `${baseUrl}/images/${filename}`;
 	} catch (error: any) {
-		console.error("Failed to process UCloud image:", error.message);
+		logError("post-to-dev", "Failed to process UCloud image", {
+			ucloudUrl,
+			error,
+		});
 		return ucloudUrl;
 	}
 }
@@ -356,7 +365,9 @@ if (process.argv[1] && path.basename(process.argv[1]) === "post-to-dev.ts") {
 	dotenv.config({ path: ".env.local" });
 	const postFilePath = process.argv[2];
 	if (!postFilePath) {
-		console.error("Please provide a path to a markdown file.");
+		logError("post-to-dev", "Please provide a path to a markdown file.", {
+			error: new Error("Missing markdown file path"),
+		});
 		process.exit(1);
 	}
 	postToDev(path.resolve(postFilePath));

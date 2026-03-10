@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import { logError } from "../src/lib/log";
 import { processMermaidDiagrams } from "./mermaid-to-image";
 
 const baseUrl =
@@ -48,6 +49,6 @@ async function run() {
 }
 
 run().catch((err) => {
-	console.error(err?.stack || String(err));
+	logError("generate-images-ci", "mermaid 이미지 생성 실패", { error: err });
 	process.exit(1);
 });

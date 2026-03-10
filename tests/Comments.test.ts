@@ -167,7 +167,14 @@ describe("Comments Component", () => {
 		});
 		window.dispatchEvent(errorMessageEvent);
 		await waitFor(() => {
-			expect(errorSpy).toHaveBeenCalledWith("❌ Giscus Error:", "Some Error");
+			expect(errorSpy).toHaveBeenCalledWith(
+				expect.stringContaining("❌ [Comments] Giscus Error"),
+				expect.objectContaining({
+					error: "Some Error",
+					message: "Some Error",
+					stack: "Stack trace unavailable",
+				}),
+			);
 		});
 
 		consoleSpy.mockRestore();
@@ -231,7 +238,13 @@ describe("Comments Component", () => {
 		});
 
 		await waitFor(() => {
-			expect(errorSpy).toHaveBeenCalledWith("❌ Failed to load Giscus script");
+			expect(errorSpy).toHaveBeenCalledWith(
+				expect.stringContaining("❌ [Comments] Failed to load Giscus script"),
+				expect.objectContaining({
+					error: expect.any(Error),
+					message: "Failed to load Giscus script",
+				}),
+			);
 		});
 
 		errorSpy.mockRestore();

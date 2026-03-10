@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import puppeteer from "puppeteer";
+import { logError } from "../src/lib/log";
 
 export async function convertSvgToPng(svgFilePath: string, outputPath: string) {
 	let browser: puppeteer.Browser | undefined;
@@ -35,7 +36,11 @@ export async function convertSvgToPng(svgFilePath: string, outputPath: string) {
 		console.log(`✅ Converted SVG to PNG: ${outputPath}`);
 		return outputPath;
 	} catch (error) {
-		console.error("Error converting SVG to PNG:", error);
+		logError("svg-to-png", "Error converting SVG to PNG", {
+			svgFilePath,
+			outputPath,
+			error,
+		});
 		throw error;
 	} finally {
 		if (browser) {
@@ -48,13 +53,19 @@ if (process.argv[1] && path.basename(process.argv[1]) === "svg-to-png.ts") {
 	const svgPath = process.argv[2];
 	const pngPath = process.argv[3];
 	if (!svgPath || !pngPath) {
-		console.error("Usage: tsx svg-to-png.ts <input-svg> <output-png>");
+		logError(
+			"svg-to-png",
+			"Usage: tsx svg-to-png.ts <input-svg> <output-png>",
+			{
+				error: new Error("Missing arguments"),
+			},
+		);
 		process.exit(1);
 	}
 	convertSvgToPng(svgPath, pngPath)
 		.then(() => process.exit(0))
 		.catch((error) => {
-			console.error(error);
+			logError("svg-to-png", "Unhandled error", { error });
 			process.exit(1);
 		});
 }

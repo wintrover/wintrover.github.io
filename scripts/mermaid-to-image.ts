@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import puppeteer, { type Browser } from "puppeteer";
+import { logError } from "../src/lib/log";
 
 async function getGitHubRawUrl(
 	publicBaseUrl: string,
@@ -32,7 +33,7 @@ async function getGitHubRawUrl(
 		}
 		return `${publicBaseUrl.replace(/\/$/, "")}/${urlPath}/${filename}`;
 	} catch (error: any) {
-		console.error("Failed to get GitHub repo info:", error.message);
+		logError("mermaid-to-image", "GitHub repo info 가져오기 실패", { error });
 		let urlPath = outputDir.replace(/\\/g, "/");
 		if (urlPath.startsWith("public/")) {
 			urlPath = urlPath.substring(7);
@@ -82,7 +83,7 @@ ${mermaidCode}
 		} as any);
 		return outputPath;
 	} catch (error) {
-		console.error("Error converting Mermaid to image:", error);
+		logError("mermaid-to-image", "Mermaid 이미징 변환 실패", { error });
 		throw error;
 	} finally {
 		if (browser) {
@@ -145,7 +146,10 @@ export async function processMermaidDiagrams(
 			images.push({ path: imagePath, url: imageUrl, filename });
 			console.log(`✅ Converted Mermaid diagram to image: ${filename}`);
 		} catch (error) {
-			console.error(`❌ Failed to convert Mermaid diagram:`, error);
+			logError("mermaid-to-image", "Mermaid 다이어그램 변환 실패", {
+				filenameBase,
+				error,
+			});
 			const fallbackMarkdown = `> ⚠️ **Mermaid Diagram Could Not Be Rendered**\n\n\`\`\`mermaid\n${block.code}\n\`\`\``;
 			processedContent =
 				processedContent.substring(0, block.startIndex) +

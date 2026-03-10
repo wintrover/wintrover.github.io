@@ -15,6 +15,7 @@ description: 블로그 포스트 및 코드의 품질을 보장하기 위한 최
   - **타입 체크**: TypeScript 타입 안정성 검사
   - **Knip**: 사용되지 않는 코드 및 의존성 탐색
   - **Dependency Cruiser**: 종속성 규칙 및 그래프 유효성 검사
+- **로깅 일관성**: 앱 코드에서 `console.error` 직접 호출이 남아있지 않은지 확인한다. (`src/lib/log.ts` 예외)
 - **테스트 표준**: 테스트는 `fast-check` 기반 Property-Based Testing(PBT)을 우선 적용한다.
 - **체크리스트 수행**: `unified-template.md` 하단에 정의된 작성 완료 체크리스트를 100% 충족해야 한다.
 - **빌드 확인**: `pnpm build`를 통해 빌드 오류가 발생하지 않는지 확인한다.

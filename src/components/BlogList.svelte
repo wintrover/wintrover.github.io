@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import { push } from "svelte-spa-router";
+import { logError } from "../lib/log";
 import { loadAllPosts } from "../lib/postLoader";
 import { formatDate, slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
@@ -32,12 +33,7 @@ async function loadPosts() {
 			selectedCategory.set("all");
 		}
 	} catch (error) {
-		console.error("❌ [BlogList] 포스트 목록 로딩 중 에러 발생:", {
-			params,
-			message: error instanceof Error ? error.message : String(error),
-			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
-			error,
-		});
+		logError("BlogList", "포스트 목록 로딩 중 에러 발생", { params, error });
 		filteredPosts = [];
 	}
 }

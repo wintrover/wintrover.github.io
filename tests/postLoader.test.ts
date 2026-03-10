@@ -214,11 +214,13 @@ describe("postLoader", () => {
 		};
 
 		const posts = await loadAllPosts(mockModules);
-		expect(posts.find((p) => p.fileName === "a").category).toBe("Project");
-		expect(posts.find((p) => p.fileName === "b").category).toBe("Company Work");
-		expect(posts.find((p) => p.fileName === "c").category).toBe("Tutorial");
-		expect(posts.find((p) => p.fileName === "d").category).toBe("General");
-		expect(posts.find((p) => p.fileName === "e").category).toBe("General");
+		expect(posts.find((p) => p.fileName === "a")?.category).toBe("Project");
+		expect(posts.find((p) => p.fileName === "b")?.category).toBe(
+			"Company Work",
+		);
+		expect(posts.find((p) => p.fileName === "c")?.category).toBe("Tutorial");
+		expect(posts.find((p) => p.fileName === "d")?.category).toBe("General");
+		expect(posts.find((p) => p.fileName === "e")?.category).toBe("General");
 	});
 
 	test("autoAssignByFolder=false 이면 폴더 기반 자동 할당을 하지 않는다", async () => {

@@ -3,11 +3,12 @@ import fc from "fast-check";
 import { get, writable } from "svelte/store";
 import { push } from "svelte-spa-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import type { Post } from "../src/lib/postLoader";
 import { selectedCategory } from "../src/stores/category";
 
 // Mock the posts store
 vi.mock("../src/stores/posts", () => ({
-	posts: writable([]),
+	posts: writable<Post[]>([]),
 }));
 
 // Now import Sidebar and posts (mocked)
@@ -30,15 +31,40 @@ describe("Sidebar Component", () => {
 		});
 
 	const mockPosts = [
-		{ title: "Post 1", category: "Project", tags: ["Svelte"], slug: "post-1" },
 		{
+			fileName: "post-1",
+			title: "Post 1",
+			category: "Project",
+			tags: ["Svelte"],
+			slug: "post-1",
+			date: "2023-10-01",
+			excerpt: "",
+			html: "",
+			content: "",
+		},
+		{
+			fileName: "post-2",
 			title: "Post 2",
 			category: "Company Work",
 			tags: ["Vitest"],
 			slug: "post-2",
+			date: "2023-10-02",
+			excerpt: "",
+			html: "",
+			content: "",
 		},
-		{ title: "Post 3", category: "Project", tags: ["Svelte"], slug: "post-3" },
-	];
+		{
+			fileName: "post-3",
+			title: "Post 3",
+			category: "Project",
+			tags: ["Svelte"],
+			slug: "post-3",
+			date: "2023-10-03",
+			excerpt: "",
+			html: "",
+			content: "",
+		},
+	] satisfies Post[];
 
 	beforeEach(() => {
 		posts.set(mockPosts);

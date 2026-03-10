@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import { get } from "svelte/store";
 import { describe, expect, test, vi } from "vitest";
+import type { Post } from "../src/lib/postLoader";
 import * as postLoader from "../src/lib/postLoader";
 import { selectedCategory } from "../src/stores/category";
 
@@ -44,7 +45,30 @@ describe("selectedCategory store", () => {
 
 describe("posts store", () => {
 	test("loadAllPosts 성공 시 데이터를 로드해야 함", async () => {
-		const mockPosts = [{ title: "Post 1" }, { title: "Post 2" }];
+		const mockPosts = [
+			{
+				fileName: "post-1",
+				slug: "post-1",
+				title: "Post 1",
+				date: "2023-10-01",
+				category: "",
+				tags: [],
+				excerpt: "",
+				html: "",
+				content: "",
+			},
+			{
+				fileName: "post-2",
+				slug: "post-2",
+				title: "Post 2",
+				date: "2023-10-02",
+				category: "",
+				tags: [],
+				excerpt: "",
+				html: "",
+				content: "",
+			},
+		] satisfies Post[];
 		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(mockPosts);
 
 		// store를 import (모킹된 loadAllPosts 사용)
@@ -80,8 +104,11 @@ describe("posts store", () => {
 
 		expect(data).toEqual([]);
 		expect(consoleSpy).toHaveBeenCalledWith(
-			"[postsStore] Failed to load posts:",
-			expect.any(Error),
+			expect.stringContaining("❌ [postsStore] 포스트 로딩 실패"),
+			expect.objectContaining({
+				error: expect.any(Error),
+				message: "Fetch error",
+			}),
 		);
 		unsubscribe();
 		consoleSpy.mockRestore();
