@@ -42,9 +42,6 @@ importers:
       '@biomejs/biome':
         specifier: ^2.3.10
         version: 2.4.4
-      '@fast-check/vitest':
-        specifier: ^0.2.4
-        version: 0.2.4(vitest@4.0.18)
       '@j178/prek':
         specifier: ^0.2.25
         version: 0.2.30
@@ -717,11 +714,6 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
-
-  '@fast-check/vitest@0.2.4':
-    resolution: {integrity: sha512-Ilcr+JAIPhb1s6FRm4qoglQYSGXXrS+zAupZeNuWAA3qHVGDA1d1Gb84Hb/+otL3GzVZjFJESg5/1SfIvrgssA==}
-    peerDependencies:
-      vitest: ^1 || ^2 || ^3 || ^4
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -3863,11 +3855,6 @@ snapshots:
     optional: true
 
   '@exodus/bytes@1.14.1': {}
-
-  '@fast-check/vitest@0.2.4(vitest@4.0.18)':
-    dependencies:
-      fast-check: 4.5.3
-      vitest: 4.0.18(@types/node@25.3.2)(@vitest/ui@4.0.18)(jiti@2.6.1)(jsdom@27.4.0)(tsx@4.21.0)
 
   '@iconify/types@2.0.0': {}
 

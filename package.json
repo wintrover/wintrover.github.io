@@ -56,5 +56,12 @@
 		"svelte": "^4.0.0",
 		"svelte-spa-router": "^4.0.1",
 		"vite-plugin-raw": "^1.0.3"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@j178/prek",
+			"esbuild",
+			"puppeteer"
+		]
 	}
 }
