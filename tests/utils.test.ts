@@ -575,10 +575,10 @@ describe("parseFrontMatter", () => {
 		expect(data.title).toBe("");
 	});
 
-	test("태그 구분자(쉼표, 공백) 및 빈 태그 처리 (EP: Tags Split)", () => {
+	test("태그 구분자(쉼표) 및 빈 태그 처리 (EP: Tags Split)", () => {
 		const md = "---\ntags: t1,  t2 t3,,t4\n---\n";
 		const { data } = parseFrontMatter(md);
-		expect(data.tags).toEqual(["t1", "t2", "t3", "t4"]);
+		expect(data.tags).toEqual(["t1", "t2 t3", "t4"]);
 	});
 
 	test("PBT: 빈 FrontMatter는 data가 비어있고 body는 trim 된다", () => {
@@ -667,16 +667,16 @@ describe("parseFrontMatter", () => {
 		);
 	});
 
-	test("PBT: tags는 쉼표/공백 구분자를 기준으로 split 된다", () => {
+	test("PBT: tags는 쉼표 구분자를 기준으로 split 된다", () => {
 		const token = fc
 			.string({
 				unit: fc.constantFrom(
-					..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+					..."abcdefghijklmnopqrstuvwxyz0123456789_- ".split(""),
 				),
 				minLength: 1,
 				maxLength: 10,
 			})
-			.filter((s) => !s.includes(",") && !s.includes(" "));
+			.filter((s) => !s.includes(","));
 
 		fc.assert(
 			fc.property(
@@ -685,7 +685,8 @@ describe("parseFrontMatter", () => {
 					const joined = tokens.join(",,  ");
 					const md = `---\ntags: ${joined}\n---\n`;
 					const { data } = parseFrontMatter(md);
-					expect(data.tags).toEqual(tokens);
+					const expected = tokens.map((t) => t.trim()).filter(Boolean);
+					expect(data.tags).toEqual(expected);
 				},
 			),
 		);

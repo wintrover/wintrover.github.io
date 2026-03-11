@@ -143,7 +143,14 @@ export function parseFrontMatter(content: string) {
 		}
 
 		if (key === "tags") {
-			data[key] = value.match(/[a-zA-Z0-9_-]+/g) ?? [];
+			let tagsVal = value;
+			if (tagsVal.startsWith("[") && tagsVal.endsWith("]")) {
+				tagsVal = tagsVal.slice(1, -1);
+			}
+			data[key] = tagsVal
+				.split(",")
+				.map((t) => t.trim())
+				.filter(Boolean);
 			continue;
 		}
 

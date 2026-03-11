@@ -56,7 +56,7 @@ function normalizeTags(tags: unknown) {
 	}
 	if (typeof tags === "string") {
 		return tags
-			.split(/[,\s]+/)
+			.split(",")
 			.map((t) => t.trim())
 			.filter(Boolean);
 	}
