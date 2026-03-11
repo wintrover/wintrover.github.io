@@ -8,6 +8,7 @@ function run(cmd: string, args: string[], env: Env = {}) {
 	execFileSync(cmd, args, {
 		stdio: "inherit",
 		env: { ...process.env, ...env },
+		shell: process.platform === "win32",
 	});
 }
 
@@ -32,7 +33,7 @@ function writeFile(target: string, content: string) {
 
 function buildBlog(dist: string, locale: "ko" | "en") {
 	const basePath = `/${locale}/`;
-	run("npx", ["vite", "build"], {
+	run("npm", ["run", "build"], {
 		VITE_BASE_PATH: basePath,
 		VITE_OUT_DIR: path.join(dist, locale),
 		VITE_LOCALE: locale,
