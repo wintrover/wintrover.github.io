@@ -1,7 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/svelte";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("$app/environment", () => ({ browser: false }));
+globalThis.__TEST_BROWSER__ ??= false;
+vi.mock("$app/environment", () => ({
+	get browser() {
+		return globalThis.__TEST_BROWSER__;
+	},
+}));
 let currentBase = "/base";
 vi.mock("$app/paths", () => ({
 	get base() {
@@ -58,24 +63,76 @@ describe("components", () => {
 		const { locale } = await import("svelte-i18n");
 		locale.set("ko");
 		const setSpy = vi.spyOn(locale, "set");
+		window.history.replaceState({}, "", "/ko/resume/");
+		const navigate = vi.fn();
 
-		render(LanguageSwitcher);
+		render(LanguageSwitcher, { navigate });
 		const button = screen.getByRole("button");
 		expect(button).toHaveTextContent("lang_switcher_en");
 		await fireEvent.click(button);
 		expect(setSpy).toHaveBeenCalledWith("en");
+		expect(new URL(navigate.mock.calls[0][0]).pathname).toBe("/en/resume/");
 	});
 
 	it("LanguageSwitcher toggles locale from en to ko", async () => {
 		const { locale } = await import("svelte-i18n");
 		locale.set("en");
 		const setSpy = vi.spyOn(locale, "set");
+		window.history.replaceState({}, "", "/en/resume/");
+		const navigate = vi.fn();
 
-		render(LanguageSwitcher);
+		render(LanguageSwitcher, { navigate });
 		const button = screen.getByRole("button");
 		expect(button).toHaveTextContent("lang_switcher_ko");
 		await fireEvent.click(button);
 		expect(setSpy).toHaveBeenCalledWith("ko");
+		expect(new URL(navigate.mock.calls[0][0]).pathname).toBe("/ko/resume/");
+	});
+
+	it("LanguageSwitcher prefixes locale when url has no language prefix", async () => {
+		const { locale } = await import("svelte-i18n");
+		locale.set("ko");
+		window.history.replaceState({}, "", "/resume/");
+		const navigate = vi.fn();
+
+		render(LanguageSwitcher, { navigate });
+		await fireEvent.click(screen.getByRole("button"));
+		expect(new URL(navigate.mock.calls[0][0]).pathname).toBe("/en/resume/");
+	});
+
+	it("LanguageSwitcher handles URL constructor failure", async () => {
+		const { locale } = await import("svelte-i18n");
+		locale.set("ko");
+		const setSpy = vi.spyOn(locale, "set");
+		const navigate = vi.fn();
+
+		const OriginalURL = globalThis.URL;
+		globalThis.URL = class {
+			constructor() {
+				throw new Error("url fail");
+			}
+		};
+
+		render(LanguageSwitcher, { navigate });
+		await fireEvent.click(screen.getByRole("button"));
+		expect(setSpy).toHaveBeenCalledWith("en");
+		expect(navigate).not.toHaveBeenCalled();
+
+		globalThis.URL = OriginalURL;
+	});
+
+	it("LanguageSwitcher handles navigation failure", async () => {
+		const { locale } = await import("svelte-i18n");
+		locale.set("ko");
+		window.history.replaceState({}, "", "/ko/resume/");
+		const navigate = () => {
+			throw new Error("nav fail");
+		};
+
+		render(LanguageSwitcher, { navigate });
+		await expect(
+			fireEvent.click(screen.getByRole("button")),
+		).resolves.toBeTruthy();
 	});
 
 	it("AboutSection uses base path for image and renders HTML content", async () => {

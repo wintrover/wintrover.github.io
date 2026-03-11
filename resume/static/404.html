@@ -1,18 +1,27 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>윤수혁 포트폴리오</title>
     <script>
-        // GitHub Pages SPA 라우팅을 위한 리다이렉트
-        const path = window.location.pathname.slice(1);
-        if (path) {
-            window.location.replace(
-                window.location.origin + '/resume/?/' + path
-            );
-        } else {
-            window.location.replace(window.location.origin + '/resume/');
-        }
+        (() => {
+            const pathname = window.location.pathname || "/";
+            const pickLang = () => (navigator.language || "").toLowerCase().startsWith("ko") ? "ko" : "en";
+            const match = pathname.match(/^\/(ko|en)(\/|$)/);
+            const lang = match ? match[1] : pickLang();
+            const base = `/${lang}/resume/`;
+
+            if (pathname === "/resume" || pathname === "/resume/") {
+                window.location.replace(`${window.location.origin}${base}`);
+                return;
+            }
+            if (pathname.startsWith("/resume/")) {
+                const rest = pathname.replace(/^\/resume\//, "");
+                window.location.replace(`${window.location.origin}${base}?/${rest}`);
+                return;
+            }
+            window.location.replace(`${window.location.origin}${base}`);
+        })();
     </script>
 </head>
 <body>

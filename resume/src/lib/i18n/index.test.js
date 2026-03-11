@@ -5,6 +5,7 @@ describe("i18n init", () => {
 		vi.resetModules();
 
 		vi.doMock("$app/environment", () => ({ browser: false }));
+		vi.doMock("$env/static/public", () => ({ PUBLIC_DEFAULT_LOCALE: "ko" }));
 
 		const init = vi.fn();
 		const register = vi.fn();
@@ -45,6 +46,7 @@ describe("i18n init", () => {
 		});
 
 		vi.doMock("$app/environment", () => ({ browser: true }));
+		vi.doMock("$env/static/public", () => ({ PUBLIC_DEFAULT_LOCALE: "ko" }));
 
 		const init = vi.fn();
 		const register = vi.fn();
@@ -74,6 +76,7 @@ describe("i18n init", () => {
 		});
 
 		vi.doMock("$app/environment", () => ({ browser: true }));
+		vi.doMock("$env/static/public", () => ({ PUBLIC_DEFAULT_LOCALE: "ko" }));
 
 		const init = vi.fn();
 		const register = vi.fn();
@@ -103,6 +106,7 @@ describe("i18n init", () => {
 		});
 
 		vi.doMock("$app/environment", () => ({ browser: true }));
+		vi.doMock("$env/static/public", () => ({ PUBLIC_DEFAULT_LOCALE: "ko" }));
 
 		const init = vi.fn();
 		const register = vi.fn();
@@ -132,6 +136,7 @@ describe("i18n init", () => {
 		});
 
 		vi.doMock("$app/environment", () => ({ browser: true }));
+		vi.doMock("$env/static/public", () => ({ PUBLIC_DEFAULT_LOCALE: "ko" }));
 
 		const init = vi.fn();
 		const register = vi.fn();
@@ -174,6 +179,7 @@ describe("i18n init", () => {
 		vi.resetModules();
 
 		vi.doMock("$app/environment", () => ({ browser: false }));
+		vi.doMock("$env/static/public", () => ({ PUBLIC_DEFAULT_LOCALE: "ko" }));
 
 		const init = vi.fn();
 		const register = vi.fn();
@@ -211,5 +217,62 @@ describe("i18n init", () => {
 		);
 
 		errorSpy.mockRestore();
+	});
+
+	it("uses path locale over navigator language on browser", async () => {
+		vi.resetModules();
+
+		window.history.replaceState({}, "", "/en/resume/");
+
+		Object.defineProperty(window.navigator, "language", {
+			value: "ko-KR",
+			configurable: true,
+		});
+
+		vi.doMock("$app/environment", () => ({ browser: true }));
+		vi.doMock("$env/static/public", () => ({ PUBLIC_DEFAULT_LOCALE: "ko" }));
+
+		const init = vi.fn();
+		const register = vi.fn();
+		vi.doMock("svelte-i18n", () => ({
+			_: undefined,
+			init,
+			isLoading: undefined,
+			locale: undefined,
+			register,
+			waitLocale: undefined,
+		}));
+
+		await import("./index.js");
+
+		expect(init).toHaveBeenCalledWith({
+			fallbackLocale: "ko",
+			initialLocale: "en",
+		});
+	});
+
+	it("uses PUBLIC_DEFAULT_LOCALE as default locale on server", async () => {
+		vi.resetModules();
+
+		vi.doMock("$app/environment", () => ({ browser: false }));
+		vi.doMock("$env/static/public", () => ({ PUBLIC_DEFAULT_LOCALE: "en" }));
+
+		const init = vi.fn();
+		const register = vi.fn();
+		vi.doMock("svelte-i18n", () => ({
+			_: undefined,
+			init,
+			isLoading: undefined,
+			locale: undefined,
+			register,
+			waitLocale: undefined,
+		}));
+
+		await import("./index.js");
+
+		expect(init).toHaveBeenCalledWith({
+			fallbackLocale: "en",
+			initialLocale: "en",
+		});
 	});
 });

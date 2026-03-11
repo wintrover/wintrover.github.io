@@ -17,10 +17,11 @@ export default defineConfig(({ mode }) => ({
 			),
 		},
 	},
-	base: "/blog/",
+	base: process.env.VITE_BASE_PATH ?? "/",
 	build: {
-		outDir: "dist",
+		outDir: process.env.VITE_OUT_DIR ?? "dist",
 		copyPublicDir: true,
+		chunkSizeWarningLimit: 900,
 		rollupOptions: {
 			output: {
 				manualChunks: undefined,
@@ -34,6 +35,7 @@ export default defineConfig(({ mode }) => ({
 		environment: "jsdom",
 		setupFiles: ["tests/setup.ts"],
 		include: ["tests/**/*.test.ts"],
+		pool: "threads",
 		coverage: {
 			provider: "istanbul",
 			include: ["src/**/*.ts", "src/**/*.svelte"],
@@ -59,7 +61,7 @@ export default defineConfig(({ mode }) => ({
 			noExternal: ["svelte-spa-router"],
 		},
 		env: {
-			BASE_URL: "/blog/",
+			BASE_URL: "/",
 		},
 	},
 	server: {

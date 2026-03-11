@@ -1,7 +1,11 @@
 import { init, register } from "svelte-i18n";
 import { browser } from "$app/environment";
+import { PUBLIC_DEFAULT_LOCALE } from "$env/static/public";
 
-export const defaultLocale = "ko";
+export const defaultLocale =
+	PUBLIC_DEFAULT_LOCALE === "en" || PUBLIC_DEFAULT_LOCALE === "ko"
+		? PUBLIC_DEFAULT_LOCALE
+		: "ko";
 const supportedLocales = ["ko", "en"];
 
 const normalizeLocale = (value) => {
@@ -10,7 +14,16 @@ const normalizeLocale = (value) => {
 	return primary;
 };
 
+const resolvePathLocale = () => {
+	if (!browser) return "";
+	const pathname = globalThis.location.pathname.toLowerCase();
+	const match = pathname.match(/\/(ko|en)(\/|$)/);
+	return match ? match[1] : "";
+};
+
 export const resolveInitialLocale = () => {
+	const fromPath = resolvePathLocale();
+	if (supportedLocales.includes(fromPath)) return fromPath;
 	if (!browser) return defaultLocale;
 	const normalized = normalizeLocale(window.navigator.language);
 	return supportedLocales.includes(normalized) ? normalized : defaultLocale;

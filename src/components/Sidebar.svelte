@@ -16,9 +16,19 @@ type SidebarItem = {
 };
 
 let categories: SidebarItem[] = [];
+let langBase = "/ko";
+let resumeUrl = "/ko/resume/";
 
 void siteConfig;
 void posts;
+
+$: langBase = (() => {
+	const base = (import.meta as any)?.env?.BASE_URL ?? "/";
+	const match = String(base).match(/^\/(ko|en)(\/|$)/);
+	return `/${match ? match[1] : "ko"}`;
+})();
+
+$: resumeUrl = `${langBase}/resume/`;
 
 $: {
 	const configuredTagsByCategoryName: Record<string, string[]> = {};
@@ -157,7 +167,7 @@ void goHome;
   <h4>About</h4>
   <p>Working as a Fullstack AI Application Architect, sharing the latest tech trends and development experiences.</p>
   <br>
-  <p>Check my resume <a href="https://wintrover.github.io" target="_blank" rel="noopener noreferrer">wintrover.github.io</a></p>
+  <p>Check my resume <a href={resumeUrl} target="_blank" rel="noopener noreferrer">wintrover.github.io/resume</a></p>
 </div>
 
 <style>
@@ -194,16 +204,7 @@ void goHome;
     margin: 0 0 8px 0;
     font-size: 24px;
     font-weight: 600;
-  }
-
-  .site-name a {
     color: #24292e;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .site-name a:hover {
-    color: #0366d6;
   }
 
   .site-description {

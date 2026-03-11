@@ -6,7 +6,7 @@
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
-		"build:github": "vite build --base=/ && npm --prefix resume run build && node -e \"const fs=require('node:fs'); const path=require('node:path'); const src=path.join('resume','build'); const dst=path.join('dist','resume'); fs.rmSync(dst,{recursive:true,force:true}); fs.mkdirSync(dst,{recursive:true}); fs.cpSync(src,dst,{recursive:true});\"",
+		"build:github": "tsx scripts/build-github.ts",
 		"preview:github": "vite preview --base=/",
 		"deploy:github": "npm run build:github && tsx scripts/deploy-github.ts",
 		"test": "vitest run",
