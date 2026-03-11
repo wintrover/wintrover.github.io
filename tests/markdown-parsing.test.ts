@@ -114,7 +114,7 @@ describe("parseMarkdown", () => {
 	});
 
 	test("FrontMatter 파싱 테스트", () => {
-		const md = `---\ntitle: Test\ntags: t1 t2\n---\n# Content`;
+		const md = `---\ntitle: Test\ntags: t1, t2\n---\n# Content`;
 		const { frontMatter, html } = parseMarkdown(md);
 		expect(frontMatter).toEqual({ title: "Test", tags: ["t1", "t2"] });
 		expect(html).toContain("<h1>Content</h1>");
