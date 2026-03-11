@@ -1,15 +1,35 @@
 <script>
   import { locale, _ } from "$lib/i18n";
 
-  function switchLanguage(lang) {
-    locale.set(lang);
+  export let navigate = (href) => globalThis.location.assign(href);
+
+  function switchLanguage() {
+    const next = $locale === "ko" ? "en" : "ko";
+    locale.set(next);
+
+    let url;
+    try {
+      url = new URL(globalThis.location.href);
+    } catch {
+      return;
+    }
+
+    const pathname = url.pathname;
+    const replaced = pathname.replace(/\/(ko|en)(\/|$)/, `/${next}$2`);
+    url.pathname = replaced === pathname ? `/${next}${pathname}` : replaced;
+
+    try {
+      navigate(url.toString());
+    } catch {
+      return;
+    }
   }
 </script>
 
 <div class="language-switcher">
   <button
     class="language-toggle"
-    on:click={() => switchLanguage($locale === "ko" ? "en" : "ko")}
+    on:click={switchLanguage}
   >
     {$locale === "ko" ? $_("lang_switcher_en") : $_("lang_switcher_ko")}
   </button>

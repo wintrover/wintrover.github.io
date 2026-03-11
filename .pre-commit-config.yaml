@@ -20,7 +20,7 @@ repos:
     hooks:
     -   id: typescript-typecheck
         name: typescript-typecheck
-        entry: bun run typecheck
+        entry: node -e "require('node:child_process').execSync('npm run -s typecheck',{stdio:'inherit',shell:true})"
         language: system
         pass_filenames: false
         files: ^src/
@@ -28,7 +28,7 @@ repos:
         priority: 0
     -   id: knip
         name: knip
-        entry: bun run knip
+        entry: node -e "require('node:child_process').execSync('npm run -s knip',{stdio:'inherit',shell:true})"
         language: system
         pass_filenames: false
         files: ^src/
@@ -36,7 +36,7 @@ repos:
         priority: 0
     -   id: dependency-cruiser
         name: dependency-cruiser
-        entry: bun run depcruise
+        entry: node -e "require('node:child_process').execSync('npm run -s depcruise',{stdio:'inherit',shell:true})"
         language: system
         pass_filenames: false
         files: ^src/
@@ -44,7 +44,7 @@ repos:
         priority: 0
     -   id: vitest-coverage
         name: vitest-coverage
-        entry: bun run test:coverage
+        entry: node -e "require('node:child_process').execSync('npm run -s test:coverage',{stdio:'inherit',shell:true})"
         language: system
         pass_filenames: false
         always_run: true

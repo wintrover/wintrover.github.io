@@ -17,9 +17,9 @@ export default defineConfig(({ mode }) => ({
 			),
 		},
 	},
-	base: "/",
+	base: process.env.VITE_BASE_PATH ?? "/",
 	build: {
-		outDir: "dist",
+		outDir: process.env.VITE_OUT_DIR ?? "dist",
 		copyPublicDir: true,
 		chunkSizeWarningLimit: 900,
 		rollupOptions: {

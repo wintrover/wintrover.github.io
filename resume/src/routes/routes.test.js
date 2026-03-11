@@ -34,6 +34,7 @@ vi.mock("svelte-i18n", async () => {
 	};
 });
 
+import { handle } from "../hooks.server.js";
 import { load as layoutLoad } from "./+layout.js";
 import Layout from "./+layout.svelte";
 import Page from "./+page.svelte";
@@ -45,6 +46,14 @@ describe("routes", () => {
 
 		const { unmount } = render(Page);
 		expect(document.title).toBe("meta.title");
+		expect(
+			document.head
+				.querySelector('link[rel="canonical"]')
+				?.getAttribute("href"),
+		).toBe("https://wintrover.github.io/ko/resume/");
+		expect(
+			document.head.querySelectorAll('link[rel="alternate"][hreflang]').length,
+		).toBeGreaterThanOrEqual(3);
 		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
 			"site_title",
 		);
@@ -63,6 +72,31 @@ describe("routes", () => {
 
 		_.set((key) => key);
 		await tick();
+		unmount();
+	});
+
+	it("updates canonical url when locale changes", async () => {
+		const { _ } = await import("svelte-i18n");
+		_.set((key) => key);
+		const { locale } = await import("svelte-i18n");
+		locale.set("ko");
+
+		const { unmount } = render(Page);
+
+		expect(
+			document.head
+				.querySelector('link[rel="canonical"]')
+				?.getAttribute("href"),
+		).toBe("https://wintrover.github.io/ko/resume/");
+
+		locale.set("en");
+		await tick();
+		expect(
+			document.head
+				.querySelector('link[rel="canonical"]')
+				?.getAttribute("href"),
+		).toBe("https://wintrover.github.io/en/resume/");
+
 		unmount();
 	});
 
@@ -240,5 +274,50 @@ describe("routes", () => {
 		);
 		expect(waitLocaleImpl).toHaveBeenCalledTimes(2);
 		errorSpy.mockRestore();
+	});
+
+	it("hooks handle replaces html lang from ko path", async () => {
+		const resolve = vi.fn((_event, opts) =>
+			opts.transformPageChunk({ html: '<html lang="%lang%"></html>' }),
+		);
+		const result = handle({
+			event: { url: new URL("https://example.com/ko/resume/") },
+			resolve,
+		});
+		expect(result).toBe('<html lang="ko"></html>');
+		expect(resolve).toHaveBeenCalledTimes(1);
+	});
+
+	it("hooks handle replaces html lang from en path", async () => {
+		const resolve = vi.fn((_event, opts) =>
+			opts.transformPageChunk({ html: '<html lang="%lang%"></html>' }),
+		);
+		const result = handle({
+			event: { url: new URL("https://example.com/EN/resume/") },
+			resolve,
+		});
+		expect(result).toBe('<html lang="en"></html>');
+	});
+
+	it("hooks handle falls back to ko when path has no locale", async () => {
+		const resolve = vi.fn((_event, opts) =>
+			opts.transformPageChunk({ html: '<html lang="%lang%"></html>' }),
+		);
+		const result = handle({
+			event: { url: new URL("https://example.com/resume/") },
+			resolve,
+		});
+		expect(result).toBe('<html lang="ko"></html>');
+	});
+
+	it("hooks handle falls back to ko when url is missing", async () => {
+		const resolve = vi.fn((_event, opts) =>
+			opts.transformPageChunk({ html: '<html lang="%lang%"></html>' }),
+		);
+		const result = handle({
+			event: {},
+			resolve,
+		});
+		expect(result).toBe('<html lang="ko"></html>');
 	});
 });

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,30 +7,51 @@
   <link rel="icon" type="image/png" href="/images/profile.png" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <script type="module">
-    // GitHub Pages SPA redirect fix
-    // This script redirects 404s back to the SPA with the original path
     (() => {
-      var path = window.location.pathname;
-      var search = window.location.search;
-      var hash = window.location.hash;
+      const path = window.location.pathname || "/";
+      const search = window.location.search || "";
+      const hash = window.location.hash || "";
 
-      // If we're not at the root and not already at the SPA
-      if (path === '/blog' || path === '/blog/' || path.startsWith('/blog/')) {
-        window.location.replace('/');
+      const pickLang = () => {
+        const nav = (navigator.language || "").toLowerCase();
+        return nav.startsWith("ko") ? "ko" : "en";
+      };
+
+      const matchLangPrefix = path.match(/^\/(ko|en)(\/|$)/);
+      const lang = matchLangPrefix ? matchLangPrefix[1] : pickLang();
+      const langBase = `/${lang}`;
+
+      if (path === "/resume" || path === "/resume/") {
+        window.location.replace(`${langBase}/resume/`);
         return;
       }
-      if (path === '/resume' || path === '/resume/') {
-        window.location.replace('/resume/');
+      if (path.startsWith("/resume/")) {
+        const rest = path.replace(/^\/resume\//, "");
+        window.location.replace(`${langBase}/resume/?/${rest}${hash}`);
         return;
       }
-      if (path.startsWith('/resume/')) {
-        var rest = path.replace(/^\/resume\//, '');
-        window.location.replace(`/resume/?/${rest}${hash}`);
+
+      if (path === "/" || path === "/index.html") {
+        window.location.replace(`${langBase}/`);
         return;
       }
-      if (path !== '/') {
-        window.location.replace(`/#${path}${search}${hash}`);
+
+      if (matchLangPrefix) {
+        const rest = path.slice(langBase.length) || "/";
+        if (rest === "/resume" || rest === "/resume/") {
+          window.location.replace(`${langBase}/resume/`);
+          return;
+        }
+        if (rest.startsWith("/resume/")) {
+          const resumeRest = rest.replace(/^\/resume\//, "");
+          window.location.replace(`${langBase}/resume/?/${resumeRest}${hash}`);
+          return;
+        }
+        window.location.replace(`${langBase}/#${rest}${search}${hash}`);
+        return;
       }
+
+      window.location.replace(`${langBase}/#${path}${search}${hash}`);
     })();
   </script>
 </head>

@@ -1,8 +1,8 @@
 export const siteConfig = {
 	name: "wintrover",
 	description: "Fullstack AI Application Architect",
-	avatar: "/images/profile.png",
-	baseUrl: "",
+	avatar: `${(import.meta as any)?.env?.BASE_URL ?? "/"}images/profile.png`,
+	baseUrl: (import.meta as any)?.env?.BASE_URL ?? "/",
 	social: {
 		email: "wintrover@gmail.com",
 		github: "wintrover",
