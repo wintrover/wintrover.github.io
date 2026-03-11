@@ -18,6 +18,7 @@ let resizeTimeout: any = null;
 const routes = {
 	"/": BlogList,
 	"/category/:category": BlogList,
+	"/category/:category/tag/:tag": BlogList,
 	"/post/:slug": PostDetail,
 };
 

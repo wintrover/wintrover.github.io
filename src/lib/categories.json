@@ -12,7 +12,8 @@
 			"description": "회사 업무 관련 포스트",
 			"slug": "company",
 			"color": "#6f42c1",
-			"icon": "🏢"
+			"icon": "🏢",
+			"tags": ["smbholdings"]
 		},
 		"tutorial": {
 			"name": "Tutorial",

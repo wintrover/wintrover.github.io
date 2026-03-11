@@ -6,7 +6,7 @@ import { loadAllPosts } from "../lib/postLoader";
 import { formatDate, slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
 
-export let params: { category?: string } = {};
+export let params: { category?: string; tag?: string } = {};
 let posts = [];
 let filteredPosts = [];
 
@@ -21,13 +21,20 @@ async function loadPosts() {
 
 		// URL 파라미터에 따라 필터링
 		if (params.category) {
-			filteredPosts = posts.filter(
+			const categoryPosts = posts.filter(
 				(post) => slugify(post.category) === params.category,
 			);
-			selectedCategory.set(
-				posts.find((p) => slugify(p.category) === params.category)?.category ||
-					"all",
-			);
+			if (params.tag) {
+				filteredPosts = categoryPosts.filter((post) =>
+					post.tags.some((tag) => slugify(tag) === params.tag),
+				);
+				selectedCategory.set(
+					`${categoryPosts[0]?.category || "all"} - ${params.tag}`,
+				);
+			} else {
+				filteredPosts = categoryPosts;
+				selectedCategory.set(categoryPosts[0]?.category || "all");
+			}
 		} else {
 			filteredPosts = posts;
 			selectedCategory.set("all");
