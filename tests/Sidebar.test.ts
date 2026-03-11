@@ -85,6 +85,9 @@ describe("Sidebar Component", () => {
 		expect(screen.getByText(/All Posts \(3\)/)).toBeInTheDocument();
 		expect(screen.getByText(/Project \(2\)/)).toBeInTheDocument();
 		expect(screen.getByText(/Company Work \(1\)/)).toBeInTheDocument();
+		expect(screen.getByText(/Svelte \(2\)/)).toBeInTheDocument();
+		expect(screen.getByText(/Vitest \(1\)/)).toBeInTheDocument();
+		expect(screen.getByText(/smbholdings \(0\)/)).toBeInTheDocument();
 	});
 
 	test("카테고리 클릭 시 selectedCategory가 업데이트되고 경로가 이동해야 함", async () => {
@@ -106,6 +109,16 @@ describe("Sidebar Component", () => {
 
 		expect(get(selectedCategory)).toBe("all");
 		expect(push).toHaveBeenCalledWith("/");
+	});
+
+	test("태그 클릭 시 selectedCategory가 업데이트되고 태그 경로로 이동해야 함", async () => {
+		render(Sidebar);
+
+		const tagButton = screen.getByText(/Vitest \(1\)/);
+		await fireEvent.click(tagButton);
+
+		expect(get(selectedCategory)).toBe("Company Work - vitest");
+		expect(push).toHaveBeenCalledWith("/category/company-work/tag/vitest");
 	});
 
 	test("아바타 클릭 시 홈으로 이동하고 'all'로 설정되어야 함", async () => {

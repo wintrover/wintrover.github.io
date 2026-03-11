@@ -15,7 +15,7 @@
 		"mcp:code-index": "code-index-mcp",
 		"typecheck": "tsc --noEmit",
 		"lint": "prek run --all-files",
-		"prepare": "node -e \"const fs=require('node:fs'); if (fs.existsSync('.git')) { require('node:child_process').execSync('bun x prek install --overwrite --hook-type pre-commit', { stdio: 'inherit' }); }\"",
+		"prepare": "node -e \"const fs=require('node:fs'); const cp=require('node:child_process'); if (fs.existsSync('.git')) { try { cp.execSync('bun x prek install --overwrite --hook-type pre-commit', { stdio: 'inherit' }); } catch { cp.execSync('npx prek install --overwrite --hook-type pre-commit', { stdio: 'inherit' }); } }\"",
 		"stryker": "stryker run",
 		"knip": "knip",
 		"depcruise": "depcruise src"

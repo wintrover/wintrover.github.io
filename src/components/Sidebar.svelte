@@ -1,58 +1,111 @@
 <script lang="ts">
 import { push } from "svelte-spa-router";
+import categoryConfig from "../lib/categories.json";
 import { siteConfig } from "../lib/config";
 import { slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
 import { posts } from "../stores/posts";
 
-let categories = [];
+type SidebarItem = {
+	label: string;
+	slug: string;
+	count: number;
+	value: string;
+	isTag?: boolean;
+	parentSlug?: string;
+};
+
+let categories: SidebarItem[] = [];
 
 void siteConfig;
 void posts;
 
 $: {
-	const categoryCount = {};
-	const tagCount = {};
+	const configuredTagsByCategoryName: Record<string, string[]> = {};
+	const categoryEntries = (categoryConfig as any)?.categories ?? {};
+	for (const entry of Object.values(categoryEntries)) {
+		const name = (entry as any)?.name;
+		const tags = (entry as any)?.tags;
+		if (typeof name === "string" && name) {
+			configuredTagsByCategoryName[name] = Array.isArray(tags)
+				? tags.map((t) => String(t)).filter(Boolean)
+				: [];
+		}
+	}
+
+	const categoryCount: Record<string, number> = {};
+	const tagCountByCategory: Record<string, Record<string, number>> = {};
 
 	if (Array.isArray($posts)) {
 		$posts.forEach((post) => {
 			if (post.category) {
 				categoryCount[post.category] = (categoryCount[post.category] || 0) + 1;
 
-				// Company Work과 Project 카테고리의 태그별 카운트
 				if (post.category === "Company Work" || post.category === "Project") {
+					tagCountByCategory[post.category] =
+						tagCountByCategory[post.category] || {};
 					post.tags.forEach((tag) => {
-						const tagKey = `${post.category} - ${tag}`;
-						tagCount[tagKey] = (tagCount[tagKey] || 0) + 1;
+						tagCountByCategory[post.category][tag] =
+							(tagCountByCategory[post.category][tag] || 0) + 1;
 					});
 				}
 			}
 		});
 	}
 
-	categories = [
+	const nextCategories: SidebarItem[] = [
 		{
-			name: "All Posts",
+			label: "All Posts",
 			slug: "all",
 			count: Array.isArray($posts) ? $posts.length : 0,
+			value: "all",
 		},
-		...Object.entries(categoryCount).map(([name, count]) => ({
-			name,
-			slug: slugify(name),
-			count,
-			isCategory: true,
-		})),
 	];
+
+	for (const [name, count] of Object.entries(categoryCount)) {
+		const categorySlug = slugify(name);
+		nextCategories.push({
+			label: name,
+			slug: categorySlug,
+			count,
+			value: name,
+		});
+
+		if (name === "Company Work" || name === "Project") {
+			const fromConfig = configuredTagsByCategoryName[name] ?? [];
+			const fromPosts = Object.keys(tagCountByCategory[name] ?? {});
+			const tags = Array.from(new Set([...fromConfig, ...fromPosts]))
+				.map((t) => String(t).trim())
+				.filter(Boolean)
+				.sort((a, b) => a.localeCompare(b));
+
+			for (const tag of tags) {
+				const tagSlug = slugify(tag);
+				nextCategories.push({
+					label: tag,
+					slug: tagSlug,
+					count: tagCountByCategory[name]?.[tag] ?? 0,
+					value: `${name} - ${tagSlug}`,
+					isTag: true,
+					parentSlug: categorySlug,
+				});
+			}
+		}
+	}
+
+	categories = nextCategories;
 }
 
-function selectCategory(categorySlug, categoryName) {
-	// slug 대신 실제 카테고리 이름을 저장
-	if (categorySlug === "all") {
+function selectCategory(item: SidebarItem) {
+	if (item.value === "all") {
 		selectedCategory.set("all");
 		push("/");
+	} else if (item.isTag) {
+		selectedCategory.set(item.value);
+		push(`/category/${item.parentSlug}/tag/${item.slug}`);
 	} else {
-		selectedCategory.set(categoryName);
-		push(`/category/${categorySlug}`);
+		selectedCategory.set(item.value);
+		push(`/category/${item.slug}`);
 	}
 
 	// 모바일 환경에서 카테고리 클릭 시 사이드바 닫기
@@ -90,10 +143,10 @@ void goHome;
     {#each categories as category}
       <li>
         <button
-          class="category-link {category.isTag ? 'tag-item' : ''} {($selectedCategory === 'all' && category.slug === 'all') || ($selectedCategory === category.name) ? 'active' : ''}"
-          on:click={() => selectCategory(category.slug, category.name)}
+          class="category-link {category.isTag ? 'tag-item' : ''} {($selectedCategory === 'all' && category.value === 'all') || ($selectedCategory === category.value) ? 'active' : ''}"
+          on:click={() => selectCategory(category)}
         >
-          {category.name} ({category.count})
+          {category.label} ({category.count})
         </button>
       </li>
     {/each}
