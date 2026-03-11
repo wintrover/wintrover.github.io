@@ -72,6 +72,44 @@ describe("BlogList Component", () => {
 		expect(get(selectedCategory)).toBe("all");
 	});
 
+	test("포스팅 목록 배지는 카테고리가 아니라 태그를 표시해야 함", async () => {
+		vi.mocked(postLoader.loadAllPosts).mockResolvedValue([
+			{
+				fileName: "company-post",
+				title: "Company Post",
+				slug: "company-post",
+				category: "Company Work",
+				date: "2023-10-01",
+				tags: ["SMBholdings"],
+				excerpt: "Excerpt",
+				html: "",
+				content: "",
+			},
+			{
+				fileName: "project-post",
+				title: "Project Post",
+				slug: "project-post",
+				category: "Project",
+				date: "2023-10-02",
+				tags: ["project"],
+				excerpt: "Excerpt 2",
+				html: "",
+				content: "",
+			},
+		] satisfies Post[]);
+
+		render(BlogList);
+
+		await waitFor(() => {
+			expect(screen.getByText("Company Post")).toBeInTheDocument();
+			expect(screen.getByText("Project Post")).toBeInTheDocument();
+		});
+
+		expect(screen.getByText("SMBholdings")).toBeInTheDocument();
+		expect(screen.getByText("project")).toBeInTheDocument();
+		expect(screen.queryByText("Company Work")).not.toBeInTheDocument();
+	});
+
 	test("카테고리 파라미터가 있을 때 필터링된 포스트를 렌더링해야 함", async () => {
 		render(BlogList, { params: { category: "tech" } });
 

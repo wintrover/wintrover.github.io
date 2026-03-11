@@ -66,9 +66,9 @@ void slugify;
         <article class="post">
           <div class="post-meta">
             <span class="date">{formatDate(post.date)}</span>
-            {#if post.category}
-              <span class="category-badge {slugify(post.category)}">
-                {post.category}
+            {#if post.tags?.length}
+              <span class="tag-badge {slugify(post.tags[0])}">
+                {post.tags[0]}
               </span>
             {/if}
           </div>
@@ -123,7 +123,7 @@ void slugify;
     font-size: 14px;
   }
 
-  .category-badge {
+  .tag-badge {
     background: #0366d6;
     color: white;
     padding: 2px 8px;
@@ -132,11 +132,11 @@ void slugify;
     font-weight: 500;
   }
 
-  .category-badge.project {
+  .tag-badge.project {
     background: #28a745;
   }
 
-  .category-badge.company-work {
+  .tag-badge.smbholdings {
     background: #6f42c1;
   }
 
