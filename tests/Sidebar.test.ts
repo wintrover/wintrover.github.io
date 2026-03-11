@@ -87,7 +87,7 @@ describe("Sidebar Component", () => {
 		expect(screen.getByText(/Company Work \(1\)/)).toBeInTheDocument();
 		expect(screen.getByText(/Svelte \(2\)/)).toBeInTheDocument();
 		expect(screen.getByText(/Vitest \(1\)/)).toBeInTheDocument();
-		expect(screen.getByText(/smbholdings \(0\)/)).toBeInTheDocument();
+		expect(screen.getByText(/SMBholdings \(0\)/)).toBeInTheDocument();
 	});
 
 	test("카테고리 클릭 시 selectedCategory가 업데이트되고 경로가 이동해야 함", async () => {
