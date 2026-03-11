@@ -1,0 +1,27 @@
+{
+	"forbidden": [
+		{
+			"name": "no-circular",
+			"severity": "error",
+			"from": {
+				"pathNot": "^node_modules"
+			},
+			"to": {
+				"circular": true
+			}
+		}
+	],
+	"options": {
+		"doNotFollow": {
+			"path": "node_modules"
+		},
+		"exclude": {
+			"path": "(^node_modules)|(^\\.svelte-kit)|(^build)|(^dist)|(\\.svelte$)"
+		},
+		"reporterOptions": {
+			"dot": {
+				"collapsePattern": "node_modules/[^/]+"
+			}
+		}
+	}
+}

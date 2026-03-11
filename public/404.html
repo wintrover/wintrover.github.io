@@ -19,6 +19,15 @@
         window.location.replace('/');
         return;
       }
+      if (path === '/resume' || path === '/resume/') {
+        window.location.replace('/resume/');
+        return;
+      }
+      if (path.startsWith('/resume/')) {
+        var rest = path.replace(/^\/resume\//, '');
+        window.location.replace(`/resume/?/${rest}${hash}`);
+        return;
+      }
       if (path !== '/') {
         window.location.replace(`/#${path}${search}${hash}`);
       }
