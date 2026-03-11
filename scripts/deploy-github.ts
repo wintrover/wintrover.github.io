@@ -6,7 +6,13 @@ console.log("🚀 Verifying GitHub Pages build output...");
 
 const distPath = path.join(process.cwd(), "dist");
 const indexPath = path.join(distPath, "index.html");
-const resumeIndexPath = path.join(distPath, "resume", "index.html");
+const expectedFiles = [
+	indexPath,
+	path.join(distPath, "ko", "index.html"),
+	path.join(distPath, "en", "index.html"),
+	path.join(distPath, "ko", "resume", "index.html"),
+	path.join(distPath, "en", "resume", "index.html"),
+];
 
 if (!fs.existsSync(distPath)) {
 	logError(
@@ -20,25 +26,12 @@ if (!fs.existsSync(distPath)) {
 	process.exit(1);
 }
 
-if (!fs.existsSync(indexPath)) {
-	logError(
-		"deploy-github",
-		"Build output invalid: index.html not found in dist",
-		{
-			error: new Error("index.html not found in dist"),
-		},
-	);
-	process.exit(1);
-}
-
-if (!fs.existsSync(resumeIndexPath)) {
-	logError(
-		"deploy-github",
-		"Build output invalid: resume/index.html not found in dist",
-		{
-			error: new Error("resume/index.html not found in dist"),
-		},
-	);
+for (const filePath of expectedFiles) {
+	if (fs.existsSync(filePath)) continue;
+	const relative = path.relative(distPath, filePath).replaceAll("\\", "/");
+	logError("deploy-github", `Build output invalid: ${relative} not found`, {
+		error: new Error(`${relative} not found in dist`),
+	});
 	process.exit(1);
 }
 
