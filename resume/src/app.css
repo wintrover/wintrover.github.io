@@ -1,0 +1,363 @@
+/* Import Google Fonts and Bootstrap (similar to original Jekyll) */
+@import url("https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,500,500italic,400italic,300italic,100italic,700italic");
+@import url("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css");
+
+/* Reset and base styles */
+html {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: inherit;
+}
+
+body {
+  background: #ffffff;
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography - matching original Jekyll theme */
+h1 {
+  font-size: 4rem;
+  margin-top: 0;
+  margin-bottom: 0.1rem;
+  font-weight: 500;
+}
+
+h2 {
+  font-weight: 300;
+  font-size: 2rem;
+}
+
+h3 {
+  font-weight: 300;
+  font-size: 3rem;
+  text-align: center;
+  border-bottom: dashed 2px #cccccc;
+  padding-bottom: 10px;
+  margin-bottom: 40px;
+}
+
+h4 {
+  font-weight: 300;
+  font-size: 2.5rem;
+  margin-bottom: 3px;
+}
+
+p,
+ul {
+  font-size: 1.4rem;
+  text-align: justify;
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+}
+
+a {
+  color: #477dca;
+  transition: color 150ms ease;
+  text-decoration: none;
+}
+
+a:active,
+a:focus,
+a:hover {
+  color: #355e98;
+}
+
+a i {
+  font-size: 1.4rem;
+}
+
+/* Container styles */
+.container {
+  margin-top: 30px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.header-container {
+  margin-top: 50px;
+}
+
+.header-right {
+  text-align: right;
+  margin-top: 30px;
+}
+
+.header-left {
+  margin-top: 30px;
+}
+
+.header-right p {
+  font-size: 1.4rem;
+  text-align: right;
+  margin-bottom: 3px;
+}
+
+.header-right a {
+  color: inherit;
+  font-weight: 500;
+}
+
+/* Profile image styles */
+.profile-img {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  display: block;
+  border-radius: 90px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  -moz-box-shadow: inset 0 0 20px #636161;
+  -webkit-box-shadow: inset 0 0 20px #636161;
+  box-shadow: inset 0 0 20px #636161;
+}
+
+/* Layout styles */
+.layout {
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: row;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.layout .details {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 0;
+  padding-right: 2rem;
+  width: 35%;
+}
+
+.layout .details p {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  font-size: 1.4rem;
+  text-align: inherit;
+  font-weight: 300;
+}
+
+.layout .details p b {
+  font-weight: 500;
+}
+
+.layout .details a {
+  color: inherit;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.layout .details .fa {
+  font-size: 2rem;
+}
+
+.layout .details .link {
+  font-size: 1.5rem;
+}
+
+.layout .details h4 {
+  margin-bottom: 0.1rem;
+  font-weight: 500;
+  display: block;
+}
+
+.layout .details h4 a {
+  font-weight: 500;
+}
+
+.layout .content {
+  width: 65%;
+}
+
+.layout .details {
+  margin-bottom: 0;
+}
+
+/* Quote styles */
+p.quote {
+  font-size: 1.4rem;
+  font-style: italic;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+/* Border styles */
+.border-weak {
+  padding-bottom: 8px;
+  border-bottom: dashed 1px #cccccc;
+}
+
+/* List container */
+.list-container h3 {
+  margin-bottom: 0;
+}
+
+/* Contact info */
+.contact-info p {
+  margin-bottom: 3px;
+  text-align: left;
+}
+
+.contact-info {
+  text-align: left;
+  display: inline-block;
+}
+
+/* Additional links */
+.no-print.additional-links {
+  margin-top: 3px;
+}
+
+.no-print.additional-links a {
+  margin: 0 5px;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  color: #4c4c4c;
+}
+
+.no-print.additional-links a i {
+  font-size: 4rem;
+}
+
+/* Language switcher */
+.language-switcher {
+  position: fixed;
+  top: 2vw;
+  right: 2vw;
+  z-index: 9999;
+}
+
+.language-switcher .button {
+  margin: 1vw 2vw 2vw 0 !important;
+}
+
+/* Button styles */
+.button {
+  min-width: 150px;
+  border: none;
+  background: none;
+  color: inherit;
+  vertical-align: middle;
+  position: relative;
+  z-index: 1;
+  border-radius: 0;
+  float: none;
+  margin: 0 auto;
+  margin-top: 0px;
+  padding: 5px 20px;
+  display: inline-block;
+  font-weight: 400;
+  max-width: 400px;
+  cursor: pointer;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 767px) {
+  .header-container div {
+    text-align: center;
+  }
+
+  .header-right p {
+    text-align: center;
+  }
+
+  .contact-info p {
+    text-align: left;
+  }
+
+  .header-left {
+    margin-top: 0px;
+  }
+
+  .layout {
+    flex-direction: column;
+  }
+
+  .layout .details,
+  .layout .content {
+    width: 100%;
+  }
+
+  .layout .details {
+    text-align: center;
+  }
+
+  .layout .details p {
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .layout .details {
+    padding: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  .layout .content {
+    width: 100%;
+  }
+}
+
+/* Utility classes */
+.center-text {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Print styles */
+@media print {
+  .container {
+    margin-top: 20px;
+  }
+
+  .header-left {
+    margin-top: 0px;
+  }
+
+  h3 {
+    margin-bottom: 20px;
+  }
+
+  body {
+    font-size: 0.9rem;
+  }
+
+  p.quote {
+    text-align: left;
+    padding: 0rem 0;
+    margin-top: 1rem;
+  }
+
+  .layout .details h4 {
+    margin-bottom: 0.2rem;
+  }
+
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+}

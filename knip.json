@@ -10,6 +10,7 @@
 	],
 	"project": ["src/**/*.{ts,svelte}", "scripts/**/*.ts", "tests/**/*.ts"],
 	"ignore": [
+		"resume/**/*",
 		"public/**/*",
 		"src/lib/config.ts",
 		"src/stores/posts.ts",
@@ -21,9 +22,7 @@
 		"@rollup/plugin-dsv",
 		"vite-plugin-raw",
 		"@biomejs/biome",
-		"@j178/prek",
-		"@stryker-mutator/typescript-checker",
 		"@vitest/coverage-v8"
 	],
-	"ignoreBinaries": ["code-index-mcp", "uvx"]
+	"ignoreBinaries": ["code-index-mcp"]
 }

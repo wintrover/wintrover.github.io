@@ -1,0 +1,12 @@
+default_stages = ["pre-commit", "manual"]
+default_install_hook_types = ["pre-commit"]
+
+[[repos]]
+repo = "local"
+hooks = [
+  { id = "biome", name = "Biome", language = "system", entry = "npm run -s biome:ci", pass_filenames = false, always_run = true, priority = 0 },
+  { id = "typecheck", name = "Typecheck", language = "system", entry = "npm run -s typecheck", pass_filenames = false, always_run = true, priority = 0 },
+  { id = "knip", name = "Knip", language = "system", entry = "npm run -s knip", pass_filenames = false, always_run = true, priority = 0 },
+  { id = "depcruise", name = "Dependency Cruiser", language = "system", entry = "npm run -s depcruise", pass_filenames = false, always_run = true, priority = 0 },
+  { id = "test-coverage", name = "Test Coverage", language = "system", entry = "npm run -s test:coverage", pass_filenames = false, always_run = true, stages = ["pre-commit", "manual"], priority = 0 },
+]

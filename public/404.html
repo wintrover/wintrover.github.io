@@ -15,9 +15,21 @@
       var hash = window.location.hash;
 
       // If we're not at the root and not already at the SPA
-      if (path !== '/' && path !== '/blog/' && path !== '/blog') {
-        // Redirect to the root with the original path as hash
-        window.location.replace(`/blog/#${path}${search}${hash}`);
+      if (path === '/blog' || path === '/blog/' || path.startsWith('/blog/')) {
+        window.location.replace('/');
+        return;
+      }
+      if (path === '/resume' || path === '/resume/') {
+        window.location.replace('/resume/');
+        return;
+      }
+      if (path.startsWith('/resume/')) {
+        var rest = path.replace(/^\/resume\//, '');
+        window.location.replace(`/resume/?/${rest}${hash}`);
+        return;
+      }
+      if (path !== '/') {
+        window.location.replace(`/#${path}${search}${hash}`);
       }
     })();
   </script>
