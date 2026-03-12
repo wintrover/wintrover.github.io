@@ -2,19 +2,30 @@ import App from "./App.svelte";
 
 // Handle common browser/extension errors that are often uncatchable
 if (typeof window !== "undefined") {
-	const env = (import.meta as any)?.env ?? {};
-	if (env.DEV) {
+	if (import.meta.env.DEV) {
 		const url = new URL(window.location.href);
 		const path = url.pathname || "/";
 		const matchLangPrefix = path.match(/^\/(ko|en)(\/|$)/);
-		const langBase = matchLangPrefix ? `/${matchLangPrefix[1]}/` : "/";
-		const rest = matchLangPrefix ? path.slice(langBase.length - 1) : path;
-		if (
-			(!url.hash || url.hash === "#") &&
-			rest !== "/" &&
-			rest !== "/index.html"
-		) {
-			window.history.replaceState({}, "", `${langBase}${url.search}#${rest}`);
+		if (!matchLangPrefix) {
+			const lang = (navigator.language ?? "").toLowerCase().startsWith("ko")
+				? "ko"
+				: "en";
+			const langBase = `/${lang}/`;
+			if (path === "/" || path === "/index.html") {
+				window.location.replace(`${langBase}${url.search}${url.hash}`);
+			} else {
+				window.location.replace(`${langBase}#${path}${url.search}${url.hash}`);
+			}
+		} else {
+			const langBase = `/${matchLangPrefix[1]}/`;
+			const rest = path.slice(langBase.length - 1);
+			if (
+				(!url.hash || url.hash === "#") &&
+				rest !== "/" &&
+				rest !== "/index.html"
+			) {
+				window.history.replaceState({}, "", `${langBase}${url.search}#${rest}`);
+			}
 		}
 	}
 
@@ -29,11 +40,14 @@ if (typeof window !== "undefined") {
 }
 
 if (typeof document !== "undefined") {
-	const env = (import.meta as any)?.env ?? {};
-	const htmlLang = env.VITE_HTML_LANG ?? env.VITE_LOCALE ?? "en";
+	const htmlLang =
+		import.meta.env.VITE_HTML_LANG ?? import.meta.env.VITE_LOCALE ?? "en";
 	document.documentElement.lang = htmlLang;
 	const canonical = document.querySelector('link[rel="canonical"]');
-	const locale = env.VITE_LOCALE;
+	const locale =
+		import.meta.env.VITE_LOCALE === "auto"
+			? undefined
+			: import.meta.env.VITE_LOCALE;
 	if (canonical instanceof HTMLLinkElement) {
 		canonical.href = locale
 			? `https://wintrover.github.io/${String(locale)}/`

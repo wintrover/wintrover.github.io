@@ -3,8 +3,10 @@ import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vite";
 
 export default defineConfig(({ mode }) => {
-	process.env.VITE_LOCALE ??= "en";
-	process.env.VITE_HTML_LANG ??= process.env.VITE_LOCALE;
+	const defaultLocale = mode === "test" ? "en" : "auto";
+	process.env.VITE_LOCALE ??= defaultLocale;
+	process.env.VITE_HTML_LANG ??=
+		process.env.VITE_LOCALE === "auto" ? "en" : process.env.VITE_LOCALE;
 
 	return {
 		plugins: [

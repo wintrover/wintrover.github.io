@@ -1,14 +1,31 @@
-const locale = ((import.meta as any)?.env?.VITE_LOCALE ?? "en") as "ko" | "en";
+type Locale = "ko" | "en";
+type PostFiles = Record<string, string | null>;
 
-export const postFiles =
+const rawLocale = (import.meta.env.VITE_LOCALE ?? "en") as string;
+const locale: Locale = rawLocale === "ko" ? "ko" : "en";
+
+export const postFiles: PostFiles =
 	locale === "ko"
-		? (import.meta.glob("../posts/ko/**/*.md", {
+		? import.meta.glob("../posts/ko/**/*.md", {
 				eager: true,
 				query: "?raw",
 				import: "default",
-			}) as Record<string, string>)
-		: (import.meta.glob(["../posts/**/*.md", "!../posts/ko/**/*.md"], {
+			})
+		: import.meta.glob(["../posts/**/*.md", "!../posts/ko/**/*.md"], {
 				eager: true,
 				query: "?raw",
 				import: "default",
-			}) as Record<string, string>);
+			});
+
+export async function getPostFiles(): Promise<PostFiles> {
+	const envLocale = import.meta.env.VITE_LOCALE;
+
+	if (envLocale === "ko" || envLocale === "en") return postFiles;
+
+	if (import.meta.env.DEV && typeof window !== "undefined") {
+		const mod = await import("./glob.dev");
+		return mod.getPostFilesDev(window.location.pathname);
+	}
+
+	return postFiles;
+}
