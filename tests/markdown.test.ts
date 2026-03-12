@@ -1,7 +1,15 @@
 import fc from "fast-check";
 import { marked } from "marked";
 import mermaid from "mermaid";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import {
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	test,
+	vi,
+} from "vitest";
 import { initMermaid, loadPost, parseMarkdown } from "../src/lib/markdown";
 import { normalizeImageSrc } from "../src/lib/utils";
 
@@ -25,10 +33,16 @@ vi.mock("marked", async (importActual) => {
 });
 
 describe("markdown utilities", () => {
-	beforeEach(async () => {
-		vi.resetAllMocks();
+	let actualMarkedParse: any;
+
+	beforeAll(async () => {
 		const actual = await vi.importActual<typeof import("marked")>("marked");
-		vi.mocked(marked.parse).mockImplementation(actual.marked.parse as any);
+		actualMarkedParse = actual.marked.parse as any;
+	});
+
+	beforeEach(() => {
+		vi.resetAllMocks();
+		vi.mocked(marked.parse).mockImplementation(actualMarkedParse);
 	});
 
 	afterEach(() => {

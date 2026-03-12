@@ -20,12 +20,6 @@ function mk(target: string) {
 	fs.mkdirSync(target, { recursive: true });
 }
 
-function copyDir(src: string, dst: string) {
-	rm(dst);
-	mk(dst);
-	fs.cpSync(src, dst, { recursive: true });
-}
-
 function writeFile(target: string, content: string) {
 	mk(path.dirname(target));
 	fs.writeFileSync(target, content);
@@ -39,18 +33,6 @@ function buildBlog(dist: string, locale: "ko" | "en") {
 		VITE_LOCALE: locale,
 		VITE_HTML_LANG: locale,
 	});
-}
-
-function buildResume(dist: string, locale: "ko" | "en") {
-	const basePath = `/${locale}/resume`;
-	run("npm", ["--prefix", "resume", "run", "build"], {
-		BASE_PATH: basePath,
-		PUBLIC_DEFAULT_LOCALE: locale,
-	});
-	copyDir(
-		path.join(process.cwd(), "resume", "build"),
-		path.join(dist, locale, "resume"),
-	);
 }
 
 function main() {
@@ -71,9 +53,6 @@ function main() {
 
 	buildBlog(dist, "ko");
 	buildBlog(dist, "en");
-
-	buildResume(dist, "ko");
-	buildResume(dist, "en");
 }
 
 main();

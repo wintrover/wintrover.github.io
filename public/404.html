@@ -21,16 +21,6 @@
       const lang = matchLangPrefix ? matchLangPrefix[1] : pickLang();
       const langBase = `/${lang}`;
 
-      if (path === "/resume" || path === "/resume/") {
-        window.location.replace(`${langBase}/resume/`);
-        return;
-      }
-      if (path.startsWith("/resume/")) {
-        const rest = path.replace(/^\/resume\//, "");
-        window.location.replace(`${langBase}/resume/?/${rest}${hash}`);
-        return;
-      }
-
       if (path === "/" || path === "/index.html") {
         window.location.replace(`${langBase}/`);
         return;
@@ -38,15 +28,6 @@
 
       if (matchLangPrefix) {
         const rest = path.slice(langBase.length) || "/";
-        if (rest === "/resume" || rest === "/resume/") {
-          window.location.replace(`${langBase}/resume/`);
-          return;
-        }
-        if (rest.startsWith("/resume/")) {
-          const resumeRest = rest.replace(/^\/resume\//, "");
-          window.location.replace(`${langBase}/resume/?/${resumeRest}${hash}`);
-          return;
-        }
         window.location.replace(`${langBase}/#${rest}${search}${hash}`);
         return;
       }
