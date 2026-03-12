@@ -15,8 +15,7 @@
 	"loading_message": "포트폴리오를 불러오는 중...",
 	"social": {
 		"github": "GitHub",
-		"linkedin": "LinkedIn",
-		"blog": "Blog"
+		"linkedin": "LinkedIn"
 	},
 	"project_link": {
 		"github": "GitHub Repository",

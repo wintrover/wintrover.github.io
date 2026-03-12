@@ -15,8 +15,7 @@
 	"loading_message": "Loading portfolio...",
 	"social": {
 		"github": "GitHub",
-		"linkedin": "LinkedIn",
-		"blog": "Blog"
+		"linkedin": "LinkedIn"
 	},
 	"project_link": {
 		"github": "GitHub Repository",

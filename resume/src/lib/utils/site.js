@@ -15,11 +15,6 @@ export const site = {
 			url: "https://linkedin.com/in/suhyok-yun-1934b713a",
 			iconClass: "fab fa-linkedin",
 		},
-		{
-			id: "blog",
-			url: "https://wintrover.github.io/",
-			iconClass: "fab fa-blogger",
-		},
 	],
 };
 
