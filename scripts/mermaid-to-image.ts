@@ -3,8 +3,11 @@ import path from "node:path";
 import puppeteer, { type Browser } from "puppeteer";
 import { logError } from "../src/lib/log";
 
-async function getGitHubRawUrl(outputDir: string, filename: string) {
-	const publicBaseUrl = "https://wintrover.github.io/blog";
+async function getGitHubRawUrl(
+	publicBaseUrl: string,
+	outputDir: string,
+	filename: string,
+) {
 	try {
 		const { exec } = await import("node:child_process");
 		const util = await import("node:util");
@@ -28,14 +31,14 @@ async function getGitHubRawUrl(outputDir: string, filename: string) {
 		if (urlPath.startsWith("public/")) {
 			urlPath = urlPath.substring(7);
 		}
-		return `${publicBaseUrl}/${urlPath}/${filename}`;
+		return `${publicBaseUrl.replace(/\/$/, "")}/${urlPath}/${filename}`;
 	} catch (error: any) {
 		logError("mermaid-to-image", "GitHub repo info 가져오기 실패", { error });
 		let urlPath = outputDir.replace(/\\/g, "/");
 		if (urlPath.startsWith("public/")) {
 			urlPath = urlPath.substring(7);
 		}
-		return `${publicBaseUrl}/${urlPath}/${filename}`;
+		return `${publicBaseUrl.replace(/\/$/, "")}/${urlPath}/${filename}`;
 	}
 }
 
@@ -109,7 +112,7 @@ export function extractMermaidBlocks(markdown: string) {
 
 export async function processMermaidDiagrams(
 	markdown: string,
-	_publicBaseUrl: string,
+	publicBaseUrl: string,
 	outputDir = "public/images",
 	filenameBase = "diagram",
 ) {
@@ -129,7 +132,11 @@ export async function processMermaidDiagrams(
 			const idx = mermaidBlocks.length - i;
 			const filename = `${filenameBase}-${idx}.png`;
 			const imagePath = path.join(outputDir, filename);
-			const imageUrl = await getGitHubRawUrl(outputDir, filename);
+			const imageUrl = await getGitHubRawUrl(
+				publicBaseUrl,
+				outputDir,
+				filename,
+			);
 			await convertMermaidToImage(block.code, imagePath);
 			const imageMarkdown = `![Mermaid Diagram](${imageUrl})`;
 			processedContent =

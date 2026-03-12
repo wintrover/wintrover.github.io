@@ -71,6 +71,7 @@ export function normalizeImageSrc(src: any) {
 		p = p.slice(base.length);
 	}
 
+	p = p.replace(/^blog\//, "");
 	p = resolveRelativePath(p);
 
 	if (p.startsWith("assets/images/")) {

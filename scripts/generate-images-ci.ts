@@ -5,7 +5,7 @@ import { logError } from "../src/lib/log";
 import { processMermaidDiagrams } from "./mermaid-to-image";
 
 const baseUrl =
-	process.env.BLOG_PUBLIC_BASE_URL || "https://wintrover.github.io/blog";
+	process.env.BLOG_PUBLIC_BASE_URL || "https://wintrover.github.io";
 const postsRoot = "src/posts";
 
 async function listMarkdownFiles(dir: string) {
