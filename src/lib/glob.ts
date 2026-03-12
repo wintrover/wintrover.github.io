@@ -5,7 +5,7 @@ type PostFiles = Record<string, string | null>;
 const rawLocale = (import.meta.env.VITE_LOCALE ?? "en") as string;
 const locale: Locale = rawLocale === "ko" ? "ko" : "en";
 
-export const postFiles: PostFiles =
+const postFiles: PostFiles =
 	locale === "ko"
 		? import.meta.glob("../posts/ko/**/*.md", {
 				eager: true,

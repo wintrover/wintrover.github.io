@@ -1,5 +1,4 @@
 <script lang="ts">
-import mermaid from "mermaid";
 import { onMount, tick } from "svelte";
 import { push } from "svelte-spa-router";
 import { logError } from "../lib/log";
@@ -9,6 +8,8 @@ import Comments from "./Comments.svelte";
 
 // Browser detection
 const browser = typeof window !== "undefined";
+const siteOrigin = "https://wintrover.github.io";
+const defaultOgImage = `${siteOrigin}/images/profile.png`;
 
 export let params: { slug?: string } = {};
 let post = null;
@@ -36,16 +37,22 @@ async function loadPostData(slug: string) {
 
 		// Update page title and meta tags
 		if (browser && post) {
+			const currentUrl = window.location.href;
 			document.title = `${post.title} - wintrover`;
 
 			// Update or create meta tags
 			updateMetaTag("og:title", post.title);
-			updateMetaTag("og:url", window.location.href);
+			updateMetaTag("og:url", currentUrl);
 			updateMetaTag("og:description", post.excerpt || post.title);
+			updateMetaTag("og:type", "article");
+			updateMetaTag("og:image", defaultOgImage);
+			updateMetaTag("og:image:alt", post.title);
+			updateMetaTag("og:site_name", "wintrover");
 			updateMetaTag("description", post.excerpt || post.title);
+			updateStructuredData(post, currentUrl);
 
 			// Update canonical URL
-			updateLinkTag("canonical", window.location.href);
+			updateLinkTag("canonical", currentUrl);
 		}
 
 		// 버튼 이벤트 리스너 추가
@@ -90,6 +97,52 @@ function updateMetaTag(property, content) {
 	meta.setAttribute("content", content);
 }
 
+function updateStructuredData(post, url: string) {
+	const existing =
+		document.querySelector(
+			'script[type="application/ld+json"][data-wintr="structured-data"]',
+		) || null;
+
+	const script =
+		existing instanceof HTMLScriptElement
+			? existing
+			: document.createElement("script");
+
+	script.setAttribute("type", "application/ld+json");
+	script.setAttribute("data-wintr", "structured-data");
+
+	const date =
+		typeof post?.date === "string" && post.date ? post.date : undefined;
+	const excerpt =
+		typeof post?.excerpt === "string" && post.excerpt
+			? post.excerpt
+			: typeof post?.title === "string"
+				? post.title
+				: "";
+
+	const jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		headline: post?.title ?? "",
+		image: [defaultOgImage],
+		datePublished: date,
+		dateModified: date,
+		author: {
+			"@type": "Person",
+			name: "wintrover",
+			url: `${siteOrigin}/`,
+		},
+		description: excerpt,
+		mainEntityOfPage: url,
+	};
+
+	script.textContent = JSON.stringify(jsonLd);
+
+	if (!existing) {
+		document.head.appendChild(script);
+	}
+}
+
 function updateLinkTag(rel, href) {
 	let link = document.querySelector(`link[rel="${rel}"]`);
 
@@ -123,7 +176,6 @@ $: if (!loading && post) {
 async function updatePostEffects() {
 	await tick();
 	setupCodeBlockButtons();
-	await setupMermaidDiagrams();
 }
 
 function showCopyToast(codeBlock) {
@@ -191,31 +243,6 @@ function setupCodeBlockButtons() {
 			});
 		}
 	});
-}
-
-async function setupMermaidDiagrams() {
-	const mermaidElements = document.querySelectorAll(".mermaid-diagram");
-	for (const element of mermaidElements) {
-		if (element.hasAttribute("data-rendered")) continue;
-
-		const code = decodeURIComponent(element.getAttribute("data-mermaid-code"));
-		const id = element.id;
-
-		try {
-			const { svg } = await mermaid.render(`${id}-svg`, code);
-			element.innerHTML = svg;
-			element.setAttribute("data-rendered", "true");
-		} catch (error) {
-			logError("PostDetail", "Mermaid 렌더링 중 에러 발생", {
-				elementId: id,
-				mermaidCode: code,
-				error,
-			});
-			element.innerHTML =
-				'<div class="mermaid-error">Mermaid diagram rendering failed</div>';
-			element.setAttribute("data-rendered", "true");
-		}
-	}
 }
 
 function goBack() {

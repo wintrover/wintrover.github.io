@@ -249,30 +249,6 @@ onDestroy(() => {
     }
   }
 
-  :global(.mermaid-diagram) {
-    text-align: center;
-    margin: 20px 0;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e1e4e8;
-  }
-
-  :global(.mermaid-diagram svg) {
-    max-width: 100%;
-    height: auto;
-  }
-
-  :global(.mermaid-error) {
-    color: #d73a49;
-    background: #ffeef0;
-    border: 1px solid #fdaeb7;
-    border-radius: 6px;
-    padding: 16px;
-    margin: 16px 0;
-    text-align: center;
-  }
-
   .sidebar-toggle {
     position: fixed;
     top: 15px;

@@ -15,15 +15,6 @@ vi.mock("svelte-spa-router", () => ({
 	push: vi.fn(),
 }));
 
-// Mock mermaid
-vi.mock("mermaid", () => ({
-	default: {
-		initialize: vi.fn(),
-		run: vi.fn(),
-		render: vi.fn(),
-	},
-}));
-
 describe("PostDetail Component", () => {
 	const safeSlug = (minLength: number, maxLength: number) =>
 		fc.string({
@@ -124,37 +115,6 @@ describe("PostDetail Component", () => {
 		const backButton = screen.getByText("← Back to List");
 		await fireEvent.click(backButton);
 		expect(pushSpy).toHaveBeenCalledWith("/");
-	});
-
-	test("Mermaid 다이어그램 렌더링 확인", async () => {
-		const mockPostWithMermaid = {
-			...mockPost,
-			html: '<div class="markdown-content"><div class="mermaid-diagram" id="mermaid-1" data-mermaid-code="graph%20TD%3B%20A--%3EB%3B"></div></div>',
-		};
-		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(
-			mockPostWithMermaid as any,
-		);
-
-		const mermaid = (await import("mermaid")).default;
-		const renderSpy = vi
-			.mocked(mermaid.render)
-			.mockResolvedValue({ svg: "<svg>mermaid</svg>" } as any);
-
-		render(PostDetail, { params: { slug: "detailed-post" } });
-
-		await waitFor(() => {
-			expect(screen.queryByText("Detailed Post")).toBeInTheDocument();
-		});
-
-		await waitFor(
-			() => {
-				const mermaidElement = document.getElementById("mermaid-1");
-				expect(mermaidElement?.innerHTML).toContain("<svg>mermaid</svg>");
-			},
-			{ timeout: 10000 },
-		);
-
-		expect(renderSpy).toHaveBeenCalled();
 	});
 
 	test("코드 블록 테마 토글 및 복사 버튼 확인", async () => {
@@ -334,39 +294,6 @@ describe("PostDetail Component", () => {
 		}
 		consoleSpy.mockRestore();
 	});
-
-	test("Mermaid 렌더링 에러 처리", async () => {
-		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const mockPostWithMermaid = {
-			...mockPost,
-			html: '<div class="markdown-content"><div class="mermaid-diagram" id="mermaid-err" data-mermaid-code="invalid"></div></div>',
-		};
-		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(
-			mockPostWithMermaid as any,
-		);
-
-		const mermaid = (await import("mermaid")).default;
-		const renderSpy = vi
-			.mocked(mermaid.render)
-			.mockRejectedValue(new Error("Mermaid Error") as any);
-
-		render(PostDetail, { params: { slug: "detailed-post" } });
-
-		await waitFor(() => {
-			expect(screen.queryByText("Detailed Post")).toBeInTheDocument();
-		});
-
-		await waitFor(
-			() => {
-				const el = document.getElementById("mermaid-err");
-				expect(el?.innerHTML).toContain("Mermaid diagram rendering failed");
-			},
-			{ timeout: 10000 },
-		);
-
-		expect(renderSpy).toHaveBeenCalled();
-		consoleSpy.mockRestore();
-	}, 20000);
 
 	test("PBT: loadPostBySlug가 null이면 Post not found를 표시해야 함", async () => {
 		await fc.assert(

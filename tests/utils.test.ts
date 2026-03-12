@@ -850,15 +850,6 @@ describe("language selection (navigator.language only)", () => {
 		expect(content).not.toContain("navigator.languages");
 	});
 
-	test("resume/static/404.html은 navigator.languages를 참조하지 않는다", () => {
-		const content = fs.readFileSync(
-			path.join(process.cwd(), "resume", "static", "404.html"),
-			"utf-8",
-		);
-		expect(content).toContain("navigator.language");
-		expect(content).not.toContain("navigator.languages");
-	});
-
 	test("scripts/build-github.ts의 selectorHtml은 navigator.language만 사용한다", () => {
 		const content = fs.readFileSync(
 			path.join(process.cwd(), "scripts", "build-github.ts"),
