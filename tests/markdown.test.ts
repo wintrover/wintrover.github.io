@@ -1,6 +1,5 @@
 import fc from "fast-check";
 import { marked } from "marked";
-import mermaid from "mermaid";
 import {
 	afterEach,
 	beforeAll,
@@ -10,16 +9,10 @@ import {
 	test,
 	vi,
 } from "vitest";
-import { initMermaid, loadPost, parseMarkdown } from "../src/lib/markdown";
+import { parseMarkdown } from "../src/lib/markdown";
 import { normalizeImageSrc } from "../src/lib/utils";
 
 const originalFetch = global.fetch;
-
-vi.mock("mermaid", () => ({
-	default: {
-		initialize: vi.fn(),
-	},
-}));
 
 vi.mock("marked", async (importActual) => {
 	const actual = await importActual<typeof import("marked")>();
@@ -195,199 +188,6 @@ describe("markdown utilities", () => {
 						}),
 					);
 				}),
-			);
-			errorSpy.mockRestore();
-		});
-	});
-
-	describe("initMermaid", () => {
-		test("PBT: Mermaid는 고정 설정으로 초기화된다", () => {
-			fc.assert(
-				fc.property(fc.constant(null), () => {
-					initMermaid();
-					expect(mermaid.initialize).toHaveBeenCalledWith({
-						startOnLoad: true,
-						theme: "default",
-						securityLevel: "loose",
-					});
-				}),
-			);
-		});
-	});
-
-	describe("loadPost", () => {
-		test("filePath가 빈 문자열이면 null을 반환하고 fetch는 호출되지 않는다", async () => {
-			global.fetch = vi.fn() as any;
-			const result = await loadPost("a", { a: "" });
-			expect(result).toBeNull();
-			expect(global.fetch).not.toHaveBeenCalled();
-		});
-
-		test("filePath가 문자열이 아니면 null을 반환하고 fetch는 호출되지 않는다", async () => {
-			global.fetch = vi.fn() as any;
-			const result = await loadPost("a", { a: 123 as any });
-			expect(result).toBeNull();
-			expect(global.fetch).not.toHaveBeenCalled();
-		});
-
-		test("존재하지 않는 slug는 null을 반환한다", async () => {
-			global.fetch = vi.fn() as any;
-			const result = await loadPost("not-exists");
-			expect(result).toBeNull();
-			expect(global.fetch).not.toHaveBeenCalled();
-		});
-
-		test("PBT: 존재하지 않는 슬러그는 null을 반환한다", async () => {
-			await fc.assert(
-				fc.asyncProperty(fc.string(), async (slug) => {
-					global.fetch = vi.fn() as any;
-					const result = await loadPost(slug, {});
-					expect(result).toBeNull();
-					expect(global.fetch).not.toHaveBeenCalled();
-				}),
-				{ numRuns: 100 },
-			);
-		});
-
-		test("PBT: 성공적인 로드 시 frontMatter.title이 유지된다", async () => {
-			const slug = "../posts/project/2025-06-25-1.md";
-			const filePath = "/__test__/post.md";
-			const title = fc
-				.string({
-					unit: fc.constantFrom(
-						..."abcdefghijklmnopqrstuvwxyz0123456789 _-".split(""),
-					),
-					minLength: 1,
-					maxLength: 40,
-				})
-				.filter(
-					(s) =>
-						!s.includes("\n") &&
-						!s.includes("\r") &&
-						/^[a-z]/i.test(s) &&
-						!s.endsWith(" ") &&
-						s !== "true" &&
-						s !== "false",
-				);
-			const body = fc
-				.string({
-					unit: fc.constantFrom(
-						..."abcdefghijklmnopqrstuvwxyz0123456789 _-".split(""),
-					),
-					minLength: 1,
-					maxLength: 80,
-				})
-				.filter((s) => !s.includes("\n") && !s.includes("\r"));
-
-			await fc.assert(
-				fc.asyncProperty(title, body, async (t, b) => {
-					global.fetch = vi.fn().mockResolvedValue({
-						ok: true,
-						text: () => Promise.resolve(`---\ntitle: ${t}\n---\n${b}`),
-					});
-					const result = await loadPost(slug, { [slug]: filePath });
-					expect(result).not.toBeNull();
-					expect(result?.frontMatter.title).toBe(t);
-					expect(global.fetch).toHaveBeenCalledWith(filePath);
-				}),
-				{ numRuns: 50 },
-			);
-		});
-
-		test("PBT: fetch ok=false 인 경우 null을 반환한다", async () => {
-			const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-			const slug = "../posts/project/2025-06-25-1.md";
-			const filePath = "/__test__/post.md";
-			await fc.assert(
-				fc.asyncProperty(fc.integer({ min: 400, max: 599 }), async (status) => {
-					global.fetch = vi.fn().mockResolvedValue({
-						ok: false,
-						status,
-						text: () => Promise.resolve("---\ntitle: x\n---\nbody"),
-					});
-					const result = await loadPost(slug, { [slug]: filePath });
-					expect(result).toBeNull();
-					expect(errorSpy).toHaveBeenCalledWith(
-						expect.stringContaining("포스트 로딩 중 에러 발생"),
-						expect.objectContaining({
-							slug,
-							filePath,
-							message: expect.stringContaining(String(status)),
-						}),
-					);
-				}),
-				{ numRuns: 50 },
-			);
-			errorSpy.mockRestore();
-		});
-
-		test("PBT: fetch에서 Error 예외가 발생하면 null을 반환한다", async () => {
-			const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-			const slug = "../posts/project/2025-06-25-1.md";
-			const filePath = "/__test__/post.md";
-			const msg = fc
-				.string({
-					unit: fc.constantFrom(
-						..."abcdefghijklmnopqrstuvwxyz0123456789 _-".split(""),
-					),
-					minLength: 1,
-					maxLength: 60,
-				})
-				.filter((s) => !s.includes("\n") && !s.includes("\r"));
-
-			await fc.assert(
-				fc.asyncProperty(msg, async (m) => {
-					global.fetch = vi.fn().mockImplementation(() => {
-						throw new Error(m);
-					});
-					const result = await loadPost(slug, { [slug]: filePath });
-					expect(result).toBeNull();
-					expect(errorSpy).toHaveBeenCalledWith(
-						expect.stringContaining("포스트 로딩 중 에러 발생"),
-						expect.objectContaining({
-							slug,
-							filePath,
-							message: m,
-						}),
-					);
-				}),
-				{ numRuns: 50 },
-			);
-			errorSpy.mockRestore();
-		});
-
-		test("PBT: fetch에서 non-Error 예외가 발생하면 null을 반환한다", async () => {
-			const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-			const slug = "../posts/project/2025-06-25-1.md";
-			const filePath = "/__test__/post.md";
-			const msg = fc
-				.string({
-					unit: fc.constantFrom(
-						..."abcdefghijklmnopqrstuvwxyz0123456789 _-".split(""),
-					),
-					minLength: 1,
-					maxLength: 60,
-				})
-				.filter((s) => !s.includes("\n") && !s.includes("\r"));
-
-			await fc.assert(
-				fc.asyncProperty(msg, async (m) => {
-					global.fetch = vi.fn().mockImplementation(() => {
-						throw m;
-					});
-					const result = await loadPost(slug, { [slug]: filePath });
-					expect(result).toBeNull();
-					expect(errorSpy).toHaveBeenCalledWith(
-						expect.stringContaining("포스트 로딩 중 에러 발생"),
-						expect.objectContaining({
-							slug,
-							filePath,
-							message: m,
-							stack: "Stack trace unavailable",
-						}),
-					);
-				}),
-				{ numRuns: 50 },
 			);
 			errorSpy.mockRestore();
 		});

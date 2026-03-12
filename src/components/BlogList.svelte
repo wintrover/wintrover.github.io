@@ -9,9 +9,58 @@ import { selectedCategory } from "../stores/category";
 export let params: { category?: string; tag?: string } = {};
 let posts = [];
 let filteredPosts = [];
+const siteOrigin = "https://wintrover.github.io";
+const defaultOgImage = `${siteOrigin}/images/profile.png`;
 
 function selectPost(post) {
 	push(`/post/${post.slug}`);
+}
+
+function updateMetaTag(property, content) {
+	let meta =
+		document.querySelector(`meta[property="${property}"]`) ||
+		document.querySelector(`meta[name="${property}"]`);
+
+	if (!meta) {
+		meta = document.createElement("meta");
+		meta.setAttribute(property.includes("og:") ? "property" : "name", property);
+		document.head.appendChild(meta);
+	}
+
+	meta.setAttribute("content", content);
+}
+
+function updateLinkTag(rel, href) {
+	let link = document.querySelector(`link[rel="${rel}"]`);
+
+	if (!link) {
+		link = document.createElement("link");
+		link.setAttribute("rel", rel);
+		document.head.appendChild(link);
+	}
+
+	link.setAttribute("href", href);
+}
+
+function updateListingSeo({
+	title,
+	description,
+	url,
+}: {
+	title: string;
+	description: string;
+	url: string;
+}) {
+	document.title = title;
+	updateMetaTag("description", description);
+	updateMetaTag("og:title", title);
+	updateMetaTag("og:description", description);
+	updateMetaTag("og:type", "website");
+	updateMetaTag("og:url", url);
+	updateMetaTag("og:image", defaultOgImage);
+	updateMetaTag("og:image:alt", title);
+	updateMetaTag("og:site_name", "wintrover");
+	updateLinkTag("canonical", url);
 }
 
 async function loadPosts() {
@@ -38,6 +87,31 @@ async function loadPosts() {
 		} else {
 			filteredPosts = posts;
 			selectedCategory.set("all");
+		}
+
+		if (typeof document !== "undefined") {
+			const url = window.location.href;
+			const lang = (document.documentElement.lang || "en").toLowerCase();
+			const isKo = lang.startsWith("ko");
+			const categoryLabel = params.category
+				? filteredPosts?.[0]?.category || params.category
+				: "";
+			const tagLabel = params.tag ? `#${params.tag}` : "";
+			const listTitle = params.category
+				? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} - wintrover`
+				: "wintrover - Fullstack AI Application Architect";
+			const listDescription = params.category
+				? isKo
+					? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} 글 목록`
+					: `Posts in ${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""}.`
+				: isKo
+					? "wintrover의 개발 블로그. AI/LLM, 컴퓨터 비전, 풀스택 개발 기록."
+					: "wintrover's engineering blog. Notes on AI/LLM, computer vision, and fullstack development.";
+			updateListingSeo({
+				title: listTitle,
+				description: listDescription,
+				url,
+			});
 		}
 	} catch (error) {
 		logError("BlogList", "포스트 목록 로딩 중 에러 발생", { params, error });

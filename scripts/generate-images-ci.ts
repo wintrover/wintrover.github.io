@@ -4,9 +4,27 @@ import matter from "gray-matter";
 import { logError } from "../src/lib/log";
 import { processMermaidDiagrams } from "./mermaid-to-image";
 
-const baseUrl =
-	process.env.BLOG_PUBLIC_BASE_URL || "https://wintrover.github.io";
 const postsRoot = "src/posts";
+
+function splitFrontMatter(raw: string) {
+	const lines = raw.split(/\r?\n/);
+	if (lines[0] !== "---") {
+		return { frontMatterBlock: null as string | null, body: raw };
+	}
+	const endIndexAfterFirstLine = lines
+		.slice(1)
+		.findIndex((line) => line.trim() === "---");
+	if (endIndexAfterFirstLine === -1) {
+		return { frontMatterBlock: null as string | null, body: raw };
+	}
+	const endIndex = endIndexAfterFirstLine + 1;
+	const frontMatterBlock = lines.slice(0, endIndex + 1).join("\n");
+	const body = lines
+		.slice(endIndex + 1)
+		.join("\n")
+		.replace(/^\n+/, "");
+	return { frontMatterBlock, body };
+}
 
 async function listMarkdownFiles(dir: string) {
 	const out: string[] = [];
@@ -38,12 +56,19 @@ async function run() {
 		const raw = await fs.readFile(f, "utf-8");
 		const { data, content } = matter(raw);
 		const filenameBase = deriveFilenameBase(f, data);
-		await processMermaidDiagrams(
+		const { content: processedContent } = await processMermaidDiagrams(
 			content,
-			baseUrl as string,
+			"/",
 			"public/images",
 			filenameBase,
 		);
+		if (processedContent !== content) {
+			const { frontMatterBlock } = splitFrontMatter(raw);
+			const out = frontMatterBlock
+				? `${frontMatterBlock}\n\n${processedContent.trim()}\n`
+				: processedContent;
+			await fs.writeFile(f, out, "utf-8");
+		}
 	}
 	console.log("OK: mermaid images generated");
 }

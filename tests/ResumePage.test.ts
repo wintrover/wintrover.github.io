@@ -1,8 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/svelte";
 import { tick } from "svelte";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { site } from "../resume/src/lib/utils/site.js";
 import ResumePage from "../src/components/ResumePage.svelte";
+import { site } from "../src/lib/resume/site";
 
 describe("ResumePage", () => {
 	beforeEach(() => {

@@ -5,24 +5,10 @@
 		"src/App.svelte",
 		"src/components/**/*.svelte",
 		"scripts/*.ts",
-		"tests/*.ts",
-		"scripts/generate-blog-images.ts"
+		"tests/*.ts"
 	],
 	"project": ["src/**/*.{ts,svelte}", "scripts/**/*.ts", "tests/**/*.ts"],
-	"ignore": [
-		"resume/**/*",
-		"public/**/*",
-		"src/lib/config.ts",
-		"src/stores/posts.ts",
-		"src/lib/utils.ts",
-		"src/lib/markdown.ts"
-	],
-	"ignoreDependencies": [
-		"@playwright/test",
-		"@rollup/plugin-dsv",
-		"vite-plugin-raw",
-		"@biomejs/biome",
-		"@vitest/coverage-v8"
-	],
+	"ignore": [],
+	"ignoreDependencies": ["@biomejs/biome", "@vitest/coverage-v8", "mermaid"],
 	"ignoreBinaries": ["code-index-mcp"]
 }
