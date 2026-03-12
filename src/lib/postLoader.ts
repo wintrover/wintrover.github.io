@@ -1,5 +1,5 @@
 import categoryConfig from "./categories.json";
-import { postFiles } from "./glob";
+import { getPostFiles } from "./glob";
 import { logError, logWarn } from "./log";
 import { renderMarkdownBody } from "./markdown";
 import { parseFrontMatter, slugify } from "./utils";
@@ -137,7 +137,8 @@ export async function loadAllPosts(
 	modulesOverride?: Record<string, string | null>,
 ): Promise<Post[]> {
 	try {
-		const modules: Record<string, string | null> = modulesOverride || postFiles;
+		const modules: Record<string, string | null> =
+			modulesOverride || (await getPostFiles());
 		const posts: Post[] = [];
 
 		for (const [path, content] of Object.entries(modules)) {
@@ -188,7 +189,8 @@ export async function loadPostBySlug(
 	modulesOverride?: Record<string, string | null>,
 ): Promise<Post | null> {
 	try {
-		const modules: Record<string, string | null> = modulesOverride || postFiles;
+		const modules: Record<string, string | null> =
+			modulesOverride || (await getPostFiles());
 		let target: { path: string; content: string } | null = null;
 
 		for (const path in modules) {
