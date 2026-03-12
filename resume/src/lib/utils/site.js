@@ -30,12 +30,6 @@ export const content = {
 					iconClass: "fab fa-github",
 					titleKey: "project_link.github",
 				},
-				{
-					type: "demo",
-					url: "https://cvfactory.dev",
-					iconClass: "fas fa-external-link-alt",
-					titleKey: "project_link.demo",
-				},
 			],
 		},
 		{
