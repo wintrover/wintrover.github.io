@@ -1,4 +1,5 @@
-type Locale = "ko" | "en";
+import type { Locale } from "./locale";
+
 type PostFiles = Record<string, string | null>;
 
 const rawLocale = (import.meta.env.VITE_LOCALE ?? "en") as string;

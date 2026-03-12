@@ -1,24 +1,34 @@
 import App from "./App.svelte";
+import {
+	detectLocale,
+	localeBase,
+	parseLocaleFromPathname,
+} from "./lib/locale";
 
 // Handle common browser/extension errors that are often uncatchable
 if (typeof window !== "undefined") {
 	if (import.meta.env.DEV) {
 		const url = new URL(window.location.href);
 		const path = url.pathname || "/";
-		const matchLangPrefix = path.match(/^\/(ko|en)(\/|$)/);
-		if (!matchLangPrefix) {
-			const lang = (navigator.language ?? "").toLowerCase().startsWith("ko")
-				? "ko"
-				: "en";
-			const langBase = `/${lang}/`;
+		const localeFromPath = parseLocaleFromPathname(path);
+
+		if (!localeFromPath) {
+			const locale = detectLocale({
+				envLocale: import.meta.env.VITE_LOCALE,
+				pathname: path,
+				navigatorLanguage: navigator.language,
+			});
+			const langBase = localeBase(locale);
+
 			if (path === "/" || path === "/index.html") {
 				window.location.replace(`${langBase}${url.search}${url.hash}`);
 			} else {
 				window.location.replace(`${langBase}#${path}${url.search}${url.hash}`);
 			}
 		} else {
-			const langBase = `/${matchLangPrefix[1]}/`;
+			const langBase = localeBase(localeFromPath);
 			const rest = path.slice(langBase.length - 1);
+
 			if (
 				(!url.hash || url.hash === "#") &&
 				rest !== "/" &&
@@ -28,7 +38,6 @@ if (typeof window !== "undefined") {
 			}
 		}
 	}
-
 	window.addEventListener("error", (event) => {
 		// Suppress or explain "Unchecked runtime.lastError"
 		if (event.message?.includes("message port closed")) {
@@ -40,14 +49,18 @@ if (typeof window !== "undefined") {
 }
 
 if (typeof document !== "undefined") {
-	const htmlLang =
-		import.meta.env.VITE_HTML_LANG ?? import.meta.env.VITE_LOCALE ?? "en";
+	const htmlLang = detectLocale({
+		envLocale: import.meta.env.VITE_LOCALE,
+		pathname: window.location.pathname,
+		navigatorLanguage: navigator.language,
+	});
 	document.documentElement.lang = htmlLang;
 	const canonical = document.querySelector('link[rel="canonical"]');
+	const envLocale = import.meta.env.VITE_LOCALE;
 	const locale =
-		import.meta.env.VITE_LOCALE === "auto"
-			? undefined
-			: import.meta.env.VITE_LOCALE;
+		envLocale === "ko" || envLocale === "en"
+			? envLocale
+			: (parseLocaleFromPathname(window.location.pathname) ?? htmlLang);
 	if (canonical instanceof HTMLLinkElement) {
 		canonical.href = locale
 			? `https://wintrover.github.io/${String(locale)}/`
