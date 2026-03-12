@@ -121,14 +121,15 @@ describe("Sidebar Component", () => {
 		expect(push).toHaveBeenCalledWith("/category/company-work/tag/vitest");
 	});
 
-	test("아바타 클릭 시 홈으로 이동하고 'all'로 설정되어야 함", async () => {
+	test("아바타는 링크가 아니고 클릭 시 이동하지 않아야 함", async () => {
 		render(Sidebar);
 
 		const avatar = screen.getByAltText(/wintrover/i); // 대소문자 무시
 		await fireEvent.click(avatar);
 
 		expect(get(selectedCategory)).toBe("all");
-		expect(push).toHaveBeenCalledWith("/");
+		expect(avatar.closest("a")).toBeNull();
+		expect(push).not.toHaveBeenCalled();
 	});
 
 	test("resume 링크 클릭 시 resume로 이동해야 함", async () => {

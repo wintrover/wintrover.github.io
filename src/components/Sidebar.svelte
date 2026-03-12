@@ -117,12 +117,6 @@ function selectCategory(item: SidebarItem) {
 	}
 }
 
-function goHome(event) {
-	event.preventDefault();
-	selectedCategory.set("all");
-	push("/");
-}
-
 function goResume(event) {
 	event.preventDefault();
 	push(resumeUrl);
@@ -130,15 +124,14 @@ function goResume(event) {
 
 void categories;
 void selectCategory;
-void goHome;
 void goResume;
 </script>
 
 <div class="sidebar-header">
   <div class="profile-section">
-    <a href={siteConfig.baseUrl + '/'} class="avatar-link" on:click={goHome}>
+    <div class="avatar-link">
       <img src={siteConfig.avatar} alt={siteConfig.name} class="avatar" />
-    </a>
+    </div>
     <h1 class="site-name">
       {siteConfig.name}
     </h1>
@@ -192,11 +185,6 @@ void goResume;
     height: 80px;
     border-radius: 50%;
     border: 3px solid #e1e4e8;
-    transition: border-color 0.2s;
-  }
-
-  .avatar:hover {
-    border-color: #0366d6;
   }
 
   .site-name {
