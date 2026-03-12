@@ -207,10 +207,16 @@ onDestroy(() => {
     position: fixed;
     height: 100vh;
     overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     padding: 0;
     transform: translateX(0);
     transition: transform 0.01s ease;
     z-index: 1000;
+  }
+
+  :global(#sidebar::-webkit-scrollbar) {
+    display: none;
   }
 
   #sidebar.collapsed {
