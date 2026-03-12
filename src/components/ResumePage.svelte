@@ -2,17 +2,16 @@
 import en from "../../resume/src/lib/i18n/locales/en.json";
 import ko from "../../resume/src/lib/i18n/locales/ko.json";
 import { content, site } from "../../resume/src/lib/utils/site.js";
+import { detectLocale } from "../lib/locale";
 
 type Dictionary = Record<string, unknown>;
 
-const env = (import.meta as any)?.env ?? {};
-const resolvedLocale =
-	env.VITE_LOCALE === "en" || env.VITE_LOCALE === "ko"
-		? env.VITE_LOCALE
-		: typeof navigator !== "undefined" &&
-				navigator.language.toLowerCase().startsWith("ko")
-			? "ko"
-			: "en";
+const resolvedLocale = detectLocale({
+	envLocale: import.meta.env.VITE_LOCALE,
+	pathname: typeof window !== "undefined" ? window.location.pathname : "/",
+	navigatorLanguage:
+		typeof navigator !== "undefined" ? navigator.language : undefined,
+});
 
 const dict: Dictionary = resolvedLocale === "en" ? (en as any) : (ko as any);
 
