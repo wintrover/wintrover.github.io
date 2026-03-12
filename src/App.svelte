@@ -4,6 +4,7 @@ import Router from "svelte-spa-router";
 import BlogList from "./components/BlogList.svelte";
 import Footer from "./components/Footer.svelte";
 import PostDetail from "./components/PostDetail.svelte";
+import ResumePage from "./components/ResumePage.svelte";
 import Sidebar from "./components/Sidebar.svelte";
 import { posts } from "./stores/posts";
 
@@ -20,6 +21,9 @@ const routes = {
 	"/category/:category": BlogList,
 	"/category/:category/tag/:tag": BlogList,
 	"/post/:slug": PostDetail,
+	"/resume": ResumePage,
+	"/resume/": ResumePage,
+	"/resume/*": ResumePage,
 };
 
 $: {

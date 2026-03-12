@@ -131,6 +131,15 @@ describe("Sidebar Component", () => {
 		expect(push).toHaveBeenCalledWith("/");
 	});
 
+	test("resume 링크 클릭 시 resume로 이동해야 함", async () => {
+		render(Sidebar);
+
+		const resumeLink = screen.getByText("wintrover.github.io/resume");
+		await fireEvent.click(resumeLink);
+
+		expect(push).toHaveBeenCalledWith("/resume/");
+	});
+
 	test("모바일 환경에서 카테고리 클릭 시 toggle-sidebar 이벤트 발생 확인", async () => {
 		// Mock window.innerWidth
 		Object.defineProperty(window, "innerWidth", {

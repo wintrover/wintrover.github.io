@@ -16,19 +16,12 @@ type SidebarItem = {
 };
 
 let categories: SidebarItem[] = [];
-let langBase = "/ko";
-let resumeUrl = "/ko/resume/";
+let resumeUrl = "/resume/";
 
 void siteConfig;
 void posts;
 
-$: langBase = (() => {
-	const base = (import.meta as any)?.env?.BASE_URL ?? "/";
-	const match = String(base).match(/^\/(ko|en)(\/|$)/);
-	return `/${match ? match[1] : "ko"}`;
-})();
-
-$: resumeUrl = `${langBase}/resume/`;
+$: resumeUrl = "/resume/";
 
 $: {
 	const configuredTagsByCategoryName: Record<string, string[]> = {};
@@ -130,9 +123,15 @@ function goHome(event) {
 	push("/");
 }
 
+function goResume(event) {
+	event.preventDefault();
+	push(resumeUrl);
+}
+
 void categories;
 void selectCategory;
 void goHome;
+void goResume;
 </script>
 
 <div class="sidebar-header">
@@ -167,7 +166,7 @@ void goHome;
   <h4>About</h4>
   <p>Working as a Fullstack AI Application Architect, sharing the latest tech trends and development experiences.</p>
   <br>
-  <p>Check my resume <a href={resumeUrl} target="_blank" rel="noopener noreferrer">wintrover.github.io/resume</a></p>
+  <p>Check my resume <a href={resumeUrl} on:click={goResume}>wintrover.github.io/resume</a></p>
 </div>
 
 <style>
