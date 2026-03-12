@@ -134,7 +134,7 @@ describe("Sidebar Component", () => {
 	test("resume 링크 클릭 시 resume로 이동해야 함", async () => {
 		render(Sidebar);
 
-		const resumeLink = screen.getByText("wintrover.github.io/resume");
+		const resumeLink = screen.getByRole("link", { name: "resume" });
 		await fireEvent.click(resumeLink);
 
 		expect(push).toHaveBeenCalledWith("/resume/");

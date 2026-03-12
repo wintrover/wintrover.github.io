@@ -166,7 +166,7 @@ void goResume;
   <h4>About</h4>
   <p>Working as a Fullstack AI Application Architect, sharing the latest tech trends and development experiences.</p>
   <br>
-  <p>Check my resume <a href={resumeUrl} on:click={goResume}>wintrover.github.io/resume</a></p>
+  <p>Check my <a href={resumeUrl} on:click={goResume}>resume</a></p>
 </div>
 
 <style>
