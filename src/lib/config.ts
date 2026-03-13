@@ -39,7 +39,7 @@ export function getRuntimeOrigin() {
 
 export const siteConfig = {
 	name: "wintrover",
-	description: "Fullstack AI Application Architect",
+	description: "Product Engineer & Builder",
 	avatar: `${baseUrl}images/profile.png`,
 	baseUrl,
 	origin: siteOrigin,

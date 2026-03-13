@@ -33,12 +33,12 @@ function buildBlog(dist: string, locale: "ko" | "en") {
 	const basePath = `/${locale}/`;
 	const metaDescription =
 		locale === "ko"
-			? "wintrover의 개발 블로그와 이력서. AI/LLM, 컴퓨터 비전, 풀스택 개발 기록."
-			: "wintrover's blog and resume. Notes on AI/LLM, computer vision, and fullstack engineering.";
+			? "wintrover의 프로덕트 개발 블로그와 이력서. AI/LLM, 컴퓨터 비전, 프로덕트 엔지니어링 기록."
+			: "wintrover's blog and resume. Notes on building products with AI/LLM and computer vision.";
 	const ogTitle =
 		locale === "ko"
-			? "wintrover - Fullstack AI Application Architect"
-			: "wintrover - Fullstack AI Application Architect";
+			? "wintrover - Product Engineer & Builder"
+			: "wintrover - Product Engineer & Builder";
 	const ogDescription = metaDescription;
 	const ogImageAlt =
 		locale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";
@@ -156,7 +156,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 	const title = String(json?.meta?.title ?? "wintrover's resume");
 	const description = String(
 		json?.meta?.description ??
-			"Developer portfolio focused on AI, LLM, and Computer Vision projects.",
+			"Product engineer & builder shipping AI-powered products. Portfolio and project notes.",
 	);
 	const canonical = `${siteOrigin}/${locale}/resume/`;
 	const redirect = `/${locale}/#/resume`;
@@ -314,7 +314,7 @@ function main() {
 	}
 
 	const selectorHtml =
-		'<!doctype html><html lang="en" prefix="og: https://ogp.me/ns#"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>wintrover</title><meta name="description" content="wintrover&#39;s blog and resume. Notes on AI/LLM, computer vision, and fullstack engineering."/><meta name="robots" content="index,follow"/><link rel="canonical" href="https://wintrover.github.io/"/><link rel="alternate" hreflang="ko" href="https://wintrover.github.io/ko/"/><link rel="alternate" hreflang="en" href="https://wintrover.github.io/en/"/><link rel="alternate" hreflang="x-default" href="https://wintrover.github.io/"/><meta property="og:title" content="wintrover - Fullstack AI Application Architect"/><meta property="og:description" content="wintrover&#39;s blog and resume. Notes on AI/LLM, computer vision, and fullstack engineering."/><meta property="og:type" content="website"/><meta property="og:url" content="https://wintrover.github.io/"/><meta property="og:image" content="https://wintrover.github.io/images/profile.png"/><meta property="og:image:alt" content="wintrover profile image"/><meta property="og:site_name" content="wintrover"/><script>(()=>{const lang=(navigator.language||"").toLowerCase().startsWith("ko")?"ko":"en";location.replace("/"+lang+"/");})();</script></head><body><noscript><a href="/ko/" lang="ko">한국어</a> <a href="/en/" lang="en">English</a></noscript></body></html>';
+		'<!doctype html><html lang="en" prefix="og: https://ogp.me/ns#"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>wintrover</title><meta name="description" content="wintrover&#39;s blog and resume. Notes on building products with AI/LLM and computer vision."/><meta name="robots" content="index,follow"/><link rel="canonical" href="https://wintrover.github.io/"/><link rel="alternate" hreflang="ko" href="https://wintrover.github.io/ko/"/><link rel="alternate" hreflang="en" href="https://wintrover.github.io/en/"/><link rel="alternate" hreflang="x-default" href="https://wintrover.github.io/"/><meta property="og:title" content="wintrover - Product Engineer & Builder"/><meta property="og:description" content="wintrover&#39;s blog and resume. Notes on building products with AI/LLM and computer vision."/><meta property="og:type" content="website"/><meta property="og:url" content="https://wintrover.github.io/"/><meta property="og:image" content="https://wintrover.github.io/images/profile.png"/><meta property="og:image:alt" content="wintrover profile image"/><meta property="og:site_name" content="wintrover"/><script>(()=>{const lang=(navigator.language||"").toLowerCase().startsWith("ko")?"ko":"en";location.replace("/"+lang+"/");})();</script></head><body><noscript><a href="/ko/" lang="ko">한국어</a> <a href="/en/" lang="en">English</a></noscript></body></html>';
 	writeFile(path.join(dist, "index.html"), selectorHtml);
 
 	buildBlog(dist, "ko");

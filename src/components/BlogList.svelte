@@ -13,9 +13,9 @@ const browser =
 
 let filteredPosts: Post[] = [];
 let resolvedLocale: "ko" | "en" = "en";
-let seoTitle = "wintrover - Fullstack AI Application Architect";
+let seoTitle = "wintrover - Product Engineer & Builder";
 let seoDescription =
-	"wintrover's engineering blog. Notes on AI/LLM, computer vision, and fullstack development.";
+	"wintrover's product engineering blog. Notes on AI/LLM, computer vision, and building products.";
 let seoUrl = `${getRuntimeOrigin()}/`;
 let requestedPosts = false;
 
@@ -67,14 +67,14 @@ $: {
 
 	seoTitle = params.category
 		? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} - wintrover`
-		: "wintrover - Fullstack AI Application Architect";
+		: "wintrover - Product Engineer & Builder";
 	seoDescription = params.category
 		? isKo
 			? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} 글 목록`
 			: `Posts in ${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""}.`
 		: isKo
-			? "wintrover의 개발 블로그. AI/LLM, 컴퓨터 비전, 풀스택 개발 기록."
-			: "wintrover's engineering blog. Notes on AI/LLM, computer vision, and fullstack development.";
+			? "wintrover의 프로덕트 개발 블로그. AI/LLM, 컴퓨터 비전, 제품 만들기 기록."
+			: "wintrover's product engineering blog. Notes on AI/LLM, computer vision, and building products.";
 	seoUrl = browser
 		? window.location.href
 		: `${getRuntimeOrigin()}/${resolvedLocale}/`;

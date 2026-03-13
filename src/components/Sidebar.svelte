@@ -157,7 +157,7 @@ void goResume;
 
 <div class="sidebar-module">
   <h4>About</h4>
-  <p>Working as a Fullstack AI Application Architect, sharing the latest tech trends and development experiences.</p>
+  <p>Product engineer & builder, shipping AI-powered products and sharing learnings from the field.</p>
   <br>
   <p>Check my <a href={resumeUrl} on:click={goResume}>resume</a></p>
 </div>
