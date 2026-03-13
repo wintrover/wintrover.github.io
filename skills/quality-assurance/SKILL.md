@@ -10,12 +10,8 @@ description: 블로그 포스트 및 코드의 품질을 보장하기 위한 최
 
 ## Rules
 
-- **통합 품질 게이트 (prek)**: `bun x prek run --all-files`를 실행하여 다음 항목들을 병렬로 검증한다.
-  - **Biome**: 린트 및 포매팅 체크
-  - **타입 체크**: TypeScript 타입 안정성 검사
-  - **Knip**: 사용되지 않는 코드 및 의존성 탐색
-  - **Dependency Cruiser**: 종속성 규칙 및 그래프 유효성 검사
-  - **테스트 + 커버리지**: 회귀 방지용 테스트 수행 및 커버리지 임계치 통과
+- **통합 품질 게이트 (prek)**: 빠른 검증을 위해 `bun x prek run --all-files`를 실행한다. (Biome, 타입 체크, Knip, DepCruise, 테스트 병렬 수행)
+- **의존성 및 빌드 검증**: 엄격한 의존성 정합성이 필요한 빌드 확인은 `pnpm build`를 사용한다.
 - **GitHub Actions 확인**: `gh` 명령어만 사용한다. (예: `gh run list`, `gh run view`)
 - **로깅 일관성**: 앱 코드에서 `console.error` 직접 호출이 남아있지 않은지 확인한다. (`src/lib/log.ts` 예외)
 - **테스트 표준**:
