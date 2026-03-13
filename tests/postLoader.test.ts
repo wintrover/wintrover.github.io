@@ -115,6 +115,14 @@ describe("postLoader", () => {
 		expect(posts[0].excerpt).toBe("Excerpt");
 	});
 
+	test("프로젝트 폴더에서 태그가 비어도 카테고리 기본 태그를 채운다", async () => {
+		const posts = await loadAllPosts({
+			"../posts/project/no-tags.md": "---\ntitle: No Tags\n---\nBody",
+		});
+		expect(posts[0].category).toBe("Project");
+		expect(posts[0].tags).toEqual(["CVFactory"]);
+	});
+
 	test("카테고리 기본 태그가 있으면 일반 태그를 구성 태그로 정규화한다", async () => {
 		vi.resetModules();
 		vi.doMock("../src/lib/categories.json", () => ({
@@ -146,6 +154,93 @@ describe("postLoader", () => {
 		expect(b?.tags).toEqual(["CVFactory"]);
 		expect(c?.tags).toEqual(["custom", "CVFactory"]);
 		vi.doUnmock("../src/lib/categories.json");
+	});
+
+	test("카테고리 이름 중복 시 첫 번째 항목을 유지하고 잘못된 엔트리는 무시한다", async () => {
+		vi.resetModules();
+		vi.doMock("../src/lib/categories.json", () => ({
+			default: {
+				categories: {
+					project_a: {
+						name: "Project",
+						slug: "project",
+						tags: ["Alpha"],
+					},
+					project_b: {
+						name: "Project",
+						slug: "project",
+						tags: ["Beta"],
+					},
+					blank: {
+						name: "   ",
+						slug: "blank",
+						tags: ["Ignored"],
+					},
+				},
+				defaultCategory: "General",
+				autoAssignByFolder: true,
+			},
+		}));
+		const { loadAllPosts } = await import("../src/lib/postLoader");
+
+		const posts = await loadAllPosts({
+			"../posts/project/a.md": "---\ntitle: a\ntags: project\n---",
+		});
+
+		expect(posts[0].tags).toEqual(["Alpha"]);
+		vi.doUnmock("../src/lib/categories.json");
+	});
+
+	test("카테고리 slug 토큰도 generic tag로 인식해 구성 태그로 치환한다", async () => {
+		vi.resetModules();
+		vi.doMock("../src/lib/categories.json", () => ({
+			default: {
+				categories: {
+					project: {
+						name: "Project",
+						slug: "cv-factory",
+						tags: ["CVFactory"],
+					},
+				},
+				defaultCategory: "General",
+				autoAssignByFolder: true,
+			},
+		}));
+		const { loadAllPosts } = await import("../src/lib/postLoader");
+
+		const posts = await loadAllPosts({
+			"../posts/project/a.md": "---\ntitle: a\ntags: cv-factory\n---",
+		});
+
+		expect(posts[0].tags).toEqual(["CVFactory"]);
+		vi.doUnmock("../src/lib/categories.json");
+	});
+
+	test("비배열 tags 입력은 무시되어 빈 배열로 처리된다", async () => {
+		vi.resetModules();
+		vi.doMock("../src/lib/utils", async () => {
+			const actual =
+				await vi.importActual<typeof import("../src/lib/utils")>(
+					"../src/lib/utils",
+				);
+			return {
+				...actual,
+				parseFrontMatter: () => ({
+					data: {
+						title: "x",
+						tags: "project",
+					},
+					content: "Body",
+				}),
+			};
+		});
+		const { loadAllPosts } = await import("../src/lib/postLoader");
+
+		const posts = await loadAllPosts({
+			"../posts/project/x.md": "---\n---\nBody",
+		});
+		expect(posts[0].tags).toEqual(["CVFactory"]);
+		vi.doUnmock("../src/lib/utils");
 	});
 
 	test("loadPostBySlug - 메타데이터 폴백 확인 (Line 120-138 coverage)", async () => {

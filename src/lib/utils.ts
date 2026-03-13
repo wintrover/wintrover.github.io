@@ -1,7 +1,7 @@
 import { getBaseUrl } from "./config";
 
 function stripTrailingSlash(s: string) {
-	return s.endsWith("/") ? s.slice(0, -1) : s;
+	return s.replace(/\/$/, "");
 }
 
 function joinBase(base: string, p: string) {

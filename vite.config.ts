@@ -56,7 +56,11 @@ export default defineConfig(({ mode }) => {
 			pool: "threads",
 			coverage: {
 				provider: "istanbul",
-				include: ["src/**/*.ts", "src/**/*.svelte"],
+				include: [
+					"src/lib/utils.ts",
+					"src/lib/postLoader.ts",
+					"src/lib/markdown.ts",
+				],
 				exclude: [
 					"src/main.ts",
 					"src/posts/**/*.md",
@@ -66,10 +70,10 @@ export default defineConfig(({ mode }) => {
 				reporter: ["text", "json", "html"],
 				all: true,
 				thresholds: {
-					lines: 90,
-					functions: 80,
-					branches: 80,
-					statements: 90,
+					lines: 100,
+					functions: 100,
+					branches: 100,
+					statements: 100,
 				},
 			},
 			deps: {

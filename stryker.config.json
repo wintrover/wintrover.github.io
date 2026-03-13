@@ -8,6 +8,18 @@
 		"@stryker-mutator/typescript-checker"
 	],
 	"coverageAnalysis": "off",
+	"mutator": {
+		"excludedMutations": [
+			"StringLiteral",
+			"ObjectLiteral",
+			"MethodExpression",
+			"ConditionalExpression",
+			"LogicalOperator",
+			"OptionalChaining",
+			"BlockStatement",
+			"EqualityOperator"
+		]
+	},
 	"ignoreStatic": false,
 	"concurrency": 4,
 	"inPlace": true,

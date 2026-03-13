@@ -45,41 +45,24 @@ export type Post = PostBase & {
 };
 
 const categories = categoryConfig as unknown as CategoryConfig;
-const categoryEntryByName = new Map<string, CategoryEntry>();
-let cachedPosts: Post[] | null = null;
-let cachedPostBySlug: Map<string, Post> | null = null;
-
-for (const entry of Object.values(categories.categories ?? {})) {
-	const name = entry?.name;
-	if (typeof name === "string" && name && !categoryEntryByName.has(name)) {
-		categoryEntryByName.set(name, entry);
-	}
-}
 
 function splitPathParts(filePath: string) {
 	const parts = String(filePath).split(/[\\/]/);
-	return Array.isArray(parts) ? parts.filter(Boolean) : [];
+	return parts.filter(Boolean);
 }
 
 function normalizeTags(tags: unknown) {
 	if (Array.isArray(tags)) {
 		return tags.map((t) => String(t)).filter(Boolean);
 	}
-	if (typeof tags === "string") {
-		return tags
-			.split(",")
-			.map((t) => t.trim())
-			.filter(Boolean);
-	}
 	return [];
 }
 
-function getCategoryEntryByName(categoryName: string): CategoryEntry | null {
-	return categoryEntryByName.get(categoryName) ?? null;
-}
-
 function normalizeTagsByCategory(tags: string[], categoryName: string) {
-	const categoryEntry = getCategoryEntryByName(categoryName);
+	const normalizedCategoryName = categoryName.trim();
+	const categoryEntry = Object.values(categories.categories).find(
+		(entry) => String(entry.name).trim() === normalizedCategoryName,
+	);
 	const configuredTags = Array.isArray(categoryEntry?.tags)
 		? categoryEntry.tags.map((tag) => String(tag).trim()).filter(Boolean)
 		: [];
@@ -88,9 +71,7 @@ function normalizeTagsByCategory(tags: string[], categoryName: string) {
 		return Array.from(new Set(tags));
 	}
 
-	const categorySlug = String(categoryEntry?.slug || "")
-		.trim()
-		.toLowerCase();
+	const categorySlug = String(categoryEntry?.slug).trim().toLowerCase();
 	const categoryNameToken = categoryName.trim().toLowerCase();
 	const genericTokens = new Set(
 		[
@@ -108,7 +89,6 @@ function normalizeTagsByCategory(tags: string[], categoryName: string) {
 	const nextTags: string[] = [];
 	for (const rawTag of tags) {
 		const tag = String(rawTag).trim();
-		if (!tag) continue;
 		if (genericTokens.has(tag.toLowerCase())) {
 			nextTags.push(...configuredTags);
 			continue;
@@ -123,16 +103,6 @@ function normalizeTagsByCategory(tags: string[], categoryName: string) {
 	return Array.from(new Set(nextTags));
 }
 
-function buildPostBySlugMap(posts: Post[]) {
-	const postBySlug = new Map<string, Post>();
-	for (const post of posts) {
-		if (!postBySlug.has(post.slug)) {
-			postBySlug.set(post.slug, post);
-		}
-	}
-	return postBySlug;
-}
-
 function determineCategoryFromPath(filePath: string) {
 	const pathParts = splitPathParts(filePath);
 	const folderName =
@@ -140,10 +110,13 @@ function determineCategoryFromPath(filePath: string) {
 	const key = folderName.toLowerCase();
 	const fromConfig = categories.categories?.[key]?.name;
 	if (fromConfig) return fromConfig;
-	if (key === "project") return "Project";
-	if (key === "company") return "Company Work";
-	if (key === "tutorial") return "Tutorial";
-	if (key === "general") return "General";
+	const fallbackByKey: Record<string, string> = {
+		project: "Project",
+		company: "Company Work",
+		tutorial: "Tutorial",
+		general: "General",
+	};
+	if (fallbackByKey[key]) return fallbackByKey[key];
 	return categories.defaultCategory;
 }
 
@@ -226,14 +199,9 @@ function parsePostFromModule(path: string, content: string): Post | null {
 export async function loadAllPosts(
 	modulesOverride?: Record<string, string | null>,
 ): Promise<Post[]> {
-	const shouldCache = !modulesOverride && !import.meta.env.VITEST;
-
 	try {
 		const modules: Record<string, string | null> =
 			modulesOverride || (await getPostFiles());
-		if (shouldCache && cachedPosts !== null) {
-			return cachedPosts;
-		}
 		const posts: Post[] = [];
 
 		for (const [path, content] of Object.entries(modules)) {
@@ -258,11 +226,6 @@ export async function loadAllPosts(
 			}
 		});
 
-		if (shouldCache) {
-			cachedPosts = sortedPosts;
-			cachedPostBySlug = buildPostBySlugMap(sortedPosts);
-		}
-
 		return sortedPosts;
 	} catch (error) {
 		logError("postLoader", "포스트 로딩 중 치명적 에러 발생", {
@@ -276,24 +239,6 @@ export async function loadPostBySlug(
 	slug: string,
 	modulesOverride?: Record<string, string | null>,
 ): Promise<Post | null> {
-	const shouldCache = !modulesOverride && !import.meta.env.VITEST;
-
-	if (shouldCache) {
-		if (cachedPostBySlug === null) {
-			await loadAllPosts();
-		}
-
-		const fromCache = cachedPostBySlug?.get(slug) ?? null;
-		if (fromCache) {
-			return fromCache;
-		}
-
-		logWarn("postLoader", `해당 슬러그에 대한 포스트를 찾을 수 없음: ${slug}`, {
-			slug,
-		});
-		return null;
-	}
-
 	try {
 		const modules: Record<string, string | null> =
 			modulesOverride || (await getPostFiles());

@@ -115,6 +115,16 @@ describe("normalizeImageSrc", () => {
 		}
 	});
 
+	test("BASE가 후행 슬래시가 없어도 경로를 보존해야 한다", () => {
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = "/blog";
+		try {
+			expect(normalizeImageSrc("images/a.png")).toBe("/blog/images/a.png");
+		} finally {
+			testGlobal.__WINTR_BASE_URL__ = prev;
+		}
+	});
+
 	test("BASE 오버라이드가 빈 문자열이면 기본 BASE로 폴백된다", () => {
 		const prev = testGlobal.__WINTR_BASE_URL__;
 		testGlobal.__WINTR_BASE_URL__ = "";
@@ -586,6 +596,16 @@ describe("parseFrontMatter", () => {
 		const md = "---\ntags: t1,  t2 t3,,t4\n---\n";
 		const { data } = parseFrontMatter(md);
 		expect(data.tags).toEqual(["t1", "t2 t3", "t4"]);
+	});
+
+	test("대괄호가 양쪽에 있을 때만 tags 래퍼를 제거해야 한다", () => {
+		const wrapped = "---\ntags: [a, b]\n---\n";
+		const onlyLeft = "---\ntags: [a, b\n---\n";
+		const onlyRight = "---\ntags: a, b]\n---\n";
+
+		expect(parseFrontMatter(wrapped).data.tags).toEqual(["a", "b"]);
+		expect(parseFrontMatter(onlyLeft).data.tags).toEqual(["[a", "b"]);
+		expect(parseFrontMatter(onlyRight).data.tags).toEqual(["a", "b]"]);
 	});
 
 	test("PBT: 빈 FrontMatter는 data가 비어있고 body는 trim 된다", () => {
