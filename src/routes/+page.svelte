@@ -119,11 +119,10 @@ $: {
 	<main class="content">
 		<div transition:fade={{ duration: 420 }}>
 			<section class="hero" transition:fly={{ y: 16, duration: 420 }}>
-				<p class="eyebrow">Product Engineer Blog</p>
-				<h1>Minimal, dense, and discoverable writing surface</h1>
+				<p class="eyebrow">Engineering Journal</p>
+				<h1>Shipping ideas with reliability</h1>
 				<p class="description">
-					AI/LLM, computer vision, and product engineering notes arranged in a bento
-					grid for fast scanning.
+					Notes on building products, engineering discipline, and practical AI.
 				</p>
 			</section>
 		</div>
