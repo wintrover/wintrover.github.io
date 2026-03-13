@@ -42,7 +42,8 @@ function writeFile(target: string, content: string) {
 }
 
 function buildBlog(dist: string, locale: "ko" | "en") {
-	const basePath = `/${locale}/`;
+	const basePath = locale === "ko" ? "/ko/" : "/";
+	const outDir = locale === "ko" ? path.join(dist, "ko") : dist;
 	const metaDescription =
 		locale === "ko"
 			? "wintrover의 프로덕트 개발 블로그와 이력서. AI/LLM, 컴퓨터 비전, 프로덕트 엔지니어링 기록."
@@ -56,7 +57,7 @@ function buildBlog(dist: string, locale: "ko" | "en") {
 		locale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";
 	run(process.execPath, ["./node_modules/vite/bin/vite.js", "build"], {
 		VITE_BASE_PATH: basePath,
-		VITE_OUT_DIR: path.join(dist, locale),
+		VITE_OUT_DIR: outDir,
 		VITE_LOCALE: locale,
 		VITE_HTML_LANG: locale,
 		VITE_META_DESCRIPTION: metaDescription,
@@ -155,7 +156,8 @@ function collectPostEntries(root: string, locale: "ko" | "en") {
 }
 
 function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
-	const localeDir = path.join(dist, locale);
+	const localeDir = locale === "ko" ? path.join(dist, "ko") : dist;
+	const localePrefix = locale === "ko" ? "/ko" : "";
 	const resumeLocalePath = path.join(
 		process.cwd(),
 		"src",
@@ -171,8 +173,8 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 		json?.meta?.description ??
 			"Product engineer & builder shipping AI-powered products. Portfolio and project notes.",
 	);
-	const canonical = `${siteOrigin}/${locale}/resume/`;
-	const redirect = `/${locale}/#/resume`;
+	const canonical = `${siteOrigin}${localePrefix}/resume/`;
+	const redirect = `${localePrefix}/#/resume`;
 	const ogTitle = String(json?.meta?.og_title ?? title);
 	const ogDescription = String(json?.meta?.og_description ?? description);
 	const ogType = String(json?.meta?.og_type ?? "website");
@@ -190,7 +192,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 		`<meta name="robots" content="index,follow"/>` +
 		`<link rel="canonical" href="${xmlEscape(canonical)}"/>` +
 		`<link rel="alternate" hreflang="ko" href="${siteOrigin}/ko/resume/"/>` +
-		`<link rel="alternate" hreflang="en" href="${siteOrigin}/en/resume/"/>` +
+		`<link rel="alternate" hreflang="en" href="${siteOrigin}/resume/"/>` +
 		`<link rel="alternate" hreflang="x-default" href="${siteOrigin}/"/>` +
 		`<meta property="og:title" content="${xmlEscape(ogTitle)}"/>` +
 		`<meta property="og:description" content="${xmlEscape(ogDescription)}"/>` +
@@ -211,11 +213,12 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 
 function buildPostLandingPages(dist: string, locale: "ko" | "en") {
 	const root = process.cwd();
-	const localeDir = path.join(dist, locale);
+	const localeDir = locale === "ko" ? path.join(dist, "ko") : dist;
+	const localePrefix = locale === "ko" ? "/ko" : "";
 	const posts = collectPostEntries(root, locale);
 	for (const post of posts) {
-		const canonical = `${siteOrigin}/${locale}/post/${post.slug}/`;
-		const redirect = `/${locale}/#/post/${post.slug}`;
+		const canonical = `${siteOrigin}${localePrefix}/post/${post.slug}/`;
+		const redirect = `${localePrefix}/#/post/${post.slug}`;
 		const title = `${post.title} - wintrover`;
 		const description = post.description || post.title;
 		const jsonLd = {
@@ -271,14 +274,14 @@ function buildSitemap(dist: string) {
 
 	urls.push({ loc: `${base}/` });
 	urls.push({ loc: `${base}/ko/` });
-	urls.push({ loc: `${base}/en/` });
+	urls.push({ loc: `${base}/resume/` });
 	urls.push({ loc: `${base}/ko/resume/` });
-	urls.push({ loc: `${base}/en/resume/` });
 
 	for (const locale of ["ko", "en"] as const) {
 		const posts = collectPostEntries(root, locale);
 		for (const post of posts) {
-			const loc = `${base}/${locale}/post/${post.slug}/`;
+			const localePrefix = locale === "ko" ? "/ko" : "";
+			const loc = `${base}${localePrefix}/post/${post.slug}/`;
 			if (post.lastmod) {
 				urls.push({ loc, lastmod: post.lastmod });
 			} else {
@@ -319,9 +322,8 @@ function verifyBuildOutput(distPath: string) {
 	const expectedFiles = [
 		path.join(distPath, "index.html"),
 		path.join(distPath, "ko", "index.html"),
-		path.join(distPath, "en", "index.html"),
 		path.join(distPath, "ko", "resume", "index.html"),
-		path.join(distPath, "en", "resume", "index.html"),
+		path.join(distPath, "resume", "index.html"),
 	];
 
 	if (!fs.existsSync(distPath)) {
@@ -361,12 +363,12 @@ function main() {
 		fs.cpSync(publicDir, dist, { recursive: true });
 	}
 
-	const selectorHtml =
-		'<!doctype html><html lang="en" prefix="og: https://ogp.me/ns#"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>wintrover</title><meta name="description" content="wintrover&#39;s blog and resume. Notes on building products with AI/LLM and computer vision."/><meta name="robots" content="index,follow"/><link rel="canonical" href="https://wintrover.github.io/"/><link rel="alternate" hreflang="ko" href="https://wintrover.github.io/ko/"/><link rel="alternate" hreflang="en" href="https://wintrover.github.io/en/"/><link rel="alternate" hreflang="x-default" href="https://wintrover.github.io/"/><meta property="og:title" content="wintrover - Product Engineer & Builder"/><meta property="og:description" content="wintrover&#39;s blog and resume. Notes on building products with AI/LLM and computer vision."/><meta property="og:type" content="website"/><meta property="og:url" content="https://wintrover.github.io/"/><meta property="og:image" content="https://wintrover.github.io/images/profile.png"/><meta property="og:image:alt" content="wintrover profile image"/><meta property="og:site_name" content="wintrover"/><script>(()=>{const lang=(navigator.language||"").toLowerCase().startsWith("ko")?"ko":"en";location.replace("/"+lang+"/");})();</script></head><body><noscript><a href="/ko/" lang="ko">한국어</a> <a href="/en/" lang="en">English</a></noscript></body></html>';
-	writeFile(path.join(dist, "index.html"), selectorHtml);
+	const legacyEnHtml =
+		'<!doctype html><html lang="en"><head><meta charset="utf-8"/><script>(()=>{const lang=(navigator.language||"").toLowerCase();location.replace("/"+location.hash);})();</script></head><body><noscript><a href="/">Home</a></noscript></body></html>';
+	writeFile(path.join(dist, "en", "index.html"), legacyEnHtml);
 
-	buildBlog(dist, "ko");
 	buildBlog(dist, "en");
+	buildBlog(dist, "ko");
 	buildResumeLandingPage(dist, "ko");
 	buildResumeLandingPage(dist, "en");
 	buildPostLandingPages(dist, "ko");

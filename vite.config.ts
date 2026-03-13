@@ -17,6 +17,8 @@ export default defineConfig(({ mode }) => {
 	process.env.VITE_OG_DESCRIPTION ??= process.env.VITE_META_DESCRIPTION;
 	process.env.VITE_OG_IMAGE_ALT ??=
 		metaLocale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";
+	process.env.VITE_CANONICAL_PATH ??=
+		process.env.VITE_LOCALE === "ko" ? "/ko/" : "/";
 
 	return {
 		plugins: [

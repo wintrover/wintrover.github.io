@@ -64,13 +64,15 @@ export function buildPostDetailSeo(args: {
 }) {
 	const { post, loading, slug, resolvedLocale } = args;
 	const origin = getRuntimeOrigin();
+	const localePrefix = resolvedLocale === "ko" ? "/ko" : "";
+	const localeRoot = `${origin}${localePrefix}/`;
 
 	if (post) {
 		const seoTitle = `${post.title} - wintrover`;
 		const seoDescription = post.excerpt || post.title;
 		const canonicalUrl = slug
-			? `${origin}/${resolvedLocale}/post/${slug}/`
-			: `${origin}/${resolvedLocale}/`;
+			? `${origin}${localePrefix}/post/${slug}/`
+			: localeRoot;
 		return {
 			seoTitle,
 			seoDescription,
@@ -98,7 +100,7 @@ export function buildPostDetailSeo(args: {
 			seoTitle: "Post not found - wintrover",
 			seoDescription:
 				"The post you're looking for doesn't exist or has been moved.",
-			canonicalUrl: `${origin}/${resolvedLocale}/`,
+			canonicalUrl: localeRoot,
 			structuredData: "",
 		};
 	}
@@ -106,7 +108,7 @@ export function buildPostDetailSeo(args: {
 	return {
 		seoTitle: "Loading post - wintrover",
 		seoDescription: "",
-		canonicalUrl: `${origin}/${resolvedLocale}/`,
+		canonicalUrl: localeRoot,
 		structuredData: "",
 	};
 }

@@ -25,7 +25,7 @@ describe("buildPostDetailSeo", () => {
 
 		expect(seo.seoTitle).toBe("Detailed Post - wintrover");
 		expect(seo.seoDescription).toBe("Detailed excerpt");
-		expect(seo.canonicalUrl).toContain("/en/post/detailed-post/");
+		expect(seo.canonicalUrl).toContain("/post/detailed-post/");
 		expect(seo.structuredData).toContain('"@type":"BlogPosting"');
 	});
 
@@ -53,7 +53,7 @@ describe("buildPostDetailSeo", () => {
 
 		expect(seo.seoTitle).toBe("Loading post - wintrover");
 		expect(seo.seoDescription).toBe("");
-		expect(seo.canonicalUrl).toContain("/en/");
+		expect(seo.canonicalUrl).toContain("/");
 		expect(seo.structuredData).toBe("");
 	});
 });

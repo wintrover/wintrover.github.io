@@ -23,21 +23,37 @@ if (typeof window !== "undefined") {
 			});
 			const langBase = localeBase(locale);
 
-			if (path === "/" || path === "/index.html") {
-				window.location.replace(`${langBase}${url.search}${url.hash}`);
-			} else {
-				window.location.replace(`${langBase}#${path}${url.search}${url.hash}`);
+			if (locale === "ko") {
+				if (path === "/" || path === "/index.html") {
+					window.location.replace(`${langBase}${url.search}${url.hash}`);
+				} else {
+					window.location.replace(
+						`${langBase}#${path}${url.search}${url.hash}`,
+					);
+				}
+			} else if (path !== "/" && path !== "/index.html") {
+				window.location.replace(`/${url.search}#${path}${url.hash}`);
 			}
 		} else {
-			const langBase = localeBase(localeFromPath);
-			const rest = path.slice(langBase.length - 1);
+			const rest =
+				localeFromPath === "ko"
+					? path.replace(/^\/ko(?=\/|$)/, "") || "/"
+					: path.replace(/^\/en(?=\/|$)/, "") || "/";
 
-			if (
+			if (localeFromPath === "en") {
+				if (rest === "/" || rest === "/index.html") {
+					window.location.replace(`/${url.search}${url.hash}`);
+				} else if (!url.hash || url.hash === "#") {
+					window.location.replace(`/${url.search}#${rest}`);
+				} else {
+					window.location.replace(`/${url.search}${url.hash}`);
+				}
+			} else if (
 				(!url.hash || url.hash === "#") &&
 				rest !== "/" &&
 				rest !== "/index.html"
 			) {
-				window.history.replaceState({}, "", `${langBase}${url.search}#${rest}`);
+				window.history.replaceState({}, "", `/ko/${url.search}#${rest}`);
 			}
 		}
 	}
@@ -66,9 +82,7 @@ if (typeof document !== "undefined") {
 			? envLocale
 			: (parseLocaleFromPathname(window.location.pathname) ?? htmlLang);
 	if (canonical instanceof HTMLLinkElement) {
-		canonical.href = locale
-			? `${siteOrigin}/${String(locale)}/`
-			: `${siteOrigin}/`;
+		canonical.href = `${siteOrigin}${localeBase(locale)}`;
 	}
 }
 

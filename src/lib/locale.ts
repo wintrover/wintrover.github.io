@@ -24,5 +24,5 @@ export function detectLocale(opts: {
 }
 
 export function localeBase(locale: Locale) {
-	return `/${locale}/`;
+	return locale === "ko" ? "/ko/" : "/";
 }

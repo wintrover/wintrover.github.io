@@ -20,20 +20,23 @@
 
       const matchLangPrefix = path.match(/^\/(ko|en)(\/|$)/);
       const lang = matchLangPrefix ? matchLangPrefix[1] : pickLang();
-      const langBase = `/${lang}`;
+      const langBase = lang === "ko" ? "/ko" : "";
 
       if (path === "/" || path === "/index.html") {
-        window.location.replace(`${langBase}/`);
+        window.location.replace(`${langBase || "/"}`);
         return;
       }
 
       if (matchLangPrefix) {
-        const rest = path.slice(langBase.length) || "/";
-        window.location.replace(`${langBase}/#${rest}${search}${hash}`);
+        const rest =
+          lang === "ko"
+            ? path.replace(/^\/ko(?=\/|$)/, "") || "/"
+            : path.replace(/^\/en(?=\/|$)/, "") || "/";
+        window.location.replace(`${langBase || "/"}#${rest}${search}${hash}`);
         return;
       }
 
-      window.location.replace(`${langBase}/#${path}${search}${hash}`);
+      window.location.replace(`${langBase || "/"}#${path}${search}${hash}`);
     })();
   </script>
 </head>
