@@ -35,6 +35,11 @@ $: {
 				: [];
 		}
 	}
+	const categoriesWithConfiguredTags = new Set(
+		Object.entries(configuredTagsByCategoryName)
+			.filter(([, tags]) => Array.isArray(tags) && tags.length > 0)
+			.map(([name]) => name),
+	);
 
 	const categoryCount: Record<string, number> = {};
 	const tagCountByCategory: Record<string, Record<string, number>> = {};
@@ -44,7 +49,7 @@ $: {
 			if (post.category) {
 				categoryCount[post.category] = (categoryCount[post.category] || 0) + 1;
 
-				if (post.category === "Company Work" || post.category === "Project") {
+				if (categoriesWithConfiguredTags.has(post.category)) {
 					tagCountByCategory[post.category] =
 						tagCountByCategory[post.category] || {};
 					post.tags.forEach((tag) => {
@@ -74,7 +79,7 @@ $: {
 			value: name,
 		});
 
-		if (name === "Company Work" || name === "Project") {
+		if (categoriesWithConfiguredTags.has(name)) {
 			const fromConfig = configuredTagsByCategoryName[name] ?? [];
 			const fromPosts = Object.keys(tagCountByCategory[name] ?? {});
 			const tags = Array.from(new Set([...fromConfig, ...fromPosts]))

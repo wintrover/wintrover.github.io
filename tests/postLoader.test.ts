@@ -115,6 +115,39 @@ describe("postLoader", () => {
 		expect(posts[0].excerpt).toBe("Excerpt");
 	});
 
+	test("카테고리 기본 태그가 있으면 일반 태그를 구성 태그로 정규화한다", async () => {
+		vi.resetModules();
+		vi.doMock("../src/lib/categories.json", () => ({
+			default: {
+				categories: {
+					project: {
+						name: "Project",
+						slug: "project",
+						tags: ["CVFactory"],
+					},
+				},
+				defaultCategory: "General",
+				autoAssignByFolder: true,
+			},
+		}));
+		const { loadAllPosts } = await import("../src/lib/postLoader");
+
+		const posts = await loadAllPosts({
+			"../posts/project/a.md": "---\ntitle: a\ntags: project\n---",
+			"../posts/project/b.md": "---\ntitle: b\n---",
+			"../posts/project/c.md": "---\ntitle: c\ntags: custom, project\n---",
+		});
+
+		const a = posts.find((post) => post.fileName === "a");
+		const b = posts.find((post) => post.fileName === "b");
+		const c = posts.find((post) => post.fileName === "c");
+
+		expect(a?.tags).toEqual(["CVFactory"]);
+		expect(b?.tags).toEqual(["CVFactory"]);
+		expect(c?.tags).toEqual(["custom", "CVFactory"]);
+		vi.doUnmock("../src/lib/categories.json");
+	});
+
 	test("loadPostBySlug - 메타데이터 폴백 확인 (Line 120-138 coverage)", async () => {
 		const mockModules = {
 			"posts/test.md": "---\n---",

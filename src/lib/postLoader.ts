@@ -10,6 +10,7 @@ type CategoryEntry = {
 	slug?: string;
 	color?: string;
 	icon?: string;
+	tags?: string[];
 };
 
 type CategoryConfig = {
@@ -61,6 +62,61 @@ function normalizeTags(tags: unknown) {
 			.filter(Boolean);
 	}
 	return [];
+}
+
+function getCategoryEntryByName(categoryName: string): CategoryEntry | null {
+	const entries = Object.values(categories.categories ?? {});
+	for (const entry of entries) {
+		if (entry?.name === categoryName) {
+			return entry;
+		}
+	}
+	return null;
+}
+
+function normalizeTagsByCategory(tags: string[], categoryName: string) {
+	const categoryEntry = getCategoryEntryByName(categoryName);
+	const configuredTags = Array.isArray(categoryEntry?.tags)
+		? categoryEntry.tags.map((tag) => String(tag).trim()).filter(Boolean)
+		: [];
+
+	if (configuredTags.length === 0) {
+		return Array.from(new Set(tags));
+	}
+
+	const categorySlug = String(categoryEntry?.slug || "")
+		.trim()
+		.toLowerCase();
+	const categoryNameToken = categoryName.trim().toLowerCase();
+	const genericTokens = new Set(
+		[
+			categorySlug,
+			categoryNameToken,
+			"project",
+			"company",
+			"tutorial",
+			"general",
+		]
+			.map((token) => token.trim())
+			.filter(Boolean),
+	);
+
+	const nextTags: string[] = [];
+	for (const rawTag of tags) {
+		const tag = String(rawTag).trim();
+		if (!tag) continue;
+		if (genericTokens.has(tag.toLowerCase())) {
+			nextTags.push(...configuredTags);
+			continue;
+		}
+		nextTags.push(tag);
+	}
+
+	if (nextTags.length === 0) {
+		nextTags.push(...configuredTags);
+	}
+
+	return Array.from(new Set(nextTags));
 }
 
 function determineCategoryFromPath(filePath: string) {
@@ -117,6 +173,11 @@ function processPostMetadata(
 				? data.description
 				: "";
 
+	const normalizedTags = normalizeTagsByCategory(
+		normalizeTags(data.tags),
+		category || categories.defaultCategory,
+	);
+
 	return {
 		...data,
 		fileName,
@@ -124,7 +185,7 @@ function processPostMetadata(
 		title: title || fileName,
 		date,
 		category: category || categories.defaultCategory,
-		tags: normalizeTags(data.tags),
+		tags: normalizedTags,
 		excerpt,
 		folder,
 		html: htmlContent,
