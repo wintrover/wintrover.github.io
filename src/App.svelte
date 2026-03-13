@@ -217,7 +217,7 @@ onDestroy(() => {
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    padding: 3.25rem 0 0;
+    padding: 0;
     box-sizing: border-box;
     transform: translateX(0);
     transition: transform 0.01s ease;
@@ -244,7 +244,7 @@ onDestroy(() => {
   #content {
     flex: 1;
     max-width: 920px;
-    margin: 44px auto;
+    margin: 0 auto 44px;
     padding: 0 24px;
     width: 100%;
   }
@@ -255,7 +255,7 @@ onDestroy(() => {
 
   @media (max-width: 480px) {
     #content {
-      margin: 20px 0;
+      margin: 0 0 20px;
       padding: 0 15px;
     }
   }

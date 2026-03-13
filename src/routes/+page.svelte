@@ -254,7 +254,7 @@ $: {
 	}
 
 	.hero {
-		padding: 2.4rem 0 2rem;
+		padding: 0 0 2rem;
 		display: grid;
 		gap: 1rem;
 	}
