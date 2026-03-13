@@ -7,7 +7,7 @@ param(
     ".git",
     ".svn",
     ".hg",
-    "scripts",
+    "dump_source",
     "node_modules",
     "dist",
     "build",
