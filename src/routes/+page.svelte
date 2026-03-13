@@ -5,28 +5,20 @@ import type { Post } from "../lib/postLoader";
 import { slugify } from "../lib/utils";
 import { ensurePostsLoaded, posts as postsStore } from "../stores/posts";
 
-type BentoPost = {
+type HomePost = {
 	slug: string;
 	title: string;
 	excerpt: string;
 	category: string;
 	date: string;
 	readingTime: string;
-	size: "standard" | "wide" | "tall" | "feature";
+	keywords: string[];
 };
 
 const navItems = ["Posts", "Resume", "Projects", "About"];
-const sizePattern: BentoPost["size"][] = [
-	"feature",
-	"tall",
-	"wide",
-	"standard",
-	"standard",
-	"wide",
-];
 let requestedPosts = false;
-let bentoPosts: BentoPost[] = [];
-let projectPosts: BentoPost[] = [];
+let homePosts: HomePost[] = [];
+let projectPosts: HomePost[] = [];
 const browser =
 	typeof window !== "undefined" && typeof document !== "undefined";
 
@@ -71,7 +63,13 @@ function formatDate(date: string) {
 	});
 }
 
-function toBentoPost(post: Post, index: number): BentoPost {
+function toHomePost(post: Post): HomePost {
+	const normalizedTags = Array.isArray(post.tags)
+		? post.tags.map((tag) => String(tag).trim()).filter(Boolean)
+		: [];
+	const keywords =
+		normalizedTags.length > 0 ? normalizedTags.slice(0, 3) : [post.category];
+
 	return {
 		slug: post.slug,
 		title: post.title,
@@ -81,7 +79,7 @@ function toBentoPost(post: Post, index: number): BentoPost {
 		category: post.category,
 		date: formatDate(post.date),
 		readingTime: estimateReadingTime(post.content || ""),
-		size: sizePattern[index % sizePattern.length] || "standard",
+		keywords,
 	};
 }
 
@@ -96,11 +94,11 @@ $: if (!requestedPosts) {
 
 $: {
 	const allPosts: Post[] = Array.isArray($postsStore) ? $postsStore : [];
-	bentoPosts = allPosts.slice(0, 10).map(toBentoPost);
+	homePosts = allPosts.slice(0, 12).map(toHomePost);
 	projectPosts = allPosts
 		.filter((post) => slugify(post.category) === "project")
 		.slice(0, 3)
-		.map(toBentoPost);
+		.map(toHomePost);
 }
 </script>
 
@@ -127,29 +125,31 @@ $: {
 			</section>
 		</div>
 
-		{#if bentoPosts.length > 0}
-			<section id="posts" class="bento-grid">
-				{#each bentoPosts as post, index}
-					<div
-						class={`bento-item ${post.size}`}
-						transition:fade={{ duration: 320 + index * 16, delay: 30 + index * 45 }}
+		{#if homePosts.length > 0}
+			<section id="posts" class="post-list">
+				{#each homePosts as post, index}
+					<article
+						class="post-card w-full"
+						transition:fly={{ y: 12, duration: 320 + index * 14, delay: 30 + index * 25 }}
 					>
-						<article
-							class="bento-card w-full"
-							transition:fly={{ y: 18, duration: 360 + index * 18, delay: 40 + index * 55 }}
-						>
-							<div class="meta">
-								<span class="category">{post.category}</span>
-								<span>{post.date}</span>
-								<span>{post.readingTime}</span>
+						<div class="meta">
+							<span class="category">{post.category}</span>
+							<span>{post.date}</span>
+							<span>{post.readingTime}</span>
+						</div>
+						<h2>{post.title}</h2>
+						<p class="excerpt">{post.excerpt}</p>
+						<div class="card-foot">
+							<div class="keyword-list">
+								{#each post.keywords as keyword}
+									<span class="keyword-badge">{keyword}</span>
+								{/each}
 							</div>
-							<h2>{post.title}</h2>
-							<p>{post.excerpt}</p>
 							<button class="read-more" type="button" on:click={() => openPost(post.slug)}>
 								Read article
 							</button>
-						</article>
-					</div>
+						</div>
+					</article>
 				{/each}
 			</section>
 
@@ -259,9 +259,9 @@ $: {
 	}
 
 	.content {
-		max-width: 1120px;
+		max-width: 920px;
 		margin: 0 auto;
-		padding: 2rem 1.3rem 4rem;
+		padding: 2.2rem 1.8rem 4rem;
 	}
 
 	.hero {
@@ -296,12 +296,30 @@ $: {
 		color: #a1a1aa;
 	}
 
-	.bento-grid {
+	.post-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		width: 100%;
+		max-width: 100%;
+	}
+
+	.post-card {
+		width: 100%;
+		min-width: 0;
 		display: grid;
-		grid-template-columns: repeat(1, minmax(0, 1fr));
-		grid-auto-rows: minmax(7.5rem, auto);
-		gap: 1rem;
-		align-items: stretch;
+		gap: 0.95rem;
+		padding: 1.2rem 0;
+		border-bottom: 1px solid rgb(39 39 42);
+		background: transparent;
+		transition:
+			background-color 0.28s ease,
+			border-color 0.28s ease;
+	}
+
+	.post-card:hover {
+		background: rgb(255 255 255 / 2.5%);
+		border-color: rgb(63 63 70);
 	}
 
 	.empty {
@@ -382,77 +400,6 @@ $: {
 		color: #a1a1aa;
 	}
 
-	.bento-card {
-		position: relative;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		gap: 0.9rem;
-		padding: 1.2rem;
-		min-width: 0;
-		min-height: 12.5rem;
-		border-radius: 1.3rem;
-		background: linear-gradient(160deg, rgb(24 24 27 / 88%), rgb(9 9 11 / 92%));
-		border: 1px solid rgb(255 255 255 / 6%);
-		transition:
-			transform 0.35s ease,
-			border-color 0.35s ease,
-			box-shadow 0.35s ease;
-	}
-
-	.bento-card::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		opacity: 0;
-		background: linear-gradient(
-			120deg,
-			rgb(255 255 255 / 18%) 0%,
-			rgb(244 244 245 / 4%) 40%,
-			rgb(244 244 245 / 16%) 100%
-		);
-		transition: opacity 0.35s ease;
-		pointer-events: none;
-	}
-
-	.bento-card:hover {
-		transform: translateY(-4px);
-		border-color: rgb(255 255 255 / 14%);
-		box-shadow:
-			0 18px 40px rgb(0 0 0 / 30%),
-			0 0 0 1px rgb(255 255 255 / 8%);
-	}
-
-	.bento-card:hover::before {
-		opacity: 1;
-	}
-
-	.feature {
-		grid-column: span 1;
-		grid-row: span 1;
-	}
-
-	.tall {
-		grid-column: span 1;
-		grid-row: span 1;
-	}
-
-	.wide {
-		grid-column: span 1;
-		grid-row: span 1;
-	}
-
-	.standard {
-		grid-column: span 1;
-		grid-row: span 1;
-	}
-
-	.bento-item {
-		width: 100%;
-		min-width: 0;
-	}
-
 	.w-full {
 		width: 100%;
 	}
@@ -477,22 +424,60 @@ $: {
 	h2 {
 		margin: 0;
 		color: #fff;
-		font-size: clamp(1.15rem, 2.1vw, 1.75rem);
-		font-weight: 650;
-		line-height: 1.25;
+		font-size: clamp(1.38rem, 2.2vw, 1.9rem);
+		font-weight: 700;
+		line-height: 1.2;
 		word-break: break-word;
 		overflow-wrap: break-word;
+		min-width: 0;
+		transition: color 0.28s ease;
+	}
+
+	.post-card:hover h2 {
+		color: #f4f4f5;
+	}
+
+	.excerpt {
+		margin: 0;
+		color: #a1a1aa;
+		line-height: 1.7;
+		font-size: 0.98rem;
+		word-break: break-word;
+		overflow-wrap: break-word;
+		min-width: 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.card-foot {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.8rem;
 		min-width: 0;
 	}
 
-	.bento-card p {
-		margin: 0;
-		color: #a1a1aa;
-		line-height: 1.65;
-		font-size: 0.95rem;
-		word-break: break-word;
-		overflow-wrap: break-word;
+	.keyword-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
 		min-width: 0;
+	}
+
+	.keyword-badge {
+		display: inline-flex;
+		align-items: center;
+		height: 1.4rem;
+		padding: 0 0.5rem;
+		border-radius: 999px;
+		border: 1px solid rgb(63 63 70);
+		color: #a1a1aa;
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		background: rgb(24 24 27 / 45%);
 	}
 
 	.meta span {
@@ -504,66 +489,20 @@ $: {
 	.read-more {
 		align-self: flex-start;
 		border: 0;
-		border-radius: 0.75rem;
-		padding: 0.5rem 0.85rem;
-		font-size: 0.82rem;
+		border-radius: 0.6rem;
+		padding: 0.45rem 0.72rem;
+		font-size: 0.78rem;
 		font-weight: 600;
-		color: #fff;
-		background: rgb(255 255 255 / 10%);
-		transition: background-color 0.3s ease;
+		color: #e4e4e7;
+		background: rgb(39 39 42 / 75%);
+		transition:
+			background-color 0.28s ease,
+			color 0.28s ease;
 	}
 
 	.read-more:hover {
-		background: rgb(255 255 255 / 18%);
-	}
-
-	@media (min-width: 768px) {
-		.bento-grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 1rem;
-		}
-
-		.feature {
-			grid-column: span 2;
-			grid-row: span 2;
-		}
-
-		.tall {
-			grid-column: span 1;
-			grid-row: span 2;
-		}
-
-		.wide {
-			grid-column: span 2;
-			grid-row: span 1;
-		}
-
-		.standard {
-			grid-column: span 1;
-			grid-row: span 1;
-		}
-	}
-
-	@media (min-width: 1024px) {
-		.bento-grid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 1.25rem;
-		}
-
-		.feature,
-		.wide {
-			grid-column: span 2;
-		}
-
-		.feature,
-		.tall {
-			grid-row: span 3;
-		}
-
-		.wide,
-		.standard {
-			grid-row: span 2;
-		}
+		background: rgb(63 63 70 / 85%);
+		color: #fff;
 	}
 
 	@media (max-width: 720px) {
@@ -574,13 +513,9 @@ $: {
 		.content {
 			padding: 1.2rem 0.9rem 2.6rem;
 		}
-
-		.feature,
-		.tall,
-		.wide,
-		.standard {
-			grid-column: span 1;
-			grid-row: span 1;
+		.card-foot {
+			flex-direction: column;
+			align-items: flex-start;
 		}
 	}
 </style>

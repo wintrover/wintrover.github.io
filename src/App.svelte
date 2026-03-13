@@ -226,7 +226,7 @@ onDestroy(() => {
 
   #main-content {
     flex: 1;
-    margin-left: 240px;
+    margin-left: 280px;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -235,8 +235,9 @@ onDestroy(() => {
 
   #content {
     flex: 1;
-    max-width: 800px;
-    margin: 40px auto;
+    max-width: 920px;
+    margin: 44px auto;
+    padding: 0 24px;
     width: 100%;
   }
 
@@ -246,7 +247,8 @@ onDestroy(() => {
 
   @media (max-width: 480px) {
     #content {
-      margin: 20px 15px;
+      margin: 20px 0;
+      padding: 0 15px;
     }
   }
 
