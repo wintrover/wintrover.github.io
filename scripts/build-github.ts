@@ -8,6 +8,13 @@ type Env = Record<string, string | undefined>;
 const siteOrigin = "https://wintrover.github.io";
 const defaultOgImage = `${siteOrigin}/images/profile.png`;
 
+function getPackageManagerCommand() {
+	const ua = process.env.npm_config_user_agent ?? "";
+	const isPnpm = ua.includes("pnpm");
+	if (isPnpm) return process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+	return process.platform === "win32" ? "npm.cmd" : "npm";
+}
+
 function run(cmd: string, args: string[], env: Env = {}) {
 	execFileSync(cmd, args, {
 		stdio: "inherit",
@@ -42,7 +49,7 @@ function buildBlog(dist: string, locale: "ko" | "en") {
 	const ogDescription = metaDescription;
 	const ogImageAlt =
 		locale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";
-	run("npm", ["run", "build"], {
+	run(getPackageManagerCommand(), ["run", "build"], {
 		VITE_BASE_PATH: basePath,
 		VITE_OUT_DIR: path.join(dist, locale),
 		VITE_LOCALE: locale,
