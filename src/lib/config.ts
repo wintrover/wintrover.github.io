@@ -24,7 +24,7 @@ export function getBaseUrl() {
 	if (typeof baseFromEnv === "string" && baseFromEnv.length > 0)
 		return withTrailingSlash(baseFromEnv);
 
-	return withTrailingSlash(import.meta.env.BASE_URL ?? "/");
+	return withTrailingSlash("/");
 }
 
 const baseUrl = getBaseUrl();

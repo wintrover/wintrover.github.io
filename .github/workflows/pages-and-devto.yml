@@ -29,11 +29,8 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-            resume/package-lock.json
       - name: Install
         run: npm ci
-      - name: Install (resume)
-        run: npm ci --prefix resume
       - name: Install Chrome for Puppeteer
         run: npx puppeteer browsers install chrome
       - name: Generate Mermaid images
@@ -61,6 +58,7 @@ jobs:
   devto:
     runs-on: ubuntu-latest
     needs: deploy
+    if: ${{ secrets.DEVTO_API_KEY != '' }}
     permissions:
       contents: read
     steps:
