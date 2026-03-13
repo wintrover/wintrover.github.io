@@ -9,7 +9,6 @@ type HomePost = {
 	slug: string;
 	title: string;
 	excerpt: string;
-	category: string;
 	date: string;
 	readingTime: string;
 	keywords: string[];
@@ -68,7 +67,7 @@ function toHomePost(post: Post): HomePost {
 		? post.tags.map((tag) => String(tag).trim()).filter(Boolean)
 		: [];
 	const keywords =
-		normalizedTags.length > 0 ? normalizedTags.slice(0, 3) : [post.category];
+		normalizedTags.length > 0 ? normalizedTags.slice(0, 3) : ["Note"];
 
 	return {
 		slug: post.slug,
@@ -76,7 +75,6 @@ function toHomePost(post: Post): HomePost {
 		excerpt:
 			post.excerpt?.trim() ||
 			"Deep dives on product engineering, architecture, and reliable delivery.",
-		category: post.category,
 		date: formatDate(post.date),
 		readingTime: estimateReadingTime(post.content || ""),
 		keywords,
@@ -133,22 +131,23 @@ $: {
 						transition:fly={{ y: 12, duration: 320 + index * 14, delay: 30 + index * 25 }}
 					>
 						<div class="meta">
-							<span class="category">{post.category}</span>
-							<span>{post.date}</span>
-							<span>{post.readingTime}</span>
-						</div>
-						<h2>{post.title}</h2>
-						<p class="excerpt">{post.excerpt}</p>
-						<div class="card-foot">
 							<div class="keyword-list">
 								{#each post.keywords as keyword}
 									<span class="keyword-badge">{keyword}</span>
 								{/each}
 							</div>
-							<button class="read-more" type="button" on:click={() => openPost(post.slug)}>
-								Read article
-							</button>
+							<span>{post.date}</span>
+							<span>{post.readingTime}</span>
 						</div>
+						<button
+							class="title-link"
+							type="button"
+							aria-label={`Open ${post.title}`}
+							on:click={() => openPost(post.slug)}
+						>
+							<h2>{post.title}</h2>
+						</button>
+						<p class="excerpt">{post.excerpt}</p>
 					</article>
 				{/each}
 			</section>
@@ -310,7 +309,7 @@ $: {
 		display: grid;
 		gap: 0.95rem;
 		padding: 1.2rem 0;
-		border-bottom: 1px solid rgb(39 39 42);
+		border-bottom: 1px solid rgb(39 39 42 / 50%);
 		background: transparent;
 		transition:
 			background-color 0.28s ease,
@@ -406,19 +405,24 @@ $: {
 
 	.meta {
 		display: flex;
-		gap: 0.65rem;
+		gap: 0.85rem;
 		align-items: center;
-		font-size: 0.75rem;
+		font-size: 0.72rem;
 		color: #a1a1aa;
 		flex-wrap: wrap;
 	}
 
-	.category {
-		color: #fff;
-		font-weight: 600;
-		padding: 0.22rem 0.55rem;
-		border-radius: 999px;
-		background: rgb(255 255 255 / 8%);
+	.meta span {
+		color: #71717a;
+	}
+
+	.title-link {
+		width: 100%;
+		border: 0;
+		background: transparent;
+		padding: 0;
+		text-align: left;
+		cursor: pointer;
 	}
 
 	h2 {
@@ -433,7 +437,8 @@ $: {
 		transition: color 0.28s ease;
 	}
 
-	.post-card:hover h2 {
+	.post-card:hover h2,
+	.title-link:hover h2 {
 		color: #f4f4f5;
 	}
 
@@ -451,14 +456,6 @@ $: {
 		overflow: hidden;
 	}
 
-	.card-foot {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.8rem;
-		min-width: 0;
-	}
-
 	.keyword-list {
 		display: flex;
 		flex-wrap: wrap;
@@ -472,37 +469,11 @@ $: {
 		height: 1.4rem;
 		padding: 0 0.5rem;
 		border-radius: 999px;
-		border: 1px solid rgb(63 63 70);
 		color: #a1a1aa;
 		font-size: 0.72rem;
 		font-weight: 500;
 		letter-spacing: 0.02em;
-		background: rgb(24 24 27 / 45%);
-	}
-
-	.meta span {
-		word-break: break-word;
-		overflow-wrap: break-word;
-		min-width: 0;
-	}
-
-	.read-more {
-		align-self: flex-start;
-		border: 0;
-		border-radius: 0.6rem;
-		padding: 0.45rem 0.72rem;
-		font-size: 0.78rem;
-		font-weight: 600;
-		color: #e4e4e7;
-		background: rgb(39 39 42 / 75%);
-		transition:
-			background-color 0.28s ease,
-			color 0.28s ease;
-	}
-
-	.read-more:hover {
-		background: rgb(63 63 70 / 85%);
-		color: #fff;
+		background: rgb(39 39 42 / 50%);
 	}
 
 	@media (max-width: 720px) {
@@ -512,10 +483,6 @@ $: {
 
 		.content {
 			padding: 1.2rem 0.9rem 2.6rem;
-		}
-		.card-foot {
-			flex-direction: column;
-			align-items: flex-start;
 		}
 	}
 </style>

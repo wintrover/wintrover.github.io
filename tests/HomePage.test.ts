@@ -114,7 +114,7 @@ describe("HomePage", () => {
 		expect(mockPush).toHaveBeenCalledWith("/resume");
 	});
 
-	test("Read article 버튼 클릭 시 상세 페이지로 이동해야 함", async () => {
+	test("포스트 제목 버튼 클릭 시 상세 페이지로 이동해야 함", async () => {
 		mockPostsStore.set([
 			{
 				fileName: "post-1",
@@ -122,7 +122,7 @@ describe("HomePage", () => {
 				title: "Post 1",
 				date: "2024-12-01",
 				category: "General",
-				tags: [],
+				tags: ["SMBholdings"],
 				excerpt: "Excerpt 1",
 				folder: "general",
 				html: "<p>Excerpt 1</p>",
@@ -132,8 +132,10 @@ describe("HomePage", () => {
 
 		render(HomePage);
 
+		expect(await screen.findByText("SMBholdings")).toBeInTheDocument();
+
 		await fireEvent.click(
-			await screen.findByRole("button", { name: "Read article" }),
+			await screen.findByRole("button", { name: "Open Post 1" }),
 		);
 
 		expect(mockPush).toHaveBeenCalledWith("/post/post-1");
