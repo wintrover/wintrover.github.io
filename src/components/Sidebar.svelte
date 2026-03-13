@@ -15,7 +15,18 @@ type SidebarItem = {
 	parentSlug?: string;
 };
 
-let categories: SidebarItem[] = [];
+type CategoryGroup = {
+	category: SidebarItem;
+	tags: SidebarItem[];
+};
+
+let allPostsItem: SidebarItem = {
+	label: "All Posts",
+	slug: "all",
+	count: 0,
+	value: "all",
+};
+let categoryGroups: CategoryGroup[] = [];
 let resumeUrl = "/resume/";
 
 void siteConfig;
@@ -61,23 +72,26 @@ $: {
 		});
 	}
 
-	const nextCategories: SidebarItem[] = [
-		{
-			label: "All Posts",
-			slug: "all",
-			count: Array.isArray($posts) ? $posts.length : 0,
-			value: "all",
-		},
-	];
+	allPostsItem = {
+		label: "All Posts",
+		slug: "all",
+		count: Array.isArray($posts) ? $posts.length : 0,
+		value: "all",
+	};
 
-	for (const [name, count] of Object.entries(categoryCount)) {
+	const nextCategoryGroups: CategoryGroup[] = [];
+
+	for (const [name, count] of Object.entries(categoryCount).sort(([a], [b]) =>
+		a.localeCompare(b),
+	)) {
 		const categorySlug = slugify(name);
-		nextCategories.push({
+		const categoryItem: SidebarItem = {
 			label: name,
 			slug: categorySlug,
 			count,
 			value: name,
-		});
+		};
+		const tagsForCategory: SidebarItem[] = [];
 
 		if (categoriesWithConfiguredTags.has(name)) {
 			const fromConfig = configuredTagsByCategoryName[name] ?? [];
@@ -89,7 +103,7 @@ $: {
 
 			for (const tag of tags) {
 				const tagSlug = slugify(tag);
-				nextCategories.push({
+				tagsForCategory.push({
 					label: tag,
 					slug: tagSlug,
 					count: tagCountByCategory[name]?.[tag] ?? 0,
@@ -99,9 +113,14 @@ $: {
 				});
 			}
 		}
+
+		nextCategoryGroups.push({
+			category: categoryItem,
+			tags: tagsForCategory,
+		});
 	}
 
-	categories = nextCategories;
+	categoryGroups = nextCategoryGroups;
 }
 
 function selectCategory(item: SidebarItem) {
@@ -127,9 +146,19 @@ function goResume(event) {
 	push(resumeUrl);
 }
 
-void categories;
 void selectCategory;
 void goResume;
+
+function isActive(item: SidebarItem) {
+	return (
+		($selectedCategory === "all" && item.value === "all") ||
+		$selectedCategory === item.value
+	);
+}
+
+void allPostsItem;
+void categoryGroups;
+void isActive;
 </script>
 
 <div class="sidebar-header">
@@ -147,16 +176,40 @@ void goResume;
 <div class="sidebar-module">
   <h4>Explore</h4>
   <ul class="category-list">
-    {#each categories as category}
-      <li>
-        <button
-          class="category-link {category.isTag ? 'tag-item' : ''} {($selectedCategory === 'all' && category.value === 'all') || ($selectedCategory === category.value) ? 'active' : ''}"
-          on:click={() => selectCategory(category)}
-        >
-          {category.label} ({category.count})
-        </button>
-      </li>
-    {/each}
+    <li>
+      <button
+        class="category-link all-posts-link {isActive(allPostsItem) ? 'active' : ''}"
+        on:click={() => selectCategory(allPostsItem)}
+      >
+        {allPostsItem.label} ({allPostsItem.count})
+      </button>
+      <ul class="category-tree">
+        {#each categoryGroups as group}
+          <li class="category-node">
+            <button
+              class="category-link category-level {isActive(group.category) ? 'active' : ''}"
+              on:click={() => selectCategory(group.category)}
+            >
+              {group.category.label} ({group.category.count})
+            </button>
+            {#if group.tags.length > 0}
+              <ul class="tag-tree">
+                {#each group.tags as tag}
+                  <li class="tag-node">
+                    <button
+                      class="category-link tag-item {isActive(tag) ? 'active' : ''}"
+                      on:click={() => selectCategory(tag)}
+                    >
+                      {tag.label} ({tag.count})
+                    </button>
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    </li>
   </ul>
 </div>
 
@@ -235,6 +288,38 @@ void goResume;
     margin-bottom: 0.2rem;
   }
 
+  .all-posts-link {
+    margin-bottom: 0.25rem;
+  }
+
+  .category-tree {
+    list-style: none;
+    margin: 0 0 0 0.55rem;
+    padding: 0 0 0 0.7rem;
+    border-left: 1px solid rgb(63 63 70 / 70%);
+  }
+
+  .category-node {
+    margin-bottom: 0.12rem;
+  }
+
+  .category-level {
+    font-size: 0.8rem;
+    color: #d4d4d8;
+    padding-left: 0.5rem;
+  }
+
+  .tag-tree {
+    list-style: none;
+    margin: 0.1rem 0 0.18rem 0.4rem;
+    padding: 0 0 0 0.7rem;
+    border-left: 1px dashed rgb(82 82 91 / 70%);
+  }
+
+  .tag-node {
+    margin-bottom: 0.1rem;
+  }
+
   .category-link {
     background: transparent;
     border: 1px solid transparent;
@@ -267,15 +352,15 @@ void goResume;
 
   .category-link.tag-item {
     font-size: 0.76rem;
-    color: #71717a;
-    padding-left: 1.2rem;
+    color: #a1a1aa;
+    padding-left: 0.95rem;
     position: relative;
   }
 
   .category-link.tag-item:before {
     content: "#";
     position: absolute;
-    left: 0.58rem;
+    left: 0.35rem;
     color: #52525b;
   }
 
@@ -283,7 +368,7 @@ void goResume;
     color: #d4d4d8;
     background: rgb(39 39 42 / 40%);
     border-color: rgb(63 63 70 / 70%);
-    padding-left: 1.2rem;
+    padding-left: 0.95rem;
   }
 
   .category-link.tag-item.active {
@@ -291,7 +376,7 @@ void goResume;
     font-weight: 500;
     background: rgb(39 39 42 / 65%);
     border-color: rgb(82 82 91 / 85%);
-    padding-left: 1.2rem;
+    padding-left: 0.95rem;
   }
 
   .sidebar-module p {
