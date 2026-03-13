@@ -1,3 +1,4 @@
+import { mount } from "svelte";
 import App from "./App.svelte";
 import { siteOrigin } from "./lib/config";
 import {
@@ -75,9 +76,7 @@ const target = document.getElementById("app");
 let app;
 
 if (target) {
-	app = new App({
-		target: target,
-	});
+	app = mount(App, { target });
 }
 
 export default app;
