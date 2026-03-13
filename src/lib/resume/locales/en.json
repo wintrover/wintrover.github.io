@@ -1,0 +1,87 @@
+{
+	"site_title": "Suhyok Yun",
+	"site_subtitle": "Product Engineer & Builder",
+	"meta": {
+		"title": "wintrover's resume",
+		"description": "Product engineer & builder shipping AI-powered products. Portfolio and project notes.",
+		"keywords": "Product Engineer, Builder, AI, Machine Learning, Computer Vision, LLM, NLP, Suhyok Yun",
+		"og_title": "wintrover's resume",
+		"og_description": "Product engineer & builder shipping AI-powered products. Portfolio and project notes.",
+		"og_type": "website"
+	},
+	"contact_email_label": "Email",
+	"contact_homepage_label": "Homepage",
+	"profile_alt": "Profile",
+	"loading_message": "Loading portfolio...",
+	"social": {
+		"github": "GitHub",
+		"linkedin": "LinkedIn"
+	},
+	"project_link": {
+		"github": "GitHub Repository",
+		"demo": "Live Demo"
+	},
+	"nav_home": "About",
+	"nav_projects": "Projects",
+	"nav_experience": "Experience",
+	"nav_education": "Education",
+	"lang_switcher_en": "English",
+	"lang_switcher_ko": "한국어",
+	"about_title": "About Me",
+	"about_content": "Product engineer & builder focused on shipping end-to-end, AI-powered products.<br/>With a background in Electrical and Electronic Engineering, I bridge engineering, UX, and business to turn ideas into usable software.<br/>Through the Intel developer program and the projects below, I built LLM and computer vision systems, optimized performance, and deployed services to real users.<br/>I care about fast iteration, reliable delivery, and customer-centered product decisions.<br/>",
+	"section_title_projects": "Projects",
+	"section_title_experience": "Experience",
+	"section_title_education": "Education",
+	"projects": {
+		"cvfactory": {
+			"title": "CVFactory",
+			"quote": "SaaS service that automates the generation of customized cover letters using job posting web crawling, RAG, and LLM.",
+			"description": "<br/>- Frontend (CVFactory): Django-based UI development (job posting/story input, cover letter generation/editing).<br/>- Backend (CVFactory Server): Web scraping based on Playwright/BeautifulSoup (asynchronous, iframe support).<br/>- Asynchronous API and task processing based on FastAPI, Celery, Upstash Redis.<br/>- RAG pipeline construction based on Langchain (Cohere Embeddings, FAISS, Groq LLM)."
+		},
+		"webkyc_process": {
+			"title": "WebKYC Process",
+			"quote": "An end-to-end system that automates and monitors KYC by analyzing ID images and selfie videos to compute face similarity.",
+			"description": "- Designed and implemented a high-availability asynchronous KYC workflow engine using FastAPI and Temporal.<br/>- Built a facial recognition pipeline using InsightFace and OpenCV, optimizing performance with GPU acceleration.<br/>- Managed MariaDB modeling with SQLModel and declarative database migrations using Atlas.<br/>- Established an API regression testing framework to ensure facial comparison reliability and reduce operational risks.<br/>- Developed a React 19 admin dashboard and introduced browser-side video preprocessing with FFmpeg.wasm."
+		},
+		"data_engineer_intern_task": {
+			"title": "Data Engineer Intern Position Task",
+			"quote": "Successfully completed the data engineer intern position task for AI startup by implementing Airflow-based ETL for site entity attributes.",
+			"description": "Dynamic Category Detection: Real-time identification of 16 categories through API endpoints<br/>- Data Collection and Processing: Automatic parsing of entity details from web responses<br/>- Database Storage: Efficient PostgreSQL storage with duplicate handling capabilities<br/>- Pipeline Orchestration: End-to-end workflow automation through Airflow"
+		}
+	},
+	"experience": {
+		"focc_inc": {
+			"title": "SMBholdings Inc.",
+			"sub_title": "Product Engineer · Full-time",
+			"caption": "July 2025 - Present",
+			"description": "Designed and developed AI-based facial recognition KYC systems for Web3 fintech services (SMB Wallet, Mastercard Club).<br/>Enhanced platform security by integrating AI models for secure identity verification and real-time authentication.<br/>Designed and implemented robust security protocols for biometric data to ensure data integrity and user trust.<br/>Led technical direction combining AI, Web3, and fintech to strengthen the company's core business model."
+		},
+		"insight_marketing_labs": {
+			"title": "Insight Marketing Labs",
+			"sub_title": "Sales Team · Freelancer",
+			"caption": "December 2022 - June 2024",
+			"description": "Led field sales and business development for an SEO startup, directly communicating with corporate clients.<br/>Provided customized consulting solutions by deeply understanding customer requirements and pain points.<br/>Achieved acquisition of 3 new corporate clients (15% annual revenue increase) and maintained over 85% contract renewal rate through effective problem-solving and relationship building, achieving significant business growth."
+		},
+		"vizcam": {
+			"title": "VizCam",
+			"sub_title": "Technical Support · Full-time",
+			"caption": "December 2020 - August 2022",
+			"description": "Responsible for technical support and communication for machine vision software, serving as a key liaison between overseas engineers and domestic clients.<br/>Enhanced technical understanding and problem-solving abilities by resolving complex technical issues.<br/>Facilitated smooth communication through technical translation and real-time interpretation, effectively bridging the gap between technical and non-technical stakeholders to improve project efficiency (30% reduction in project duration, over 90% customer satisfaction)."
+		}
+	},
+	"education": {
+		"intel_ai_for_future_workforce": {
+			"title": "Intel AI for Future Workforce",
+			"sub_title": "Applied AI Application Developer Course",
+			"caption": "October 2024 - April 2025",
+			"description": "Gained practical experience in AI and app development by mastering core technologies such as Python, PyTorch, and TensorFlow.<br/>Developed deployable AI solutions through in-depth projects and hackathon participation,<br/>Successfully led projects by mediating team conflicts and teaching GitHub usage, achieving successful solution deployment."
+		},
+		"halla_university": {
+			"title": "Halla University",
+			"sub_title": "Bachelor's Degree in Electrical and Electronic Engineering",
+			"caption": "March 2013 - February 2020",
+			"description": "Completed core theoretical and experimental education in electrical and electronic engineering.<br/>Gained experience in C programming and ICT electronic component/product control using Arduino.<br/>Developed practical skills through capstone design projects and multiple industry-academia collaboration programs."
+		}
+	},
+	"footer_thank_you": "Thank you for reading."
+}

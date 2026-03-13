@@ -34,7 +34,7 @@ jobs:
           cache-dependency-path: |
             pnpm-lock.yaml
       - name: Install
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --prod=false
       - name: Install Chrome for Puppeteer
         run: pnpm exec puppeteer browsers install chrome
       - name: Generate Mermaid images
@@ -95,7 +95,7 @@ jobs:
             pnpm-lock.yaml
       - name: Install
         if: ${{ steps.devto_guard.outputs.should_publish == 'true' }}
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --prod=false
       - name: Upload changed posts to Dev.to
         if: ${{ steps.devto_guard.outputs.should_publish == 'true' }}
         env:

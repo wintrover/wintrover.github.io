@@ -45,6 +45,7 @@ coverage/
 !stryker.config.json
 !knip.json
 !src/lib/categories.json
+!src/lib/resume/**/*.json
 
 # Stryker
 .stryker-tmp/
