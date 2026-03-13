@@ -145,7 +145,7 @@ void goResume;
 </div>
 
 <div class="sidebar-module">
-  <h4>Categories</h4>
+  <h4>Explore</h4>
   <ul class="category-list">
     {#each categories as category}
       <li>
@@ -169,47 +169,47 @@ void goResume;
 
 <style>
   .sidebar-header {
-    padding: 30px 20px;
-    border-bottom: 1px solid #e1e4e8;
-    background: white;
+    padding: 1.5rem 1.15rem 1.2rem;
+    border-bottom: 1px solid rgb(39 39 42 / 85%);
+    background: linear-gradient(180deg, rgb(24 24 27 / 72%), rgb(9 9 11 / 35%));
     position: relative;
   }
 
   .profile-section {
-    text-align: center;
-    /* 토글 버튼 공간 확보 제거 */
+    text-align: left;
   }
 
   .avatar-link {
     display: inline-block;
-    margin-bottom: 15px;
+    margin-bottom: 0.8rem;
   }
 
   .avatar {
-    width: 80px;
-    height: 80px;
+    width: 3.2rem;
+    height: 3.2rem;
     border-radius: 50%;
-    border: 3px solid #e1e4e8;
+    border: 1px solid rgb(63 63 70);
   }
 
   .site-name {
-    margin: 0 0 8px 0;
-    font-size: 24px;
+    margin: 0 0 0.35rem 0;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: #24292e;
+    letter-spacing: 0.01em;
+    color: #fafafa;
   }
 
   .site-description {
     margin: 0;
-    color: #586069;
-    font-size: 14px;
-    line-height: 1.4;
+    color: #a1a1aa;
+    font-size: 0.78rem;
+    line-height: 1.55;
   }
 
   .sidebar-module {
-    padding: 20px;
+    padding: 1rem 1.15rem 1.1rem;
     margin-bottom: 0;
-    border-bottom: 1px solid #e1e4e8;
+    border-bottom: 1px solid rgb(39 39 42 / 70%);
   }
 
   .sidebar-module:last-child {
@@ -217,10 +217,12 @@ void goResume;
   }
 
   .sidebar-module h4 {
-    margin: 0 0 15px 0;
-    font-size: 16px;
+    margin: 0 0 0.65rem 0;
+    font-size: 0.68rem;
     font-weight: 600;
-    color: #24292e;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: #71717a;
   }
 
   .category-list {
@@ -230,67 +232,79 @@ void goResume;
   }
 
   .category-list li {
-    margin-bottom: 6px;
+    margin-bottom: 0.2rem;
   }
 
   .category-link {
-    background: none;
-    border: none;
-    color: #0366d6;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #a1a1aa;
     cursor: pointer;
-    font-size: 14px;
-    padding: 6px 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.45rem 0.55rem;
     text-align: left;
     width: 100%;
-    transition: color 0.2s;
-    border-radius: 4px;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+    border-radius: 0.6rem;
   }
 
   .category-link:hover {
-    color: #0256cc;
-    background: #f1f8ff;
-    padding-left: 8px;
+    color: #e4e4e7;
+    background: rgb(39 39 42 / 55%);
+    border-color: rgb(63 63 70 / 90%);
   }
 
   .category-link.active {
-    color: #0256cc;
+    color: #fafafa;
     font-weight: 600;
-    background: #f1f8ff;
-    padding-left: 8px;
+    background: rgb(39 39 42 / 85%);
+    border-color: rgb(82 82 91);
   }
 
   .category-link.tag-item {
-    font-size: 13px;
-    color: #6a737d;
-    padding-left: 16px;
+    font-size: 0.76rem;
+    color: #71717a;
+    padding-left: 1.2rem;
     position: relative;
   }
 
   .category-link.tag-item:before {
     content: "#";
     position: absolute;
-    left: 8px;
-    color: #6a737d;
+    left: 0.58rem;
+    color: #52525b;
   }
 
   .category-link.tag-item:hover {
-    color: #0366d6;
-    background: #f6f8fa;
-    padding-left: 16px;
+    color: #d4d4d8;
+    background: rgb(39 39 42 / 40%);
+    border-color: rgb(63 63 70 / 70%);
+    padding-left: 1.2rem;
   }
 
   .category-link.tag-item.active {
-    color: #0366d6;
+    color: #f4f4f5;
     font-weight: 500;
-    background: #f6f8fa;
-    padding-left: 16px;
+    background: rgb(39 39 42 / 65%);
+    border-color: rgb(82 82 91 / 85%);
+    padding-left: 1.2rem;
   }
 
   .sidebar-module p {
-    color: #586069;
-    font-size: 14px;
-    line-height: 1.5;
+    color: #a1a1aa;
+    font-size: 0.8rem;
+    line-height: 1.7;
     margin: 0;
+  }
+
+  .sidebar-module a {
+    color: #e4e4e7;
+    text-decoration: underline;
+    text-underline-offset: 0.12rem;
   }
 
   </style>

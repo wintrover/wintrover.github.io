@@ -10,7 +10,6 @@ type HomePost = {
 	title: string;
 	excerpt: string;
 	date: string;
-	readingTime: string;
 	keywords: string[];
 };
 
@@ -46,12 +45,6 @@ function scrollToSection(sectionId: string) {
 	section.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function estimateReadingTime(content: string) {
-	const words = content.trim().split(/\s+/).filter(Boolean).length;
-	const minutes = Math.max(1, Math.round(words / 220));
-	return `${minutes} min`;
-}
-
 function formatDate(date: string) {
 	const parsed = new Date(date);
 	if (Number.isNaN(parsed.getTime())) return date;
@@ -76,7 +69,6 @@ function toHomePost(post: Post): HomePost {
 			post.excerpt?.trim() ||
 			"Deep dives on product engineering, architecture, and reliable delivery.",
 		date: formatDate(post.date),
-		readingTime: estimateReadingTime(post.content || ""),
 		keywords,
 	};
 }
@@ -137,7 +129,6 @@ $: {
 								{/each}
 							</div>
 							<span>{post.date}</span>
-							<span>{post.readingTime}</span>
 						</div>
 						<button
 							class="title-link"
@@ -167,7 +158,6 @@ $: {
 								transition:fly={{ y: 16, duration: 330 + index * 20, delay: 40 + index * 45 }}
 							>
 								<span>{post.title}</span>
-								<span>{post.readingTime}</span>
 							</button>
 						{/each}
 					{:else}

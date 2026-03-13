@@ -188,11 +188,18 @@ onDestroy(() => {
 
 <style>
   :global(body) {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family:
+      "Geist Sans",
+      "Pretendard",
+      "Inter",
+      -apple-system,
+      blinkmacsystemfont,
+      "Segoe UI",
+      sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #fff;
-    color: #333;
+    background-color: #09090b;
+    color: #a1a1aa;
   }
 
   #app-container {
@@ -202,15 +209,16 @@ onDestroy(() => {
   }
 
   #sidebar {
-    width: 240px;
-    background: #f8f9fa;
-    border-right: 0;
+    width: 248px;
+    background: #09090b;
+    border-right: 1px solid rgb(39 39 42 / 85%);
     position: fixed;
     height: 100vh;
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    padding: 0;
+    padding: 3.25rem 0 0;
+    box-sizing: border-box;
     transform: translateX(0);
     transition: transform 0.01s ease;
     z-index: 1000;
@@ -226,7 +234,7 @@ onDestroy(() => {
 
   #main-content {
     flex: 1;
-    margin-left: 280px;
+    margin-left: 288px;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -254,25 +262,28 @@ onDestroy(() => {
 
   .sidebar-toggle {
     position: fixed;
-    top: 15px;
-    left: 15px;
+    top: 14px;
+    left: 14px;
     z-index: 1002;
-    background: #0366d6;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    width: 40px;
-    height: 40px;
+    background: rgb(24 24 27 / 86%);
+    color: #fafafa;
+    border: 1px solid rgb(63 63 70 / 80%);
+    border-radius: 0.7rem;
+    width: 36px;
+    height: 36px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: background-color 0.2s;
+    box-shadow: 0 8px 28px rgb(0 0 0 / 30%);
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .sidebar-toggle:hover {
-    background: #0256cc;
+    background: rgb(39 39 42 / 90%);
+    border-color: rgb(82 82 91);
   }
 
   @media (max-width: 768px) {
