@@ -45,6 +45,16 @@ export type Post = PostBase & {
 };
 
 const categories = categoryConfig as unknown as CategoryConfig;
+const categoryEntryByName = new Map<string, CategoryEntry>();
+let cachedPosts: Post[] | null = null;
+let cachedPostBySlug: Map<string, Post> | null = null;
+
+for (const entry of Object.values(categories.categories ?? {})) {
+	const name = entry?.name;
+	if (typeof name === "string" && name && !categoryEntryByName.has(name)) {
+		categoryEntryByName.set(name, entry);
+	}
+}
 
 function splitPathParts(filePath: string) {
 	const parts = String(filePath).split(/[\\/]/);
@@ -65,13 +75,7 @@ function normalizeTags(tags: unknown) {
 }
 
 function getCategoryEntryByName(categoryName: string): CategoryEntry | null {
-	const entries = Object.values(categories.categories ?? {});
-	for (const entry of entries) {
-		if (entry?.name === categoryName) {
-			return entry;
-		}
-	}
-	return null;
+	return categoryEntryByName.get(categoryName) ?? null;
 }
 
 function normalizeTagsByCategory(tags: string[], categoryName: string) {
@@ -117,6 +121,16 @@ function normalizeTagsByCategory(tags: string[], categoryName: string) {
 	}
 
 	return Array.from(new Set(nextTags));
+}
+
+function buildPostBySlugMap(posts: Post[]) {
+	const postBySlug = new Map<string, Post>();
+	for (const post of posts) {
+		if (!postBySlug.has(post.slug)) {
+			postBySlug.set(post.slug, post);
+		}
+	}
+	return postBySlug;
 }
 
 function determineCategoryFromPath(filePath: string) {
@@ -195,9 +209,14 @@ function processPostMetadata(
 export async function loadAllPosts(
 	modulesOverride?: Record<string, string | null>,
 ): Promise<Post[]> {
+	const shouldCache = !modulesOverride && !import.meta.env.VITEST;
+
 	try {
 		const modules: Record<string, string | null> =
 			modulesOverride || (await getPostFiles());
+		if (shouldCache && cachedPosts !== null) {
+			return cachedPosts;
+		}
 		const posts: Post[] = [];
 
 		for (const [path, content] of Object.entries(modules)) {
@@ -222,7 +241,7 @@ export async function loadAllPosts(
 			}
 		}
 
-		return posts.sort((a, b) => {
+		const sortedPosts = posts.sort((a, b) => {
 			try {
 				return (
 					new Date(b.date).getTime() - new Date(a.date).getTime() ||
@@ -235,6 +254,13 @@ export async function loadAllPosts(
 				return 0;
 			}
 		});
+
+		if (shouldCache) {
+			cachedPosts = sortedPosts;
+			cachedPostBySlug = buildPostBySlugMap(sortedPosts);
+		}
+
+		return sortedPosts;
 	} catch (error) {
 		logError("postLoader", "포스트 로딩 중 치명적 에러 발생", {
 			error,
@@ -247,6 +273,24 @@ export async function loadPostBySlug(
 	slug: string,
 	modulesOverride?: Record<string, string | null>,
 ): Promise<Post | null> {
+	const shouldCache = !modulesOverride && !import.meta.env.VITEST;
+
+	if (shouldCache) {
+		if (cachedPostBySlug === null) {
+			await loadAllPosts();
+		}
+
+		const fromCache = cachedPostBySlug?.get(slug) ?? null;
+		if (fromCache) {
+			return fromCache;
+		}
+
+		logWarn("postLoader", `해당 슬러그에 대한 포스트를 찾을 수 없음: ${slug}`, {
+			slug,
+		});
+		return null;
+	}
+
 	try {
 		const modules: Record<string, string | null> =
 			modulesOverride || (await getPostFiles());

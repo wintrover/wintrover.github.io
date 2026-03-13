@@ -6,6 +6,7 @@ import Footer from "./components/Footer.svelte";
 import PostDetail from "./components/PostDetail.svelte";
 import ResumePage from "./components/ResumePage.svelte";
 import Sidebar from "./components/Sidebar.svelte";
+import HomePage from "./routes/+page.svelte";
 import { posts } from "./stores/posts";
 
 let innerWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
@@ -17,7 +18,7 @@ let manualToggle = false;
 let resizeTimeout: any = null;
 
 const routes = {
-	"/": BlogList,
+	"/": HomePage,
 	"/category/:category": BlogList,
 	"/category/:category/tag/:tag": BlogList,
 	"/post/:slug": PostDetail,
