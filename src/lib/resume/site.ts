@@ -57,14 +57,7 @@ export const content = {
 		},
 		{
 			id: "webkyc_process",
-			links: [
-				{
-					type: "github",
-					url: "https://github.com/wintrover/WebKYC_Process",
-					iconClass: "fab fa-github",
-					titleKey: "project_link.github",
-				},
-			],
+			links: [],
 		},
 		{
 			id: "data_engineer_intern_task",
