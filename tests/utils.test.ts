@@ -875,12 +875,12 @@ describe("language selection (navigator.language only)", () => {
 		expect(content).not.toContain("navigator.languages");
 	});
 
-	test("scripts/build-github.ts의 selectorHtml은 navigator.language만 사용한다", () => {
+	test("scripts/build-github.ts는 /en 레거시 selectorHtml에 의존하지 않는다", () => {
 		const content = fs.readFileSync(
 			path.join(process.cwd(), "scripts", "build-github.ts"),
 			"utf-8",
 		);
-		expect(content).toContain("navigator.language");
+		expect(content).not.toContain("legacyEnHtml");
 		expect(content).not.toContain("navigator.languages");
 	});
 });

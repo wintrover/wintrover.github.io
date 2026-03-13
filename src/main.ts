@@ -35,20 +35,8 @@ if (typeof window !== "undefined") {
 				window.location.replace(`/${url.search}#${path}${url.hash}`);
 			}
 		} else {
-			const rest =
-				localeFromPath === "ko"
-					? path.replace(/^\/ko(?=\/|$)/, "") || "/"
-					: path.replace(/^\/en(?=\/|$)/, "") || "/";
-
-			if (localeFromPath === "en") {
-				if (rest === "/" || rest === "/index.html") {
-					window.location.replace(`/${url.search}${url.hash}`);
-				} else if (!url.hash || url.hash === "#") {
-					window.location.replace(`/${url.search}#${rest}`);
-				} else {
-					window.location.replace(`/${url.search}${url.hash}`);
-				}
-			} else if (
+			const rest = path.replace(/^\/ko(?=\/|$)/, "") || "/";
+			if (
 				(!url.hash || url.hash === "#") &&
 				rest !== "/" &&
 				rest !== "/index.html"

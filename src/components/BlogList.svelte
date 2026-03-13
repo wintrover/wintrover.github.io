@@ -126,6 +126,9 @@ void slugify;
 
   .post {
     border-bottom: 1px solid #eee;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
   }
 
   .post:last-child {
@@ -165,6 +168,7 @@ void slugify;
     margin: 0 0 15px 0;
     font-size: 24px;
     line-height: 1.3;
+    min-height: 62px;
   }
 
   .post-link {
@@ -188,6 +192,10 @@ void slugify;
     color: #666;
     line-height: 1.6;
     font-size: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .no-posts {

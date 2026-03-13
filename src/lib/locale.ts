@@ -1,9 +1,8 @@
 export type Locale = "ko" | "en";
 
 export function parseLocaleFromPathname(pathname: string): Locale | null {
-	const match = String(pathname).match(/^\/(ko|en)(\/|$)/);
-	if (!match) return null;
-	return match[1] as Locale;
+	const match = String(pathname).match(/^\/ko(\/|$)/);
+	return match ? "ko" : null;
 }
 
 export function detectLocale(opts: {

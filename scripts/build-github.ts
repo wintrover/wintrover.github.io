@@ -363,10 +363,6 @@ function main() {
 		fs.cpSync(publicDir, dist, { recursive: true });
 	}
 
-	const legacyEnHtml =
-		'<!doctype html><html lang="en"><head><meta charset="utf-8"/><script>(()=>{const lang=(navigator.language||"").toLowerCase();location.replace("/"+location.hash);})();</script></head><body><noscript><a href="/">Home</a></noscript></body></html>';
-	writeFile(path.join(dist, "en", "index.html"), legacyEnHtml);
-
 	buildBlog(dist, "en");
 	buildBlog(dist, "ko");
 	buildResumeLandingPage(dist, "ko");

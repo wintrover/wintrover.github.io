@@ -67,7 +67,7 @@ describe("glob.dev", () => {
 		}
 	});
 
-	it("경로가 /en로 시작하면 ko 포스트를 선택하지 않는다", async () => {
+	it("경로가 /en로 시작해도 locale로 인식하지 않고 navigator.language를 따른다", async () => {
 		const prev = navigator.language;
 		Object.defineProperty(navigator, "language", {
 			value: "ko-KR",
@@ -76,7 +76,7 @@ describe("glob.dev", () => {
 		try {
 			const { getPostFilesDev } = await import("../src/lib/glob.dev");
 			const files = getPostFilesDev("/en/");
-			expect(hasKoPosts(files)).toBe(false);
+			expect(hasKoPosts(files)).toBe(true);
 		} finally {
 			Object.defineProperty(navigator, "language", {
 				value: prev,
