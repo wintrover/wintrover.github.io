@@ -313,7 +313,7 @@ void isActive;
     list-style: none;
     margin: 0.1rem 0 0.18rem 0.4rem;
     padding: 0 0 0 0.7rem;
-    border-left: 1px dashed rgb(82 82 91 / 70%);
+    border-left: 1px solid rgb(63 63 70 / 70%);
   }
 
   .tag-node {
