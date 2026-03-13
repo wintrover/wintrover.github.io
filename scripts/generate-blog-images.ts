@@ -1,6 +1,5 @@
-import path from "node:path";
 import { logError } from "../src/lib/log";
-import { convertMermaidToImage } from "./mermaid-to-image.ts";
+import { renderMermaidDiagramTasks } from "./image-tools";
 
 const outputDir = "public/images";
 
@@ -63,23 +62,6 @@ graph TB
   `;
 
 	try {
-		// Generate first image
-		await convertMermaidToImage(
-			dockerNetworkDiagram,
-			path.join(outputDir, "2025-11-30-14-docker-network.png"),
-		);
-		console.log("Generated Docker network diagram");
-
-		// Generate second image
-		await convertMermaidToImage(
-			finalArchitectureDiagram,
-			path.join(outputDir, "2025-11-30-14-final-architecture.png"),
-		);
-		console.log("Generated final architecture diagram");
-
-		// --- New diagrams for 2026-01-08-16 ---
-
-		// 1. Celery Sequence Diagram
 		const celerySequence = `
 sequenceDiagram
     participant U as User
@@ -99,13 +81,6 @@ sequenceDiagram
     W->>R: Query: Is Image ready?
     Note over W: Yes, Proceed to Similarity Check
 `;
-		await convertMermaidToImage(
-			celerySequence,
-			path.join(outputDir, "2026-01-08-16-celery-sequence.png"),
-		);
-		console.log("Generated 2026-01-08-16-celery-sequence.png");
-
-		// 2. Temporal Workflow Diagram
 		const temporalWorkflow = `
 graph TD
     Start((Start Workflow)) --> WaitCondition{Wait for Files}
@@ -121,13 +96,6 @@ graph TD
         Activity
     end
 `;
-		await convertMermaidToImage(
-			temporalWorkflow,
-			path.join(outputDir, "2026-01-08-16-temporal-workflow.png"),
-		);
-		console.log("Generated 2026-01-08-16-temporal-workflow.png");
-
-		// 3. Activity Idempotency Diagram
 		const activityIdempotency = `
 flowchart LR
     A[Start Activity] --> B{Check DB for<br/>Idempotency Key}
@@ -136,12 +104,6 @@ flowchart LR
     D --> E[Save Result with<br/>Idempotency Key]
     E --> F[Return Success]
 `;
-		await convertMermaidToImage(
-			activityIdempotency,
-			path.join(outputDir, "2026-01-08-16-activity-idempotency.png"),
-		);
-		console.log("Generated 2026-01-08-16-activity-idempotency.png");
-
 		const testingToolbox = `
 flowchart TB
     A[AI Agents\nShip More Code] --> B{QA Pressure}
@@ -166,13 +128,6 @@ flowchart TB
     style G fill:#f3e5f5,stroke:#6f42c1,stroke-width:1.5px,color:#0b1f2a
     style H fill:#f3e5f5,stroke:#6f42c1,stroke-width:1.5px,color:#0b1f2a
 `;
-		await convertMermaidToImage(
-			testingToolbox,
-			path.join(outputDir, "2026-01-12-17-testing-toolbox.png"),
-		);
-		console.log("Generated 2026-01-12-17-testing-toolbox.png");
-
-		// --- New diagrams for 2026-02-01-18 ---
 		const mutationFlow = `
 flowchart LR
     A[Original Code] --> B{Mutator}
@@ -195,11 +150,46 @@ flowchart LR
     style G1 fill:#fff5f5,stroke:#c92a2a
     style A fill:#e1f5fe,stroke:#0b7285
 `;
-		await convertMermaidToImage(
-			mutationFlow,
-			path.join(outputDir, "2026-02-01-18-mutation-flow.png"),
+		await renderMermaidDiagramTasks(
+			[
+				{
+					code: dockerNetworkDiagram,
+					outputFilename: "2025-11-30-14-docker-network.png",
+					successMessage: "Generated Docker network diagram",
+				},
+				{
+					code: finalArchitectureDiagram,
+					outputFilename: "2025-11-30-14-final-architecture.png",
+					successMessage: "Generated final architecture diagram",
+				},
+				{
+					code: celerySequence,
+					outputFilename: "2026-01-08-16-celery-sequence.png",
+					successMessage: "Generated 2026-01-08-16-celery-sequence.png",
+				},
+				{
+					code: temporalWorkflow,
+					outputFilename: "2026-01-08-16-temporal-workflow.png",
+					successMessage: "Generated 2026-01-08-16-temporal-workflow.png",
+				},
+				{
+					code: activityIdempotency,
+					outputFilename: "2026-01-08-16-activity-idempotency.png",
+					successMessage: "Generated 2026-01-08-16-activity-idempotency.png",
+				},
+				{
+					code: testingToolbox,
+					outputFilename: "2026-01-12-17-testing-toolbox.png",
+					successMessage: "Generated 2026-01-12-17-testing-toolbox.png",
+				},
+				{
+					code: mutationFlow,
+					outputFilename: "2026-02-01-18-mutation-flow.png",
+					successMessage: "Generated 2026-02-01-18-mutation-flow.png",
+				},
+			],
+			outputDir,
 		);
-		console.log("Generated 2026-02-01-18-mutation-flow.png");
 
 		console.log("All images generated successfully!");
 	} catch (error) {

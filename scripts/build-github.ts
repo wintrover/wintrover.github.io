@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { logError } from "../src/lib/log";
 import { parseFrontMatter, slugify } from "../src/lib/utils";
 
 type Env = Record<string, string | undefined>;
@@ -301,6 +302,41 @@ function buildRobots(dist: string) {
 	writeFile(path.join(dist, "robots.txt"), content);
 }
 
+function verifyBuildOutput(distPath: string) {
+	console.log("🚀 Verifying GitHub Pages build output...");
+	const expectedFiles = [
+		path.join(distPath, "index.html"),
+		path.join(distPath, "ko", "index.html"),
+		path.join(distPath, "en", "index.html"),
+		path.join(distPath, "ko", "resume", "index.html"),
+		path.join(distPath, "en", "resume", "index.html"),
+	];
+
+	if (!fs.existsSync(distPath)) {
+		logError(
+			"build-github",
+			"Build output not found: dist directory does not exist",
+			{
+				error: new Error("dist directory does not exist"),
+			},
+		);
+		console.log("Please run: npm run build:github");
+		process.exit(1);
+	}
+
+	for (const filePath of expectedFiles) {
+		if (fs.existsSync(filePath)) continue;
+		const relative = path.relative(distPath, filePath).replaceAll("\\", "/");
+		logError("build-github", `Build output invalid: ${relative} not found`, {
+			error: new Error(`${relative} not found in dist`),
+		});
+		process.exit(1);
+	}
+
+	console.log("✅ Build verification successful");
+	console.log("📦 Ready for GitHub Pages deployment!");
+}
+
 function main() {
 	const root = process.cwd();
 	const dist = path.join(root, "dist");
@@ -325,6 +361,7 @@ function main() {
 	buildPostLandingPages(dist, "en");
 	buildSitemap(dist);
 	buildRobots(dist);
+	verifyBuildOutput(dist);
 }
 
 main();

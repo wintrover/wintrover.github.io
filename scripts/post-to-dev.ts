@@ -3,7 +3,7 @@ import path from "node:path";
 import dotenv from "dotenv";
 import matter from "gray-matter";
 import { logError } from "../src/lib/log";
-import { processMermaidDiagrams } from "./mermaid-to-image";
+import { processMermaidDiagrams } from "./image-tools";
 
 function normalizePublicBaseUrl(url: string) {
 	try {

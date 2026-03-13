@@ -40,7 +40,7 @@ jobs:
       - name: Generate Mermaid images
         env:
           BLOG_PUBLIC_BASE_URL: https://wintrover.github.io
-        run: pnpm exec tsx scripts/generate-images-ci.ts
+        run: pnpm run images:generate:ci
       - name: Build for Pages
         run: pnpm run build:github
       - name: Upload Pages Artifact
