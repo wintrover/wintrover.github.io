@@ -143,7 +143,7 @@ describe("BlogList Component", () => {
 
 		await waitFor(() => {
 			expect(consoleSpy).toHaveBeenCalledWith(
-				expect.stringContaining("❌ [BlogList] 포스트 목록 로딩 중 에러 발생"),
+				expect.stringContaining("❌ [postsStore] 포스트 로딩 실패"),
 				expect.any(Object),
 			);
 			expect(
@@ -209,7 +209,7 @@ describe("BlogList Component", () => {
 
 		await waitFor(() => {
 			expect(consoleSpy).toHaveBeenCalledWith(
-				expect.stringContaining("❌ [BlogList] 포스트 목록 로딩 중 에러 발생"),
+				expect.stringContaining("❌ [postsStore] 포스트 로딩 실패"),
 				expect.objectContaining({ message: "String error" }),
 			);
 			expect(

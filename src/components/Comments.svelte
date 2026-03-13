@@ -1,7 +1,7 @@
 <script lang="ts">
 import { afterUpdate, onDestroy, onMount, tick } from "svelte";
 import { giscusConfig } from "../lib/giscus-config";
-import { logError } from "../lib/log";
+import { logError, logWarn } from "../lib/log";
 
 // Use configuration or allow override via props
 export let repo = giscusConfig.repo;
@@ -56,7 +56,7 @@ function handleMessage(event: MessageEvent) {
 
 	// Log Giscus messages if debug is enabled
 	if (giscusConfig.debug) {
-		console.log("💬 Giscus Message:", giscusData);
+		logWarn("Comments", "Giscus Message", { giscus: giscusData });
 	}
 }
 

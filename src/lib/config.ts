@@ -1,8 +1,20 @@
+const baseUrl = import.meta.env.BASE_URL ?? "/";
+
+export const siteOrigin = "https://wintrover.github.io";
+export const defaultOgImage = `${siteOrigin}/images/profile.png`;
+
+export function getRuntimeOrigin() {
+	if (typeof window === "undefined") return siteOrigin;
+	return import.meta.env.PROD ? siteOrigin : window.location.origin;
+}
+
 export const siteConfig = {
 	name: "wintrover",
 	description: "Fullstack AI Application Architect",
-	avatar: `${(import.meta as any)?.env?.BASE_URL ?? "/"}images/profile.png`,
-	baseUrl: (import.meta as any)?.env?.BASE_URL ?? "/",
+	avatar: `${baseUrl}images/profile.png`,
+	baseUrl,
+	origin: siteOrigin,
+	defaultOgImage,
 	social: {
 		email: "wintrover@gmail.com",
 		github: "wintrover",

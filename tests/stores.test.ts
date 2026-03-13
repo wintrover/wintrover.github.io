@@ -71,8 +71,7 @@ describe("posts store", () => {
 		] satisfies Post[];
 		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(mockPosts);
 
-		// store를 import (모킹된 loadAllPosts 사용)
-		const { posts } = await import("../src/stores/posts");
+		const { ensurePostsLoaded, posts } = await import("../src/stores/posts");
 
 		// subscribe를 통해 데이터 업데이트 확인
 		let data: any[] = [];
@@ -80,8 +79,7 @@ describe("posts store", () => {
 			data = v;
 		});
 
-		// Promise 비동기 처리를 위해 대기
-		await new Promise((resolve) => setTimeout(resolve, 50));
+		await ensurePostsLoaded();
 
 		expect(data).toEqual(mockPosts);
 		unsubscribe();
@@ -93,14 +91,14 @@ describe("posts store", () => {
 		);
 		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-		const { posts } = await import("../src/stores/posts");
+		const { ensurePostsLoaded, posts } = await import("../src/stores/posts");
 
 		let data: any[] = [1]; // 초기값이 아님을 확인하기 위해
 		const unsubscribe = posts.subscribe((v) => {
 			data = v;
 		});
 
-		await new Promise((resolve) => setTimeout(resolve, 50));
+		await ensurePostsLoaded();
 
 		expect(data).toEqual([]);
 		expect(consoleSpy).toHaveBeenCalledWith(

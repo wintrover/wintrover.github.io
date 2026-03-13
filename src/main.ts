@@ -1,9 +1,11 @@
 import App from "./App.svelte";
+import { siteOrigin } from "./lib/config";
 import {
 	detectLocale,
 	localeBase,
 	parseLocaleFromPathname,
 } from "./lib/locale";
+import { logWarn } from "./lib/log";
 
 // Handle common browser/extension errors that are often uncatchable
 if (typeof window !== "undefined") {
@@ -39,10 +41,11 @@ if (typeof window !== "undefined") {
 		}
 	}
 	window.addEventListener("error", (event) => {
-		// Suppress or explain "Unchecked runtime.lastError"
 		if (event.message?.includes("message port closed")) {
-			console.warn(
-				"💡 Browser/Extension Note: 'The message port closed before a response was received' is usually caused by a browser extension (like AdBlock or a Password Manager) and typically doesn't affect blog functionality.",
+			logWarn(
+				"main",
+				"'The message port closed before a response was received'는 보통 브라우저 확장 프로그램(AdBlock/Password Manager 등)에서 발생하며, 대개 블로그 기능에는 영향을 주지 않습니다.",
+				{ message: event.message },
 			);
 		}
 	});
@@ -63,8 +66,8 @@ if (typeof document !== "undefined") {
 			: (parseLocaleFromPathname(window.location.pathname) ?? htmlLang);
 	if (canonical instanceof HTMLLinkElement) {
 		canonical.href = locale
-			? `https://wintrover.github.io/${String(locale)}/`
-			: "https://wintrover.github.io/";
+			? `${siteOrigin}/${String(locale)}/`
+			: `${siteOrigin}/`;
 	}
 }
 

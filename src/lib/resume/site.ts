@@ -1,3 +1,5 @@
+import { siteOrigin } from "../config";
+
 type SocialLinkId = "github" | "linkedin";
 
 type SocialLink = {
@@ -8,7 +10,7 @@ type SocialLink = {
 
 export const site = {
 	email: "wintrover@gmail.com",
-	homepageUrl: "https://wintrover.github.io",
+	homepageUrl: siteOrigin,
 	homepageLabel: "wintrover.github.io",
 	fontAwesomeStylesheetUrl:
 		"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",

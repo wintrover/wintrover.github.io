@@ -130,7 +130,7 @@ describe("Comments Component", () => {
 	});
 
 	test("Giscus 메시지 이벤트 핸들링", async () => {
-		const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+		const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
 		render(Comments, {
@@ -155,9 +155,11 @@ describe("Comments Component", () => {
 
 		// debug가 true인 경우 로그 출력 확인
 		await waitFor(() => {
-			expect(consoleSpy).toHaveBeenCalledWith("💬 Giscus Message:", {
-				discussion: { id: "123" },
-			});
+			expect(consoleSpy).toHaveBeenCalledWith(
+				expect.stringMatching(
+					/⚠️ \[Comments] Giscus Message.*"discussion":\{"id":"123"\}/,
+				),
+			);
 		});
 
 		// 에러 메시지 시뮬레이션

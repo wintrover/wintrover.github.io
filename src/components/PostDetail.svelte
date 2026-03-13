@@ -1,21 +1,27 @@
 <script lang="ts">
 import { onMount, tick } from "svelte";
 import { push } from "svelte-spa-router";
+import { defaultOgImage, getRuntimeOrigin } from "../lib/config";
+import { detectLocale } from "../lib/locale";
 import { logError } from "../lib/log";
-import { loadPostBySlug } from "../lib/postLoader";
+import { loadPostBySlug, type Post } from "../lib/postLoader";
 import { formatDate, slugify } from "../lib/utils";
+import { posts as postsStore } from "../stores/posts";
 import Comments from "./Comments.svelte";
 
-// Browser detection
-const browser = typeof window !== "undefined";
-const siteOrigin = "https://wintrover.github.io";
-const defaultOgImage = `${siteOrigin}/images/profile.png`;
+const browser =
+	typeof window !== "undefined" && typeof document !== "undefined";
 
 export let params: { slug?: string } = {};
-let post = null;
+let post: Post | null = null;
 let loading = true;
 
-let currentSlug = null;
+let currentSlug: string | null = null;
+let resolvedLocale: "ko" | "en" = "en";
+let seoTitle = "wintrover";
+let seoDescription = "";
+let canonicalUrl = "";
+let structuredData = "";
 
 async function loadPostData(slug: string) {
 	if (!slug) return;
@@ -25,7 +31,16 @@ async function loadPostData(slug: string) {
 	loading = true;
 
 	try {
-		// 포스트 데이터 로드
+		const cached =
+			Array.isArray($postsStore) && $postsStore.length > 0
+				? ($postsStore as Post[]).find((p) => p.slug === slug)
+				: undefined;
+		if (cached) {
+			post = cached;
+			loading = false;
+			return;
+		}
+
 		const postData = await loadPostBySlug(slug);
 
 		if (!postData) {
@@ -34,31 +49,6 @@ async function loadPostData(slug: string) {
 
 		post = postData;
 		loading = false;
-
-		// Update page title and meta tags
-		if (browser && post) {
-			const currentUrl = window.location.href;
-			document.title = `${post.title} - wintrover`;
-
-			// Update or create meta tags
-			updateMetaTag("og:title", post.title);
-			updateMetaTag("og:url", currentUrl);
-			updateMetaTag("og:description", post.excerpt || post.title);
-			updateMetaTag("og:type", "article");
-			updateMetaTag("og:image", defaultOgImage);
-			updateMetaTag("og:image:alt", post.title);
-			updateMetaTag("og:site_name", "wintrover");
-			updateMetaTag("description", post.excerpt || post.title);
-			updateStructuredData(post, currentUrl);
-
-			// Update canonical URL
-			updateLinkTag("canonical", currentUrl);
-		}
-
-		// 버튼 이벤트 리스너 추가
-		setTimeout(() => {
-			setupCodeBlockButtons();
-		}, 500);
 	} catch (error) {
 		logError("PostDetail", "포스트 데이터 로딩 중 에러 발생", {
 			slug,
@@ -83,76 +73,49 @@ async function loadPostData(slug: string) {
 	}
 }
 
-function updateMetaTag(property, content) {
-	let meta =
-		document.querySelector(`meta[property="${property}"]`) ||
-		document.querySelector(`meta[name="${property}"]`);
+$: resolvedLocale = detectLocale({
+	envLocale: import.meta.env.VITE_LOCALE,
+	pathname: browser ? window.location.pathname : "/",
+	navigatorLanguage: browser ? navigator.language : undefined,
+});
 
-	if (!meta) {
-		meta = document.createElement("meta");
-		meta.setAttribute(property.includes("og:") ? "property" : "name", property);
-		document.head.appendChild(meta);
+$: {
+	const origin = getRuntimeOrigin();
+	const slug = params?.slug ?? "";
+
+	if (post) {
+		seoTitle = `${post.title} - wintrover`;
+		seoDescription = post.excerpt || post.title;
+		canonicalUrl = slug
+			? `${origin}/${resolvedLocale}/post/${slug}/`
+			: `${origin}/${resolvedLocale}/`;
+		structuredData = JSON.stringify({
+			"@context": "https://schema.org",
+			"@type": "BlogPosting",
+			headline: post.title,
+			image: [defaultOgImage],
+			datePublished: post.date,
+			dateModified: post.date,
+			author: {
+				"@type": "Person",
+				name: "wintrover",
+				url: `${origin}/`,
+			},
+			description: seoDescription,
+			mainEntityOfPage: canonicalUrl,
+		});
+	} else if (!loading) {
+		seoTitle = "Post not found - wintrover";
+		seoDescription =
+			"The post you're looking for doesn't exist or has been moved.";
+		canonicalUrl = `${origin}/${resolvedLocale}/`;
+		structuredData = "";
+	} else {
+		seoTitle = "Loading post - wintrover";
+		seoDescription = "";
+		canonicalUrl = `${origin}/${resolvedLocale}/`;
+		structuredData = "";
 	}
-
-	meta.setAttribute("content", content);
-}
-
-function updateStructuredData(post, url: string) {
-	const existing =
-		document.querySelector(
-			'script[type="application/ld+json"][data-wintr="structured-data"]',
-		) || null;
-
-	const script =
-		existing instanceof HTMLScriptElement
-			? existing
-			: document.createElement("script");
-
-	script.setAttribute("type", "application/ld+json");
-	script.setAttribute("data-wintr", "structured-data");
-
-	const date =
-		typeof post?.date === "string" && post.date ? post.date : undefined;
-	const excerpt =
-		typeof post?.excerpt === "string" && post.excerpt
-			? post.excerpt
-			: typeof post?.title === "string"
-				? post.title
-				: "";
-
-	const jsonLd = {
-		"@context": "https://schema.org",
-		"@type": "BlogPosting",
-		headline: post?.title ?? "",
-		image: [defaultOgImage],
-		datePublished: date,
-		dateModified: date,
-		author: {
-			"@type": "Person",
-			name: "wintrover",
-			url: `${siteOrigin}/`,
-		},
-		description: excerpt,
-		mainEntityOfPage: url,
-	};
-
-	script.textContent = JSON.stringify(jsonLd);
-
-	if (!existing) {
-		document.head.appendChild(script);
-	}
-}
-
-function updateLinkTag(rel, href) {
-	let link = document.querySelector(`link[rel="${rel}"]`);
-
-	if (!link) {
-		link = document.createElement("link");
-		link.setAttribute("rel", rel);
-		document.head.appendChild(link);
-	}
-
-	link.setAttribute("href", href);
 }
 
 onMount(() => {
@@ -174,31 +137,27 @@ $: if (!loading && post) {
 }
 
 async function updatePostEffects() {
+	if (!browser) return;
 	await tick();
 	setupCodeBlockButtons();
 }
 
-function showCopyToast(codeBlock) {
-	// 기존 토스트 제거
+function showCopyToast(codeBlock: Element) {
 	const existingToast = codeBlock.querySelector(".copy-toast");
 	if (existingToast) {
 		existingToast.remove();
 	}
 
-	// 새 토스트 생성
 	const toast = document.createElement("div");
 	toast.className = "copy-toast";
 	toast.textContent = "code has been copied";
 
-	// 코드 블록에 토스트 추가
 	codeBlock.appendChild(toast);
 
-	// 애니메이션을 위한 지연
 	setTimeout(() => {
 		toast.classList.add("show");
 	}, 10);
 
-	// 3초 후 제거
 	setTimeout(() => {
 		toast.classList.remove("show");
 		setTimeout(() => {
@@ -226,7 +185,8 @@ function setupCodeBlockButtons() {
 			});
 		}
 
-		if (copyButton) {
+		if (copyButton && !copyButton.hasAttribute("data-listener-added")) {
+			copyButton.setAttribute("data-listener-added", "true");
 			copyButton.addEventListener("click", () => {
 				const code = pre.querySelector("code");
 				if (code) {
@@ -254,6 +214,24 @@ void slugify;
 void Comments;
 void goBack;
 </script>
+
+<svelte:head>
+	<title>{seoTitle}</title>
+	{#if seoDescription}
+		<meta name="description" content={seoDescription} />
+	{/if}
+	<meta property="og:title" content={seoTitle} />
+	<meta property="og:description" content={seoDescription} />
+	<meta property="og:type" content={post ? "article" : "website"} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta property="og:image" content={defaultOgImage} />
+	<meta property="og:image:alt" content={post?.title ?? seoTitle} />
+	<meta property="og:site_name" content="wintrover" />
+	<link rel="canonical" href={canonicalUrl} />
+	{#if structuredData}
+		<script type="application/ld+json">{structuredData}</script>
+	{/if}
+</svelte:head>
 
 {#if post}
   <article class="post-detail">

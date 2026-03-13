@@ -9,6 +9,7 @@ import { selectedCategory } from "../src/stores/category";
 // Mock the posts store
 vi.mock("../src/stores/posts", () => ({
 	posts: writable<Post[]>([]),
+	ensurePostsLoaded: vi.fn().mockResolvedValue([]),
 }));
 
 // Now import Sidebar and posts (mocked)

@@ -16,6 +16,7 @@ vi.mock("../src/stores/posts", async () => {
 	const { writable } = await import("svelte/store");
 	return {
 		posts: writable([]),
+		ensurePostsLoaded: vi.fn().mockResolvedValue([]),
 	};
 });
 

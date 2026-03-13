@@ -1,4 +1,5 @@
 <script lang="ts">
+import { defaultOgImage, siteOrigin } from "../lib/config";
 import { detectLocale } from "../lib/locale";
 import en from "../lib/resume/locales/en.json";
 import ko from "../lib/resume/locales/ko.json";
@@ -13,7 +14,10 @@ const resolvedLocale = detectLocale({
 		typeof navigator !== "undefined" ? navigator.language : undefined,
 });
 
-const dict: Dictionary = resolvedLocale === "en" ? (en as any) : (ko as any);
+const dict: Dictionary =
+	resolvedLocale === "en"
+		? (en as unknown as Dictionary)
+		: (ko as unknown as Dictionary);
 
 function getValue(obj: Dictionary, key: string): unknown {
 	return key.split(".").reduce<unknown>((acc, part) => {
@@ -32,18 +36,18 @@ function t(key: string): string {
 
 <svelte:head>
 	<title>{t("meta.title")}</title>
-	<link rel="canonical" href={`https://wintrover.github.io/${resolvedLocale}/resume/`} />
-	<link rel="alternate" hreflang="ko" href="https://wintrover.github.io/ko/resume/" />
-	<link rel="alternate" hreflang="en" href="https://wintrover.github.io/en/resume/" />
-	<link rel="alternate" hreflang="x-default" href="https://wintrover.github.io/" />
+	<link rel="canonical" href={`${siteOrigin}/${resolvedLocale}/resume/`} />
+	<link rel="alternate" hreflang="ko" href={`${siteOrigin}/ko/resume/`} />
+	<link rel="alternate" hreflang="en" href={`${siteOrigin}/en/resume/`} />
+	<link rel="alternate" hreflang="x-default" href={`${siteOrigin}/`} />
 	<meta name="description" content={t("meta.description")} />
 	<meta name="keywords" content={t("meta.keywords")} />
 	<meta name="robots" content="index,follow" />
 	<meta property="og:title" content={t("meta.og_title")} />
 	<meta property="og:description" content={t("meta.og_description")} />
 	<meta property="og:type" content={t("meta.og_type")} />
-	<meta property="og:url" content={`https://wintrover.github.io/${resolvedLocale}/resume/`} />
-	<meta property="og:image" content="https://wintrover.github.io/images/profile.png" />
+	<meta property="og:url" content={`${siteOrigin}/${resolvedLocale}/resume/`} />
+	<meta property="og:image" content={defaultOgImage} />
 	<meta property="og:image:alt" content={t("profile_alt")} />
 	<meta property="og:site_name" content="wintrover" />
 	{#if site.fontAwesomeStylesheetUrl}
