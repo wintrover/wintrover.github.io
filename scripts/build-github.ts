@@ -5,6 +5,17 @@ import { logError } from "../src/lib/log";
 import { parseFrontMatter, slugify } from "../src/lib/utils";
 
 type Env = Record<string, string | undefined>;
+type FrontmatterData = Record<string, unknown>;
+type ResumeMeta = {
+	title?: string;
+	description?: string;
+	og_title?: string;
+	og_description?: string;
+	og_type?: string;
+};
+type ResumeLocaleJson = {
+	meta?: ResumeMeta;
+};
 
 const siteOrigin = "https://wintrover.github.io";
 const defaultOgImage = `${siteOrigin}/images/profile.png`;
@@ -118,18 +129,19 @@ function collectPostEntries(root: string, locale: "ko" | "en") {
 		const fileName = path.basename(filePath, ".md");
 		const raw = fs.readFileSync(filePath, "utf8");
 		const { data } = parseFrontMatter(raw);
+		const frontmatter = data as FrontmatterData;
 		const title =
-			typeof (data as any)?.title === "string" ? (data as any).title : "";
+			typeof frontmatter.title === "string" ? frontmatter.title : "";
 		const slug = slugify(title || fileName || "");
 		if (!slug) continue;
 		const dateRaw =
-			typeof (data as any)?.date === "string" ? (data as any).date : null;
+			typeof frontmatter.date === "string" ? frontmatter.date : null;
 		const lastmod = toLastMod(dateRaw);
 		const excerpt =
-			typeof (data as any)?.excerpt === "string"
-				? (data as any).excerpt
-				: typeof (data as any)?.description === "string"
-					? (data as any).description
+			typeof frontmatter.excerpt === "string"
+				? frontmatter.excerpt
+				: typeof frontmatter.description === "string"
+					? frontmatter.description
 					: "";
 		entries.push({
 			slug,
@@ -153,7 +165,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 		`${locale}.json`,
 	);
 	const raw = fs.readFileSync(resumeLocalePath, "utf8");
-	const json = JSON.parse(raw) as any;
+	const json = JSON.parse(raw) as ResumeLocaleJson;
 	const title = String(json?.meta?.title ?? "wintrover's resume");
 	const description = String(
 		json?.meta?.description ??

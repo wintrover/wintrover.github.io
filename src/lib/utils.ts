@@ -36,7 +36,11 @@ function flattenLegacyAssetsPath(p: string) {
 	return `images/${rest}`;
 }
 
-export function normalizeImageSrc(src: any) {
+type FrontMatterValue = string | number | boolean | string[];
+
+export function normalizeImageSrc(src: string): string;
+export function normalizeImageSrc<T>(src: T): T;
+export function normalizeImageSrc(src: unknown) {
 	if (!src || typeof src !== "string") return src;
 	if (/^(https?:\/\/|data:)/i.test(src)) return src;
 
@@ -100,7 +104,7 @@ function legacyParseFrontMatter(content: string) {
 		.join("\n")
 		.trim();
 
-	const data: Record<string, any> = {};
+	const data: Record<string, FrontMatterValue> = {};
 	for (const line of frontMatterLines) {
 		const trimmed = line.trim();
 		if (trimmed.startsWith("#")) continue;

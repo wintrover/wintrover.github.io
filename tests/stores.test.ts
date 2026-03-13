@@ -74,7 +74,7 @@ describe("posts store", () => {
 		const { ensurePostsLoaded, posts } = await import("../src/stores/posts");
 
 		// subscribe를 통해 데이터 업데이트 확인
-		let data: any[] = [];
+		let data: Post[] = [];
 		const unsubscribe = posts.subscribe((v) => {
 			data = v;
 		});
@@ -93,7 +93,7 @@ describe("posts store", () => {
 
 		const { ensurePostsLoaded, posts } = await import("../src/stores/posts");
 
-		let data: any[] = [1]; // 초기값이 아님을 확인하기 위해
+		let data: unknown[] = [1]; // 초기값이 아님을 확인하기 위해
 		const unsubscribe = posts.subscribe((v) => {
 			data = v;
 		});

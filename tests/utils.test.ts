@@ -10,6 +10,14 @@ import {
 	truncateText,
 } from "../src/lib/utils";
 
+type WintrTestGlobal = typeof globalThis & {
+	__WINTR_BASE_URL__?: string;
+	__WINTR_ENV_BASE_URL__?: string;
+	__WINTR_IMPORT_META_ENV__?: { BASE_URL?: unknown };
+};
+
+const testGlobal = globalThis as WintrTestGlobal;
+
 // TODO: Add tests for .svelte components
 
 // Coverage configuration (added for reference)
@@ -98,276 +106,273 @@ describe("normalizeImageSrc", () => {
 	});
 
 	test("BASE 오버라이드로 startsWith(base) 분기 커버", () => {
-		const prev = (globalThis as any).__WINTR_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = "/x/";
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = "/x/";
 		try {
 			expect(normalizeImageSrc("/x/y.png")).toBe("/x/y.png");
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prev;
+			testGlobal.__WINTR_BASE_URL__ = prev;
 		}
 	});
 
 	test("BASE 오버라이드가 빈 문자열이면 기본 BASE로 폴백된다", () => {
-		const prev = (globalThis as any).__WINTR_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = "";
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = "";
 		try {
 			expect(normalizeImageSrc("/blog/test.png")).toBe("/test.png");
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prev;
+			testGlobal.__WINTR_BASE_URL__ = prev;
 		}
 	});
 
 	test("__WINTR_ENV_BASE_URL__ 오버라이드는 getBase에 적용된다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = "/z/";
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = "/z/";
 		try {
 			expect(normalizeImageSrc("images/a.png")).toBe("/z/images/a.png");
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 		}
 	});
 
 	test("__WINTR_ENV_BASE_URL__가 빈 문자열이면 '/'로 폴백된다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = "";
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = "";
 		try {
 			expect(normalizeImageSrc("/blog/test.png")).toBe("/test.png");
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 		}
 	});
 
 	test("BASE_URL 환경값을 사용해 상대 경로를 prefix 한다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
 		const prevProcessBaseUrl = process.env.BASE_URL;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = undefined;
 		process.env.BASE_URL = "/v/";
 		try {
 			expect(normalizeImageSrc("images/a.png")).toBe("/v/images/a.png");
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 			process.env.BASE_URL = prevProcessBaseUrl;
 		}
 	});
 
 	test("process가 없어도 예외 없이 동작한다", () => {
-		const prev = (globalThis as any).__WINTR_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		vi.stubGlobal("process", undefined as any);
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		vi.stubGlobal("process", undefined);
 		try {
 			expect(() => normalizeImageSrc("images/a.png")).not.toThrow();
 		} finally {
 			vi.unstubAllGlobals();
-			(globalThis as any).__WINTR_BASE_URL__ = prev;
+			testGlobal.__WINTR_BASE_URL__ = prev;
 		}
 	});
 
 	test("process.env.BASE_URL이 string이 아니면 무시한다", () => {
-		const prev = (globalThis as any).__WINTR_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		vi.stubGlobal("process", { env: { BASE_URL: 123 } } as any);
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		vi.stubGlobal("process", {
+			env: { BASE_URL: 123 },
+		} as unknown as NodeJS.Process);
 		try {
 			expect(normalizeImageSrc("images/a.png")).toBe("/images/a.png");
 		} finally {
 			vi.unstubAllGlobals();
-			(globalThis as any).__WINTR_BASE_URL__ = prev;
+			testGlobal.__WINTR_BASE_URL__ = prev;
 		}
 	});
 
 	test("process.env.BASE_URL이 빈 문자열이면 import.meta.env 또는 기본값으로 폴백된다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
-		const hadMetaEnv = Object.hasOwn(
-			globalThis as any,
-			"__WINTR_IMPORT_META_ENV__",
-		);
-		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_IMPORT_META_ENV__ = { BASE_URL: "/" };
-		vi.stubGlobal("process", { env: { BASE_URL: "" } } as any);
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(testGlobal, "__WINTR_IMPORT_META_ENV__");
+		const prevMetaEnv = testGlobal.__WINTR_IMPORT_META_ENV__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = undefined;
+		testGlobal.__WINTR_IMPORT_META_ENV__ = { BASE_URL: "/" };
+		vi.stubGlobal("process", {
+			env: { BASE_URL: "" },
+		} as unknown as NodeJS.Process);
 		try {
 			expect(normalizeImageSrc("/blog/images/a.png")).toBe("/images/a.png");
 		} finally {
 			vi.unstubAllGlobals();
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 			if (hadMetaEnv) {
-				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+				testGlobal.__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
 			} else {
-				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+				delete testGlobal.__WINTR_IMPORT_META_ENV__;
 			}
 		}
 	});
 
 	test("process.env가 없으면 예외 없이 동작한다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
-		vi.stubGlobal("process", { env: undefined } as any);
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", { env: undefined } as unknown as NodeJS.Process);
 		try {
 			expect(() => normalizeImageSrc("images/a.png")).not.toThrow();
 		} finally {
 			vi.unstubAllGlobals();
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 		}
 	});
 
 	test("__WINTR_IMPORT_META_ENV__ BASE_URL이 있으면 이를 사용한다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
-		const hadMetaEnv = Object.hasOwn(
-			globalThis as any,
-			"__WINTR_IMPORT_META_ENV__",
-		);
-		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
-		vi.stubGlobal("process", { env: { BASE_URL: undefined } } as any);
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(testGlobal, "__WINTR_IMPORT_META_ENV__");
+		const prevMetaEnv = testGlobal.__WINTR_IMPORT_META_ENV__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", {
+			env: { BASE_URL: undefined },
+		} as unknown as NodeJS.Process);
 		try {
-			(globalThis as any).__WINTR_IMPORT_META_ENV__ = { BASE_URL: "/m/" };
+			testGlobal.__WINTR_IMPORT_META_ENV__ = { BASE_URL: "/m/" };
 			expect(normalizeImageSrc("images/a.png")).toBe("/m/images/a.png");
 		} finally {
 			vi.unstubAllGlobals();
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 			if (hadMetaEnv) {
-				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+				testGlobal.__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
 			} else {
-				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+				delete testGlobal.__WINTR_IMPORT_META_ENV__;
 			}
 		}
 	});
 
 	test("__WINTR_IMPORT_META_ENV__ BASE_URL이 빈 문자열이면 '/'로 폴백된다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
-		const hadMetaEnv = Object.hasOwn(
-			globalThis as any,
-			"__WINTR_IMPORT_META_ENV__",
-		);
-		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
-		vi.stubGlobal("process", { env: { BASE_URL: undefined } } as any);
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(testGlobal, "__WINTR_IMPORT_META_ENV__");
+		const prevMetaEnv = testGlobal.__WINTR_IMPORT_META_ENV__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", {
+			env: { BASE_URL: undefined },
+		} as unknown as NodeJS.Process);
 		try {
-			(globalThis as any).__WINTR_IMPORT_META_ENV__ = { BASE_URL: "" };
+			testGlobal.__WINTR_IMPORT_META_ENV__ = { BASE_URL: "" };
 			expect(normalizeImageSrc("/blog/images/a.png")).toBe("/images/a.png");
 		} finally {
 			vi.unstubAllGlobals();
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 			if (hadMetaEnv) {
-				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+				testGlobal.__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
 			} else {
-				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+				delete testGlobal.__WINTR_IMPORT_META_ENV__;
 			}
 		}
 	});
 
 	test("__WINTR_IMPORT_META_ENV__ BASE_URL이 string이 아니면 무시한다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
-		const hadMetaEnv = Object.hasOwn(
-			globalThis as any,
-			"__WINTR_IMPORT_META_ENV__",
-		);
-		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
-		vi.stubGlobal("process", { env: { BASE_URL: undefined } } as any);
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(testGlobal, "__WINTR_IMPORT_META_ENV__");
+		const prevMetaEnv = testGlobal.__WINTR_IMPORT_META_ENV__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", {
+			env: { BASE_URL: undefined },
+		} as unknown as NodeJS.Process);
 		try {
-			(globalThis as any).__WINTR_IMPORT_META_ENV__ = { BASE_URL: ["x"] };
+			testGlobal.__WINTR_IMPORT_META_ENV__ = { BASE_URL: ["x"] };
 			expect(() => normalizeImageSrc("images/a.png")).not.toThrow();
 			expect(normalizeImageSrc("images/a.png")).toBe("/images/a.png");
 		} finally {
 			vi.unstubAllGlobals();
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 			if (hadMetaEnv) {
-				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+				testGlobal.__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
 			} else {
-				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+				delete testGlobal.__WINTR_IMPORT_META_ENV__;
 			}
 		}
 	});
 
 	test("__WINTR_IMPORT_META_ENV__가 undefined면 '/'로 폴백된다", () => {
-		const prevBase = (globalThis as any).__WINTR_BASE_URL__;
-		const prevEnvBase = (globalThis as any).__WINTR_ENV_BASE_URL__;
-		const hadMetaEnv = Object.hasOwn(
-			globalThis as any,
-			"__WINTR_IMPORT_META_ENV__",
-		);
-		const prevMetaEnv = (globalThis as any).__WINTR_IMPORT_META_ENV__;
-		(globalThis as any).__WINTR_BASE_URL__ = undefined;
-		(globalThis as any).__WINTR_ENV_BASE_URL__ = undefined;
-		vi.stubGlobal("process", { env: { BASE_URL: undefined } } as any);
+		const prevBase = testGlobal.__WINTR_BASE_URL__;
+		const prevEnvBase = testGlobal.__WINTR_ENV_BASE_URL__;
+		const hadMetaEnv = Object.hasOwn(testGlobal, "__WINTR_IMPORT_META_ENV__");
+		const prevMetaEnv = testGlobal.__WINTR_IMPORT_META_ENV__;
+		testGlobal.__WINTR_BASE_URL__ = undefined;
+		testGlobal.__WINTR_ENV_BASE_URL__ = undefined;
+		vi.stubGlobal("process", {
+			env: { BASE_URL: undefined },
+		} as unknown as NodeJS.Process);
 		try {
-			(globalThis as any).__WINTR_IMPORT_META_ENV__ = undefined;
+			testGlobal.__WINTR_IMPORT_META_ENV__ = undefined;
 			expect(normalizeImageSrc("/blog/images/a.png")).toBe("/images/a.png");
 		} finally {
 			vi.unstubAllGlobals();
-			(globalThis as any).__WINTR_BASE_URL__ = prevBase;
-			(globalThis as any).__WINTR_ENV_BASE_URL__ = prevEnvBase;
+			testGlobal.__WINTR_BASE_URL__ = prevBase;
+			testGlobal.__WINTR_ENV_BASE_URL__ = prevEnvBase;
 			if (hadMetaEnv) {
-				(globalThis as any).__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
+				testGlobal.__WINTR_IMPORT_META_ENV__ = prevMetaEnv;
 			} else {
-				delete (globalThis as any).__WINTR_IMPORT_META_ENV__;
+				delete testGlobal.__WINTR_IMPORT_META_ENV__;
 			}
 		}
 	});
 
 	test("BASE가 trailing slash가 없어도 정상 결합된다", () => {
-		const prev = (globalThis as any).__WINTR_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = "/x";
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = "/x";
 		try {
 			expect(normalizeImageSrc("images/a.png")).toBe("/x/images/a.png");
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prev;
+			testGlobal.__WINTR_BASE_URL__ = prev;
 		}
 	});
 
 	test("BASE가 다른 경우 root-relative는 leading slash를 제거 후 결합된다", () => {
-		const prev = (globalThis as any).__WINTR_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = "/x/";
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = "/x/";
 		try {
 			expect(normalizeImageSrc("/images/a.png")).toBe("/x/images/a.png");
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prev;
+			testGlobal.__WINTR_BASE_URL__ = prev;
 		}
 	});
 
 	test("blog 프리픽스는 경로 시작에서만 제거된다", () => {
-		const prev = (globalThis as any).__WINTR_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = "/";
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = "/";
 		try {
 			expect(normalizeImageSrc("a/blog/test.png")).toBe("/a/blog/test.png");
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prev;
+			testGlobal.__WINTR_BASE_URL__ = prev;
 		}
 	});
 
 	test("Legacy assets 폴더가 2자리 숫자가 아니면 filename만 남는다", () => {
-		const prev = (globalThis as any).__WINTR_BASE_URL__;
-		(globalThis as any).__WINTR_BASE_URL__ = "/";
+		const prev = testGlobal.__WINTR_BASE_URL__;
+		testGlobal.__WINTR_BASE_URL__ = "/";
 		try {
 			expect(normalizeImageSrc("assets/images/012/arch.svg")).toBe(
 				"/images/arch.svg",
 			);
 		} finally {
-			(globalThis as any).__WINTR_BASE_URL__ = prev;
+			testGlobal.__WINTR_BASE_URL__ = prev;
 		}
 	});
 
@@ -476,7 +481,7 @@ describe("truncateText", () => {
 	test("PBT: falsy 입력은 빈 문자열을 반환", () => {
 		fc.assert(
 			fc.property(fc.constantFrom("", null, undefined), (v) => {
-				expect(truncateText(v as any, 10)).toBe("");
+				expect(truncateText(v as unknown as string, 10)).toBe("");
 			}),
 		);
 	});
@@ -531,7 +536,7 @@ describe("slugify", () => {
 	test("PBT: falsy 입력은 빈 문자열을 반환", () => {
 		fc.assert(
 			fc.property(fc.constantFrom("", null, undefined), (v) => {
-				expect(slugify(v as any)).toBe("");
+				expect(slugify(v as unknown as string)).toBe("");
 			}),
 		);
 	});

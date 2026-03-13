@@ -48,6 +48,22 @@ describe("Footer Component", () => {
 		);
 	});
 
+	test("소셜 값이 모두 비어있으면 링크가 렌더링되지 않아야 함", () => {
+		vi.mocked(siteConfig).social = {
+			email: "",
+			github: "",
+			instagram: "",
+			linkedin: "",
+		};
+
+		render(Footer);
+
+		expect(screen.queryByTitle("Email")).not.toBeInTheDocument();
+		expect(screen.queryByTitle("GitHub")).not.toBeInTheDocument();
+		expect(screen.queryByTitle("Instagram")).not.toBeInTheDocument();
+		expect(screen.queryByTitle("LinkedIn")).not.toBeInTheDocument();
+	});
+
 	test("PBT: 소셜 값 유무에 따라 링크 렌더링이 일관되어야 함", () => {
 		fc.assert(
 			fc.property(

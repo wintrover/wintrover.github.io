@@ -103,7 +103,7 @@ describe("Sidebar Component", () => {
 	});
 
 	test("All Posts 클릭 시 'all'로 설정되고 홈으로 이동해야 함", async () => {
-		(selectedCategory as any).set("Project");
+		selectedCategory.set("Project");
 		render(Sidebar);
 
 		const allPostsButton = screen.getByText(/All Posts \(3\)/);
@@ -169,6 +169,7 @@ describe("Sidebar Component", () => {
 			fc.property(
 				fc.array(
 					fc.record({
+						fileName: safeText(1, 12),
 						title: safeText(1, 12),
 						category: fc.oneof(
 							fc.constant(undefined),
@@ -185,23 +186,33 @@ describe("Sidebar Component", () => {
 							maxLength: 4,
 						}),
 						slug: safeText(1, 12),
+						date: fc.string({ minLength: 1, maxLength: 20 }),
+						excerpt: fc.string({ maxLength: 50 }),
+						html: fc.string({ maxLength: 50 }),
+						content: fc.string({ maxLength: 50 }),
 					}),
 					{ minLength: 0, maxLength: 20 },
 				),
 				(generated) => {
 					document.body.innerHTML = "";
-					posts.set(generated as any);
+					const normalized: Post[] = generated.map((post) => ({
+						...post,
+						category: post.category ?? "",
+					}));
+					posts.set(normalized);
 					selectedCategory.set("all");
 					vi.clearAllMocks();
 
 					const { unmount } = render(Sidebar);
 
 					expect(
-						screen.getByText(new RegExp(`All Posts \\(${generated.length}\\)`)),
+						screen.getByText(
+							new RegExp(`All Posts \\(${normalized.length}\\)`),
+						),
 					).toBeInTheDocument();
 
 					const counts = new Map<string, number>();
-					for (const p of generated as any[]) {
+					for (const p of normalized) {
 						if (!p.category) continue;
 						counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
 					}

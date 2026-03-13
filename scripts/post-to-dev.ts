@@ -5,6 +5,25 @@ import matter from "gray-matter";
 import { logError } from "../src/lib/log";
 import { processMermaidDiagrams } from "./image-tools";
 
+type Frontmatter = Record<string, unknown> & {
+	title?: string;
+	date?: string;
+	excerpt?: string;
+	description?: string;
+	canonical_url?: string;
+	cover_image?: string;
+	tags?: string | string[];
+};
+
+type DevToArticleSummary = {
+	id: number;
+	title: string;
+};
+
+type DevToArticleResponse = {
+	url?: string;
+};
+
 function normalizePublicBaseUrl(url: string) {
 	try {
 		if (typeof url !== "string" || !url) return "https://wintrover.github.io/";
@@ -32,9 +51,11 @@ function slugifyTitle(title: string) {
 		.trim();
 }
 
-export function absolutizeSrc(src: string, publicBaseUrl: string) {
+export function absolutizeSrc(src: string, publicBaseUrl: string): string;
+export function absolutizeSrc<T>(src: T, publicBaseUrl: string): T;
+export function absolutizeSrc(src: unknown, publicBaseUrl: string) {
 	try {
-		if (typeof src !== "string" || !src) return src as any;
+		if (typeof src !== "string" || !src) return src;
 		const trimmed = src.trim().replace(/^["']|["']$/g, "");
 		if (
 			trimmed.includes("ufileos.com") ||
@@ -109,7 +130,7 @@ export function absolutizeSrc(src: string, publicBaseUrl: string) {
 		const abs = new URL(p, base).toString();
 		return abs;
 	} catch {
-		return src as any;
+		return src;
 	}
 }
 
@@ -118,7 +139,6 @@ export async function absolutizeImagesInMarkdown(
 	publicBaseUrl: string,
 	firstImageRef: { url: string | null },
 ) {
-	if (typeof markdown !== "string") return markdown as any;
 	let out = markdown;
 
 	// Handle <img> tags
@@ -168,7 +188,8 @@ async function postToDev(filePath: string) {
 	try {
 		const markdownWithMeta = await fs.readFile(filePath, "utf-8");
 		const { data: frontmatter, content } = matter(markdownWithMeta);
-		const rawTags = (frontmatter as any).tags;
+		const typedFrontmatter = frontmatter as Frontmatter;
+		const rawTags = typedFrontmatter.tags;
 		const normalizedTags = Array.isArray(rawTags)
 			? rawTags
 			: typeof rawTags === "string"
@@ -177,7 +198,7 @@ async function postToDev(filePath: string) {
 		const sanitized = Array.from(
 			new Set(
 				normalizedTags
-					.map((t: any) =>
+					.map((t: unknown) =>
 						String(t)
 							.toLowerCase()
 							.replace(/[^a-z0-9]/g, ""),
@@ -190,7 +211,7 @@ async function postToDev(filePath: string) {
 		const mermaidOutputDir = path.join("public", "images");
 		const baseName = path.basename(filePath, path.extname(filePath));
 		const m = baseName.match(/^(\d{4}-\d{2}-\d{2})(?:-(\d+))?/);
-		const datePart = m?.[1] || ((frontmatter as any).date || "").toString();
+		const datePart = m?.[1] || String(typedFrontmatter.date || "");
 		const numPart = m?.[2] || "0";
 		const filenameBase = `${datePart}-${numPart}`;
 		const { content: processedContent, images: mermaidImages } =
@@ -217,27 +238,24 @@ async function postToDev(filePath: string) {
 			firstImageRef,
 		);
 		const slug = slugifyTitle(
-			(frontmatter as any).title ||
-				path.basename(filePath, path.extname(filePath)),
+			typedFrontmatter.title || path.basename(filePath, path.extname(filePath)),
 		);
 		const canonicalUrl =
-			(frontmatter as any).canonical_url || `${publicBaseUrl}#/post/${slug}`;
+			typedFrontmatter.canonical_url || `${publicBaseUrl}#/post/${slug}`;
 		const clampTitle = (t: string) => {
 			if (!t) return "";
 			return t.length <= 128 ? t : `${t.slice(0, 125)}...`;
 		};
 		const article = {
-			title: clampTitle((frontmatter as any).title),
+			title: clampTitle(String(typedFrontmatter.title ?? "")),
 			published: false,
 			body_markdown: bodyMarkdown,
 			tags,
 			description:
-				(frontmatter as any).excerpt ||
-				(frontmatter as any).description ||
-				undefined,
+				typedFrontmatter.excerpt || typedFrontmatter.description || undefined,
 			canonical_url: canonicalUrl,
 			cover_image:
-				(frontmatter as any).cover_image || firstImageRef.url || undefined,
+				typedFrontmatter.cover_image || firstImageRef.url || undefined,
 		};
 
 		// Check if article exists
@@ -251,7 +269,16 @@ async function postToDev(filePath: string) {
 
 		let existingId = null;
 		if (checkResponse.ok) {
-			const articles = (await checkResponse.json()) as any[];
+			const rawArticles = await checkResponse.json();
+			const articles = Array.isArray(rawArticles)
+				? rawArticles.filter(
+						(v): v is DevToArticleSummary =>
+							typeof v === "object" &&
+							v !== null &&
+							typeof (v as DevToArticleSummary).id === "number" &&
+							typeof (v as DevToArticleSummary).title === "string",
+					)
+				: [];
 			const found = articles.find((a) => a.title === article.title);
 			if (found) {
 				existingId = found.id;
@@ -285,12 +312,12 @@ async function postToDev(filePath: string) {
 		}
 
 		if (response.ok) {
-			const result = (await response.json()) as any;
+			const result = (await response.json()) as DevToArticleResponse;
 			console.log(
 				`Successfully ${existingId ? "updated" : "created"} draft: ${result.url}`,
 			);
 		} else {
-			const error = (await response.json()) as any;
+			const error = await response.json();
 			logError("post-to-dev", "Failed to create draft", {
 				apiError: error,
 				error: new Error("Failed to create draft"),
@@ -327,7 +354,7 @@ async function downloadAndHostUCloudImage(
 		}
 		const baseUrl = normalizePublicBaseUrl(publicBaseUrl);
 		return `${baseUrl}/images/${filename}`;
-	} catch (error: any) {
+	} catch (error: unknown) {
 		logError("post-to-dev", "Failed to process UCloud image", {
 			ucloudUrl,
 			error,

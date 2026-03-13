@@ -3,6 +3,7 @@ import fc from "fast-check";
 import { push } from "svelte-spa-router";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import PostDetail from "../src/components/PostDetail.svelte";
+import type { Post } from "../src/lib/postLoader";
 import * as postLoader from "../src/lib/postLoader";
 
 // Mock postLoader
@@ -35,11 +36,11 @@ describe("PostDetail Component", () => {
 		html: "<h1>Header</h1><p>Body content</p>",
 		excerpt: "Detailed excerpt",
 		tags: ["svelte", "testing"],
-	};
+	} satisfies Post;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(mockPost as any);
+		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(mockPost);
 	});
 
 	afterEach(() => {
@@ -67,13 +68,11 @@ describe("PostDetail Component", () => {
 	});
 
 	test("포스트 전환 시 로딩 상태 표시 확인", async () => {
-		let resolveFirst: (value: any) => void = () => {};
-		const firstPromise = new Promise((resolve) => {
+		let resolveFirst: (value: Post | null) => void = () => {};
+		const firstPromise = new Promise<Post | null>((resolve) => {
 			resolveFirst = resolve;
 		});
-		vi.mocked(postLoader.loadPostBySlug).mockReturnValueOnce(
-			firstPromise as any,
-		);
+		vi.mocked(postLoader.loadPostBySlug).mockReturnValueOnce(firstPromise);
 
 		const { rerender } = render(PostDetail, { params: { slug: "first" } });
 
@@ -85,13 +84,11 @@ describe("PostDetail Component", () => {
 		);
 
 		// 두 번째 포스트 로딩 시작
-		let resolveSecond: (value: any) => void = () => {};
-		const secondPromise = new Promise((resolve) => {
+		let resolveSecond: (value: Post | null) => void = () => {};
+		const secondPromise = new Promise<Post | null>((resolve) => {
 			resolveSecond = resolve;
 		});
-		vi.mocked(postLoader.loadPostBySlug).mockReturnValueOnce(
-			secondPromise as any,
-		);
+		vi.mocked(postLoader.loadPostBySlug).mockReturnValueOnce(secondPromise);
 
 		await rerender({ params: { slug: "second" } });
 
@@ -130,9 +127,7 @@ describe("PostDetail Component", () => {
 				</div>
 			`,
 		};
-		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(
-			mockPostWithCode as any,
-		);
+		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(mockPostWithCode);
 
 		render(PostDetail, { params: { slug: "detailed-post" } });
 
@@ -259,9 +254,7 @@ describe("PostDetail Component", () => {
 				</div>
 			`,
 		};
-		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(
-			mockPostWithCode as any,
-		);
+		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(mockPostWithCode);
 
 		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		const writeTextMock = vi

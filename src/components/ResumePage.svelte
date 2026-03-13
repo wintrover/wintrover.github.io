@@ -21,8 +21,8 @@ const dict: Dictionary =
 
 function getValue(obj: Dictionary, key: string): unknown {
 	return key.split(".").reduce<unknown>((acc, part) => {
-		if (acc && typeof acc === "object" && part in (acc as any)) {
-			return (acc as any)[part];
+		if (acc && typeof acc === "object" && part in acc) {
+			return (acc as Dictionary)[part];
 		}
 		return undefined;
 	}, obj);

@@ -208,7 +208,9 @@ describe("Comments Component", () => {
 		wrapper?.appendChild(iframe);
 
 		// 테마 업데이트 호출
-		(component as any).updateTheme("dark");
+		(
+			component as unknown as { updateTheme: (theme: string) => void }
+		).updateTheme("dark");
 
 		expect(postMessageSpy).toHaveBeenCalledWith(
 			{
@@ -309,7 +311,9 @@ describe("Comments Component", () => {
 		wrapper?.appendChild(iframe);
 
 		// 테마 업데이트 호출
-		(component as any).updateTheme("dark");
+		(
+			component as unknown as { updateTheme: (theme: string) => void }
+		).updateTheme("dark");
 
 		expect(postMessageSpy).toHaveBeenCalledWith(
 			expect.objectContaining({

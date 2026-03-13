@@ -160,7 +160,7 @@ describe("postLoader", () => {
 
 	test("loadPostBySlug - 에러 핸들링 (Catch block coverage)", async () => {
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const modules: any = {};
+		const modules: Record<string, string | null> = {};
 		Object.defineProperty(modules, "a.md", {
 			enumerable: true,
 			get() {
@@ -180,7 +180,7 @@ describe("postLoader", () => {
 
 	test("loadPostBySlug - Non-Error 에러는 stack 폴백을 가진다", async () => {
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const modules: any = {};
+		const modules: Record<string, string | null> = {};
 		Object.defineProperty(modules, "a.md", {
 			enumerable: true,
 			get() {
@@ -314,12 +314,15 @@ describe("postLoader", () => {
 		const originalSplit = String.prototype.split;
 		const spy = vi
 			.spyOn(String.prototype, "split")
-			.mockImplementation(function (this: string, ...args: any[]) {
-				const separator = args[0];
+			.mockImplementation(function (this: string, ...args: unknown[]) {
 				if (this === "special-path-for-mock") {
-					return { pop: () => undefined } as any;
+					return [];
 				}
-				return originalSplit.call(this, separator);
+				return Reflect.apply(
+					originalSplit,
+					this,
+					args as Parameters<typeof originalSplit>,
+				) as ReturnType<typeof originalSplit>;
 			});
 
 		const posts = await loadAllPosts({
@@ -335,12 +338,15 @@ describe("postLoader", () => {
 		const originalSplit = String.prototype.split;
 		const spy = vi
 			.spyOn(String.prototype, "split")
-			.mockImplementation(function (this: string, ...args: any[]) {
-				const separator = args[0];
+			.mockImplementation(function (this: string, ...args: unknown[]) {
 				if (this === "special-path-for-mock") {
-					return { pop: () => undefined } as any;
+					return [];
 				}
-				return originalSplit.call(this, separator);
+				return Reflect.apply(
+					originalSplit,
+					this,
+					args as Parameters<typeof originalSplit>,
+				) as ReturnType<typeof originalSplit>;
 			});
 
 		// slugify(data.title || fileName || "") -> slugify("t" || "" || "") -> "t"
@@ -360,22 +366,29 @@ describe("postLoader", () => {
 	});
 
 	test("loadPostBySlug - null and undefined content skip", async () => {
-		const mockModules = {
+		const mockModules: Record<string, string | null> = {
 			"a.md": null,
-			"b.md": undefined,
 			"c.md": "---\ntitle: c\n---",
 		};
-		const post = await loadPostBySlug("c", mockModules as any);
+		Object.defineProperty(mockModules, "b.md", {
+			enumerable: true,
+			get: () => undefined as unknown as string | null,
+		});
+		const post = await loadPostBySlug("c", mockModules);
 		expect(post?.title).toBe("c");
 	});
 
 	test("loadAllPosts - null/undefined content는 skip되고 에러 로그가 없다", async () => {
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const posts = await loadAllPosts({
-			"a.md": null as any,
-			"b.md": undefined as any,
+		const modules: Record<string, string | null> = {
+			"a.md": null,
 			"posts/test.md": "---\ntitle: ok\n---",
+		};
+		Object.defineProperty(modules, "b.md", {
+			enumerable: true,
+			get: () => undefined as unknown as string | null,
 		});
+		const posts = await loadAllPosts(modules);
 		expect(posts).toHaveLength(1);
 		expect(errorSpy).not.toHaveBeenCalled();
 		errorSpy.mockRestore();

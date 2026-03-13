@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 import matter from "gray-matter";
-import puppeteer, { type Browser } from "puppeteer";
+import puppeteer, { type Browser, type ScreenshotOptions } from "puppeteer";
 import { logError } from "../src/lib/log";
 
 const execAsync = promisify(exec);
@@ -34,7 +34,7 @@ async function resolvePublicImageUrl(
 			urlPath = urlPath.substring(7);
 		}
 		return `${publicBaseUrl.replace(/\/$/, "")}/${urlPath}/${filename}`;
-	} catch (error: any) {
+	} catch (error: unknown) {
 		logError("image-tools", "GitHub repo info 가져오기 실패", { error });
 		let urlPath = outputDir.replace(/\\/g, "/");
 		if (urlPath.startsWith("public/")) {
@@ -82,7 +82,7 @@ ${mermaidCode}
 			path: outputPath,
 			type: "png",
 			omitBackground: false,
-		} as any);
+		} as ScreenshotOptions);
 		return outputPath;
 	} catch (error) {
 		logError("image-tools", "Mermaid 이미징 변환 실패", { error });
@@ -243,7 +243,10 @@ async function listMarkdownFiles(dir: string) {
 	return out;
 }
 
-function deriveFilenameBase(filePath: string, frontmatter: any) {
+function deriveFilenameBase(
+	filePath: string,
+	frontmatter: Record<string, unknown>,
+) {
 	const base = path.basename(filePath, path.extname(filePath));
 	const m = base.match(/^(\d{4}-\d{2}-\d{2})(?:-(\d+))?$/);
 	const datePart = m?.[1] || String(frontmatter?.date || "");

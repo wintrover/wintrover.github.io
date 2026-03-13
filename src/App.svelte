@@ -15,7 +15,6 @@ let sidebarElement: HTMLElement | null = null;
 let mainContentElement: HTMLElement | null = null;
 let contentElement: HTMLElement | null = null;
 let manualToggle = false;
-let resizeTimeout: any = null;
 
 const routes = {
 	"/": HomePage,
@@ -37,7 +36,7 @@ $: {
 	}
 }
 
-let checkTimeout: any = null;
+let checkTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function checkSidebarCollision() {
 	if (innerWidth < 768) {

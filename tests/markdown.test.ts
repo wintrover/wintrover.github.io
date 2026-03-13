@@ -26,11 +26,11 @@ vi.mock("marked", async (importActual) => {
 });
 
 describe("markdown utilities", () => {
-	let actualMarkedParse: any;
+	let actualMarkedParse: typeof marked.parse;
 
 	beforeAll(async () => {
 		const actual = await vi.importActual<typeof import("marked")>("marked");
-		actualMarkedParse = actual.marked.parse as any;
+		actualMarkedParse = actual.marked.parse;
 	});
 
 	beforeEach(() => {

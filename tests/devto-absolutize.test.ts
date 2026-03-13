@@ -42,7 +42,8 @@ describe("absolutizeSrc", () => {
 	test("PBT: 빈 값 및 유효하지 않은 타입은 그대로 반환", () => {
 		fc.assert(
 			fc.property(fc.constantFrom("", null, undefined), (v) => {
-				expect(absolutizeSrc(v as any, base)).toBe(v as any);
+				const input = v as unknown as string;
+				expect(absolutizeSrc(input, base)).toBe(input);
 			}),
 		);
 	});

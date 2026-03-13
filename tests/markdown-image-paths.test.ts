@@ -107,7 +107,8 @@ describe("normalizeImageSrc", () => {
 	test("PBT: 유효하지 않은 입력은 그대로 반환한다", () => {
 		fc.assert(
 			fc.property(fc.constantFrom("", null, undefined, 123), (v) => {
-				expect(normalizeImageSrc(v as any)).toBe(v as any);
+				const input = v as unknown as string;
+				expect(normalizeImageSrc(input)).toBe(input);
 			}),
 		);
 	});

@@ -1,27 +1,42 @@
 import type { Post } from "./postLoader";
 
+type RuntimeEnv = {
+	BASE_URL?: unknown;
+};
+
+type WintrGlobal = typeof globalThis & {
+	__WINTR_BASE_URL__?: unknown;
+	__WINTR_ENV_BASE_URL__?: unknown;
+	__WINTR_IMPORT_META_ENV__?: RuntimeEnv;
+	process?: {
+		env?: RuntimeEnv;
+	};
+};
+
+type ImportMetaWithEnv = ImportMeta & {
+	env?: RuntimeEnv;
+};
+
 export function getBaseUrl() {
 	const withTrailingSlash = (s: string) => (s.endsWith("/") ? s : `${s}/`);
+	const globals = globalThis as WintrGlobal;
 
-	const fromGlobal = (globalThis as any).__WINTR_BASE_URL__;
+	const fromGlobal = globals.__WINTR_BASE_URL__;
 	if (typeof fromGlobal === "string" && fromGlobal.length > 0)
 		return withTrailingSlash(fromGlobal);
 
-	const envOverride = (globalThis as any).__WINTR_ENV_BASE_URL__;
+	const envOverride = globals.__WINTR_ENV_BASE_URL__;
 	if (typeof envOverride === "string" && envOverride.length > 0)
 		return withTrailingSlash(envOverride);
 
-	const baseFromProcess = (globalThis as any).process?.env?.BASE_URL;
+	const baseFromProcess = globals.process?.env?.BASE_URL;
 	if (typeof baseFromProcess === "string" && baseFromProcess.length > 0)
 		return withTrailingSlash(baseFromProcess);
 
-	const hasGlobalMetaEnv = Object.hasOwn(
-		globalThis as any,
-		"__WINTR_IMPORT_META_ENV__",
-	);
+	const hasGlobalMetaEnv = Object.hasOwn(globals, "__WINTR_IMPORT_META_ENV__");
 	const metaEnv = hasGlobalMetaEnv
-		? (globalThis as any).__WINTR_IMPORT_META_ENV__
-		: (import.meta as any).env;
+		? globals.__WINTR_IMPORT_META_ENV__
+		: (import.meta as ImportMetaWithEnv).env;
 	const baseFromEnv = metaEnv?.BASE_URL;
 	if (typeof baseFromEnv === "string" && baseFromEnv.length > 0)
 		return withTrailingSlash(baseFromEnv);

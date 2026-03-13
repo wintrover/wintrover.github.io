@@ -155,21 +155,29 @@ describe("BlogList Component", () => {
 	test("카테고리 필터링이 올바르게 작동해야 함", async () => {
 		const mockPosts = [
 			{
+				fileName: "post-1",
 				slug: "post-1",
 				title: "Post 1",
 				category: "Tech",
 				date: "2023-01-01",
-				summary: "Summary 1",
+				tags: [],
+				excerpt: "Summary 1",
+				html: "",
+				content: "",
 			},
 			{
+				fileName: "post-2",
 				slug: "post-2",
 				title: "Post 2",
 				category: "Life",
 				date: "2023-01-02",
-				summary: "Summary 2",
+				tags: [],
+				excerpt: "Summary 2",
+				html: "",
+				content: "",
 			},
-		];
-		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(mockPosts as any);
+		] satisfies Post[];
+		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(mockPosts);
 
 		const { rerender } = render(BlogList, { params: {} });
 		await waitFor(() => {
@@ -281,17 +289,21 @@ describe("BlogList Component", () => {
 					document.body.innerHTML = "";
 					const [catA, catB] = categoryPair;
 					const posts = titles.map((title, i) => ({
+						fileName: `post-${i}`,
 						title,
 						slug: `post-${i}`,
 						category: i % 2 === 0 ? catA : catB,
 						date: "2023-01-01",
+						tags: [],
 						excerpt: `Excerpt ${i}`,
+						html: "",
+						content: "",
 					}));
 
 					const chosen = posts[idx % posts.length].category;
 					const chosenSlug = slugify(chosen);
 
-					vi.mocked(postLoader.loadAllPosts).mockResolvedValue(posts as any);
+					vi.mocked(postLoader.loadAllPosts).mockResolvedValue(posts);
 					selectedCategory.set("all");
 
 					const { unmount } = render(BlogList, {
@@ -332,14 +344,18 @@ describe("BlogList Component", () => {
 				async (titles) => {
 					document.body.innerHTML = "";
 					const posts = titles.map((title, i) => ({
+						fileName: `post-${i}`,
 						title,
 						slug: `post-${i}`,
 						category: "Tech",
 						date: "2023-01-01",
+						tags: [],
 						excerpt: `Excerpt ${i}`,
+						html: "",
+						content: "",
 					}));
 
-					vi.mocked(postLoader.loadAllPosts).mockResolvedValue(posts as any);
+					vi.mocked(postLoader.loadAllPosts).mockResolvedValue(posts);
 					selectedCategory.set("all");
 
 					const { unmount } = render(BlogList, {

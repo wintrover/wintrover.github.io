@@ -41,7 +41,7 @@ class MockResizeObserver {
 	unobserve = vi.fn();
 	disconnect = vi.fn();
 }
-window.ResizeObserver = MockResizeObserver as any;
+window.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
 // Import App after mocks
 import App from "../src/App.svelte";
@@ -302,7 +302,7 @@ describe("App.svelte", () => {
 		const errorPromise = Promise.reject(error);
 		errorPromise.catch(() => {});
 
-		vi.mocked(posts).set(errorPromise as any);
+		vi.mocked(posts).set(errorPromise as unknown as []);
 
 		render(App);
 		await tick();
