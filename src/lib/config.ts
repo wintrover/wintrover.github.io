@@ -1,3 +1,5 @@
+import type { Post } from "./postLoader";
+
 export function getBaseUrl() {
 	const withTrailingSlash = (s: string) => (s.endsWith("/") ? s : `${s}/`);
 
@@ -31,6 +33,68 @@ const baseUrl = getBaseUrl();
 
 export const siteOrigin = "https://wintrover.github.io";
 export const defaultOgImage = `${siteOrigin}/images/profile.png`;
+export const blogDefaultSeo = {
+	title: "wintrover - Product Engineer & Builder",
+	description: {
+		ko: "wintrover의 프로덕트 개발 블로그. AI/LLM, 컴퓨터 비전, 제품 만들기 기록.",
+		en: "wintrover's product engineering blog. Notes on AI/LLM, computer vision, and building products.",
+	},
+};
+
+export function buildPostDetailSeo(args: {
+	post: Post | null;
+	loading: boolean;
+	slug: string;
+	resolvedLocale: "ko" | "en";
+}) {
+	const { post, loading, slug, resolvedLocale } = args;
+	const origin = getRuntimeOrigin();
+
+	if (post) {
+		const seoTitle = `${post.title} - wintrover`;
+		const seoDescription = post.excerpt || post.title;
+		const canonicalUrl = slug
+			? `${origin}/${resolvedLocale}/post/${slug}/`
+			: `${origin}/${resolvedLocale}/`;
+		return {
+			seoTitle,
+			seoDescription,
+			canonicalUrl,
+			structuredData: JSON.stringify({
+				"@context": "https://schema.org",
+				"@type": "BlogPosting",
+				headline: post.title,
+				image: [defaultOgImage],
+				datePublished: post.date,
+				dateModified: post.date,
+				author: {
+					"@type": "Person",
+					name: "wintrover",
+					url: `${origin}/`,
+				},
+				description: seoDescription,
+				mainEntityOfPage: canonicalUrl,
+			}),
+		};
+	}
+
+	if (!loading) {
+		return {
+			seoTitle: "Post not found - wintrover",
+			seoDescription:
+				"The post you're looking for doesn't exist or has been moved.",
+			canonicalUrl: `${origin}/${resolvedLocale}/`,
+			structuredData: "",
+		};
+	}
+
+	return {
+		seoTitle: "Loading post - wintrover",
+		seoDescription: "",
+		canonicalUrl: `${origin}/${resolvedLocale}/`,
+		structuredData: "",
+	};
+}
 
 export function getRuntimeOrigin() {
 	if (typeof window === "undefined") return siteOrigin;

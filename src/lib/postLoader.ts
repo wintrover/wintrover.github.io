@@ -147,10 +147,6 @@ function determineCategoryFromPath(filePath: string) {
 	return categories.defaultCategory;
 }
 
-function getFileNameFromPath(filePath: string) {
-	return splitPathParts(filePath).pop()?.replace(".md", "") || "";
-}
-
 function derivePostSlug(data: PostFrontMatter, fileName: string) {
 	const title = typeof data.title === "string" ? data.title : "";
 	return slugify(title || fileName || "");
@@ -206,6 +202,27 @@ function processPostMetadata(
 	} as PostBase;
 }
 
+function parsePostFromModule(path: string, content: string): Post | null {
+	try {
+		const { data, content: markdownBody } = parseFrontMatter(content);
+		const post = processPostMetadata(
+			path,
+			data as PostFrontMatter,
+			markdownBody,
+		);
+		return {
+			...post,
+			content: markdownBody,
+		} as Post;
+	} catch (postError) {
+		logError("postLoader", "포스트 파싱 중 에러 발생", {
+			path,
+			error: postError,
+		});
+		return null;
+	}
+}
+
 export async function loadAllPosts(
 	modulesOverride?: Record<string, string | null>,
 ): Promise<Post[]> {
@@ -220,24 +237,10 @@ export async function loadAllPosts(
 		const posts: Post[] = [];
 
 		for (const [path, content] of Object.entries(modules)) {
-			try {
-				if (content === null || content === undefined) continue;
-
-				const { data, content: markdownBody } = parseFrontMatter(content);
-				const post = processPostMetadata(
-					path,
-					data as PostFrontMatter,
-					markdownBody,
-				);
-				posts.push({
-					...post,
-					content: markdownBody,
-				} as Post);
-			} catch (postError) {
-				logError("postLoader", "포스트 파싱 중 에러 발생", {
-					path,
-					error: postError,
-				});
+			if (content === null || content === undefined) continue;
+			const post = parsePostFromModule(path, content);
+			if (post) {
+				posts.push(post);
 			}
 		}
 
@@ -294,44 +297,17 @@ export async function loadPostBySlug(
 	try {
 		const modules: Record<string, string | null> =
 			modulesOverride || (await getPostFiles());
-		let target: { path: string; content: string } | null = null;
-
-		for (const path in modules) {
-			const content = modules[path];
+		for (const [path, content] of Object.entries(modules)) {
 			if (content === null || content === undefined) continue;
-
-			const fileName = getFileNameFromPath(path);
-			const { data } = parseFrontMatter(content);
-			const postSlug = derivePostSlug(data as PostFrontMatter, fileName);
-
-			if (postSlug === slug) {
-				target = { path, content };
-				break;
+			const post = parsePostFromModule(path, content);
+			if (post && post.slug === slug) {
+				return post;
 			}
 		}
-
-		if (target === null) {
-			logWarn(
-				"postLoader",
-				`해당 슬러그에 대한 포스트를 찾을 수 없음: ${slug}`,
-				{
-					slug,
-				},
-			);
-			return null;
-		}
-
-		const { data, content: markdownBody } = parseFrontMatter(target.content);
-		const post = processPostMetadata(
-			target.path,
-			data as PostFrontMatter,
-			markdownBody,
-		);
-
-		return {
-			...post,
-			content: markdownBody,
-		} as Post;
+		logWarn("postLoader", `해당 슬러그에 대한 포스트를 찾을 수 없음: ${slug}`, {
+			slug,
+		});
+		return null;
 	} catch (error) {
 		logError("postLoader", `슬러그(${slug})로 포스트 로딩 중 에러 발생`, {
 			slug,

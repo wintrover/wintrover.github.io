@@ -4,6 +4,7 @@ import { get, writable } from "svelte/store";
 import { push } from "svelte-spa-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { Post } from "../src/lib/postLoader";
+import { buildSidebarData } from "../src/lib/postQuery";
 import { selectedCategory } from "../src/stores/category";
 
 // Mock the posts store
@@ -217,5 +218,73 @@ describe("Sidebar Component", () => {
 			),
 			{ numRuns: 50 },
 		);
+	});
+
+	test("buildSidebarData는 configured 태그와 포스트 태그를 병합해야 함", () => {
+		const generatedPosts: Post[] = [
+			{
+				fileName: "a",
+				title: "A",
+				category: "Company Work",
+				tags: ["Vitest"],
+				slug: "a",
+				date: "2024-01-01",
+				excerpt: "",
+				html: "",
+				content: "",
+			},
+		];
+		const config = {
+			categories: {
+				company: { name: "Company Work", tags: ["Vitest", "SMBholdings"] },
+			},
+		};
+
+		const result = buildSidebarData(generatedPosts, config);
+		const companyGroup = result.categoryGroups.find(
+			(group) => group.category.label === "Company Work",
+		);
+
+		expect(result.allPostsItem.count).toBe(1);
+		expect(companyGroup).toBeDefined();
+		expect(companyGroup?.tags.map((tag) => tag.label)).toEqual([
+			"SMBholdings",
+			"Vitest",
+		]);
+		expect(
+			companyGroup?.tags.find((tag) => tag.label === "SMBholdings")?.count,
+		).toBe(0);
+		expect(
+			companyGroup?.tags.find((tag) => tag.label === "Vitest")?.count,
+		).toBe(1);
+	});
+
+	test("buildSidebarData는 configured 태그가 없는 카테고리엔 태그 목록을 만들지 않아야 함", () => {
+		const generatedPosts: Post[] = [
+			{
+				fileName: "b",
+				title: "B",
+				category: "Project",
+				tags: ["Svelte"],
+				slug: "b",
+				date: "2024-01-02",
+				excerpt: "",
+				html: "",
+				content: "",
+			},
+		];
+		const config = {
+			categories: {
+				project: { name: "Project", tags: [] },
+			},
+		};
+
+		const result = buildSidebarData(generatedPosts, config);
+		const projectGroup = result.categoryGroups.find(
+			(group) => group.category.label === "Project",
+		);
+
+		expect(projectGroup).toBeDefined();
+		expect(projectGroup?.tags).toHaveLength(0);
 	});
 });

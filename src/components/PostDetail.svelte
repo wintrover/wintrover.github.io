@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onMount, tick } from "svelte";
 import { push } from "svelte-spa-router";
-import { defaultOgImage, getRuntimeOrigin } from "../lib/config";
+import { buildPostDetailSeo, defaultOgImage } from "../lib/config";
 import { detectLocale } from "../lib/locale";
 import { logError } from "../lib/log";
 import { loadPostBySlug, type Post } from "../lib/postLoader";
@@ -80,42 +80,12 @@ $: resolvedLocale = detectLocale({
 });
 
 $: {
-	const origin = getRuntimeOrigin();
 	const slug = params?.slug ?? "";
-
-	if (post) {
-		seoTitle = `${post.title} - wintrover`;
-		seoDescription = post.excerpt || post.title;
-		canonicalUrl = slug
-			? `${origin}/${resolvedLocale}/post/${slug}/`
-			: `${origin}/${resolvedLocale}/`;
-		structuredData = JSON.stringify({
-			"@context": "https://schema.org",
-			"@type": "BlogPosting",
-			headline: post.title,
-			image: [defaultOgImage],
-			datePublished: post.date,
-			dateModified: post.date,
-			author: {
-				"@type": "Person",
-				name: "wintrover",
-				url: `${origin}/`,
-			},
-			description: seoDescription,
-			mainEntityOfPage: canonicalUrl,
-		});
-	} else if (!loading) {
-		seoTitle = "Post not found - wintrover";
-		seoDescription =
-			"The post you're looking for doesn't exist or has been moved.";
-		canonicalUrl = `${origin}/${resolvedLocale}/`;
-		structuredData = "";
-	} else {
-		seoTitle = "Loading post - wintrover";
-		seoDescription = "";
-		canonicalUrl = `${origin}/${resolvedLocale}/`;
-		structuredData = "";
-	}
+	const seo = buildPostDetailSeo({ post, loading, slug, resolvedLocale });
+	seoTitle = seo.seoTitle;
+	seoDescription = seo.seoDescription;
+	canonicalUrl = seo.canonicalUrl;
+	structuredData = seo.structuredData;
 }
 
 onMount(() => {

@@ -1,8 +1,13 @@
 <script lang="ts">
 import { push } from "svelte-spa-router";
-import { defaultOgImage, getRuntimeOrigin } from "../lib/config";
+import {
+	blogDefaultSeo,
+	defaultOgImage,
+	getRuntimeOrigin,
+} from "../lib/config";
 import { detectLocale } from "../lib/locale";
 import type { Post } from "../lib/postLoader";
+import { filterPostsByRoute, toPostArray } from "../lib/postQuery";
 import { formatDate, slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
 import { ensurePostsLoaded, posts as postsStore } from "../stores/posts";
@@ -13,9 +18,8 @@ const browser =
 
 let filteredPosts: Post[] = [];
 let resolvedLocale: "ko" | "en" = "en";
-let seoTitle = "wintrover - Product Engineer & Builder";
-let seoDescription =
-	"wintrover's product engineering blog. Notes on AI/LLM, computer vision, and building products.";
+let seoTitle = blogDefaultSeo.title;
+let seoDescription = blogDefaultSeo.description.en;
 let seoUrl = `${getRuntimeOrigin()}/`;
 let requestedPosts = false;
 
@@ -35,46 +39,23 @@ $: resolvedLocale = detectLocale({
 });
 
 $: {
-	const allPosts: Post[] = Array.isArray($postsStore)
-		? ($postsStore as Post[])
-		: [];
-
-	if (params.category) {
-		const categoryPosts = allPosts.filter(
-			(p) => slugify(p.category) === params.category,
-		);
-		if (params.tag) {
-			filteredPosts = categoryPosts.filter((p) =>
-				p.tags.some((tag) => slugify(tag) === params.tag),
-			);
-			selectedCategory.set(
-				`${categoryPosts[0]?.category || "all"} - ${params.tag}`,
-			);
-		} else {
-			filteredPosts = categoryPosts;
-			selectedCategory.set(categoryPosts[0]?.category || "all");
-		}
-	} else {
-		filteredPosts = allPosts;
-		selectedCategory.set("all");
-	}
+	const allPosts = toPostArray($postsStore);
+	const filterResult = filterPostsByRoute(allPosts, params);
+	filteredPosts = filterResult.filteredPosts;
+	selectedCategory.set(filterResult.selectedCategoryValue);
 
 	const isKo = resolvedLocale === "ko";
-	const categoryLabel = params.category
-		? filteredPosts?.[0]?.category || params.category
-		: "";
-	const tagLabel = params.tag ? `#${params.tag}` : "";
+	const categoryLabel = filterResult.categoryLabel;
+	const tagLabel = filterResult.tagLabel ? `#${filterResult.tagLabel}` : "";
 
 	seoTitle = params.category
 		? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} - wintrover`
-		: "wintrover - Product Engineer & Builder";
+		: blogDefaultSeo.title;
 	seoDescription = params.category
 		? isKo
 			? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} 글 목록`
 			: `Posts in ${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""}.`
-		: isKo
-			? "wintrover의 프로덕트 개발 블로그. AI/LLM, 컴퓨터 비전, 제품 만들기 기록."
-			: "wintrover's product engineering blog. Notes on AI/LLM, computer vision, and building products.";
+		: blogDefaultSeo.description[isKo ? "ko" : "en"];
 	seoUrl = browser
 		? window.location.href
 		: `${getRuntimeOrigin()}/${resolvedLocale}/`;

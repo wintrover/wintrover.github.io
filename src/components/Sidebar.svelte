@@ -2,23 +2,14 @@
 import { push } from "svelte-spa-router";
 import categoryConfig from "../lib/categories.json";
 import { siteConfig } from "../lib/config";
-import { slugify } from "../lib/utils";
+import {
+	buildSidebarData,
+	type CategoryGroup,
+	type SidebarItem,
+	toPostArray,
+} from "../lib/postQuery";
 import { selectedCategory } from "../stores/category";
 import { posts } from "../stores/posts";
-
-type SidebarItem = {
-	label: string;
-	slug: string;
-	count: number;
-	value: string;
-	isTag?: boolean;
-	parentSlug?: string;
-};
-
-type CategoryGroup = {
-	category: SidebarItem;
-	tags: SidebarItem[];
-};
 
 let allPostsItem: SidebarItem = {
 	label: "All Posts",
@@ -35,92 +26,9 @@ void posts;
 $: resumeUrl = "/resume/";
 
 $: {
-	const configuredTagsByCategoryName: Record<string, string[]> = {};
-	const categoryEntries = (categoryConfig as any)?.categories ?? {};
-	for (const entry of Object.values(categoryEntries)) {
-		const name = (entry as any)?.name;
-		const tags = (entry as any)?.tags;
-		if (typeof name === "string" && name) {
-			configuredTagsByCategoryName[name] = Array.isArray(tags)
-				? tags.map((t) => String(t)).filter(Boolean)
-				: [];
-		}
-	}
-	const categoriesWithConfiguredTags = new Set(
-		Object.entries(configuredTagsByCategoryName)
-			.filter(([, tags]) => Array.isArray(tags) && tags.length > 0)
-			.map(([name]) => name),
-	);
-
-	const categoryCount: Record<string, number> = {};
-	const tagCountByCategory: Record<string, Record<string, number>> = {};
-
-	if (Array.isArray($posts)) {
-		$posts.forEach((post) => {
-			if (post.category) {
-				categoryCount[post.category] = (categoryCount[post.category] || 0) + 1;
-
-				if (categoriesWithConfiguredTags.has(post.category)) {
-					tagCountByCategory[post.category] =
-						tagCountByCategory[post.category] || {};
-					post.tags.forEach((tag) => {
-						tagCountByCategory[post.category][tag] =
-							(tagCountByCategory[post.category][tag] || 0) + 1;
-					});
-				}
-			}
-		});
-	}
-
-	allPostsItem = {
-		label: "All Posts",
-		slug: "all",
-		count: Array.isArray($posts) ? $posts.length : 0,
-		value: "all",
-	};
-
-	const nextCategoryGroups: CategoryGroup[] = [];
-
-	for (const [name, count] of Object.entries(categoryCount).sort(([a], [b]) =>
-		a.localeCompare(b),
-	)) {
-		const categorySlug = slugify(name);
-		const categoryItem: SidebarItem = {
-			label: name,
-			slug: categorySlug,
-			count,
-			value: name,
-		};
-		const tagsForCategory: SidebarItem[] = [];
-
-		if (categoriesWithConfiguredTags.has(name)) {
-			const fromConfig = configuredTagsByCategoryName[name] ?? [];
-			const fromPosts = Object.keys(tagCountByCategory[name] ?? {});
-			const tags = Array.from(new Set([...fromConfig, ...fromPosts]))
-				.map((t) => String(t).trim())
-				.filter(Boolean)
-				.sort((a, b) => a.localeCompare(b));
-
-			for (const tag of tags) {
-				const tagSlug = slugify(tag);
-				tagsForCategory.push({
-					label: tag,
-					slug: tagSlug,
-					count: tagCountByCategory[name]?.[tag] ?? 0,
-					value: `${name} - ${tagSlug}`,
-					isTag: true,
-					parentSlug: categorySlug,
-				});
-			}
-		}
-
-		nextCategoryGroups.push({
-			category: categoryItem,
-			tags: tagsForCategory,
-		});
-	}
-
-	categoryGroups = nextCategoryGroups;
+	const sidebarData = buildSidebarData(toPostArray($posts), categoryConfig);
+	allPostsItem = sidebarData.allPostsItem;
+	categoryGroups = sidebarData.categoryGroups;
 }
 
 function selectCategory(item: SidebarItem) {
