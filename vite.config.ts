@@ -22,11 +22,13 @@ export default defineConfig(({ mode }) => {
 	return {
 		plugins: [
 			svelte({
+				configFile: false,
 				preprocess: vitePreprocess({ script: true }),
 				emitCss: mode !== "test",
 			}),
 		],
 		resolve: {
+			conditions: mode === "test" ? ["browser"] : undefined,
 			alias: {
 				"svelte-spa-router": path.resolve(
 					__dirname,
@@ -81,6 +83,7 @@ export default defineConfig(({ mode }) => {
 				BASE_URL: "/",
 			},
 		},
+		ssr: mode === "test" ? { resolve: { conditions: ["browser"] } } : undefined,
 		server: {
 			historyApiFallback: true,
 		},

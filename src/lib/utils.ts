@@ -1,29 +1,4 @@
-function getBase() {
-	const fromGlobal = (globalThis as any).__WINTR_BASE_URL__;
-	if (typeof fromGlobal === "string" && fromGlobal.length > 0)
-		return fromGlobal;
-
-	const envOverride = (globalThis as any).__WINTR_ENV_BASE_URL__;
-	if (typeof envOverride === "string" && envOverride.length > 0)
-		return envOverride;
-
-	const baseFromProcess = (globalThis as any).process?.env?.BASE_URL;
-	if (typeof baseFromProcess === "string" && baseFromProcess.length > 0)
-		return baseFromProcess;
-
-	const hasGlobalMetaEnv = Object.hasOwn(
-		globalThis as any,
-		"__WINTR_IMPORT_META_ENV__",
-	);
-	const metaEnv = hasGlobalMetaEnv
-		? (globalThis as any).__WINTR_IMPORT_META_ENV__
-		: (import.meta as any).env;
-	const baseFromEnv = metaEnv?.BASE_URL;
-	if (typeof baseFromEnv === "string" && baseFromEnv.length > 0)
-		return baseFromEnv;
-
-	return "/";
-}
+import { getBaseUrl } from "./config";
 
 function stripTrailingSlash(s: string) {
 	return s.endsWith("/") ? s.slice(0, -1) : s;
@@ -65,7 +40,7 @@ export function normalizeImageSrc(src: any) {
 	if (!src || typeof src !== "string") return src;
 	if (/^(https?:\/\/|data:)/i.test(src)) return src;
 
-	const base = getBase();
+	const base = getBaseUrl();
 	let p = src;
 	if (p.startsWith(base)) {
 		p = p.slice(base.length);
@@ -104,7 +79,7 @@ export function slugify(text: string) {
 	return tokens ? tokens.join("-") : "";
 }
 
-export function parseFrontMatter(content: string) {
+function legacyParseFrontMatter(content: string) {
 	const lines = content.split(/\r?\n/);
 	const delimiter = /^---\s*$/;
 	if (!delimiter.test(lines[0])) {
@@ -172,4 +147,8 @@ export function parseFrontMatter(content: string) {
 	}
 
 	return { data, content: body };
+}
+
+export function parseFrontMatter(content: string) {
+	return legacyParseFrontMatter(content);
 }

@@ -68,15 +68,13 @@ function determineCategoryFromPath(filePath: string) {
 	const folderName =
 		pathParts.length >= 2 ? pathParts[pathParts.length - 2] : "";
 	const key = folderName.toLowerCase();
-	const folderMapping: Record<string, string> = {
-		project: "Project",
-		company: "Company Work",
-		tutorial: "Tutorial",
-		general: "General",
-	};
-	const fromMapping = folderMapping[key];
 	const fromConfig = categories.categories?.[key]?.name;
-	return fromMapping || fromConfig || categories.defaultCategory;
+	if (fromConfig) return fromConfig;
+	if (key === "project") return "Project";
+	if (key === "company") return "Company Work";
+	if (key === "tutorial") return "Tutorial";
+	if (key === "general") return "General";
+	return categories.defaultCategory;
 }
 
 function getFileNameFromPath(filePath: string) {
