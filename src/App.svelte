@@ -204,7 +204,7 @@ onDestroy(() => {
   #app-container {
     display: flex;
     min-height: 100vh;
-    transition: all 0.01s ease;
+    transition: margin-left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   #sidebar {
@@ -219,7 +219,7 @@ onDestroy(() => {
     padding: 0;
     box-sizing: border-box;
     transform: translateX(0);
-    transition: transform 0.01s ease;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     z-index: 1000;
   }
 
@@ -237,7 +237,7 @@ onDestroy(() => {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: margin-left 0.01s ease;
+    transition: margin-left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   #content {
@@ -300,6 +300,14 @@ onDestroy(() => {
       left: 8px;
       width: 32px;
       height: 32px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #app-container,
+    #sidebar,
+    #main-content {
+      transition-duration: 0.01ms;
     }
   }
 </style>
