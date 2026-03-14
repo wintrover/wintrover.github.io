@@ -5,13 +5,30 @@ import { push } from "svelte-spa-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import BlogList from "../src/components/BlogList.svelte";
 import type { Post } from "../src/lib/postLoader";
-import * as postLoader from "../src/lib/postLoader";
 import { slugify } from "../src/lib/utils";
 import { selectedCategory } from "../src/stores/category";
 
-// Mock postLoader
-vi.mock("../src/lib/postLoader", () => ({
-	loadAllPosts: vi.fn(),
+const { mockPostsStore } = vi.hoisted(() => {
+	let value: Post[] = [];
+	const subscribers = new Set<(posts: Post[]) => void>();
+	const store = {
+		subscribe(run: (posts: Post[]) => void) {
+			run(value);
+			subscribers.add(run);
+			return () => subscribers.delete(run);
+		},
+		set(next: Post[]) {
+			value = next;
+			subscribers.forEach((run) => {
+				run(value);
+			});
+		},
+	};
+	return { mockPostsStore: store };
+});
+
+vi.mock("../src/stores/posts", () => ({
+	posts: mockPostsStore,
 }));
 
 // Mock svelte-spa-router
@@ -56,7 +73,8 @@ describe("BlogList Component", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(mockPosts);
+		selectedCategory.set("all");
+		mockPostsStore.set(mockPosts);
 	});
 
 	test("전체 포스트 목록을 렌더링해야 함", async () => {
@@ -73,7 +91,7 @@ describe("BlogList Component", () => {
 	});
 
 	test("포스팅 목록 배지는 카테고리가 아니라 태그를 표시해야 함", async () => {
-		vi.mocked(postLoader.loadAllPosts).mockResolvedValue([
+		mockPostsStore.set([
 			{
 				fileName: "company-post",
 				title: "Company Post",
@@ -134,18 +152,10 @@ describe("BlogList Component", () => {
 		expect(push).toHaveBeenCalledWith("/post/post-1");
 	});
 
-	test("에러 발생 시 에러 로그를 출력하고 목록을 비워야 함", async () => {
-		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const error = new Error("Fetch error");
-		vi.mocked(postLoader.loadAllPosts).mockRejectedValue(error);
-
+	test("스토어가 빈 배열이면 빈 목록을 렌더링해야 함", async () => {
+		mockPostsStore.set([]);
 		render(BlogList);
-
 		await waitFor(() => {
-			expect(consoleSpy).toHaveBeenCalledWith(
-				expect.stringContaining("❌ [postsStore] 포스트 로딩 실패"),
-				expect.any(Object),
-			);
 			expect(
 				screen.getByText("No posts found in this category."),
 			).toBeInTheDocument();
@@ -177,7 +187,7 @@ describe("BlogList Component", () => {
 				content: "",
 			},
 		] satisfies Post[];
-		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(mockPosts);
+		mockPostsStore.set(mockPosts);
 
 		const { rerender } = render(BlogList, { params: {} });
 		await waitFor(() => {
@@ -225,7 +235,7 @@ describe("BlogList Component", () => {
 			},
 		] satisfies Post[];
 
-		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(listPosts);
+		mockPostsStore.set(listPosts);
 
 		const { container, rerender } = render(BlogList, {
 			params: { category: "company-work" },
@@ -275,7 +285,7 @@ describe("BlogList Component", () => {
 			},
 		] satisfies Post[];
 
-		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(listPosts);
+		mockPostsStore.set(listPosts);
 
 		const { container, rerender } = render(BlogList, {
 			params: { category: "company-work", tag: "smbholdings" },
@@ -300,7 +310,7 @@ describe("BlogList Component", () => {
 	});
 
 	test("포스트 데이터가 없을 때 빈 목록 표시", async () => {
-		vi.mocked(postLoader.loadAllPosts).mockResolvedValue([]);
+		mockPostsStore.set([]);
 		render(BlogList);
 		await waitFor(() => {
 			expect(
@@ -309,17 +319,10 @@ describe("BlogList Component", () => {
 		});
 	});
 
-	test("문자열 에러 발생 시에도 올바르게 처리해야 함", async () => {
-		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		vi.mocked(postLoader.loadAllPosts).mockRejectedValue("String error");
-
-		render(BlogList);
-
+	test("선택된 카테고리에 일치하는 포스트가 없으면 빈 목록을 표시해야 함", async () => {
+		mockPostsStore.set(mockPosts);
+		render(BlogList, { params: { category: "tech", tag: "not-found-tag" } });
 		await waitFor(() => {
-			expect(consoleSpy).toHaveBeenCalledWith(
-				expect.stringContaining("❌ [postsStore] 포스트 로딩 실패"),
-				expect.objectContaining({ message: "String error" }),
-			);
 			expect(
 				screen.getByText("No posts found in this category."),
 			).toBeInTheDocument();
@@ -347,7 +350,7 @@ describe("BlogList Component", () => {
 	});
 
 	test("포스트에 카테고리나 요약이 없을 때도 정상 렌더링되어야 함", async () => {
-		vi.mocked(postLoader.loadAllPosts).mockResolvedValue([
+		mockPostsStore.set([
 			{
 				fileName: "no-meta",
 				title: "No Meta Post",
@@ -403,7 +406,7 @@ describe("BlogList Component", () => {
 					const chosen = posts[idx % posts.length].category;
 					const chosenSlug = slugify(chosen);
 
-					vi.mocked(postLoader.loadAllPosts).mockResolvedValue(posts);
+					mockPostsStore.set(posts);
 					selectedCategory.set("all");
 
 					const { unmount } = render(BlogList, {
@@ -455,7 +458,7 @@ describe("BlogList Component", () => {
 						content: "",
 					}));
 
-					vi.mocked(postLoader.loadAllPosts).mockResolvedValue(posts);
+					mockPostsStore.set(posts);
 					selectedCategory.set("all");
 
 					const { unmount } = render(BlogList, {

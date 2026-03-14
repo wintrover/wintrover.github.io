@@ -1,25 +1,21 @@
 <script lang="ts">
 import { defaultOgImage, siteOrigin } from "../lib/config";
-import { detectLocale } from "../lib/locale";
+import { detectLocaleFromRuntime, localePrefix } from "../lib/locale";
 import en from "../lib/resume/locales/en.json";
 import ko from "../lib/resume/locales/ko.json";
 import { content, site } from "../lib/resume/site";
 
 type Dictionary = Record<string, unknown>;
 
-const resolvedLocale = detectLocale({
-	envLocale: import.meta.env.VITE_LOCALE,
-	pathname: typeof window !== "undefined" ? window.location.pathname : "/",
-	navigatorLanguage:
-		typeof navigator !== "undefined" ? navigator.language : undefined,
-});
+const resolvedLocale = detectLocaleFromRuntime(
+	typeof window !== "undefined" ? window.location.pathname : "/",
+);
 
 const dict: Dictionary =
 	resolvedLocale === "en"
 		? (en as unknown as Dictionary)
 		: (ko as unknown as Dictionary);
-const localePrefix = resolvedLocale === "ko" ? "/ko" : "";
-const canonicalResumeUrl = `${siteOrigin}${localePrefix}/resume/`;
+const canonicalResumeUrl = `${siteOrigin}${localePrefix(resolvedLocale)}/resume/`;
 
 function getValue(obj: Dictionary, key: string): unknown {
 	return key.split(".").reduce<unknown>((acc, part) => {

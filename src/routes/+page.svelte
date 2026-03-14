@@ -3,18 +3,12 @@ import { fade } from "svelte/transition";
 import { push } from "svelte-spa-router";
 import PostFeed from "../components/PostFeed.svelte";
 import type { Post } from "../lib/postLoader";
-import { ensurePostsLoaded, posts as postsStore } from "../stores/posts";
+import { posts as postsStore } from "../stores/posts";
 
-let requestedPosts = false;
 let homePosts: Post[] = [];
 
 function openPost(slug: string) {
 	void push(`/post/${slug}`);
-}
-
-$: if (!requestedPosts) {
-	requestedPosts = true;
-	void ensurePostsLoaded();
 }
 
 $: {

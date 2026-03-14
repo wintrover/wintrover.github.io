@@ -6,11 +6,11 @@ import {
 	defaultOgImage,
 	getRuntimeOrigin,
 } from "../lib/config";
-import { detectLocale } from "../lib/locale";
+import { detectLocaleFromRuntime } from "../lib/locale";
 import type { Post } from "../lib/postLoader";
 import { filterPostsByRoute, toPostArray } from "../lib/postQuery";
 import { selectedCategory } from "../stores/category";
-import { ensurePostsLoaded, posts as postsStore } from "../stores/posts";
+import { posts as postsStore } from "../stores/posts";
 import PostFeed from "./PostFeed.svelte";
 
 export let params: { category?: string; tag?: string } = {};
@@ -22,23 +22,15 @@ let resolvedLocale: "ko" | "en" = "en";
 let seoTitle = blogDefaultSeo.title;
 let seoDescription = blogDefaultSeo.description.en;
 let seoUrl = `${getRuntimeOrigin()}/`;
-let requestedPosts = false;
 let routeMotionKey = "all";
 
 function selectPost(post: Post) {
 	push(`/post/${post.slug}`);
 }
 
-$: if (!requestedPosts) {
-	requestedPosts = true;
-	void ensurePostsLoaded();
-}
-
-$: resolvedLocale = detectLocale({
-	envLocale: import.meta.env.VITE_LOCALE,
-	pathname: browser ? window.location.pathname : "/",
-	navigatorLanguage: browser ? navigator.language : undefined,
-});
+$: resolvedLocale = detectLocaleFromRuntime(
+	browser ? window.location.pathname : "/",
+);
 
 $: {
 	const allPosts = toPostArray($postsStore);

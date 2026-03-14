@@ -49,6 +49,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Blog list layout keeps vertical flow and equal card size",
 			"Mobile app content fits viewport width without horizontal overflow",
 			"Mobile sidebar actions should close drawer consistently",
+			"Locale and posts loading logic should reuse shared helpers",
 			"All list routes reuse one post list UI source",
 			"Post detail page keeps Geist dark visual language",
 			"Post detail markdown should not overflow mobile viewport",
@@ -85,11 +86,29 @@ describe("SSoT context 규칙 전수 검증", () => {
 		expect(locale).toContain('return locale === "ko" ? "/ko/" : "/"');
 	});
 
+	test("Given locale 관련 컴포넌트 When DRY 검증 Then locale helper를 공통 재사용한다", () => {
+		expect(locale).toContain("export function localePrefix");
+		expect(locale).toContain("export function detectLocaleFromRuntime");
+		expect(config).toContain("localePrefix(resolvedLocale)");
+		expect(postDetail).toContain("detectLocaleFromRuntime(");
+		expect(blogList).toContain("detectLocaleFromRuntime(");
+		const resumePage = read("src/components/ResumePage.svelte");
+		expect(resumePage).toContain("detectLocaleFromRuntime(");
+		expect(resumePage).toContain("localePrefix(resolvedLocale)");
+	});
+
+	test("Given 리스트 라우트 When 로딩 로직 검증 Then requestedPosts 중복 가드가 제거된다", () => {
+		expect(homePage).not.toContain("requestedPosts");
+		expect(blogList).not.toContain("requestedPosts");
+		expect(homePage).not.toContain("ensurePostsLoaded");
+		expect(blogList).not.toContain("ensurePostsLoaded");
+	});
+
 	test("Given post SEO 생성 When locale 적용 Then canonical prefix가 규칙을 따른다", () => {
 		expect(config).toContain(
-			'const localePrefix = resolvedLocale === "ko" ? "/ko" : ""',
+			"const localePathPrefix = localePrefix(resolvedLocale)",
 		);
-		expect(config).toContain("`${origin}${localePrefix}/post/${slug}/`");
+		expect(config).toContain("`${origin}${localePathPrefix}/post/${slug}/`");
 	});
 
 	test("Given 브랜드 메타데이터 When 빌드 설정 검증 Then 단일 원천 함수를 사용한다", () => {

@@ -2,7 +2,7 @@
 import { onMount, tick } from "svelte";
 import { push } from "svelte-spa-router";
 import { buildPostDetailSeo, defaultOgImage } from "../lib/config";
-import { detectLocale } from "../lib/locale";
+import { detectLocaleFromRuntime } from "../lib/locale";
 import { logError } from "../lib/log";
 import { loadPostBySlug, type Post } from "../lib/postLoader";
 import { formatDate } from "../lib/utils";
@@ -77,11 +77,9 @@ async function loadPostData(slug: string) {
 	}
 }
 
-$: resolvedLocale = detectLocale({
-	envLocale: import.meta.env.VITE_LOCALE,
-	pathname: browser ? window.location.pathname : "/",
-	navigatorLanguage: browser ? navigator.language : undefined,
-});
+$: resolvedLocale = detectLocaleFromRuntime(
+	browser ? window.location.pathname : "/",
+);
 
 $: {
 	const slug = params?.slug ?? "";

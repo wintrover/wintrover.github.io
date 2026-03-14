@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { Post } from "../src/lib/postLoader";
 import HomePage from "../src/routes/+page.svelte";
 
-const { mockEnsurePostsLoaded, mockPush, mockPostsStore } = vi.hoisted(() => {
+const { mockPush, mockPostsStore } = vi.hoisted(() => {
 	let value: Post[] = [];
 	const subscribers = new Set<(posts: Post[]) => void>();
 	const store = {
@@ -21,7 +21,6 @@ const { mockEnsurePostsLoaded, mockPush, mockPostsStore } = vi.hoisted(() => {
 	};
 
 	return {
-		mockEnsurePostsLoaded: vi.fn(() => Promise.resolve([])),
 		mockPush: vi.fn(),
 		mockPostsStore: store,
 	};
@@ -29,7 +28,6 @@ const { mockEnsurePostsLoaded, mockPush, mockPostsStore } = vi.hoisted(() => {
 
 vi.mock("../src/stores/posts", () => ({
 	posts: mockPostsStore,
-	ensurePostsLoaded: mockEnsurePostsLoaded,
 }));
 
 vi.mock("svelte-spa-router", () => ({
@@ -67,8 +65,6 @@ describe("HomePage", () => {
 		expect((await screen.findAllByText("General Post")).length).toBeGreaterThan(
 			0,
 		);
-
-		expect(mockEnsurePostsLoaded).toHaveBeenCalled();
 	});
 
 	test("포스트 제목 버튼 클릭 시 상세 페이지로 이동해야 함", async () => {

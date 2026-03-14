@@ -1,3 +1,4 @@
+import { localePrefix } from "./locale";
 import type { Post } from "./postLoader";
 
 type RuntimeEnv = {
@@ -97,8 +98,7 @@ export function buildBlogListSeoUrl(args: {
 }) {
 	const { isBrowser, currentHref, resolvedLocale } = args;
 	if (isBrowser && currentHref) return currentHref;
-	const localePrefix = resolvedLocale === "ko" ? "/ko" : "";
-	return `${getRuntimeOrigin()}${localePrefix}/`;
+	return `${getRuntimeOrigin()}${localePrefix(resolvedLocale)}/`;
 }
 
 export function buildPostDetailSeo(args: {
@@ -109,14 +109,14 @@ export function buildPostDetailSeo(args: {
 }) {
 	const { post, loading, slug, resolvedLocale } = args;
 	const origin = getRuntimeOrigin();
-	const localePrefix = resolvedLocale === "ko" ? "/ko" : "";
-	const localeRoot = `${origin}${localePrefix}/`;
+	const localePathPrefix = localePrefix(resolvedLocale);
+	const localeRoot = `${origin}${localePathPrefix}/`;
 
 	if (post) {
 		const seoTitle = `${post.title} - wintrover`;
 		const seoDescription = post.excerpt || post.title;
 		const canonicalUrl = slug
-			? `${origin}${localePrefix}/post/${slug}/`
+			? `${origin}${localePathPrefix}/post/${slug}/`
 			: localeRoot;
 		return {
 			seoTitle,

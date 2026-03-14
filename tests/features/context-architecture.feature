@@ -63,6 +63,13 @@ Feature: Context SSoT architecture and UI invariants
     Then each sidebar action should dispatch the same close event
     And duplicated close logic should be avoided across actions
 
+  Scenario: Locale and posts loading logic should reuse shared helpers
+    Given locale resolution and posts loading are used across routes
+    When BlogList Home and Resume page compose runtime behavior
+    Then locale prefix generation should reuse one shared locale helper
+    And browser locale detection arguments should be centralized
+    And list routes should avoid duplicated requestedPosts guard logic
+
   Scenario: All list routes reuse one post list UI source
     Given root category and tag list pages exist
     When each route renders post cards

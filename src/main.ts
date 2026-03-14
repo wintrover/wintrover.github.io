@@ -2,7 +2,7 @@ import { mount } from "svelte";
 import App from "./App.svelte";
 import { siteOrigin } from "./lib/config";
 import {
-	detectLocale,
+	detectLocaleFromRuntime,
 	localeBase,
 	parseLocaleFromPathname,
 } from "./lib/locale";
@@ -16,11 +16,7 @@ if (typeof window !== "undefined") {
 		const localeFromPath = parseLocaleFromPathname(path);
 
 		if (!localeFromPath) {
-			const locale = detectLocale({
-				envLocale: import.meta.env.VITE_LOCALE,
-				pathname: path,
-				navigatorLanguage: navigator.language,
-			});
+			const locale = detectLocaleFromRuntime(path);
 			const langBase = localeBase(locale);
 
 			if (locale === "ko") {
@@ -57,11 +53,7 @@ if (typeof window !== "undefined") {
 }
 
 if (typeof document !== "undefined") {
-	const htmlLang = detectLocale({
-		envLocale: import.meta.env.VITE_LOCALE,
-		pathname: window.location.pathname,
-		navigatorLanguage: navigator.language,
-	});
+	const htmlLang = detectLocaleFromRuntime(window.location.pathname);
 	document.documentElement.lang = htmlLang;
 	const canonical = document.querySelector('link[rel="canonical"]');
 	const envLocale = import.meta.env.VITE_LOCALE;
