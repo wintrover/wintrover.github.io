@@ -30,8 +30,8 @@ $: {
 
 <div class="page">
 	<main class="content">
-		<div transition:fade={{ duration: 420 }}>
-			<section class="hero motion-reveal" transition:fly={{ y: 16, duration: 420 }}>
+		<div>
+			<section class="hero motion-reveal">
 				<p class="eyebrow">Engineering Journal</p>
 				<h1>Shipping ideas with reliability</h1>
 				<p class="description">
@@ -220,6 +220,10 @@ $: {
 		animation: sectionReveal 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
 	}
 
+	.hero.motion-reveal {
+		animation: heroReveal 0.74s cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+
 	#projects.motion-reveal {
 		animation-delay: 0.08s;
 	}
@@ -236,6 +240,19 @@ $: {
 		to {
 			opacity: 1;
 			transform: translateY(0);
+		}
+	}
+
+	@keyframes heroReveal {
+		from {
+			opacity: 0;
+			transform: translateY(14px) scale(0.99);
+			filter: blur(1px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+			filter: blur(0);
 		}
 	}
 
