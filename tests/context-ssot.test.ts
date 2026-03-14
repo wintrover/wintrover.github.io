@@ -19,6 +19,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 	const blogList = read("src/components/BlogList.svelte");
 	const homePage = read("src/routes/+page.svelte");
 	const postFeed = read("src/components/PostFeed.svelte");
+	const postDetail = read("src/components/PostDetail.svelte");
 
 	test("Given CONTEXT When 검토 Then 필수 헌법 규칙이 빠짐없이 존재한다", () => {
 		expect(context).toContain("진실의 단일 원천");
@@ -30,6 +31,10 @@ describe("SSoT context 규칙 전수 검증", () => {
 		expect(context).toContain("세로 정렬");
 		expect(context).toContain("일정한 카드 크기");
 		expect(context).toContain("동일한 포스트 리스트 UI 컴포넌트");
+		expect(context).toContain("Geist 다크 테마");
+		expect(context).toContain("zinc 기반 중성 팔레트");
+		expect(context).toContain("시각 밀도");
+		expect(context).toContain("수직 리듬 스케일 토큰");
 	});
 
 	test("Given feature 파일 When 파싱 Then 시나리오 카탈로그가 SSoT와 일치한다", () => {
@@ -40,6 +45,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Canonical SEO path must follow locale prefix policy",
 			"Blog list layout keeps vertical flow and equal card size",
 			"All list routes reuse one post list UI source",
+			"Post detail page keeps Geist dark visual language",
 			"Build output verification enforces deployment entrypoints",
 			"Sitemap generation preserves locale architecture",
 			"Build and Mermaid pipelines keep critical invariants",
@@ -92,6 +98,27 @@ describe("SSoT context 규칙 전수 검증", () => {
 		expect(postFeed).toContain("min-height: 176px");
 		expect(postFeed).toContain("display: grid");
 		expect(postFeed).toContain("-webkit-line-clamp: 2");
+	});
+
+	test("Given 포스트 상세 페이지 When 스타일 검증 Then Geist 다크 토큰을 유지한다", () => {
+		expect(postDetail).not.toContain("#0366d6");
+		expect(postDetail).not.toContain("#f6f8fa");
+		expect(postDetail).not.toContain("#24292e");
+		expect(postDetail).toContain("rgb(39 39 42");
+		expect(postDetail).toContain("#a1a1aa");
+		expect(postDetail).toContain("font-size: clamp(1.75rem, 3.2vw, 2.1rem)");
+		expect(postDetail).toContain("--rhythm-type-body: 0.98rem");
+		expect(postDetail).toContain("--rhythm-line-body: 1.7");
+		expect(postDetail).toContain("line-height: var(--rhythm-line-body)");
+	});
+
+	test("Given 리스트와 상세 페이지 When 스타일 검증 Then 수직 리듬 토큰을 공유한다", () => {
+		expect(postFeed).toContain("--rhythm-gap-md:");
+		expect(postFeed).toContain("--rhythm-type-body:");
+		expect(postDetail).toContain("--rhythm-gap-md:");
+		expect(postDetail).toContain("--rhythm-type-body:");
+		expect(postFeed).toContain("gap: var(--rhythm-gap-md)");
+		expect(postDetail).toContain("font-size: var(--rhythm-type-body)");
 	});
 
 	test("Given build-github.ts When output 검증 Then 필수 entrypoint를 강제한다", () => {

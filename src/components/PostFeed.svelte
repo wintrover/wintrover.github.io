@@ -53,6 +53,13 @@ void getKeywords;
 
 <style>
 	.post-list {
+		--rhythm-gap-xs: 0.45rem;
+		--rhythm-gap-sm: 0.85rem;
+		--rhythm-gap-md: 0.95rem;
+		--rhythm-gap-lg: 1.2rem;
+		--rhythm-type-meta: 0.72rem;
+		--rhythm-type-body: 0.98rem;
+		--rhythm-line-body: 1.7;
 		display: flex;
 		flex-direction: column;
 		gap: 0;
@@ -65,8 +72,8 @@ void getKeywords;
 		min-width: 0;
 		min-height: 176px;
 		display: grid;
-		gap: 0.95rem;
-		padding: 1.2rem 0;
+		gap: var(--rhythm-gap-md);
+		padding: var(--rhythm-gap-lg) 0;
 		border-bottom: 1px solid rgb(39 39 42 / 50%);
 		background: transparent;
 		transition:
@@ -91,9 +98,9 @@ void getKeywords;
 
 	.meta {
 		display: flex;
-		gap: 0.85rem;
+		gap: var(--rhythm-gap-sm);
 		align-items: center;
-		font-size: 0.72rem;
+		font-size: var(--rhythm-type-meta);
 		color: #a1a1aa;
 		flex-wrap: wrap;
 	}
@@ -135,8 +142,8 @@ void getKeywords;
 	.excerpt {
 		margin: 0;
 		color: #a1a1aa;
-		line-height: 1.7;
-		font-size: 0.98rem;
+		line-height: var(--rhythm-line-body);
+		font-size: var(--rhythm-type-body);
 		word-break: break-word;
 		overflow-wrap: break-word;
 		min-width: 0;
@@ -149,7 +156,7 @@ void getKeywords;
 	.keyword-list {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.45rem;
+		gap: var(--rhythm-gap-xs);
 		min-width: 0;
 	}
 
@@ -160,7 +167,7 @@ void getKeywords;
 		padding: 0 0.5rem;
 		border-radius: 999px;
 		color: #a1a1aa;
-		font-size: 0.72rem;
+		font-size: var(--rhythm-type-meta);
 		font-weight: 500;
 		letter-spacing: 0.02em;
 		background: rgb(39 39 42 / 50%);

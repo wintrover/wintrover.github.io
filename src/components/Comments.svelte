@@ -157,7 +157,7 @@ export function updateTheme(newTheme: string) {
 .giscus-wrapper {
 	margin-top: 50px;
 	padding-top: 20px;
-	border-top: 1px solid var(--border-color);
+	border-top: 1px solid rgb(39 39 42 / 70%);
 	min-height: 300px;
 }
 </style>

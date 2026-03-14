@@ -45,6 +45,14 @@ Feature: Context SSoT architecture and UI invariants
     Then they must share the same post list component
     And route pages should only compose filters and sections
 
+  Scenario: Post detail page keeps Geist dark visual language
+    Given the application uses Geist-style dark tokens globally
+    When a post detail page is rendered
+    Then the page should avoid legacy GitHub accent colors
+    And badges buttons and code blocks should use zinc-based neutral palette
+    And title and body typography should keep density aligned with list UI
+    And list and detail should share vertical rhythm scale tokens
+
   Scenario: Build output verification enforces deployment entrypoints
     Given GitHub Pages build output is generated
     When verification is executed
