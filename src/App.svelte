@@ -246,6 +246,7 @@ onDestroy(() => {
     margin: 0 auto 44px;
     padding: 0 24px;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .sidebar-collapsed #main-content {

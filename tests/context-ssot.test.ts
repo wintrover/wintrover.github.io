@@ -47,6 +47,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Brand metadata should be derived from one shared source",
 			"Blog list canonical URL must not emit /en fallback",
 			"Blog list layout keeps vertical flow and equal card size",
+			"Mobile app content fits viewport width without horizontal overflow",
 			"All list routes reuse one post list UI source",
 			"Post detail page keeps Geist dark visual language",
 			"Post route hero motion must replay on route entry",

@@ -146,6 +146,24 @@ describe("App.svelte", () => {
 		);
 	});
 
+	test("모바일에서 메인 콘텐츠는 패딩을 포함한 너비 계산을 사용해야 함", async () => {
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: 375,
+		});
+		window.dispatchEvent(new Event("resize"));
+
+		const { container } = render(App);
+		await tick();
+
+		const content = container.querySelector("#content");
+		expect(content).not.toBeNull();
+		expect(getComputedStyle(content as HTMLElement).boxSizing).toBe(
+			"border-box",
+		);
+	});
+
 	test("모바일에서 토글로 연 사이드바가 즉시 다시 닫히지 않아야 함", async () => {
 		Object.defineProperty(window, "innerWidth", {
 			writable: true,

@@ -50,6 +50,12 @@ Feature: Context SSoT architecture and UI invariants
     Then the list must stay vertically aligned
     And each card must keep a consistent size
 
+  Scenario: Mobile app content fits viewport width without horizontal overflow
+    Given the app shell is rendered on a mobile viewport
+    When the main content container uses full width
+    Then the content box sizing should include horizontal padding in width calculation
+    And the page should avoid extending beyond viewport width
+
   Scenario: All list routes reuse one post list UI source
     Given root category and tag list pages exist
     When each route renders post cards
