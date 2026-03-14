@@ -21,4 +21,4 @@ Feature: Modern UI motion across core blog surfaces
   Scenario: Category route changes replay list motion
     Given I render the category list route
     When I move from /category/company-work to /category/project
-    Then the post list container should be recreated for motion replay
+    Then the previous post list DOM should be destroyed and a new DOM should be created for motion replay

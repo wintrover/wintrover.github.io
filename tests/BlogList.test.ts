@@ -249,6 +249,56 @@ describe("BlogList Component", () => {
 		expect(afterSwitchList).not.toBe(beforeSwitchList);
 	});
 
+	test("태그 라우트 전환 시 포스트 리스트 컨테이너가 재생성되어야 함", async () => {
+		const listPosts = [
+			{
+				fileName: "company-1",
+				slug: "company-1",
+				title: "Company 1",
+				category: "Company Work",
+				date: "2024-01-01",
+				tags: ["SMBholdings"],
+				excerpt: "Company excerpt",
+				html: "",
+				content: "",
+			},
+			{
+				fileName: "company-2",
+				slug: "company-2",
+				title: "Company 2",
+				category: "Company Work",
+				date: "2024-01-02",
+				tags: ["AI"],
+				excerpt: "Company excerpt 2",
+				html: "",
+				content: "",
+			},
+		] satisfies Post[];
+
+		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(listPosts);
+
+		const { container, rerender } = render(BlogList, {
+			params: { category: "company-work", tag: "smbholdings" },
+		});
+
+		await waitFor(() => {
+			expect(screen.getByText("Company 1")).toBeInTheDocument();
+		});
+
+		const beforeSwitchList = container.querySelector(".post-list");
+		expect(beforeSwitchList).not.toBeNull();
+
+		await rerender({ params: { category: "company-work", tag: "ai" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("Company 2")).toBeInTheDocument();
+		});
+
+		const afterSwitchList = container.querySelector(".post-list");
+		expect(afterSwitchList).not.toBeNull();
+		expect(afterSwitchList).not.toBe(beforeSwitchList);
+	});
+
 	test("포스트 데이터가 없을 때 빈 목록 표시", async () => {
 		vi.mocked(postLoader.loadAllPosts).mockResolvedValue([]);
 		render(BlogList);
