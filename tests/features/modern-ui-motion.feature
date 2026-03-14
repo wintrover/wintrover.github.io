@@ -22,3 +22,8 @@ Feature: Modern UI motion across core blog surfaces
     Given I render the category list route
     When I move from /category/company-work to /category/project
     Then the previous post list DOM should be destroyed and a new DOM should be created for motion replay
+
+  Scenario: Mobile sidebar toggle keeps sidebar open after manual open
+    Given I render the app shell on a mobile viewport
+    When I tap the sidebar toggle button to open sidebar
+    Then the sidebar should remain open without immediate auto-collapse

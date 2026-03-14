@@ -37,9 +37,29 @@ vi.mock("mermaid", () => ({
 
 // Mock ResizeObserver
 class MockResizeObserver {
+	private readonly callback: ResizeObserverCallback;
+
+	static instances: MockResizeObserver[] = [];
+
+	constructor(callback: ResizeObserverCallback) {
+		this.callback = callback;
+		MockResizeObserver.instances.push(this);
+	}
+
 	observe = vi.fn();
 	unobserve = vi.fn();
 	disconnect = vi.fn();
+
+	static triggerAll() {
+		const entry = { target: document.body } as unknown as ResizeObserverEntry;
+		for (const instance of MockResizeObserver.instances) {
+			instance.callback([entry], instance as unknown as ResizeObserver);
+		}
+	}
+
+	static reset() {
+		MockResizeObserver.instances = [];
+	}
 }
 window.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
@@ -51,6 +71,7 @@ describe("App.svelte", () => {
 		document.body.className = "";
 		vi.mocked(posts).set([]);
 		vi.clearAllMocks();
+		MockResizeObserver.reset();
 
 		// Mock getBoundingClientRect on prototype
 		window.HTMLElement.prototype.getBoundingClientRect = vi.fn(function (
@@ -123,6 +144,31 @@ describe("App.svelte", () => {
 			},
 			{ timeout: 2000 },
 		);
+	});
+
+	test("모바일에서 토글로 연 사이드바가 즉시 다시 닫히지 않아야 함", async () => {
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: 500,
+		});
+		window.dispatchEvent(new Event("resize"));
+
+		const { container } = render(App);
+		await tick();
+
+		const toggleButton = screen.getByLabelText("Toggle Sidebar");
+		const appContainer = container.querySelector("#app-container");
+
+		expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(true);
+
+		await fireEvent.click(toggleButton);
+		await tick();
+		MockResizeObserver.triggerAll();
+		await new Promise((resolve) => setTimeout(resolve, 30));
+		await tick();
+
+		expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(false);
 	});
 
 	test("수동 토글 버튼 작동 확인", async () => {

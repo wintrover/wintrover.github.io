@@ -40,7 +40,7 @@ let checkTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function checkSidebarCollision() {
 	if (innerWidth < 768) {
-		if (!sidebarCollapsed) {
+		if (!manualToggle && !sidebarCollapsed) {
 			sidebarCollapsed = true;
 		}
 		return;
