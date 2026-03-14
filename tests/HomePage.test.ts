@@ -46,20 +46,8 @@ describe("HomePage", () => {
 		});
 	});
 
-	test("포스트와 프로젝트 섹션을 렌더링해야 함", async () => {
+	test("포스트 섹션을 렌더링해야 함", async () => {
 		mockPostsStore.set([
-			{
-				fileName: "feature-project",
-				slug: "feature-project",
-				title: "Feature Project",
-				date: "2024-10-03",
-				category: "Project",
-				tags: [],
-				excerpt: "Build notes",
-				folder: "project",
-				html: "<p>Build notes</p>",
-				content: "Build notes and delivery details",
-			},
 			{
 				fileName: "general-post",
 				slug: "general-post",
@@ -76,15 +64,11 @@ describe("HomePage", () => {
 
 		render(HomePage);
 
-		expect(
-			(await screen.findAllByText("Feature Project")).length,
-		).toBeGreaterThan(0);
+		expect((await screen.findAllByText("General Post")).length).toBeGreaterThan(
+			0,
+		);
 
 		expect(mockEnsurePostsLoaded).toHaveBeenCalled();
-		expect(screen.getByText("Featured project posts")).toBeInTheDocument();
-		expect(
-			screen.getByText("Building products with shipping discipline"),
-		).toBeInTheDocument();
 	});
 
 	test("포스트 제목 버튼 클릭 시 상세 페이지로 이동해야 함", async () => {
@@ -114,29 +98,6 @@ describe("HomePage", () => {
 		expect(mockPush).toHaveBeenCalledWith("/post/post-1");
 	});
 
-	test("프로젝트 포스트가 없으면 빈 상태를 표시해야 함", async () => {
-		mockPostsStore.set([
-			{
-				fileName: "general-only",
-				slug: "general-only",
-				title: "General Only",
-				date: "2025-01-01",
-				category: "General",
-				tags: [],
-				excerpt: "Notes",
-				folder: "general",
-				html: "<p>Notes</p>",
-				content: "Notes",
-			},
-		]);
-
-		render(HomePage);
-
-		await waitFor(() => {
-			expect(screen.getByText("No project posts yet.")).toBeInTheDocument();
-		});
-	});
-
 	test("포스트가 없으면 홈 빈 상태를 표시해야 함", async () => {
 		mockPostsStore.set([]);
 		render(HomePage);
@@ -153,10 +114,10 @@ describe("HomePage", () => {
 				slug: "motion-post",
 				title: "Motion Post",
 				date: "2025-03-01",
-				category: "Project",
+				category: "General",
 				tags: ["UI"],
 				excerpt: "Motion check",
-				folder: "project",
+				folder: "general",
 				html: "<p>Motion check</p>",
 				content: "Motion check",
 			},
@@ -170,7 +131,5 @@ describe("HomePage", () => {
 		expect(document.querySelector(".hero.motion-reveal")).not.toBeNull();
 		// 그라데이션 pseudo-element가 없는지 확인 (스타일 시트 확인은 어렵지만, 클래스 존재 여부로 간접 확인)
 		expect(document.querySelector(".hero::after")).toBeNull();
-		expect(document.querySelector("#projects.motion-reveal")).not.toBeNull();
-		expect(document.querySelector("#about.motion-reveal")).not.toBeNull();
 	});
 });

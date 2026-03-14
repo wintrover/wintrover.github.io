@@ -1,14 +1,12 @@
 <script lang="ts">
-import { fade, fly } from "svelte/transition";
+import { fade } from "svelte/transition";
 import { push } from "svelte-spa-router";
 import PostFeed from "../components/PostFeed.svelte";
 import type { Post } from "../lib/postLoader";
-import { slugify } from "../lib/utils";
 import { ensurePostsLoaded, posts as postsStore } from "../stores/posts";
 
 let requestedPosts = false;
 let homePosts: Post[] = [];
-let projectPosts: Post[] = [];
 
 function openPost(slug: string) {
 	void push(`/post/${slug}`);
@@ -22,9 +20,6 @@ $: if (!requestedPosts) {
 $: {
 	const allPosts: Post[] = Array.isArray($postsStore) ? $postsStore : [];
 	homePosts = allPosts.slice(0, 12);
-	projectPosts = allPosts
-		.filter((post) => slugify(post.category) === "project")
-		.slice(0, 3);
 }
 </script>
 
@@ -47,40 +42,6 @@ $: {
 					emptyMessage="No posts found."
 					onSelectPost={(post) => openPost(post.slug)}
 				/>
-			</section>
-
-			<section id="projects" class="section-block motion-reveal" transition:fade={{ duration: 420 }}>
-				<div class="section-head">
-					<p class="eyebrow">Projects</p>
-					<h2 class="section-title">Featured project posts</h2>
-				</div>
-				<div class="project-list">
-					{#if projectPosts.length > 0}
-						{#each projectPosts as post, index}
-							<button
-								class="project-item"
-								type="button"
-								on:click={() => openPost(post.slug)}
-								transition:fly={{ y: 16, duration: 330 + index * 20, delay: 40 + index * 45 }}
-							>
-								<span>{post.title}</span>
-							</button>
-						{/each}
-					{:else}
-						<p class="section-empty">No project posts yet.</p>
-					{/if}
-				</div>
-			</section>
-
-			<section id="about" class="section-block motion-reveal" transition:fade={{ duration: 420 }}>
-				<div class="section-head">
-					<p class="eyebrow">About</p>
-					<h2 class="section-title">Building products with shipping discipline</h2>
-				</div>
-				<p class="about-copy">
-					I design and ship practical AI-powered products with a strong focus on
-					reliability, measurable outcomes, and fast iteration.
-				</p>
 			</section>
 		{:else}
 			<div class="section-empty" transition:fade={{ duration: 320 }}>
