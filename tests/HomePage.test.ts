@@ -168,6 +168,8 @@ describe("HomePage", () => {
 		);
 
 		expect(document.querySelector(".hero.motion-reveal")).not.toBeNull();
+		// 그라데이션 pseudo-element가 없는지 확인 (스타일 시트 확인은 어렵지만, 클래스 존재 여부로 간접 확인)
+		expect(document.querySelector(".hero::after")).toBeNull();
 		expect(document.querySelector("#projects.motion-reveal")).not.toBeNull();
 		expect(document.querySelector("#about.motion-reveal")).not.toBeNull();
 	});

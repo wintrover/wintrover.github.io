@@ -125,19 +125,6 @@ $: {
 		overflow: clip;
 	}
 
-	.hero::after {
-		content: "";
-		position: absolute;
-		inset: auto -10% -45% auto;
-		width: 16rem;
-		height: 16rem;
-		border-radius: 999px;
-		background: radial-gradient(circle, rgb(113 113 122 / 32%), transparent 70%);
-		filter: blur(3px);
-		pointer-events: none;
-		animation: haloDrift 5.8s ease-in-out infinite;
-	}
-
 	.eyebrow {
 		margin: 0;
 		font-size: 0.8rem;
@@ -256,18 +243,6 @@ $: {
 		}
 	}
 
-	@keyframes haloDrift {
-		0%,
-		100% {
-			transform: translate3d(0, 0, 0);
-			opacity: 0.75;
-		}
-		50% {
-			transform: translate3d(-10px, -10px, 0);
-			opacity: 1;
-		}
-	}
-
 	.project-item span {
 		min-width: 0;
 		word-break: break-word;
@@ -298,8 +273,7 @@ $: {
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.motion-reveal,
-		.hero::after {
+		.motion-reveal {
 			animation-duration: 0.01ms;
 			animation-iteration-count: 1;
 		}
