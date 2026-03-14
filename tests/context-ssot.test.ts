@@ -8,35 +8,139 @@ function read(rel: string) {
 	return fs.readFileSync(path.join(root, rel), "utf-8");
 }
 
-describe("SSoT context 규칙", () => {
-	test("Given context.md When 읽으면 Then 필수 헌법 규칙을 포함한다", () => {
-		const content = read("context.md");
-		expect(content).toContain("진실의 단일 원천");
-		expect(content).toContain("Devlog 프로젝트");
-		expect(content).toContain("기본 언어는 영어");
-		expect(content).toContain("/ko/");
-		expect(content).toContain("/en/");
-		expect(content).toContain("build-github.ts");
-		expect(content).toContain("image-tools.ts");
-		expect(content).toContain("세로 정렬");
-		expect(content).toContain("일정한 카드 크기");
-		expect(content).toContain("동일한 포스트 리스트 UI 컴포넌트");
-		expect(content).toContain("HTML 구조");
-		expect(content).toContain("CSS");
+describe("SSoT context 규칙 전수 검증", () => {
+	const feature = read("tests/features/context-architecture.feature");
+	const context = read("CONTEXT.md");
+	const buildScript = read("scripts/build-github.ts");
+	const imageTools = read("scripts/image-tools.ts");
+	const locale = read("src/lib/locale.ts");
+	const config = read("src/lib/config.ts");
+	const app = read("src/App.svelte");
+	const blogList = read("src/components/BlogList.svelte");
+	const homePage = read("src/routes/+page.svelte");
+	const postFeed = read("src/components/PostFeed.svelte");
+
+	test("Given CONTEXT When 검토 Then 필수 헌법 규칙이 빠짐없이 존재한다", () => {
+		expect(context).toContain("진실의 단일 원천");
+		expect(context).toContain("기본 언어는 영어");
+		expect(context).toContain("/ko/");
+		expect(context).toContain("/en/");
+		expect(context).toContain("build-github.ts");
+		expect(context).toContain("image-tools.ts");
+		expect(context).toContain("세로 정렬");
+		expect(context).toContain("일정한 카드 크기");
+		expect(context).toContain("동일한 포스트 리스트 UI 컴포넌트");
 	});
 
-	test("Given build-github.ts When URL 규칙 검증 Then /en 레거시 생성 로직이 없어야 한다", () => {
-		const buildScript = read("scripts/build-github.ts");
-		expect(buildScript).not.toContain("legacyEnHtml");
-		expect(buildScript).not.toContain('path.join(dist, "en", "index.html")');
+	test("Given feature 파일 When 파싱 Then 시나리오 카탈로그가 SSoT와 일치한다", () => {
+		const expected = [
+			"CONTEXT 문서가 핵심 헌법 규칙을 포함한다",
+			"URL architecture uses root for English and /ko for Korean",
+			"Locale detection must not treat /en as locale path",
+			"Canonical SEO path must follow locale prefix policy",
+			"Blog list layout keeps vertical flow and equal card size",
+			"All list routes reuse one post list UI source",
+			"Build output verification enforces deployment entrypoints",
+			"Sitemap generation preserves locale architecture",
+			"Build and Mermaid pipelines keep critical invariants",
+			"Mermaid image naming and fallback handling remain deterministic",
+		];
+		const scenarios = [...feature.matchAll(/^\s*Scenario:\s*(.+)$/gm)].map(
+			(match) => match[1].trim(),
+		);
+		expect(scenarios).toEqual(expected);
+	});
+
+	test("Given feature 파일 When 구조 검증 Then 각 시나리오는 Given/When/Then 흐름을 가진다", () => {
+		const blocks = feature
+			.split(/\r?\n(?=\s*Scenario:)/)
+			.filter((block) => block.includes("Scenario:"));
+		for (const block of blocks) {
+			expect(block).toContain("Given ");
+			expect(block).toContain("When ");
+			expect(block).toContain("Then ");
+		}
+	});
+
+	test("Given locale 규칙 When 경로 파싱 Then /ko만 locale 경로로 인식한다", () => {
+		expect(locale).toContain("match(/^\\/ko(\\/|$)/)");
+		expect(locale).not.toContain("/^\\/en(\\/|$)/");
+		expect(locale).toContain(
+			'return nav.startsWith("ko") ? "ko" : defaultLocale',
+		);
+		expect(locale).toContain('return locale === "ko" ? "/ko/" : "/"');
+	});
+
+	test("Given post SEO 생성 When locale 적용 Then canonical prefix가 규칙을 따른다", () => {
+		expect(config).toContain(
+			'const localePrefix = resolvedLocale === "ko" ? "/ko" : ""',
+		);
+		expect(config).toContain("`${origin}${localePrefix}/post/${slug}/`");
 	});
 
 	test("Given list routes When UI 구성 검증 Then 단일 PostFeed 컴포넌트를 재사용한다", () => {
-		const blogList = read("src/components/BlogList.svelte");
-		const homePage = read("src/routes/+page.svelte");
 		expect(blogList).toContain('import PostFeed from "./PostFeed.svelte"');
 		expect(homePage).toContain(
 			'import PostFeed from "../components/PostFeed.svelte"',
 		);
+		expect(app).toContain('"/category/:category": BlogList');
+		expect(app).toContain('"/category/:category/tag/:tag": BlogList');
+	});
+
+	test("Given PostFeed 스타일 When 카드 레이아웃 검증 Then 세로 흐름과 균일 카드 크기를 유지한다", () => {
+		expect(postFeed).toContain(".post-card");
+		expect(postFeed).toContain("min-height: 176px");
+		expect(postFeed).toContain("display: grid");
+		expect(postFeed).toContain("-webkit-line-clamp: 2");
+	});
+
+	test("Given build-github.ts When output 검증 Then 필수 entrypoint를 강제한다", () => {
+		expect(buildScript).toContain('path.join(distPath, "index.html")');
+		expect(buildScript).toContain('path.join(distPath, "ko", "index.html")');
+		expect(buildScript).toContain(
+			'path.join(distPath, "resume", "index.html")',
+		);
+		expect(buildScript).toContain(
+			'path.join(distPath, "ko", "resume", "index.html")',
+		);
+		expect(buildScript).not.toContain(
+			'path.join(distPath, "en", "index.html")',
+		);
+		expect(buildScript).toContain("process.exit(1)");
+	});
+
+	test("Given build-github.ts When sitemap 생성 Then locale URL 구조를 보존한다", () => {
+		expect(buildScript).toContain(
+			'const localePrefix = locale === "ko" ? "/ko" : ""',
+		);
+		expect(buildScript).toContain(
+			"`${base}${localePrefix}/post/${post.slug}/`",
+		);
+		expect(buildScript).not.toContain("`${base}/en/post/");
+	});
+
+	test("Given image-tools.ts When Mermaid 처리 검증 Then 추출-렌더-치환-폴백을 유지한다", () => {
+		expect(imageTools).toContain("export function extractMermaidBlocks");
+		expect(imageTools).toContain(
+			"export async function processMermaidDiagrams",
+		);
+		expect(imageTools).toContain("await convertMermaidToImage");
+		expect(imageTools).toContain(
+			"const imageMarkdown = `![Mermaid Diagram](${imageUrl})`",
+		);
+		expect(imageTools).toContain(
+			"> ⚠️ **Mermaid Diagram Could Not Be Rendered**",
+		);
+	});
+
+	test("Given image-tools.ts When 파일명 생성 검증 Then 결정적 numbering 규칙을 유지한다", () => {
+		expect(imageTools).toContain("function deriveFilenameBase");
+		expect(imageTools).toContain("/^(\\d{4}-\\d{2}-\\d{2})(?:-(\\d+))?$/");
+		expect(imageTools).toContain(
+			"const filename = `${filenameBase}-${idx}.png`",
+		);
+		expect(imageTools).toContain("export async function runGenerateImagesCi");
+		expect(imageTools).toContain('logError("generate-images-ci"');
+		expect(imageTools).toContain("process.exit(1)");
 	});
 });
