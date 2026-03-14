@@ -16,6 +16,12 @@ Feature: Context SSoT architecture and UI invariants
     Then the list must stay vertically aligned
     And each card must keep a consistent size
 
+  Scenario: All list routes reuse one post list UI source
+    Given root category and tag list pages exist
+    When each route renders post cards
+    Then they must share the same post list component
+    And route pages should only compose filters and sections
+
   Scenario: Build and Mermaid pipelines keep critical invariants
     Given build-github.ts and image-tools.ts are part of release flow
     When pipeline safety checks are executed

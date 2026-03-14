@@ -8,9 +8,9 @@ import {
 import { detectLocale } from "../lib/locale";
 import type { Post } from "../lib/postLoader";
 import { filterPostsByRoute, toPostArray } from "../lib/postQuery";
-import { formatDate, slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
 import { ensurePostsLoaded, posts as postsStore } from "../stores/posts";
+import PostFeed from "./PostFeed.svelte";
 
 export let params: { category?: string; tag?: string } = {};
 const browser =
@@ -63,8 +63,6 @@ $: {
 
 void filteredPosts;
 void selectPost;
-void formatDate;
-void slugify;
 </script>
 
 <svelte:head>
@@ -81,136 +79,15 @@ void slugify;
 </svelte:head>
 
 <div class="blog-page">
-  {#if filteredPosts.length > 0}
-    <div class="posts">
-      {#each filteredPosts as post}
-        <article class="post">
-          <div class="post-meta">
-            <span class="date">{formatDate(post.date)}</span>
-            {#if post.tags?.length}
-              <span class="tag-badge {slugify(post.tags[0])}">
-                {post.tags[0]}
-              </span>
-            {/if}
-          </div>
-          <h1>
-            <button class="post-link" on:click={() => selectPost(post)}>
-              {post.title}
-            </button>
-          </h1>
-          {#if post.excerpt}
-            <div class="post-excerpt">
-              {post.excerpt}
-            </div>
-          {/if}
-        </article>
-      {/each}
-    </div>
-  {:else}
-    <div class="no-posts">
-      <p>No posts found in this category.</p>
-    </div>
-  {/if}
+	<PostFeed
+		posts={filteredPosts}
+		emptyMessage="No posts found in this category."
+		onSelectPost={selectPost}
+	/>
 </div>
 
 <style>
-  .blog-page {
-    min-height: 400px;
-  }
-
-  .posts {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
-
-  .post {
-    border-bottom: 1px solid #eee;
-    height: 220px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .post:last-child {
-    border-bottom: none;
-  }
-
-  .post-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-
-  .date {
-    color: #666;
-    font-size: 14px;
-  }
-
-  .tag-badge {
-    background: #0366d6;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-
-  .tag-badge.project {
-    background: #28a745;
-  }
-
-  .tag-badge.smbholdings {
-    background: #6f42c1;
-  }
-
-  .post h1 {
-    margin: 0 0 15px 0;
-    font-size: 24px;
-    line-height: 1.3;
-    min-height: 62px;
-  }
-
-  .post-link {
-    background: none;
-    border: none;
-    color: #333;
-    cursor: pointer;
-    font-size: inherit;
-    font-weight: inherit;
-    text-align: left;
-    padding: 0;
-    transition: color 0.2s;
-    width: 100%;
-  }
-
-  .post-link:hover {
-    color: #0366d6;
-  }
-
-  .post-excerpt {
-    color: #666;
-    line-height: 1.6;
-    font-size: 16px;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .no-posts {
-    text-align: center;
-    padding: 60px 20px;
-    color: #666;
-  }
-
-  @media (max-width: 640px) {
-    .post h1 {
-      font-size: 20px;
-    }
-
-    .post-excerpt {
-      font-size: 14px;
-    }
-  }
+	.blog-page {
+		min-height: 400px;
+	}
 </style>

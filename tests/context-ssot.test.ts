@@ -20,6 +20,7 @@ describe("SSoT context 규칙", () => {
 		expect(content).toContain("image-tools.ts");
 		expect(content).toContain("세로 정렬");
 		expect(content).toContain("일정한 카드 크기");
+		expect(content).toContain("동일한 포스트 리스트 UI 컴포넌트");
 		expect(content).toContain("HTML 구조");
 		expect(content).toContain("CSS");
 	});
@@ -30,9 +31,12 @@ describe("SSoT context 규칙", () => {
 		expect(buildScript).not.toContain('path.join(dist, "en", "index.html")');
 	});
 
-	test("Given BlogList.svelte When 카드 레이아웃 검증 Then 세로 정렬과 고정 카드 높이를 유지한다", () => {
+	test("Given list routes When UI 구성 검증 Then 단일 PostFeed 컴포넌트를 재사용한다", () => {
 		const blogList = read("src/components/BlogList.svelte");
-		expect(blogList).toMatch(/\.posts\s*\{[\s\S]*flex-direction:\s*column;/);
-		expect(blogList).toMatch(/\.post\s*\{[\s\S]*height:\s*\d+px;/);
+		const homePage = read("src/routes/+page.svelte");
+		expect(blogList).toContain('import PostFeed from "./PostFeed.svelte"');
+		expect(homePage).toContain(
+			'import PostFeed from "../components/PostFeed.svelte"',
+		);
 	});
 });
