@@ -101,6 +101,31 @@ describe("PostDetail Component", () => {
 		);
 	});
 
+	test("slug 전환 시 히어로 헤더 DOM이 재생성되어 모션이 재생되어야 함", async () => {
+		const firstPost = { ...mockPost, slug: "first", title: "First Post" };
+		const secondPost = { ...mockPost, slug: "second", title: "Second Post" };
+		vi.mocked(postLoader.loadPostBySlug)
+			.mockResolvedValueOnce(firstPost)
+			.mockResolvedValueOnce(secondPost);
+
+		const { rerender } = render(PostDetail, { params: { slug: "first" } });
+		await waitFor(() =>
+			expect(screen.getByText("First Post")).toBeInTheDocument(),
+		);
+
+		const firstHeader = document.querySelector(".post-header");
+		expect(firstHeader).not.toBeNull();
+
+		await rerender({ params: { slug: "second" } });
+		await waitFor(() =>
+			expect(screen.getByText("Second Post")).toBeInTheDocument(),
+		);
+
+		const secondHeader = document.querySelector(".post-header");
+		expect(secondHeader).not.toBeNull();
+		expect(secondHeader).not.toBe(firstHeader);
+	});
+
 	test("goBack 함수 호출 확인", async () => {
 		const pushSpy = (await import("svelte-spa-router")).push;
 		render(PostDetail, { params: { slug: "detailed-post" } });

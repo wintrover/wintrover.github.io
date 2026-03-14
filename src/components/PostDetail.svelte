@@ -22,6 +22,7 @@ let seoTitle = "wintrover";
 let seoDescription = "";
 let canonicalUrl = "";
 let structuredData = "";
+let routeMotionKey = "post";
 
 async function loadPostData(slug: string) {
 	if (!slug) return;
@@ -84,6 +85,7 @@ $: resolvedLocale = detectLocale({
 
 $: {
 	const slug = params?.slug ?? "";
+	routeMotionKey = slug || "post";
 	const seo = buildPostDetailSeo({ post, loading, slug, resolvedLocale });
 	seoTitle = seo.seoTitle;
 	seoDescription = seo.seoDescription;
@@ -206,58 +208,60 @@ void goBack;
 	{/if}
 </svelte:head>
 
-{#if post}
-  <article class="post-detail">
-    <header class="post-header">
-      <div class="post-meta">
-        <span class="date">{formatDate(post.date)}</span>
-        <span class="category-badge {slugify(post.category)}">
-          {post.category}
-        </span>
-      </div>
-      <h1 class="post-title">{post.title}</h1>
-      <div class="post-tags">
-        {#each post.tags as tag}
-          <span class="tag">#{tag}</span>
-        {/each}
-      </div>
-    </header>
+{#key routeMotionKey}
+	{#if post}
+		<article class="post-detail">
+			<header class="post-header motion-reveal">
+				<div class="post-meta">
+					<span class="date">{formatDate(post.date)}</span>
+					<span class="category-badge {slugify(post.category)}">
+						{post.category}
+					</span>
+				</div>
+				<h1 class="post-title">{post.title}</h1>
+				<div class="post-tags">
+					{#each post.tags as tag}
+						<span class="tag">#{tag}</span>
+					{/each}
+				</div>
+			</header>
 
-    <div class="post-content">
-      {#if loading}
-        <div class="loading">
-          <p>Loading post content...</p>
-        </div>
-      {:else}
-        <div class="markdown-content">
-          {@html post.html}
-        </div>
-      {/if}
-    </div>
+			<div class="post-content">
+				{#if loading}
+					<div class="loading">
+						<p>Loading post content...</p>
+					</div>
+				{:else}
+					<div class="markdown-content">
+						{@html post.html}
+					</div>
+				{/if}
+			</div>
 
-    <footer class="post-footer">
-      <button class="back-button" on:click={goBack}>
-        ← Back to List
-      </button>
+			<footer class="post-footer">
+				<button class="back-button" on:click={goBack}>
+					← Back to List
+				</button>
 
-      <div class="comments-section">
-        <Comments />
-      </div>
-    </footer>
-  </article>
-{:else if !loading}
-  <div class="error-container">
-    <h2>Post not found</h2>
-    <p>The post you're looking for doesn't exist or has been moved.</p>
-    <button class="back-button" on:click={goBack}>
-      Go back to home
-    </button>
-  </div>
-{:else}
-  <div class="loading-container">
-    <p>Loading post...</p>
-  </div>
-{/if}
+				<div class="comments-section">
+					<Comments />
+				</div>
+			</footer>
+		</article>
+	{:else if !loading}
+		<div class="error-container">
+			<h2>Post not found</h2>
+			<p>The post you're looking for doesn't exist or has been moved.</p>
+			<button class="back-button" on:click={goBack}>
+				Go back to home
+			</button>
+		</div>
+	{:else}
+		<div class="loading-container">
+			<p>Loading post...</p>
+		</div>
+	{/if}
+{/key}
 
 <style>
   .post-detail {
@@ -277,6 +281,22 @@ void goBack;
     margin-bottom: 2.25rem;
     border-bottom: 1px solid rgb(39 39 42 / 70%);
     padding-bottom: 1.1rem;
+  }
+
+  .motion-reveal {
+    animation: postHeroReveal 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes postHeroReveal {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
   }
 
   .post-meta {
@@ -510,6 +530,12 @@ void goBack;
 
     .post-detail {
       padding: 1rem 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-reveal {
+      animation: none;
     }
   }
 </style>

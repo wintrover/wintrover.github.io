@@ -58,6 +58,12 @@ Feature: Context SSoT architecture and UI invariants
     And title and body typography should keep density aligned with list UI
     And list and detail should share vertical rhythm scale tokens
 
+  Scenario: Post route hero motion must replay on route entry
+    Given hero motion uses route-level entry animation
+    When navigation enters "/post/{slug}" from another route
+    Then hero container should be recreated instead of reused
+    And hero entry motion should be replayed on the recreated DOM
+
   Scenario: Build output verification enforces deployment entrypoints
     Given GitHub Pages build output is generated
     When verification is executed

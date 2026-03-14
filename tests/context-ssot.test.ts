@@ -47,6 +47,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Blog list layout keeps vertical flow and equal card size",
 			"All list routes reuse one post list UI source",
 			"Post detail page keeps Geist dark visual language",
+			"Post route hero motion must replay on route entry",
 			"Build output verification enforces deployment entrypoints",
 			"Sitemap generation preserves locale architecture",
 			"Build and Mermaid pipelines keep critical invariants",
