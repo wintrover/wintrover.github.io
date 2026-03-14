@@ -48,6 +48,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Blog list canonical URL must not emit /en fallback",
 			"Blog list layout keeps vertical flow and equal card size",
 			"Mobile app content fits viewport width without horizontal overflow",
+			"Mobile sidebar actions should close drawer consistently",
 			"All list routes reuse one post list UI source",
 			"Post detail page keeps Geist dark visual language",
 			"Post detail markdown should not overflow mobile viewport",

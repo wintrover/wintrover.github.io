@@ -31,6 +31,12 @@ $: {
 	categoryGroups = sidebarData.categoryGroups;
 }
 
+function closeSidebarOnMobile() {
+	if (window.innerWidth < 768) {
+		document.dispatchEvent(new CustomEvent("toggle-sidebar"));
+	}
+}
+
 function selectCategory(item: SidebarItem) {
 	if (item.value === "all") {
 		selectedCategory.set("all");
@@ -42,16 +48,13 @@ function selectCategory(item: SidebarItem) {
 		selectedCategory.set(item.value);
 		push(`/category/${item.slug}`);
 	}
-
-	// 모바일 환경에서 카테고리 클릭 시 사이드바 닫기
-	if (window.innerWidth < 768) {
-		document.dispatchEvent(new CustomEvent("toggle-sidebar"));
-	}
+	closeSidebarOnMobile();
 }
 
-function goResume(event) {
+function goResume(event: MouseEvent) {
 	event.preventDefault();
 	push(resumeUrl);
+	closeSidebarOnMobile();
 }
 
 void selectCategory;

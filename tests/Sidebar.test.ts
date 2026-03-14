@@ -159,6 +159,27 @@ describe("Sidebar Component", () => {
 		expect(push).toHaveBeenCalledWith("/resume/");
 	});
 
+	test("모바일 환경에서 resume 클릭 시 toggle-sidebar 이벤트 발생 확인", async () => {
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: 500,
+		});
+
+		const toggleSpy = vi.fn();
+		document.addEventListener("toggle-sidebar", toggleSpy);
+
+		render(Sidebar);
+		const resumeLink = screen.getByRole("link", { name: "resume" });
+
+		await fireEvent.click(resumeLink);
+
+		expect(push).toHaveBeenCalledWith("/resume/");
+		expect(toggleSpy).toHaveBeenCalledTimes(1);
+
+		document.removeEventListener("toggle-sidebar", toggleSpy);
+	});
+
 	test("모바일 환경에서 카테고리 클릭 시 toggle-sidebar 이벤트 발생 확인", async () => {
 		// Mock window.innerWidth
 		Object.defineProperty(window, "innerWidth", {

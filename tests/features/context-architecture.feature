@@ -57,6 +57,12 @@ Feature: Context SSoT architecture and UI invariants
     And flex-based main content should allow shrinking with min-width zero
     And the page should avoid extending beyond viewport width
 
+  Scenario: Mobile sidebar actions should close drawer consistently
+    Given the sidebar is open on a mobile viewport
+    When users click a category tag or resume action
+    Then each sidebar action should dispatch the same close event
+    And duplicated close logic should be avoided across actions
+
   Scenario: All list routes reuse one post list UI source
     Given root category and tag list pages exist
     When each route renders post cards
