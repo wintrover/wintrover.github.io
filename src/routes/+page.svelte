@@ -13,30 +13,11 @@ type HomePost = {
 	keywords: string[];
 };
 
-const navItems = ["Posts", "Resume", "Projects", "About"];
 let requestedPosts = false;
 let homePosts: HomePost[] = [];
 let projectPosts: HomePost[] = [];
 const browser =
 	typeof window !== "undefined" && typeof document !== "undefined";
-
-function navigateFromNav(item: string) {
-	if (item === "Posts") {
-		scrollToSection("posts");
-		return;
-	}
-	if (item === "Resume") {
-		void push("/resume");
-		return;
-	}
-	if (item === "Projects") {
-		scrollToSection("projects");
-		return;
-	}
-	if (item === "About") {
-		scrollToSection("about");
-	}
-}
 
 function scrollToSection(sectionId: string) {
 	if (!browser) return;
@@ -93,17 +74,6 @@ $: {
 </script>
 
 <div class="page">
-	<header class="navbar" transition:fade={{ duration: 360 }}>
-		<div class="brand">wintrover</div>
-		<nav class="nav">
-			{#each navItems as item}
-				<button class="nav-item" type="button" on:click={() => navigateFromNav(item)}>
-					{item}
-				</button>
-			{/each}
-		</nav>
-	</header>
-
 	<main class="content">
 		<div transition:fade={{ duration: 420 }}>
 			<section class="hero" transition:fly={{ y: 16, duration: 420 }}>
@@ -205,48 +175,6 @@ $: {
 			#09090b;
 	}
 
-	.navbar {
-		position: sticky;
-		top: 0;
-		z-index: 20;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 1rem 2rem;
-		background: rgb(9 9 11 / 56%);
-		border-bottom: 1px solid rgb(255 255 255 / 7%);
-		backdrop-filter: blur(16px);
-		-webkit-backdrop-filter: blur(16px);
-	}
-
-	.brand {
-		color: #fff;
-		font-size: 0.95rem;
-		font-weight: 600;
-		letter-spacing: 0.02em;
-	}
-
-	.nav {
-		display: flex;
-		gap: 0.4rem;
-	}
-
-	.nav-item {
-		border: 0;
-		background: transparent;
-		color: #a1a1aa;
-		padding: 0.45rem 0.8rem;
-		border-radius: 0.8rem;
-		font-size: 0.88rem;
-		font-weight: 500;
-		transition: background-color 0.25s ease;
-	}
-
-	.nav-item:hover {
-		background: rgb(255 255 255 / 5%);
-		color: #fff;
-	}
-
 	.content {
 		max-width: 920px;
 		margin: 0 auto;
@@ -254,7 +182,7 @@ $: {
 	}
 
 	.hero {
-		padding: 0 0 2rem;
+		padding: 2rem 0;
 		display: grid;
 		gap: 1rem;
 	}
@@ -467,10 +395,6 @@ $: {
 	}
 
 	@media (max-width: 720px) {
-		.navbar {
-			padding: 0.9rem 1rem;
-		}
-
 		.content {
 			padding: 1.2rem 0.9rem 2.6rem;
 		}

@@ -87,33 +87,6 @@ describe("HomePage", () => {
 		).toBeInTheDocument();
 	});
 
-	test("네브바 버튼 동작이 올바르게 연결되어야 함", async () => {
-		mockPostsStore.set([
-			{
-				fileName: "project-a",
-				slug: "project-a",
-				title: "Project A",
-				date: "2024-11-01",
-				category: "Project",
-				tags: [],
-				excerpt: "Excerpt",
-				folder: "project",
-				html: "<p>Excerpt</p>",
-				content: "Excerpt",
-			},
-		]);
-
-		render(HomePage);
-
-		await fireEvent.click(screen.getByRole("button", { name: "Posts" }));
-		await fireEvent.click(screen.getByRole("button", { name: "Projects" }));
-		await fireEvent.click(screen.getByRole("button", { name: "About" }));
-		await fireEvent.click(screen.getByRole("button", { name: "Resume" }));
-
-		expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(3);
-		expect(mockPush).toHaveBeenCalledWith("/resume");
-	});
-
 	test("포스트 제목 버튼 클릭 시 상세 페이지로 이동해야 함", async () => {
 		mockPostsStore.set([
 			{
@@ -171,16 +144,5 @@ describe("HomePage", () => {
 		await waitFor(() => {
 			expect(screen.getByText("No posts found.")).toBeInTheDocument();
 		});
-	});
-
-	test("섹션이 없을 때 네브바 스크롤은 무시되어야 함", async () => {
-		mockPostsStore.set([]);
-		render(HomePage);
-
-		await fireEvent.click(screen.getByRole("button", { name: "Posts" }));
-		await fireEvent.click(screen.getByRole("button", { name: "Projects" }));
-		await fireEvent.click(screen.getByRole("button", { name: "About" }));
-
-		expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled();
 	});
 });
