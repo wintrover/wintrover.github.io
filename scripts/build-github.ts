@@ -1,6 +1,11 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import {
+	defaultOgImage,
+	getBlogBuildMeta,
+	siteOrigin,
+} from "../src/lib/config";
 import { logError } from "../src/lib/log";
 import { parseFrontMatter, slugify } from "../src/lib/utils";
 
@@ -16,9 +21,6 @@ type ResumeMeta = {
 type ResumeLocaleJson = {
 	meta?: ResumeMeta;
 };
-
-const siteOrigin = "https://wintrover.github.io";
-const defaultOgImage = `${siteOrigin}/images/profile.png`;
 
 function run(cmd: string, args: string[], env: Env = {}) {
 	execFileSync(cmd, args, {
@@ -44,26 +46,16 @@ function writeFile(target: string, content: string) {
 function buildBlog(dist: string, locale: "ko" | "en") {
 	const basePath = locale === "ko" ? "/ko/" : "/";
 	const outDir = locale === "ko" ? path.join(dist, "ko") : dist;
-	const metaDescription =
-		locale === "ko"
-			? "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그와 이력서."
-			: "Blog and resume of a Thought Trajectory Architect who designs decision trajectories behind AI products.";
-	const ogTitle =
-		locale === "ko"
-			? "wintrover - 사고 궤적 아키텍트"
-			: "wintrover - Thought Trajectory Architect";
-	const ogDescription = metaDescription;
-	const ogImageAlt =
-		locale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";
+	const meta = getBlogBuildMeta(locale);
 	run(process.execPath, ["./node_modules/vite/bin/vite.js", "build"], {
 		VITE_BASE_PATH: basePath,
 		VITE_OUT_DIR: outDir,
 		VITE_LOCALE: locale,
 		VITE_HTML_LANG: locale,
-		VITE_META_DESCRIPTION: metaDescription,
-		VITE_OG_TITLE: ogTitle,
-		VITE_OG_DESCRIPTION: ogDescription,
-		VITE_OG_IMAGE_ALT: ogImageAlt,
+		VITE_META_DESCRIPTION: meta.metaDescription,
+		VITE_OG_TITLE: meta.ogTitle,
+		VITE_OG_DESCRIPTION: meta.ogDescription,
+		VITE_OG_IMAGE_ALT: meta.ogImageAlt,
 	});
 }
 

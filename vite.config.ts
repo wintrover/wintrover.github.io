@@ -1,6 +1,7 @@
 import path from "node:path";
 import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vite";
+import { getBlogBuildMeta } from "./src/lib/config";
 
 export default defineConfig(({ mode }) => {
 	const defaultLocale =
@@ -9,14 +10,11 @@ export default defineConfig(({ mode }) => {
 	process.env.VITE_HTML_LANG ??=
 		process.env.VITE_LOCALE === "auto" ? "en" : process.env.VITE_LOCALE;
 	const metaLocale = process.env.VITE_LOCALE === "ko" ? "ko" : "en";
-	process.env.VITE_META_DESCRIPTION ??=
-		metaLocale === "ko"
-			? "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그와 이력서."
-			: "Blog and resume of a Thought Trajectory Architect who designs decision trajectories behind AI products.";
-	process.env.VITE_OG_TITLE ??= "wintrover - Thought Trajectory Architect";
+	const meta = getBlogBuildMeta(metaLocale);
+	process.env.VITE_META_DESCRIPTION ??= meta.metaDescription;
+	process.env.VITE_OG_TITLE ??= meta.ogTitle;
 	process.env.VITE_OG_DESCRIPTION ??= process.env.VITE_META_DESCRIPTION;
-	process.env.VITE_OG_IMAGE_ALT ??=
-		metaLocale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";
+	process.env.VITE_OG_IMAGE_ALT ??= meta.ogImageAlt;
 	process.env.VITE_CANONICAL_PATH ??=
 		process.env.VITE_LOCALE === "ko" ? "/ko/" : "/";
 

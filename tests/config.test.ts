@@ -1,5 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { buildBlogListSeoUrl, buildPostDetailSeo } from "../src/lib/config";
+import {
+	blogDefaultSeo,
+	buildBlogListSeoUrl,
+	buildPostDetailSeo,
+	getBlogBuildMeta,
+} from "../src/lib/config";
 import type { Post } from "../src/lib/postLoader";
 
 describe("buildPostDetailSeo", () => {
@@ -85,5 +90,20 @@ describe("buildBlogListSeoUrl", () => {
 			resolvedLocale: "ko",
 		});
 		expect(url).toContain("/ko/");
+	});
+});
+
+describe("brand metadata ssot", () => {
+	test("ko/en 빌드 메타데이터는 단일 설정에서 파생되어야 함", () => {
+		const en = getBlogBuildMeta("en");
+		const ko = getBlogBuildMeta("ko");
+
+		expect(en.ogTitle).toBe(blogDefaultSeo.title);
+		expect(en.metaDescription).toContain("Thought Trajectory Architect");
+		expect(en.ogImageAlt).toBe("wintrover profile image");
+
+		expect(ko.ogTitle).toContain("사고 궤적 아키텍트");
+		expect(ko.metaDescription).toContain("블로그와 이력서");
+		expect(ko.ogImageAlt).toBe("wintrover 프로필 이미지");
 	});
 });

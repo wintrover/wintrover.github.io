@@ -26,6 +26,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 		expect(context).toContain("기본 언어는 영어");
 		expect(context).toContain("/ko/");
 		expect(context).toContain("/en/");
+		expect(context).toContain("브랜드 메타데이터");
 		expect(context).toContain("build-github.ts");
 		expect(context).toContain("image-tools.ts");
 		expect(context).toContain("세로 정렬");
@@ -43,6 +44,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"URL architecture uses root for English and /ko for Korean",
 			"Locale detection must not treat /en as locale path",
 			"Canonical SEO path must follow locale prefix policy",
+			"Brand metadata should be derived from one shared source",
 			"Blog list canonical URL must not emit /en fallback",
 			"Blog list layout keeps vertical flow and equal card size",
 			"All list routes reuse one post list UI source",
@@ -85,6 +87,12 @@ describe("SSoT context 규칙 전수 검증", () => {
 			'const localePrefix = resolvedLocale === "ko" ? "/ko" : ""',
 		);
 		expect(config).toContain("`${origin}${localePrefix}/post/${slug}/`");
+	});
+
+	test("Given 브랜드 메타데이터 When 빌드 설정 검증 Then 단일 원천 함수를 사용한다", () => {
+		expect(config).toContain("export function getBlogBuildMeta");
+		expect(buildScript).toContain("getBlogBuildMeta");
+		expect(buildScript).toContain('from "../src/lib/config"');
 	});
 
 	test("Given list routes When UI 구성 검증 Then 단일 PostFeed 컴포넌트를 재사용한다", () => {

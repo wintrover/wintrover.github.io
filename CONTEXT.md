@@ -26,6 +26,7 @@
   - `dist/ko/index.html`
   - `dist/resume/index.html`
   - `dist/ko/resume/index.html`
+- 블로그 브랜드 메타데이터(타이틀/설명/OG)는 런타임 설정과 빌드 파이프라인에서 **하나의 공유 소스**로부터 파생되어야 한다.
 - 영어는 루트에 배치하므로 `dist/en/index.html` 생성에 의존하지 않는다.
 - Sitemap과 canonical 생성 시 영어는 루트 prefix(`""`), 한국어는 `/ko` prefix를 사용한다.
 - 빌드 검증 단계(`verifyBuildOutput`)는 위 규칙 위반을 실패로 처리해야 한다.

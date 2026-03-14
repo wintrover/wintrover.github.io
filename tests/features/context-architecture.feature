@@ -33,6 +33,12 @@ Feature: Context SSoT architecture and UI invariants
     When locale is Korean
     Then canonical URL must be generated with "/ko" prefix
 
+  Scenario: Brand metadata should be derived from one shared source
+    Given blog and build pipelines use SEO metadata
+    When identity strings are changed
+    Then runtime SEO defaults and build-time env defaults should share one source
+    And duplicated hardcoded branding literals should be avoided in build scripts
+
   Scenario: Blog list canonical URL must not emit /en fallback
     Given blog list metadata is generated outside browser runtime
     When locale is English

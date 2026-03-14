@@ -17,6 +17,31 @@ type ImportMetaWithEnv = ImportMeta & {
 	env?: RuntimeEnv;
 };
 
+type SupportedLocale = "ko" | "en";
+
+const brandProfile = {
+	role: {
+		ko: "사고 궤적 아키텍트",
+		en: "Thought Trajectory Architect",
+	},
+	blogTitle: {
+		ko: "wintrover - 사고 궤적 아키텍트",
+		en: "wintrover - Thought Trajectory Architect",
+	},
+	blogDescription: {
+		ko: "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그.",
+		en: "A Thought Trajectory Architect's blog on designing decision trajectories behind AI products.",
+	},
+	buildDescription: {
+		ko: "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그와 이력서.",
+		en: "Blog and resume of a Thought Trajectory Architect who designs decision trajectories behind AI products.",
+	},
+	ogImageAlt: {
+		ko: "wintrover 프로필 이미지",
+		en: "wintrover profile image",
+	},
+} as const;
+
 export function getBaseUrl() {
 	const withTrailingSlash = (s: string) => (s.endsWith("/") ? s : `${s}/`);
 	const globals = globalThis as WintrGlobal;
@@ -49,12 +74,21 @@ const baseUrl = getBaseUrl();
 export const siteOrigin = "https://wintrover.github.io";
 export const defaultOgImage = `${siteOrigin}/images/profile.png`;
 export const blogDefaultSeo = {
-	title: "wintrover - Thought Trajectory Architect",
+	title: brandProfile.blogTitle.en,
 	description: {
-		ko: "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그.",
-		en: "A Thought Trajectory Architect's blog on designing decision trajectories behind AI products.",
+		ko: brandProfile.blogDescription.ko,
+		en: brandProfile.blogDescription.en,
 	},
 };
+
+export function getBlogBuildMeta(locale: SupportedLocale) {
+	return {
+		metaDescription: brandProfile.buildDescription[locale],
+		ogTitle: brandProfile.blogTitle[locale],
+		ogDescription: brandProfile.buildDescription[locale],
+		ogImageAlt: brandProfile.ogImageAlt[locale],
+	};
+}
 
 export function buildBlogListSeoUrl(args: {
 	isBrowser: boolean;
@@ -131,7 +165,7 @@ export function getRuntimeOrigin() {
 
 export const siteConfig = {
 	name: "wintrover",
-	description: "Thought Trajectory Architect",
+	description: brandProfile.role.en,
 	avatar: `${baseUrl}images/profile.png`,
 	baseUrl,
 	origin: siteOrigin,
