@@ -90,6 +90,9 @@ describe("Sidebar Component", () => {
 		expect(screen.getByText(/Svelte \(2\)/)).toBeInTheDocument();
 		expect(screen.getByText(/Vitest \(1\)/)).toBeInTheDocument();
 		expect(screen.getByText(/SMBholdings \(0\)/)).toBeInTheDocument();
+		expect(
+			screen.getByText("Thought Trajectory Architect"),
+		).toBeInTheDocument();
 	});
 
 	test("사이드바 주요 영역은 모션 훅 클래스를 가져야 함", () => {

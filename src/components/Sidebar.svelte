@@ -123,7 +123,7 @@ void isActive;
 
 <div class="sidebar-module motion-reveal">
   <h4>About</h4>
-  <p>Product engineer & builder, shipping AI-powered products and sharing learnings from the field.</p>
+  <p>A Thought Trajectory Architect turning hidden decision paths behind AI products into explicit, sharable architecture.</p>
   <br>
   <p>Check my <a href={resumeUrl} on:click={goResume}>resume</a></p>
 </div>

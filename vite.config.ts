@@ -11,9 +11,9 @@ export default defineConfig(({ mode }) => {
 	const metaLocale = process.env.VITE_LOCALE === "ko" ? "ko" : "en";
 	process.env.VITE_META_DESCRIPTION ??=
 		metaLocale === "ko"
-			? "wintrover의 프로덕트 개발 블로그와 이력서. AI/LLM, 컴퓨터 비전, 프로덕트 엔지니어링 기록."
-			: "wintrover's blog and resume. Notes on building products with AI/LLM and computer vision.";
-	process.env.VITE_OG_TITLE ??= "wintrover - Product Engineer & Builder";
+			? "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그와 이력서."
+			: "Blog and resume of a Thought Trajectory Architect who designs decision trajectories behind AI products.";
+	process.env.VITE_OG_TITLE ??= "wintrover - Thought Trajectory Architect";
 	process.env.VITE_OG_DESCRIPTION ??= process.env.VITE_META_DESCRIPTION;
 	process.env.VITE_OG_IMAGE_ALT ??=
 		metaLocale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";

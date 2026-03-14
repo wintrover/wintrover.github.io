@@ -28,7 +28,9 @@ describe("ResumePage", () => {
 		expect(
 			screen.getByRole("heading", { level: 1, name: "Suhyok Yun" }),
 		).toBeInTheDocument();
-		expect(screen.getByText("Product Engineer & Builder")).toBeInTheDocument();
+		expect(
+			screen.getByText("Thought Trajectory Architect"),
+		).toBeInTheDocument();
 		expect(
 			screen.getByRole("heading", { level: 3, name: "Projects" }),
 		).toBeInTheDocument();

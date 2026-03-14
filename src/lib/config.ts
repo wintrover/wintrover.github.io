@@ -49,10 +49,10 @@ const baseUrl = getBaseUrl();
 export const siteOrigin = "https://wintrover.github.io";
 export const defaultOgImage = `${siteOrigin}/images/profile.png`;
 export const blogDefaultSeo = {
-	title: "wintrover - Product Engineer & Builder",
+	title: "wintrover - Thought Trajectory Architect",
 	description: {
-		ko: "wintrover의 프로덕트 개발 블로그. AI/LLM, 컴퓨터 비전, 제품 만들기 기록.",
-		en: "wintrover's product engineering blog. Notes on AI/LLM, computer vision, and building products.",
+		ko: "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그.",
+		en: "A Thought Trajectory Architect's blog on designing decision trajectories behind AI products.",
 	},
 };
 
@@ -131,7 +131,7 @@ export function getRuntimeOrigin() {
 
 export const siteConfig = {
 	name: "wintrover",
-	description: "Product Engineer & Builder",
+	description: "Thought Trajectory Architect",
 	avatar: `${baseUrl}images/profile.png`,
 	baseUrl,
 	origin: siteOrigin,

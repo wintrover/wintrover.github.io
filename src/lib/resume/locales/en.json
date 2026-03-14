@@ -1,12 +1,12 @@
 {
 	"site_title": "Suhyok Yun",
-	"site_subtitle": "Product Engineer & Builder",
+	"site_subtitle": "Thought Trajectory Architect",
 	"meta": {
 		"title": "wintrover's resume",
-		"description": "Product engineer & builder shipping AI-powered products. Portfolio and project notes.",
-		"keywords": "Product Engineer, Builder, AI, Machine Learning, Computer Vision, LLM, NLP, Suhyok Yun",
+		"description": "Thought Trajectory Architect shaping AI products by making decision trajectories explicit and executable.",
+		"keywords": "Thought Trajectory Architect, Decision Trajectory, AI, Machine Learning, Computer Vision, LLM, NLP, Suhyok Yun",
 		"og_title": "wintrover's resume",
-		"og_description": "Product engineer & builder shipping AI-powered products. Portfolio and project notes.",
+		"og_description": "Thought Trajectory Architect shaping AI products by making decision trajectories explicit and executable.",
 		"og_type": "website"
 	},
 	"contact_email_label": "Email",
@@ -28,7 +28,7 @@
 	"lang_switcher_en": "English",
 	"lang_switcher_ko": "한국어",
 	"about_title": "About Me",
-	"about_content": "Product engineer & builder focused on shipping end-to-end, AI-powered products.<br/>With a background in Electrical and Electronic Engineering, I bridge engineering, UX, and business to turn ideas into usable software.<br/>Through the Intel developer program and the projects below, I built LLM and computer vision systems, optimized performance, and deployed services to real users.<br/>I care about fast iteration, reliable delivery, and customer-centered product decisions.<br/>",
+	"about_content": "I am a Thought Trajectory Architect who values the decision trajectory behind every outcome as much as the shipped product itself.<br/>With a background in Electrical and Electronic Engineering, I design logical paths for complex problems and collaborate with AI to translate those paths into working software.<br/>Through the Intel developer program and the projects below, I built LLM and computer vision systems, optimized performance, and deployed services to real users.<br/>I focus on explicit reasoning, reliable delivery, and customer-centered decisions that remain auditable after launch.<br/>",
 	"section_title_projects": "Projects",
 	"section_title_experience": "Experience",
 	"section_title_education": "Education",
@@ -52,7 +52,7 @@
 	"experience": {
 		"focc_inc": {
 			"title": "SMBholdings Inc.",
-			"sub_title": "Product Engineer · Full-time",
+			"sub_title": "Thought Trajectory Architect · Full-time",
 			"caption": "July 2025 - March 2026",
 			"description": "Implemented an asynchronous KYC orchestration architecture with separated FastAPI API services and Temporal workers.<br/>Built an ID image/selfie video face similarity pipeline using InsightFace (ArcFace and SCRFD), OpenCV, and MediaPipe.<br/>Managed MariaDB domain models with SQLModel/SQLAlchemy and controlled schema changes through Atlas migrations.<br/>Delivered a React 19 admin console with KYC integration, regression, and performance test suites for trend/success-rate monitoring and release stability."
 		},

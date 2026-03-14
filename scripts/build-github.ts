@@ -46,12 +46,12 @@ function buildBlog(dist: string, locale: "ko" | "en") {
 	const outDir = locale === "ko" ? path.join(dist, "ko") : dist;
 	const metaDescription =
 		locale === "ko"
-			? "wintrover의 프로덕트 개발 블로그와 이력서. AI/LLM, 컴퓨터 비전, 프로덕트 엔지니어링 기록."
-			: "wintrover's blog and resume. Notes on building products with AI/LLM and computer vision.";
+			? "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그와 이력서."
+			: "Blog and resume of a Thought Trajectory Architect who designs decision trajectories behind AI products.";
 	const ogTitle =
 		locale === "ko"
-			? "wintrover - Product Engineer & Builder"
-			: "wintrover - Product Engineer & Builder";
+			? "wintrover - 사고 궤적 아키텍트"
+			: "wintrover - Thought Trajectory Architect";
 	const ogDescription = metaDescription;
 	const ogImageAlt =
 		locale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";
@@ -171,7 +171,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 	const title = String(json?.meta?.title ?? "wintrover's resume");
 	const description = String(
 		json?.meta?.description ??
-			"Product engineer & builder shipping AI-powered products. Portfolio and project notes.",
+			"Thought Trajectory Architect shaping AI products by making decision trajectories explicit and executable.",
 	);
 	const canonical = `${siteOrigin}${localePrefix}/resume/`;
 	const redirect = `${localePrefix}/#/resume`;
