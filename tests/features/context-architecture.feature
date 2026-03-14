@@ -54,6 +54,7 @@ Feature: Context SSoT architecture and UI invariants
     Given the app shell is rendered on a mobile viewport
     When the main content container uses full width
     Then the content box sizing should include horizontal padding in width calculation
+    And flex-based main content should allow shrinking with min-width zero
     And the page should avoid extending beyond viewport width
 
   Scenario: All list routes reuse one post list UI source
@@ -69,6 +70,12 @@ Feature: Context SSoT architecture and UI invariants
     And badges buttons and code blocks should use zinc-based neutral palette
     And title and body typography should keep density aligned with list UI
     And list and detail should share vertical rhythm scale tokens
+
+  Scenario: Post detail markdown should not overflow mobile viewport
+    Given a post detail page renders markdown body on mobile viewport
+    When long code blocks or wide tables are present
+    Then markdown containers should keep width within parent content area
+    And wide elements should use horizontal scrolling inside themselves
 
   Scenario: Post route hero motion must replay on route entry
     Given hero motion uses route-level entry animation

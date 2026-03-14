@@ -50,6 +50,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Mobile app content fits viewport width without horizontal overflow",
 			"All list routes reuse one post list UI source",
 			"Post detail page keeps Geist dark visual language",
+			"Post detail markdown should not overflow mobile viewport",
 			"Post route hero motion must replay on route entry",
 			"Build output verification enforces deployment entrypoints",
 			"Sitemap generation preserves locale architecture",
@@ -122,6 +123,14 @@ describe("SSoT context 규칙 전수 검증", () => {
 		expect(postDetail).toContain("--rhythm-type-body: 0.98rem");
 		expect(postDetail).toContain("--rhythm-line-body: 1.7");
 		expect(postDetail).toContain("line-height: var(--rhythm-line-body)");
+	});
+
+	test("Given 포스트 상세 페이지 When 모바일 overflow 안전성 검증 Then 본문 wide 요소가 내부 스크롤을 사용한다", () => {
+		expect(postDetail).toContain("box-sizing: border-box");
+		expect(postDetail).toContain("overflow-wrap: anywhere");
+		expect(postDetail).toContain("display: block");
+		expect(postDetail).toContain("overflow-x: auto");
+		expect(postDetail).toContain("max-width: 100%");
 	});
 
 	test("Given 리스트와 상세 페이지 When 스타일 검증 Then 수직 리듬 토큰을 공유한다", () => {

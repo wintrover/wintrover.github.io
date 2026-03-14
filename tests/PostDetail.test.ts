@@ -193,6 +193,43 @@ describe("PostDetail Component", () => {
 		}
 	});
 
+	test("모바일 본문 wide 요소는 부모 폭을 넘기지 않고 내부 스크롤을 사용해야 함", async () => {
+		const overflowSafePost = {
+			...mockPost,
+			html: `
+				<div class="markdown-content">
+					<pre><code>${"x".repeat(400)}</code></pre>
+					<table>
+						<tr><th>very-long-column-name</th><th>another-very-long-column-name</th></tr>
+						<tr><td>${"y".repeat(120)}</td><td>${"z".repeat(120)}</td></tr>
+					</table>
+				</div>
+			`,
+		};
+		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(overflowSafePost);
+
+		render(PostDetail, { params: { slug: "detailed-post" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("Detailed Post")).toBeInTheDocument();
+		});
+
+		const markdown = document.querySelector(".markdown-content");
+		const pre = document.querySelector(".markdown-content pre");
+		const table = document.querySelector(".markdown-content table");
+
+		expect(markdown).not.toBeNull();
+		expect(pre).not.toBeNull();
+		expect(table).not.toBeNull();
+		expect(getComputedStyle(markdown as HTMLElement).overflowWrap).toBe(
+			"anywhere",
+		);
+		expect(getComputedStyle(pre as HTMLElement).maxWidth).toBe("100%");
+		expect(getComputedStyle(pre as HTMLElement).boxSizing).toBe("border-box");
+		expect(getComputedStyle(table as HTMLElement).display).toBe("block");
+		expect(getComputedStyle(table as HTMLElement).overflowX).toBe("auto");
+	});
+
 	test("포스트 데이터 로딩 중 에러 발생 시 처리 확인", async () => {
 		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		vi.mocked(postLoader.loadPostBySlug).mockRejectedValue(

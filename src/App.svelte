@@ -233,6 +233,7 @@ onDestroy(() => {
 
   #main-content {
     flex: 1;
+    min-width: 0;
     margin-left: 288px;
     display: flex;
     flex-direction: column;
@@ -242,6 +243,7 @@ onDestroy(() => {
 
   #content {
     flex: 1;
+    min-width: 0;
     max-width: 920px;
     margin: 0 auto 44px;
     padding: 0 24px;

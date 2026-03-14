@@ -273,8 +273,12 @@ void goBack;
     --rhythm-type-body: 0.98rem;
     --rhythm-line-body: 1.7;
     max-width: 820px;
+    width: 100%;
     margin: 0 auto;
     padding: 1.5rem 0.25rem 1rem;
+    min-width: 0;
+    box-sizing: border-box;
+    max-width: 100%;
   }
 
   .post-header {
@@ -302,11 +306,13 @@ void goBack;
   .post-meta {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--rhythm-gap-sm);
     margin-bottom: var(--rhythm-gap-sm);
     font-size: var(--rhythm-type-meta);
     letter-spacing: 0.02em;
     color: #71717a;
+    min-width: 0;
   }
 
   .category-badge {
@@ -350,6 +356,8 @@ void goBack;
     line-height: var(--rhythm-line-body);
     font-size: var(--rhythm-type-body);
     color: #d4d4d8;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .loading, .content-error {
@@ -397,7 +405,15 @@ void goBack;
 
   :global(.markdown-content) {
     word-break: break-word;
+    overflow-wrap: anywhere;
+    min-width: 0;
+    max-width: 100%;
     color: #d4d4d8;
+  }
+
+  :global(.markdown-content > *) {
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   :global(.markdown-content h1),
@@ -420,6 +436,9 @@ void goBack;
     border-radius: 0.72rem;
     padding: 0.95rem;
     overflow: auto;
+    overflow-x: auto;
+    max-width: 100%;
+    box-sizing: border-box;
     position: relative;
     margin: 1.2rem 0;
   }
@@ -431,6 +450,12 @@ void goBack;
     color: #e4e4e7;
     padding: 0.18em 0.42em;
     border-radius: 0.36rem;
+  }
+
+  :global(.markdown-content :not(pre) > code) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: break-spaces;
   }
 
   :global(.markdown-content pre code) {
@@ -454,9 +479,20 @@ void goBack;
   }
 
   :global(.markdown-content table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     width: 100%;
     border-collapse: collapse;
     margin: 1.25rem 0;
+  }
+
+  :global(.markdown-content iframe),
+  :global(.markdown-content svg),
+  :global(.markdown-content video),
+  :global(.markdown-content canvas) {
+    max-width: 100%;
   }
 
   :global(.markdown-content th, .markdown-content td) {

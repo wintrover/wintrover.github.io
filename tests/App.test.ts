@@ -164,6 +164,22 @@ describe("App.svelte", () => {
 		);
 	});
 
+	test("모바일에서 메인 콘텐츠 플렉스 영역은 축소 가능해야 함", async () => {
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: 375,
+		});
+		window.dispatchEvent(new Event("resize"));
+
+		const { container } = render(App);
+		await tick();
+
+		const mainContent = container.querySelector("#main-content");
+		expect(mainContent).not.toBeNull();
+		expect(getComputedStyle(mainContent as HTMLElement).minWidth).toBe("0");
+	});
+
 	test("모바일에서 토글로 연 사이드바가 즉시 다시 닫히지 않아야 함", async () => {
 		Object.defineProperty(window, "innerWidth", {
 			writable: true,
