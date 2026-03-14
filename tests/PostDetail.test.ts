@@ -55,7 +55,6 @@ describe("PostDetail Component", () => {
 			expect(screen.getByText("Detailed Post")).toBeInTheDocument();
 		});
 
-		expect(screen.getByText("Tech")).toBeInTheDocument();
 		expect(screen.getByText("Header")).toBeInTheDocument();
 		expect(screen.getByText("Body content")).toBeInTheDocument();
 		expect(screen.getByText("#svelte")).toBeInTheDocument();
@@ -65,6 +64,29 @@ describe("PostDetail Component", () => {
 		const backButton = screen.getByText("← Back to List");
 		await fireEvent.click(backButton);
 		expect(pushMock).toHaveBeenCalledWith("/");
+	});
+
+	test("상세 헤더 메타는 태그가 날짜보다 앞에 오고 카테고리 배지가 없어야 함", async () => {
+		render(PostDetail, { params: { slug: "detailed-post" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("Detailed Post")).toBeInTheDocument();
+		});
+
+		const meta = document.querySelector(".post-meta");
+		const tags = meta?.querySelector(".post-tags") ?? null;
+		const date = meta?.querySelector(".date") ?? null;
+		const categoryBadge = meta?.querySelector(".category-badge") ?? null;
+
+		expect(meta).not.toBeNull();
+		expect(tags).not.toBeNull();
+		expect(date).not.toBeNull();
+		expect(categoryBadge).toBeNull();
+
+		const elements = Array.from(meta?.children ?? []);
+		expect(elements.indexOf(tags as Element)).toBeLessThan(
+			elements.indexOf(date as Element),
+		);
 	});
 
 	test("포스트 전환 시 로딩 상태 표시 확인", async () => {

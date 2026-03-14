@@ -5,7 +5,7 @@ import { buildPostDetailSeo, defaultOgImage } from "../lib/config";
 import { detectLocale } from "../lib/locale";
 import { logError } from "../lib/log";
 import { loadPostBySlug, type Post } from "../lib/postLoader";
-import { formatDate, slugify } from "../lib/utils";
+import { formatDate } from "../lib/utils";
 import { posts as postsStore } from "../stores/posts";
 import Comments from "./Comments.svelte";
 
@@ -185,7 +185,6 @@ function goBack() {
 }
 
 void formatDate;
-void slugify;
 void Comments;
 void goBack;
 </script>
@@ -213,17 +212,14 @@ void goBack;
 		<article class="post-detail">
 			<header class="post-header motion-reveal">
 				<div class="post-meta">
+					<div class="post-tags">
+						{#each post.tags as tag}
+							<span class="tag">#{tag}</span>
+						{/each}
+					</div>
 					<span class="date">{formatDate(post.date)}</span>
-					<span class="category-badge {slugify(post.category)}">
-						{post.category}
-					</span>
 				</div>
 				<h1 class="post-title">{post.title}</h1>
-				<div class="post-tags">
-					{#each post.tags as tag}
-						<span class="tag">#{tag}</span>
-					{/each}
-				</div>
 			</header>
 
 			<div class="post-content">
@@ -313,20 +309,6 @@ void goBack;
     letter-spacing: 0.02em;
     color: #71717a;
     min-width: 0;
-  }
-
-  .category-badge {
-    display: inline-flex;
-    align-items: center;
-    height: 1.5rem;
-    background: rgb(39 39 42 / 75%);
-    color: #d4d4d8;
-    border: 1px solid rgb(63 63 70 / 85%);
-    padding: 0 0.6rem;
-    border-radius: 999px;
-    font-size: var(--rhythm-type-meta);
-    font-weight: 500;
-    text-transform: uppercase;
   }
 
   .post-title {

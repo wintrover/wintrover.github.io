@@ -70,6 +70,8 @@ Feature: Context SSoT architecture and UI invariants
     And badges buttons and code blocks should use zinc-based neutral palette
     And title and body typography should keep density aligned with list UI
     And list and detail should share vertical rhythm scale tokens
+    And post detail meta should place tags before published date
+    And post detail header should not render category badge
 
   Scenario: Post detail markdown should not overflow mobile viewport
     Given a post detail page renders markdown body on mobile viewport
