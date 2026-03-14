@@ -19,10 +19,10 @@ void getKeywords;
 </script>
 
 {#if posts.length > 0}
-	<section class="post-list">
+	<section class="post-list motion-stagger-list">
 		{#each posts as post, index}
 			<article
-				class="post-card w-full"
+				class="post-card w-full motion-card"
 				in:fly={{ y: 12, duration: 320 + index * 14, delay: 30 + index * 25 }}
 			>
 				<div class="meta">
@@ -77,13 +77,17 @@ void getKeywords;
 		border-bottom: 1px solid rgb(39 39 42 / 50%);
 		background: transparent;
 		transition:
+			transform 0.28s ease,
 			background-color 0.28s ease,
-			border-color 0.28s ease;
+			border-color 0.28s ease,
+			box-shadow 0.28s ease;
 	}
 
 	.post-card:hover {
 		background: rgb(255 255 255 / 2.5%);
 		border-color: rgb(63 63 70);
+		transform: translateY(-2px);
+		box-shadow: 0 12px 24px rgb(0 0 0 / 18%);
 	}
 
 	.empty {
@@ -171,5 +175,42 @@ void getKeywords;
 		font-weight: 500;
 		letter-spacing: 0.02em;
 		background: rgb(39 39 42 / 50%);
+		transition:
+			transform 0.24s ease,
+			background-color 0.24s ease,
+			color 0.24s ease;
+	}
+
+	.post-card:hover .keyword-badge {
+		background: rgb(63 63 70 / 66%);
+		color: #e4e4e7;
+		transform: translateY(-1px);
+	}
+
+	.motion-stagger-list .motion-card {
+		animation: postCardReveal 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	@keyframes postCardReveal {
+		from {
+			opacity: 0;
+			transform: translateY(8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.motion-stagger-list .motion-card {
+			animation-duration: 0.01ms;
+			animation-iteration-count: 1;
+		}
+
+		.post-card,
+		.keyword-badge {
+			transition-duration: 0.01ms;
+		}
 	}
 </style>

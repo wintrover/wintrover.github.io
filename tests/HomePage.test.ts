@@ -145,4 +145,30 @@ describe("HomePage", () => {
 			expect(screen.getByText("No posts found.")).toBeInTheDocument();
 		});
 	});
+
+	test("홈 주요 섹션은 모션 훅 클래스를 가져야 함", async () => {
+		mockPostsStore.set([
+			{
+				fileName: "motion-post",
+				slug: "motion-post",
+				title: "Motion Post",
+				date: "2025-03-01",
+				category: "Project",
+				tags: ["UI"],
+				excerpt: "Motion check",
+				folder: "project",
+				html: "<p>Motion check</p>",
+				content: "Motion check",
+			},
+		]);
+
+		render(HomePage);
+		expect((await screen.findAllByText("Motion Post")).length).toBeGreaterThan(
+			0,
+		);
+
+		expect(document.querySelector(".hero.motion-reveal")).not.toBeNull();
+		expect(document.querySelector("#projects.motion-reveal")).not.toBeNull();
+		expect(document.querySelector("#about.motion-reveal")).not.toBeNull();
+	});
 });

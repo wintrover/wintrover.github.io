@@ -31,7 +31,7 @@ $: {
 <div class="page">
 	<main class="content">
 		<div transition:fade={{ duration: 420 }}>
-			<section class="hero" transition:fly={{ y: 16, duration: 420 }}>
+			<section class="hero motion-reveal" transition:fly={{ y: 16, duration: 420 }}>
 				<p class="eyebrow">Engineering Journal</p>
 				<h1>Shipping ideas with reliability</h1>
 				<p class="description">
@@ -49,7 +49,7 @@ $: {
 				/>
 			</section>
 
-			<section id="projects" class="section-block" transition:fade={{ duration: 420 }}>
+			<section id="projects" class="section-block motion-reveal" transition:fade={{ duration: 420 }}>
 				<div class="section-head">
 					<p class="eyebrow">Projects</p>
 					<h2 class="section-title">Featured project posts</h2>
@@ -72,7 +72,7 @@ $: {
 				</div>
 			</section>
 
-			<section id="about" class="section-block" transition:fade={{ duration: 420 }}>
+			<section id="about" class="section-block motion-reveal" transition:fade={{ duration: 420 }}>
 				<div class="section-head">
 					<p class="eyebrow">About</p>
 					<h2 class="section-title">Building products with shipping discipline</h2>
@@ -121,6 +121,21 @@ $: {
 		padding: 2rem 0;
 		display: grid;
 		gap: 1rem;
+		position: relative;
+		overflow: clip;
+	}
+
+	.hero::after {
+		content: "";
+		position: absolute;
+		inset: auto -10% -45% auto;
+		width: 16rem;
+		height: 16rem;
+		border-radius: 999px;
+		background: radial-gradient(circle, rgb(113 113 122 / 32%), transparent 70%);
+		filter: blur(3px);
+		pointer-events: none;
+		animation: haloDrift 5.8s ease-in-out infinite;
 	}
 
 	.eyebrow {
@@ -155,6 +170,7 @@ $: {
 		border-radius: 1.2rem;
 		background: linear-gradient(160deg, rgb(24 24 27 / 70%), rgb(9 9 11 / 92%));
 		border: 1px solid rgb(255 255 255 / 6%);
+		will-change: transform, opacity;
 	}
 
 	.section-head {
@@ -190,12 +206,49 @@ $: {
 		text-align: left;
 		transition:
 			transform 0.3s ease,
-			border-color 0.3s ease;
+			border-color 0.3s ease,
+			box-shadow 0.3s ease;
 	}
 
 	.project-item:hover {
 		transform: translateY(-2px);
 		border-color: rgb(255 255 255 / 18%);
+		box-shadow: 0 10px 26px rgb(0 0 0 / 28%);
+	}
+
+	.motion-reveal {
+		animation: sectionReveal 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	#projects.motion-reveal {
+		animation-delay: 0.08s;
+	}
+
+	#about.motion-reveal {
+		animation-delay: 0.16s;
+	}
+
+	@keyframes sectionReveal {
+		from {
+			opacity: 0;
+			transform: translateY(10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes haloDrift {
+		0%,
+		100% {
+			transform: translate3d(0, 0, 0);
+			opacity: 0.75;
+		}
+		50% {
+			transform: translate3d(-10px, -10px, 0);
+			opacity: 1;
+		}
 	}
 
 	.project-item span {
@@ -224,6 +277,14 @@ $: {
 	@media (max-width: 720px) {
 		.content {
 			padding: 1.2rem 0.9rem 2.6rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.motion-reveal,
+		.hero::after {
+			animation-duration: 0.01ms;
+			animation-iteration-count: 1;
 		}
 	}
 </style>

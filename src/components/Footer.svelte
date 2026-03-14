@@ -4,29 +4,29 @@ import { siteConfig } from "../lib/config";
 void siteConfig;
 </script>
 
-<footer class="wrapper-footer">
+<footer class="wrapper-footer motion-reveal">
   <div class="container">
-    <div class="footer-links">
+    <div class="footer-links motion-stagger-list">
       {#if siteConfig.social.email}
-        <a href="mailto:{siteConfig.social.email}" title="Email">
+        <a href="mailto:{siteConfig.social.email}" title="Email" class="social-link">
           <svg class="svg-icon"><use href="#icon-email"></use></svg>
         </a>
       {/if}
 
       {#if siteConfig.social.github}
-        <a href="https://github.com/{siteConfig.social.github}" title="GitHub">
+        <a href="https://github.com/{siteConfig.social.github}" title="GitHub" class="social-link">
           <svg class="svg-icon"><use href="#icon-github"></use></svg>
         </a>
       {/if}
 
       {#if siteConfig.social.instagram}
-        <a href="https://instagram.com/{siteConfig.social.instagram}" title="Instagram">
+        <a href="https://instagram.com/{siteConfig.social.instagram}" title="Instagram" class="social-link">
           <svg class="svg-icon"><use href="#icon-instagram"></use></svg>
         </a>
       {/if}
 
       {#if siteConfig.social.linkedin}
-        <a href="https://linkedin.com/in/{siteConfig.social.linkedin}" title="LinkedIn">
+        <a href="https://linkedin.com/in/{siteConfig.social.linkedin}" title="LinkedIn" class="social-link">
           <svg class="svg-icon"><use href="#icon-linkedin"></use></svg>
         </a>
       {/if}
@@ -56,34 +56,98 @@ void siteConfig;
 
 <style>
   .wrapper-footer {
-    border-top: 1px solid #ddd;
-    background-color: #f8f9fa;
+    border-top: 1px solid rgb(39 39 42 / 85%);
+    background: linear-gradient(180deg, rgb(9 9 11 / 64%), rgb(9 9 11 / 96%));
+    margin-top: 0.7rem;
   }
 
   .container {
-    margin: 30px 0;
+    margin: 1.5rem 0 1.25rem;
     text-align: center;
   }
 
   .footer-links {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 0.85rem;
   }
 
-  .footer-links a {
-    color: #666;
-    transition: color 0.2s;
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.8rem;
+    border: 1px solid rgb(63 63 70 / 85%);
+    color: #a1a1aa;
+    background: rgb(24 24 27 / 68%);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 24%);
+    transition:
+      color 0.24s ease,
+      border-color 0.24s ease,
+      background-color 0.24s ease,
+      transform 0.24s ease;
   }
 
-  .footer-links a:hover {
-    color: #0366d6;
+  .social-link:hover {
+    color: #fafafa;
+    background: rgb(39 39 42 / 80%);
+    border-color: rgb(82 82 91);
+    transform: translateY(-2px);
   }
 
   .svg-icon {
-    width: 24px;
-    height: 24px;
+    width: 1.15rem;
+    height: 1.15rem;
     fill: currentColor;
+  }
+
+  .motion-reveal {
+    animation: footerReveal 0.56s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .motion-stagger-list .social-link {
+    animation: footerReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .motion-stagger-list .social-link:nth-child(1) {
+    animation-delay: 0.08s;
+  }
+
+  .motion-stagger-list .social-link:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+
+  .motion-stagger-list .social-link:nth-child(3) {
+    animation-delay: 0.16s;
+  }
+
+  .motion-stagger-list .social-link:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+
+  @keyframes footerReveal {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-reveal,
+    .motion-stagger-list .social-link {
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
+    }
+
+    .social-link {
+      transition-duration: 0.01ms;
+    }
   }
 
 

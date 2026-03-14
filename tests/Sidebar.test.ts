@@ -92,6 +92,19 @@ describe("Sidebar Component", () => {
 		expect(screen.getByText(/SMBholdings \(0\)/)).toBeInTheDocument();
 	});
 
+	test("사이드바 주요 영역은 모션 훅 클래스를 가져야 함", () => {
+		render(Sidebar);
+		expect(
+			document.querySelector(".profile-section.motion-reveal"),
+		).not.toBeNull();
+		expect(
+			document.querySelector(".category-list.motion-stagger-list"),
+		).not.toBeNull();
+		expect(
+			document.querySelector(".sidebar-module.motion-reveal"),
+		).not.toBeNull();
+	});
+
 	test("카테고리 클릭 시 selectedCategory가 업데이트되고 경로가 이동해야 함", async () => {
 		render(Sidebar);
 

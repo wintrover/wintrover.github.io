@@ -1,0 +1,19 @@
+Feature: Modern UI motion across core blog surfaces
+  As a reader
+  I want consistent, polished motion in major UI sections
+  So the Geist-based blog feels modern and lively
+
+  Scenario: Homepage sections expose modern motion hooks
+    Given I render the homepage
+    When the hero, projects, and about sections appear
+    Then each section should expose a motion-ready class hook
+
+  Scenario: Sidebar and footer expose motion hooks
+    Given I render the app shell
+    When I inspect sidebar and footer regions
+    Then profile and social link containers should expose motion-ready class hooks
+
+  Scenario: Resume surface exposes motion hooks
+    Given I render the resume page
+    When I inspect key resume cards and links
+    Then resume sections and cards should expose motion-ready class hooks

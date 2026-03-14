@@ -36,6 +36,9 @@ describe("ResumePage", () => {
 			"href",
 			"https://github.com/wintrover",
 		);
+		expect(document.querySelector(".section.motion-reveal")).not.toBeNull();
+		expect(document.querySelector(".cards.motion-stagger-list")).not.toBeNull();
+		expect(document.querySelector(".card.motion-card")).not.toBeNull();
 
 		unmount();
 		expect(

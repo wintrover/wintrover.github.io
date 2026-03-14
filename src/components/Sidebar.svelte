@@ -70,7 +70,7 @@ void isActive;
 </script>
 
 <div class="sidebar-header">
-  <div class="profile-section">
+  <div class="profile-section motion-reveal">
     <div class="avatar-link">
       <img src={siteConfig.avatar} alt={siteConfig.name} class="avatar" />
     </div>
@@ -81,9 +81,9 @@ void isActive;
   </div>
 </div>
 
-<div class="sidebar-module">
+<div class="sidebar-module motion-reveal">
   <h4>Explore</h4>
-  <ul class="category-list">
+  <ul class="category-list motion-stagger-list">
     <li>
       <button
         class="category-link all-posts-link {isActive(allPostsItem) ? 'active' : ''}"
@@ -121,7 +121,7 @@ void isActive;
   </ul>
 </div>
 
-<div class="sidebar-module">
+<div class="sidebar-module motion-reveal">
   <h4>About</h4>
   <p>Product engineer & builder, shipping AI-powered products and sharing learnings from the field.</p>
   <br>
@@ -138,6 +138,7 @@ void isActive;
 
   .profile-section {
     text-align: left;
+    animation-delay: 0.05s;
   }
 
   .avatar-link {
@@ -171,6 +172,7 @@ void isActive;
     padding: 1rem 1.15rem 1.1rem;
     margin-bottom: 0;
     border-bottom: 1px solid rgb(39 39 42 / 70%);
+    will-change: transform, opacity;
   }
 
   .sidebar-module:last-child {
@@ -194,6 +196,40 @@ void isActive;
 
   .category-list li {
     margin-bottom: 0.2rem;
+  }
+
+  .motion-reveal {
+    animation: sideReveal 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .sidebar-module.motion-reveal:nth-of-type(2) {
+    animation-delay: 0.09s;
+  }
+
+  .sidebar-module.motion-reveal:nth-of-type(3) {
+    animation-delay: 0.16s;
+  }
+
+  .motion-stagger-list > li,
+  .motion-stagger-list .category-node,
+  .motion-stagger-list .tag-node {
+    animation: sideReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .motion-stagger-list > li {
+    animation-delay: 0.12s;
+  }
+
+  .motion-stagger-list .category-node:nth-child(1) {
+    animation-delay: 0.14s;
+  }
+
+  .motion-stagger-list .category-node:nth-child(2) {
+    animation-delay: 0.17s;
+  }
+
+  .motion-stagger-list .category-node:nth-child(3) {
+    animation-delay: 0.2s;
   }
 
   .all-posts-link {
@@ -239,6 +275,7 @@ void isActive;
     text-align: left;
     width: 100%;
     transition:
+      transform 0.24s ease,
       color 0.2s ease,
       background-color 0.2s ease,
       border-color 0.2s ease;
@@ -249,6 +286,7 @@ void isActive;
     color: #e4e4e7;
     background: rgb(39 39 42 / 55%);
     border-color: rgb(63 63 70 / 90%);
+    transform: translateX(2px);
   }
 
   .category-link.active {
@@ -285,6 +323,31 @@ void isActive;
     background: rgb(39 39 42 / 65%);
     border-color: rgb(82 82 91 / 85%);
     padding-left: 0.95rem;
+  }
+
+  @keyframes sideReveal {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-reveal,
+    .motion-stagger-list > li,
+    .motion-stagger-list .category-node,
+    .motion-stagger-list .tag-node {
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
+    }
+
+    .category-link {
+      transition-duration: 0.01ms;
+    }
   }
 
   .sidebar-module p {

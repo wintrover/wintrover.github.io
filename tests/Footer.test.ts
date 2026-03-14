@@ -48,6 +48,13 @@ describe("Footer Component", () => {
 		);
 	});
 
+	test("푸터 링크 컨테이너는 모션 훅 클래스를 가져야 함", () => {
+		render(Footer);
+		expect(
+			document.querySelector(".footer-links.motion-stagger-list"),
+		).not.toBeNull();
+	});
+
 	test("소셜 값이 모두 비어있으면 링크가 렌더링되지 않아야 함", () => {
 		vi.mocked(siteConfig).social = {
 			email: "",
