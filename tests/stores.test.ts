@@ -111,4 +111,47 @@ describe("posts store", () => {
 		unsubscribe();
 		consoleSpy.mockRestore();
 	});
+
+	test("캐시 모드에서 실패 후 동일 호출은 재시도해야 함", async () => {
+		vi.resetModules();
+		const mockPosts = [
+			{
+				fileName: "post-1",
+				slug: "post-1",
+				title: "Post 1",
+				date: "2023-10-01",
+				category: "",
+				tags: [],
+				excerpt: "",
+				html: "",
+				content: "",
+			},
+		] satisfies Post[];
+		vi.mocked(postLoader.loadAllPosts)
+			.mockRejectedValueOnce(new Error("network"))
+			.mockResolvedValueOnce(mockPosts);
+
+		const { ensurePostsLoaded, posts } = await import("../src/stores/posts");
+
+		let data: Post[] = [];
+		const unsubscribe = posts.subscribe((v) => {
+			data = v;
+		});
+		const startCalls = vi.mocked(postLoader.loadAllPosts).mock.calls.length;
+
+		const first = await ensurePostsLoaded({ forceCache: true });
+		expect(first).toEqual([]);
+		expect(vi.mocked(postLoader.loadAllPosts).mock.calls.length).toBe(
+			startCalls + 1,
+		);
+
+		const second = await ensurePostsLoaded({ forceCache: true });
+		expect(second).toEqual(mockPosts);
+		expect(data).toEqual(mockPosts);
+		expect(vi.mocked(postLoader.loadAllPosts).mock.calls.length).toBe(
+			startCalls + 2,
+		);
+
+		unsubscribe();
+	});
 });

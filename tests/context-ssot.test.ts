@@ -43,6 +43,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"URL architecture uses root for English and /ko for Korean",
 			"Locale detection must not treat /en as locale path",
 			"Canonical SEO path must follow locale prefix policy",
+			"Blog list canonical URL must not emit /en fallback",
 			"Blog list layout keeps vertical flow and equal card size",
 			"All list routes reuse one post list UI source",
 			"Post detail page keeps Geist dark visual language",
@@ -50,6 +51,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Sitemap generation preserves locale architecture",
 			"Build and Mermaid pipelines keep critical invariants",
 			"Mermaid image naming and fallback handling remain deterministic",
+			"Transient post loading failures must be retryable",
 		];
 		const scenarios = [...feature.matchAll(/^\s*Scenario:\s*(.+)$/gm)].map(
 			(match) => match[1].trim(),

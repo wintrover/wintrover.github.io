@@ -56,6 +56,17 @@ export const blogDefaultSeo = {
 	},
 };
 
+export function buildBlogListSeoUrl(args: {
+	isBrowser: boolean;
+	currentHref: string | null;
+	resolvedLocale: "ko" | "en";
+}) {
+	const { isBrowser, currentHref, resolvedLocale } = args;
+	if (isBrowser && currentHref) return currentHref;
+	const localePrefix = resolvedLocale === "ko" ? "/ko" : "";
+	return `${getRuntimeOrigin()}${localePrefix}/`;
+}
+
 export function buildPostDetailSeo(args: {
 	post: Post | null;
 	loading: boolean;

@@ -14,8 +14,8 @@ export const posts = writable<Post[]>([], (_set) => {
 
 let loadPromise: Promise<Post[]> | null = null;
 
-export async function ensurePostsLoaded() {
-	const shouldCache = !import.meta.env.VITEST;
+export async function ensurePostsLoaded(options?: { forceCache?: boolean }) {
+	const shouldCache = options?.forceCache ?? !import.meta.env.VITEST;
 	if (!shouldCache) loadPromise = null;
 	if (loadPromise) return loadPromise;
 
@@ -27,6 +27,9 @@ export async function ensurePostsLoaded() {
 		.catch((error) => {
 			logError("postsStore", "포스트 로딩 실패", { error });
 			posts.set([]);
+			if (shouldCache) {
+				loadPromise = null;
+			}
 			return [];
 		});
 

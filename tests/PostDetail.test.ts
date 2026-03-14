@@ -222,6 +222,27 @@ describe("PostDetail Component", () => {
 		expect(loadSpy).toHaveBeenCalledTimes(1);
 	});
 
+	test("동일 slug 첫 로딩 실패 후에는 재시도해야 함", async () => {
+		const loadSpy = vi.mocked(postLoader.loadPostBySlug);
+		loadSpy
+			.mockRejectedValueOnce(new Error("transient"))
+			.mockResolvedValueOnce(mockPost);
+
+		const { rerender } = render(PostDetail, { params: { slug: "retry-slug" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("Post not found")).toBeInTheDocument();
+		});
+		expect(loadSpy).toHaveBeenCalledTimes(1);
+
+		await rerender({ params: { slug: "retry-slug" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("Detailed Post")).toBeInTheDocument();
+		});
+		expect(loadSpy).toHaveBeenCalledTimes(2);
+	});
+
 	test("메타 태그 업데이트 확인", async () => {
 		// Mock document methods
 		const querySelectorSpy = vi.spyOn(document, "querySelector");

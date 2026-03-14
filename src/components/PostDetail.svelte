@@ -50,6 +50,9 @@ async function loadPostData(slug: string) {
 		post = postData;
 		loading = false;
 	} catch (error) {
+		if (currentSlug === slug) {
+			currentSlug = null;
+		}
 		logError("PostDetail", "포스트 데이터 로딩 중 에러 발생", {
 			slug,
 			paramsState: {

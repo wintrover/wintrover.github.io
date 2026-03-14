@@ -33,6 +33,11 @@ Feature: Context SSoT architecture and UI invariants
     When locale is Korean
     Then canonical URL must be generated with "/ko" prefix
 
+  Scenario: Blog list canonical URL must not emit /en fallback
+    Given blog list metadata is generated outside browser runtime
+    When locale is English
+    Then canonical URL must be rooted at "/" without "/en/" prefix
+
   Scenario: Blog list layout keeps vertical flow and equal card size
     Given the blog list component is rendered in list mode
     When card content length varies
@@ -79,3 +84,9 @@ Feature: Context SSoT architecture and UI invariants
     Then image filenames must follow stable numbering convention
     And conversion failure must keep Mermaid source in warning fallback
     And CI wrapper must fail with non-zero exit on generation error
+
+  Scenario: Transient post loading failures must be retryable
+    Given post loading can fail intermittently
+    When the same slug is requested again after a failure
+    Then post detail loading should retry fetch for that slug
+    And posts store loading should retry after previous failure

@@ -2,6 +2,7 @@
 import { push } from "svelte-spa-router";
 import {
 	blogDefaultSeo,
+	buildBlogListSeoUrl,
 	defaultOgImage,
 	getRuntimeOrigin,
 } from "../lib/config";
@@ -58,9 +59,11 @@ $: {
 			? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} 글 목록`
 			: `Posts in ${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""}.`
 		: blogDefaultSeo.description[isKo ? "ko" : "en"];
-	seoUrl = browser
-		? window.location.href
-		: `${getRuntimeOrigin()}/${resolvedLocale}/`;
+	seoUrl = buildBlogListSeoUrl({
+		isBrowser: browser,
+		currentHref: browser ? window.location.href : null,
+		resolvedLocale,
+	});
 }
 
 void filteredPosts;
