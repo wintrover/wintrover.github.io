@@ -17,3 +17,8 @@ Feature: Modern UI motion across core blog surfaces
     Given I render the resume page
     When I inspect key resume cards and links
     Then resume sections and cards should expose motion-ready class hooks
+
+  Scenario: Category route changes replay list motion
+    Given I render the category list route
+    When I move from /category/company-work to /category/project
+    Then the post list container should be recreated for motion replay

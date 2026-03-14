@@ -22,6 +22,7 @@ let seoTitle = blogDefaultSeo.title;
 let seoDescription = blogDefaultSeo.description.en;
 let seoUrl = `${getRuntimeOrigin()}/`;
 let requestedPosts = false;
+let routeMotionKey = "all";
 
 function selectPost(post: Post) {
 	push(`/post/${post.slug}`);
@@ -43,6 +44,7 @@ $: {
 	const filterResult = filterPostsByRoute(allPosts, params);
 	filteredPosts = filterResult.filteredPosts;
 	selectedCategory.set(filterResult.selectedCategoryValue);
+	routeMotionKey = `${params.category ?? "all"}::${params.tag ?? "all"}`;
 
 	const isKo = resolvedLocale === "ko";
 	const categoryLabel = filterResult.categoryLabel;
@@ -79,11 +81,13 @@ void selectPost;
 </svelte:head>
 
 <div class="blog-page">
-	<PostFeed
-		posts={filteredPosts}
-		emptyMessage="No posts found in this category."
-		onSelectPost={selectPost}
-	/>
+	{#key routeMotionKey}
+		<PostFeed
+			posts={filteredPosts}
+			emptyMessage="No posts found in this category."
+			onSelectPost={selectPost}
+		/>
+	{/key}
 </div>
 
 <style>
