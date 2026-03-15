@@ -1,5 +1,6 @@
 <script lang="ts">
-import { push } from "svelte-spa-router";
+import type { Readable } from "svelte/store";
+import * as spaRouter from "svelte-spa-router";
 import categoryConfig from "../lib/categories.json";
 import { siteConfig } from "../lib/config";
 import {
@@ -19,11 +20,23 @@ let allPostsItem: SidebarItem = {
 };
 let categoryGroups: CategoryGroup[] = [];
 let resumeUrl = "/resume/";
+let currentActivePath = "/";
+const push = spaRouter.push;
+const routeLocation: Readable<string> =
+	"location" in spaRouter && spaRouter.location
+		? (spaRouter.location as Readable<string>)
+		: {
+				subscribe(run: (path: string) => void) {
+					run("/");
+					return () => {};
+				},
+			};
 
 void siteConfig;
 void posts;
 
 $: resumeUrl = "/resume/";
+$: currentActivePath = normalizeRoutePath($routeLocation);
 
 $: {
 	const sidebarData = buildSidebarData(toPostArray($posts), categoryConfig);
@@ -38,21 +51,25 @@ function closeSidebarOnMobile() {
 }
 
 function selectCategory(item: SidebarItem) {
+	let nextPath = "/";
 	if (item.value === "all") {
 		selectedCategory.set("all");
-		push("/");
+		nextPath = "/";
 	} else if (item.isTag) {
 		selectedCategory.set(item.value);
-		push(`/category/${item.parentSlug}/tag/${item.slug}`);
+		nextPath = `/category/${item.parentSlug}/tag/${item.slug}`;
 	} else {
 		selectedCategory.set(item.value);
-		push(`/category/${item.slug}`);
+		nextPath = `/category/${item.slug}`;
 	}
+	currentActivePath = normalizeRoutePath(nextPath);
+	push(nextPath);
 	closeSidebarOnMobile();
 }
 
 function goResume(event: MouseEvent) {
 	event.preventDefault();
+	currentActivePath = normalizeRoutePath(resumeUrl);
 	push(resumeUrl);
 	closeSidebarOnMobile();
 }
@@ -60,11 +77,29 @@ function goResume(event: MouseEvent) {
 void selectCategory;
 void goResume;
 
-function isActive(item: SidebarItem) {
-	return (
-		($selectedCategory === "all" && item.value === "all") ||
-		$selectedCategory === item.value
-	);
+function normalizeRoutePath(path: string) {
+	const pathWithoutQuery = path.split("?")[0] ?? "/";
+	const trimmedPath = pathWithoutQuery.replace(/\/+$/, "");
+	return trimmedPath || "/";
+}
+
+function isActive(item: SidebarItem, currentPath: string) {
+	if (currentPath === "/") {
+		return item.value === "all";
+	}
+	if (!currentPath.startsWith("/category/")) {
+		return false;
+	}
+	const pathParts = currentPath.split("/").filter(Boolean);
+	const categorySlug = pathParts[1] ?? "";
+	const isTagRoute = pathParts[2] === "tag";
+	const tagSlug = pathParts[3] ?? "";
+	if (item.isTag) {
+		return (
+			isTagRoute && item.parentSlug === categorySlug && item.slug === tagSlug
+		);
+	}
+	return !isTagRoute && item.slug === categorySlug;
 }
 
 void allPostsItem;
@@ -89,7 +124,7 @@ void isActive;
   <ul class="category-list motion-stagger-list">
     <li>
       <button
-        class="category-link all-posts-link {isActive(allPostsItem) ? 'active' : ''}"
+        class="category-link all-posts-link {isActive(allPostsItem, currentActivePath) ? 'active' : ''}"
         on:click={() => selectCategory(allPostsItem)}
       >
         {allPostsItem.label} ({allPostsItem.count})
@@ -98,7 +133,7 @@ void isActive;
         {#each categoryGroups as group}
           <li class="category-node">
             <button
-              class="category-link category-level {isActive(group.category) ? 'active' : ''}"
+              class="category-link category-level {isActive(group.category, currentActivePath) ? 'active' : ''}"
               on:click={() => selectCategory(group.category)}
             >
               {group.category.label} ({group.category.count})
@@ -108,7 +143,7 @@ void isActive;
                 {#each group.tags as tag}
                   <li class="tag-node">
                     <button
-                      class="category-link tag-item {isActive(tag) ? 'active' : ''}"
+                      class="category-link tag-item {isActive(tag, currentActivePath) ? 'active' : ''}"
                       on:click={() => selectCategory(tag)}
                     >
                       {tag.label} ({tag.count})

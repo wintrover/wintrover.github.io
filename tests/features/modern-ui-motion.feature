@@ -27,3 +27,8 @@ Feature: Modern UI motion across core blog surfaces
     Given I render the app shell on a mobile viewport
     When I tap the sidebar toggle button to open sidebar
     Then the sidebar should remain open without immediate auto-collapse
+
+  Scenario: Sidebar active indicator follows current route
+    Given I render the app shell after selecting a category
+    When I move to a non-list route like /resume
+    Then category active styling should be cleared to match current location
