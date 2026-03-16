@@ -23,8 +23,10 @@ Feature: Devlog graph state and engine bridge
     Then publication must be blocked when prerequisites are not published
     And publication must become idempotent once status is already published
 
-  Scenario: GitHub Actions acts as an interface bridge only
+  Scenario: GitHub Actions persists engine state changes safely
     Given workflow_dispatch is used as temporary GUI
     When manual dispatch inputs a command and target node
     Then workflow must invoke Nim CLI instead of embedding business logic
     And execution summary must be rendered through GITHUB_STEP_SUMMARY
+    And state.json changes must be committed and pushed to main automatically
+    And commit message must include [skip ci] to prevent loop execution

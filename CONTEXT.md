@@ -17,7 +17,8 @@
 - Edge는 최소한 `from`, `to`, `relation`, `status`를 포함해 `parent_thought_id`, `derived_from` 같은 사고 연결을 표현해야 한다.
 - 무결성 검증은 단순 `published` 플래그가 아니라 의존성(`requires`)의 충족 여부를 계산하는 방식이어야 한다.
 - 배포/동기화/그래프 생성 비즈니스 로직은 Nim CLI(`devlog`) 내부에 캡슐화하고, GitHub Actions나 향후 `/admin`은 CLI 호출만 수행해야 한다.
-- GitHub Actions는 임시 GUI로 사용하며 `workflow_dispatch` 입력과 `GITHUB_STEP_SUMMARY` 출력으로만 인터페이스를 제공한다.
+- GitHub Actions는 임시 GUI로 사용하며 `workflow_dispatch` 입력과 `GITHUB_STEP_SUMMARY` 출력을 제공해야 한다.
+- Nim CLI 실행으로 `state.json`이 변경되면 워크플로는 변경분을 `main`에 자동 커밋/푸시하고 커밋 메시지에 `[skip ci]`를 포함해야 한다.
 
 ## 2) URL 아키텍처 규칙
 

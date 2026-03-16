@@ -17,7 +17,7 @@ describe("Devlog 엔진 중심 아키텍처 검증", () => {
 			"state.json defines graph-oriented node and edge schema",
 			"devlog CLI exposes sync publish and graph commands",
 			"publish requires dependency integrity before transition",
-			"GitHub Actions acts as an interface bridge only",
+			"GitHub Actions persists engine state changes safely",
 		];
 		const scenarios = [...feature.matchAll(/^\s*Scenario:\s*(.+)$/gm)].map(
 			(match) => match[1].trim(),
@@ -67,12 +67,17 @@ describe("Devlog 엔진 중심 아키텍처 검증", () => {
 		expect(engine).toContain("buildGraphPayload");
 	});
 
-	test("Given Actions 브리지 When 워크플로 검증 Then CLI 호출과 요약 출력만 담당한다", () => {
+	test("Given Actions 브리지 When 워크플로 검증 Then 상태 영속 커밋과 루프 방지 규칙을 포함한다", () => {
 		const workflow = read(".github/workflows/devlog-bridge.yml");
+		const gitignore = read(".gitignore");
 		expect(workflow).toContain("workflow_dispatch:");
 		expect(workflow).toContain("command:");
 		expect(workflow).toContain("node_id:");
 		expect(workflow).toContain("nim c -r engine/devlog.nim");
 		expect(workflow).toContain("GITHUB_STEP_SUMMARY");
+		expect(workflow).toContain("git commit -m");
+		expect(workflow).toContain("[skip ci]");
+		expect(workflow).toContain("git push origin HEAD:main");
+		expect(gitignore).not.toContain("state.json");
 	});
 });
