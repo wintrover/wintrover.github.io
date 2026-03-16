@@ -1,0 +1,32 @@
+---
+name: quality-assurance
+description: 블로그 포스트 및 코드의 품질을 보장하기 위한 최종 검증 절차.
+---
+
+## When to Use
+
+- 작업 완료 후 사용자에게 최종 보고하기 전
+- 커밋 또는 배포 직전
+
+## Rules
+
+- **통합 품질 게이트 (prek)**: 빠른 검증을 위해 `bun x prek run --all-files`를 실행한다. (Biome, 타입 체크, Knip, DepCruise, 테스트 병렬 수행)
+- **의존성 및 빌드 검증**: 엄격한 의존성 정합성이 필요한 빌드 확인은 `pnpm build`를 사용한다.
+- **GitHub Actions 확인**: `gh` 명령어만 사용한다. (예: `gh run list`, `gh run view`)
+- **Git 명령어 페이저 비활성화**: 모든 git 명령어는 반드시 `git --no-pager <subcommand>` 형식으로 실행한다.
+- **로깅 일관성**: 앱 코드에서 `console.error` 직접 호출이 남아있지 않은지 확인한다. (`src/lib/log.ts` 예외)
+- **테스트 표준**:
+  - 테스트는 `fast-check` 기반 Property-Based Testing(PBT)을 우선 적용한다.
+  - 사용자 시나리오/버그 재현은 Given-When-Then 형태의 BDD 스타일 테스트로 작성한다.
+  - 커버리지는 버그 “무결성”을 증명하지 않으며, 회귀(regression) 방지를 위한 최소 기준으로 취급한다.
+- **체크리스트 수행**: `unified-template.md` 하단에 정의된 작성 완료 체크리스트를 100% 충족해야 한다.
+- **빌드 확인**: `pnpm build`를 통해 빌드 오류가 발생하지 않는지 확인한다.
+
+## Checklist
+
+- [ ] 린트 에러나 경고가 모두 해결되었는가?
+- [ ] 버그 재현/사용자 시나리오가 BDD 테스트로 고정되었는가?
+- [ ] 커버리지 임계치(100%)를 만족하는가? (미달 시 커밋 불가)
+- [ ] 템플릿의 '검증 체크리스트' 항목을 모두 체크했는가?
+- [ ] `pnpm run build` 결과물에 문제가 없는가?
+- [ ] 코드베이스 내에 `any` 타입 사용이 없는가? (`as any`, `: any` 등)
