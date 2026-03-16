@@ -45,11 +45,11 @@ type Project = {
 export const content = {
 	projects: [
 		{
-			id: "cvfactory",
+			id: "devlog",
 			links: [
 				{
 					type: "github",
-					url: "https://github.com/CV-Factory",
+					url: "https://github.com/Archright/Devlog",
 					iconClass: "fab fa-github",
 					titleKey: "project_link.github",
 				},

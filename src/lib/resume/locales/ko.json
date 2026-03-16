@@ -28,15 +28,15 @@
 	"lang_switcher_en": "English",
 	"lang_switcher_ko": "한국어",
 	"about_title": "About Me",
-	"about_content": "저는 결과물 뒤에 숨겨진 의사결정의 궤적(Trajectory)을 가치 있게 만드는 사고 궤적 아키텍트입니다.<br/> 전기전자공학 전공 이후 기술 지원, 영업, 사업 전략 경험을 바탕으로 복잡한 문제의 논리적 경로를 설계하고 AI와 협업해 실제 소프트웨어로 구현합니다.<br/> Intel 개발자 과정과 아래 프로젝트에서 LLM/컴퓨터 비전 기반 기능을 설계·구현하고, 성능 최적화와 서비스 배포까지 경험했습니다.<br/> 빠른 실험보다 검증 가능한 추론 과정, 안정적인 릴리즈, 고객 중심 의사결정을 우선합니다.<br/>",
+	"about_content": "저는 결과물 뒤에 숨겨진 의사결정의 궤적(Trajectory)을 가치 있게 만드는 사고 궤적 아키텍트입니다.<br/> 전기전자공학 전공 이후 기술 지원, 영업, 사업 전략 경험을 바탕으로 복잡한 문제의 논리적 경로를 설계하고 AI와 협업해 실제 소프트웨어로 구현합니다.<br/> Intel 개발자 과정과 아래 프로젝트에서 LLM/컴퓨터 비전 기반 기능을 설계·구현하고, 성능 최적화와 서비스 배포까지 경험했습니다.<br/> 빠른 실험, 검증 가능한 추론 과정, 고객 중심 의사결정을 우선합니다.<br/>",
 	"section_title_projects": "Projects",
 	"section_title_experience": "Experience",
 	"section_title_education": "Education",
 	"projects": {
-		"cvfactory": {
-			"title": "CVFactory",
-			"quote": "채용공고 웹 크롤링, RAG, LLM을 활용하여 채용 공고 맞춤형 자기소개서 생성을 자동화하는 SaaS 서비스입니다.",
-			"description": "Frontend (CVFactory): Django 기반 UI 개발 (채용 공고/스토리 입력, 자기소개서 생성/수정).<br/>- Backend (CVFactory Server): Playwright/BeautifulSoup 기반 웹 스크래핑 (비동기, iframe 지원).<br/>- FastAPI, Celery, Upstash Redis 기반 비동기 API 및 작업 처리.<br/>- Langchain (Cohere Embeddings, FAISS, Groq LLM) 기반 RAG 파이프라인 구축."
+		"devlog": {
+			"title": "Devlog",
+			"quote": "개발자와 AI 에이전트의 대화 히스토리를 분석해 가설·시도·증거의 인과가 드러나는 기술 블로그를 생성하는 프로젝트입니다.",
+			"description": "- Nim 기반 도메인 설계로 세션 데이터를 정적 검증 가능한 구조로 모델링<br/>- ReasoningTrace 스키마를 통해 가설·시도·증거 흐름을 추출하는 파이프라인 구현<br/>- Unix 철학 기반 capture | render | verify CLI 파이프라인 설계<br/>- MCP 게이트웨이와 검증 테스트를 통해 출력 신뢰성과 워크플로우 일관성 강화"
 		},
 		"webkyc_process": {
 			"title": "WebKYC Process",
@@ -52,9 +52,9 @@
 	"experience": {
 		"focc_inc": {
 			"title": "SMBholdings Inc.",
-			"sub_title": "사고 궤적 아키텍트 · 정규직",
+			"sub_title": "프로덕트 엔지니어 · 정규직",
 			"caption": "2025년 7월 - 2026년 3월",
-			"description": "FastAPI API 서버와 Temporal 워커를 분리 운용하는 비동기 KYC 오케스트레이션 구조를 구현.<br/>InsightFace(ArcFace·SCRFD), OpenCV, MediaPipe를 결합해 신분증/셀카 기반 얼굴 유사도 검증 파이프라인을 구축.<br/>SQLModel·SQLAlchemy 기반 MariaDB 도메인 모델과 Atlas 마이그레이션을 운영해 데이터 스키마 변경을 관리.<br/>React 19 관리자 화면과 KYC 통합/회귀/성능 테스트 체계를 함께 구축해 요청 추이·성공률 모니터링과 배포 안정성을 강화."
+			"description": "통합 KYC 자동화 시스템인 <strong>WebKYC Process</strong>를 구축했습니다.<br/>FastAPI API 서버와 Temporal 워커를 분리 운용하는 비동기 KYC 오케스트레이션 구조를 구현.<br/>InsightFace(ArcFace·SCRFD), OpenCV, MediaPipe를 결합해 신분증/셀카 기반 얼굴 유사도 검증 파이프라인을 구축.<br/>SQLModel·SQLAlchemy 기반 MariaDB 도메인 모델과 Atlas 마이그레이션을 운영해 데이터 스키마 변경을 관리.<br/>React 19 관리자 화면과 KYC 통합/회귀/성능 테스트 체계를 함께 구축해 요청 추이·성공률 모니터링과 배포 안정성을 강화."
 		},
 		"insight_marketing_labs": {
 			"title": "Insight Marketing Labs",

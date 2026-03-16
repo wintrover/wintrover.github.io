@@ -28,15 +28,15 @@
 	"lang_switcher_en": "English",
 	"lang_switcher_ko": "한국어",
 	"about_title": "About Me",
-	"about_content": "I am a Thought Trajectory Architect who values the decision trajectory behind every outcome as much as the shipped product itself.<br/>With a background in Electrical and Electronic Engineering, I design logical paths for complex problems and collaborate with AI to translate those paths into working software.<br/>Through the Intel developer program and the projects below, I built LLM and computer vision systems, optimized performance, and deployed services to real users.<br/>I focus on explicit reasoning, reliable delivery, and customer-centered decisions that remain auditable after launch.<br/>",
+	"about_content": "I am a Thought Trajectory Architect who values the decision trajectory behind every outcome as much as the shipped product itself.<br/>With a background in Electrical and Electronic Engineering, I design logical paths for complex problems and collaborate with AI to translate those paths into working software.<br/>Through the Intel developer program and the projects below, I built LLM and computer vision systems, optimized performance, and deployed services to real users.<br/>I focus on fast experimentation, explicit reasoning, and customer-centered decisions that remain auditable after launch.<br/>",
 	"section_title_projects": "Projects",
 	"section_title_experience": "Experience",
 	"section_title_education": "Education",
 	"projects": {
-		"cvfactory": {
-			"title": "CVFactory",
-			"quote": "SaaS service that automates the generation of customized cover letters using job posting web crawling, RAG, and LLM.",
-			"description": "<br/>- Frontend (CVFactory): Django-based UI development (job posting/story input, cover letter generation/editing).<br/>- Backend (CVFactory Server): Web scraping based on Playwright/BeautifulSoup (asynchronous, iframe support).<br/>- Asynchronous API and task processing based on FastAPI, Celery, Upstash Redis.<br/>- RAG pipeline construction based on Langchain (Cohere Embeddings, FAISS, Groq LLM)."
+		"devlog": {
+			"title": "Devlog",
+			"quote": "A project that analyzes developer–AI conversation history and generates technical blog posts with explicit causality across hypothesis, attempt, and evidence.",
+			"description": "- Modeled session data with a Nim-first domain architecture focused on static safety<br/>- Implemented a ReasoningTrace pipeline to extract hypothesis-attempt-evidence flow<br/>- Designed a Unix-style capture | render | verify CLI workflow<br/>- Strengthened output reliability and workflow integrity with MCP gateway integration and verification tests"
 		},
 		"webkyc_process": {
 			"title": "WebKYC Process",
@@ -52,9 +52,9 @@
 	"experience": {
 		"focc_inc": {
 			"title": "SMBholdings Inc.",
-			"sub_title": "Thought Trajectory Architect · Full-time",
+			"sub_title": "Product Engineer · Full-time",
 			"caption": "July 2025 - March 2026",
-			"description": "Implemented an asynchronous KYC orchestration architecture with separated FastAPI API services and Temporal workers.<br/>Built an ID image/selfie video face similarity pipeline using InsightFace (ArcFace and SCRFD), OpenCV, and MediaPipe.<br/>Managed MariaDB domain models with SQLModel/SQLAlchemy and controlled schema changes through Atlas migrations.<br/>Delivered a React 19 admin console with KYC integration, regression, and performance test suites for trend/success-rate monitoring and release stability."
+			"description": "Built <strong>WebKYC Process</strong>, an end-to-end KYC automation system.<br/>Implemented an asynchronous KYC orchestration architecture with separated FastAPI API services and Temporal workers.<br/>Built an ID image/selfie video face similarity pipeline using InsightFace (ArcFace and SCRFD), OpenCV, and MediaPipe.<br/>Managed MariaDB domain models with SQLModel/SQLAlchemy and controlled schema changes through Atlas migrations.<br/>Delivered a React 19 admin console with KYC integration, regression, and performance test suites for trend/success-rate monitoring and release stability."
 		},
 		"insight_marketing_labs": {
 			"title": "Insight Marketing Labs",
