@@ -54,7 +54,7 @@
 			"title": "SMBholdings Inc.",
 			"sub_title": "프로덕트 엔지니어 · 정규직",
 			"caption": "2025년 7월 - 2026년 3월",
-			"description": "통합 KYC 자동화 시스템인 **WebKYC Process**를 구축했습니다.<br/>FastAPI API 서버와 Temporal 워커를 분리 운용하는 비동기 KYC 오케스트레이션 구조를 구현.<br/>InsightFace(ArcFace·SCRFD), OpenCV, MediaPipe를 결합해 신분증/셀카 기반 얼굴 유사도 검증 파이프라인을 구축.<br/>SQLModel·SQLAlchemy 기반 MariaDB 도메인 모델과 Atlas 마이그레이션을 운영해 데이터 스키마 변경을 관리.<br/>React 19 관리자 화면과 KYC 통합/회귀/성능 테스트 체계를 함께 구축해 요청 추이·성공률 모니터링과 배포 안정성을 강화."
+			"description": "통합 KYC 자동화 시스템인 <strong>WebKYC Process</strong>를 구축했습니다.<br/>FastAPI API 서버와 Temporal 워커를 분리 운용하는 비동기 KYC 오케스트레이션 구조를 구현.<br/>InsightFace(ArcFace·SCRFD), OpenCV, MediaPipe를 결합해 신분증/셀카 기반 얼굴 유사도 검증 파이프라인을 구축.<br/>SQLModel·SQLAlchemy 기반 MariaDB 도메인 모델과 Atlas 마이그레이션을 운영해 데이터 스키마 변경을 관리.<br/>React 19 관리자 화면과 KYC 통합/회귀/성능 테스트 체계를 함께 구축해 요청 추이·성공률 모니터링과 배포 안정성을 강화."
 		},
 		"insight_marketing_labs": {
 			"title": "Insight Marketing Labs",
