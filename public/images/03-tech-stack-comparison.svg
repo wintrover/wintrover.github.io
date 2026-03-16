@@ -1,0 +1,49 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .node { fill: #f9f9f9; stroke: #333; stroke-width: 2; }
+      .label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .edge { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrowhead { fill: #666; }
+      .vanilla { fill: #f7df1e; }
+      .svelte { fill: #ff3e00; }
+      .sveltekit { fill: #ff3e00; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrowhead" />
+    </marker>
+  </defs>
+
+  <!-- Vanilla JS -->
+  <rect x="50" y="150" width="120" height="80" rx="10" class="node vanilla"/>
+  <text x="110" y="185" class="label" font-weight="bold">Vanilla JS</text>
+  <text x="110" y="205" class="label" font-size="10">Simple &amp; Direct</text>
+
+  <!-- Svelte Components -->
+  <rect x="300" y="80" width="140" height="80" rx="10" class="node svelte"/>
+  <text x="370" y="115" class="label" fill="white" font-weight="bold">Svelte</text>
+  <text x="370" y="135" class="label" fill="white" font-weight="bold">Components</text>
+  <text x="370" y="150" class="label" fill="white" font-size="10">Reactive &amp; Efficient</text>
+
+  <!-- SvelteKit -->
+  <rect x="300" y="220" width="140" height="80" rx="10" class="node sveltekit"/>
+  <text x="370" y="255" class="label" fill="white" font-weight="bold">SvelteKit</text>
+  <text x="370" y="275" class="label" fill="white" font-size="10">Full Framework</text>
+
+  <!-- Decision Point -->
+  <circle cx="600" cy="190" r="40" class="node" fill="#e3f2fd"/>
+  <text x="600" y="185" class="label" font-weight="bold">Choose</text>
+  <text x="600" y="200" class="label" font-size="10">Best Fit</text>
+
+  <!-- Arrows -->
+  <path d="M 170 190 L 300 120" class="edge"/>
+  <path d="M 170 190 L 300 260" class="edge"/>
+  <path d="M 440 120 L 560 170" class="edge"/>
+  <path d="M 440 260 L 560 210" class="edge"/>
+
+  <!-- Labels on arrows -->
+  <text x="230" y="145" class="label" font-size="10" fill="#666">Component-based</text>
+  <text x="230" y="235" class="label" font-size="10" fill="#666">Full-stack</text>
+  <text x="510" y="140" class="label" font-size="10" fill="#666">Lightweight</text>
+  <text x="510" y="240" class="label" font-size="10" fill="#666">Feature-rich</text>
+</svg>

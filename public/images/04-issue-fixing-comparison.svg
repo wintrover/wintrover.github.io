@@ -1,0 +1,64 @@
+<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .node { fill: #f9f9f9; stroke: #333; stroke-width: 2; }
+      .label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .edge { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrowhead { fill: #666; }
+      .initial { fill: #f44336; }
+      .fixing { fill: #ff9800; }
+      .reanalysis { fill: #2196f3; }
+      .success { fill: #4caf50; }
+      .metric-bad { fill: #ffebee; stroke: #f44336; }
+      .metric-good { fill: #e8f5e8; stroke: #4caf50; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrowhead" />
+    </marker>
+  </defs>
+
+  <!-- Main Flow -->
+  <rect x="50" y="100" width="100" height="60" rx="10" class="node initial"/>
+  <text x="100" y="125" class="label" fill="white" font-weight="bold">Initial State</text>
+  <text x="100" y="140" class="label" fill="white" font-size="10">Issues Found</text>
+
+  <rect x="200" y="100" width="100" height="60" rx="10" class="node fixing"/>
+  <text x="250" y="125" class="label" fill="white" font-weight="bold">Issue Fixing</text>
+  <text x="250" y="140" class="label" fill="white" font-size="10">Code Improvement</text>
+
+  <rect x="350" y="100" width="100" height="60" rx="10" class="node reanalysis"/>
+  <text x="400" y="125" class="label" fill="white" font-weight="bold">Re-analysis</text>
+  <text x="400" y="140" class="label" fill="white" font-size="10">Quality Check</text>
+
+  <rect x="500" y="100" width="100" height="60" rx="10" class="node success"/>
+  <text x="550" y="125" class="label" fill="white" font-weight="bold">Grade A</text>
+  <text x="550" y="140" class="label" fill="white" font-weight="bold">Achieved</text>
+
+  <!-- Arrows -->
+  <path d="M 150 130 L 200 130" class="edge"/>
+  <path d="M 300 130 L 350 130" class="edge"/>
+  <path d="M 450 130 L 500 130" class="edge"/>
+
+  <!-- Metrics Before -->
+  <rect x="50" y="200" width="80" height="40" rx="5" class="metric-bad"/>
+  <text x="90" y="215" class="label" font-size="10" font-weight="bold">Bugs: 1</text>
+  <text x="90" y="230" class="label" font-size="10">Reliability: C</text>
+
+  <rect x="140" y="200" width="80" height="40" rx="5" class="metric-bad"/>
+  <text x="180" y="220" class="label" font-size="10" font-weight="bold">Code Smells: 3</text>
+
+  <!-- Metrics After -->
+  <rect x="520" y="200" width="80" height="40" rx="5" class="metric-good"/>
+  <text x="560" y="215" class="label" font-size="10" font-weight="bold">Bugs: 0</text>
+  <text x="560" y="230" class="label" font-size="10">Reliability: A</text>
+
+  <rect x="610" y="200" width="80" height="40" rx="5" class="metric-good"/>
+  <text x="650" y="220" class="label" font-size="10" font-weight="bold">Code Smells: 0</text>
+
+  <!-- Improvement Arrows -->
+  <path d="M 220 220 L 520 220" class="edge" stroke="#4caf50" stroke-width="3"/>
+  <text x="370" y="210" class="label" font-size="11" fill="#4caf50" font-weight="bold">100% Improvement</text>
+
+  <!-- Title -->
+  <text x="400" y="30" class="label" font-size="16" font-weight="bold">SonarQube Quality Improvement Process</text>
+</svg>

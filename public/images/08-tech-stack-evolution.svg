@@ -1,0 +1,114 @@
+<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .box { fill: #f9f9f9; stroke: #333; stroke-width: 2; rx: 8; }
+      .removed { fill: #ffcdd2; stroke: #d32f2f; }
+      .improved { fill: #c8e6c9; stroke: #388e3c; }
+      .problem { fill: #fff3e0; stroke: #f57c00; }
+      .solution { fill: #e3f2fd; stroke: #1976d2; }
+      .text { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .title { font-size: 14px; font-weight: bold; }
+      .arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .problem-arrow { stroke: #f57c00; stroke-width: 2; fill: none; marker-end: url(#problem-arrowhead); }
+      .success-arrow { stroke: #388e3c; stroke-width: 2; fill: none; marker-end: url(#success-arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="problem-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f57c00" />
+    </marker>
+    <marker id="success-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#388e3c" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="30" class="text title" style="font-size: 18px;">기술 스택 진화 과정</text>
+
+  <!-- Phase 1: 초기 시도 -->
+  <g>
+    <text x="150" y="70" class="text title">Phase 1: 초기 시도</text>
+    <rect x="50" y="80" width="100" height="40" class="box removed" />
+    <text x="100" y="105" class="text">YOLOv12</text>
+    <rect x="200" y="80" width="100" height="40" class="box problem" />
+    <text x="250" y="100" class="text">데이터 확보</text>
+    <text x="250" y="115" class="text">문제</text>
+    <line x1="150" y1="100" x2="200" y2="100" class="problem-arrow" />
+  </g>
+
+  <!-- Phase 2: 방향 전환 -->
+  <g>
+    <text x="150" y="170" class="text title">Phase 2: 방향 전환</text>
+    <rect x="50" y="180" width="100" height="40" class="box removed" />
+    <text x="100" y="205" class="text">OpenCV.js</text>
+    <rect x="200" y="180" width="100" height="40" class="box improved" />
+    <text x="250" y="205" class="text">MediaPipe</text>
+    <line x1="150" y1="200" x2="200" y2="200" class="success-arrow" />
+  </g>
+
+  <!-- Phase 3: 알고리즘 문제 -->
+  <g>
+    <text x="500" y="70" class="text title">Phase 3: 알고리즘 개선</text>
+    <rect x="400" y="80" width="120" height="40" class="box removed" />
+    <text x="460" y="105" class="text">Douglas-Peucker</text>
+    <rect x="570" y="80" width="100" height="40" class="box problem" />
+    <text x="620" y="100" class="text">정확도</text>
+    <text x="620" y="115" class="text">문제</text>
+    <rect x="400" y="140" width="120" height="40" class="box improved" />
+    <text x="460" y="165" class="text">Bounding Box</text>
+    <line x1="520" y1="100" x2="570" y2="100" class="problem-arrow" />
+    <line x1="620" y1="120" x2="460" y2="140" class="success-arrow" />
+  </g>
+
+  <!-- Phase 4: 최종 안정화 -->
+  <g>
+    <text x="800" y="70" class="text title">Phase 4: 시스템 안정화</text>
+    <rect x="750" y="80" width="100" height="40" class="box removed" />
+    <text x="800" y="100" class="text">OpenCV.js</text>
+    <text x="800" y="115" class="text">완전 제거</text>
+    <rect x="750" y="140" width="100" height="40" class="box improved" />
+    <text x="800" y="160" class="text">Canvas API</text>
+    <text x="800" y="175" class="text">직접 구현</text>
+    <line x1="800" y1="120" x2="800" y2="140" class="success-arrow" />
+  </g>
+
+  <!-- 최종 기술 스택 -->
+  <g>
+    <rect x="200" y="300" width="600" height="200" class="box" style="fill: #f0f8ff; stroke: #1976d2; stroke-width: 3;" />
+    <text x="500" y="330" class="text title" style="font-size: 16px;">최종 기술 스택</text>
+
+    <!-- Frontend -->
+    <text x="300" y="360" class="text title">Frontend</text>
+    <rect x="220" y="370" width="80" height="30" class="box improved" />
+    <text x="260" y="390" class="text">MediaPipe</text>
+    <rect x="320" y="370" width="80" height="30" class="box improved" />
+    <text x="360" y="390" class="text">Canvas API</text>
+    <rect x="220" y="410" width="80" height="30" class="box improved" />
+    <text x="260" y="430" class="text">Vanilla JS</text>
+    <rect x="320" y="410" width="80" height="30" class="box improved" />
+    <text x="360" y="430" class="text">WebRTC</text>
+
+    <!-- Backend -->
+    <text x="600" y="360" class="text title">Backend</text>
+    <rect x="520" y="370" width="80" height="30" class="box improved" />
+    <text x="560" y="390" class="text">Express.js</text>
+    <rect x="620" y="370" width="80" height="30" class="box improved" />
+    <text x="660" y="390" class="text">Sharp</text>
+    <rect x="520" y="410" width="80" height="30" class="box improved" />
+    <text x="560" y="430" class="text">MariaDB</text>
+    <rect x="620" y="410" width="80" height="30" class="box improved" />
+    <text x="660" y="430" class="text">Multer</text>
+
+    <!-- 성과 -->
+    <text x="500" y="470" class="text title">주요 성과</text>
+    <text x="500" y="490" class="text">✅ 로딩 속도 대폭 개선 | ✅ 시스템 안정성 향상 | ✅ 메모리 사용량 최적화</text>
+  </g>
+
+  <!-- 연결선들 -->
+  <line x1="300" y1="100" x2="400" y2="100" class="arrow" />
+  <line x1="670" y1="100" x2="750" y2="100" class="arrow" />
+  <line x1="250" y1="220" x2="250" y2="300" class="success-arrow" />
+  <line x1="460" y1="180" x2="460" y2="300" class="success-arrow" />
+  <line x1="800" y1="180" x2="650" y2="300" class="success-arrow" />
+</svg>

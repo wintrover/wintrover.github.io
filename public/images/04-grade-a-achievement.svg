@@ -1,0 +1,79 @@
+<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .node { fill: #f9f9f9; stroke: #333; stroke-width: 2; }
+      .label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .edge { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrowhead { fill: #666; }
+      .initial { fill: #f44336; }
+      .fixing { fill: #ff9800; }
+      .reanalysis { fill: #2196f3; }
+      .success { fill: #4caf50; }
+      .metric-before { fill: #ffebee; stroke: #f44336; }
+      .metric-after { fill: #e8f5e8; stroke: #4caf50; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrowhead" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="350" y="30" class="label" font-size="16" font-weight="bold">Re-analysis Results: Perfect Grade A</text>
+
+  <!-- Main Process Flow -->
+  <rect x="50" y="80" width="100" height="50" rx="8" class="node initial"/>
+  <text x="100" y="110" class="label" fill="white" font-weight="bold">Initial State</text>
+
+  <rect x="200" y="80" width="100" height="50" rx="8" class="node fixing"/>
+  <text x="250" y="110" class="label" fill="white" font-weight="bold">Issue Fixing</text>
+
+  <rect x="350" y="80" width="100" height="50" rx="8" class="node reanalysis"/>
+  <text x="400" y="110" class="label" fill="white" font-weight="bold">Re-analysis</text>
+
+  <rect x="500" y="80" width="120" height="50" rx="8" class="node success"/>
+  <text x="560" y="105" class="label" fill="white" font-weight="bold">Grade A</text>
+  <text x="560" y="120" class="label" fill="white" font-weight="bold">Achieved</text>
+
+  <!-- Process Arrows -->
+  <path d="M 150 105 L 200 105" class="edge"/>
+  <path d="M 300 105 L 350 105" class="edge"/>
+  <path d="M 450 105 L 500 105" class="edge"/>
+
+  <!-- Before Metrics -->
+  <text x="100" y="180" class="label" font-size="14" font-weight="bold">Before</text>
+
+  <rect x="50" y="200" width="100" height="40" rx="5" class="metric-before"/>
+  <text x="100" y="220" class="label" font-size="11" font-weight="bold">Bugs: 1</text>
+
+  <rect x="50" y="250" width="100" height="40" rx="5" class="metric-before"/>
+  <text x="100" y="270" class="label" font-size="11" font-weight="bold">Code Smells: 3</text>
+
+  <rect x="50" y="300" width="100" height="40" rx="5" class="metric-before"/>
+  <text x="100" y="320" class="label" font-size="11" font-weight="bold">Reliability: C</text>
+
+  <!-- After Metrics -->
+  <text x="560" y="180" class="label" font-size="14" font-weight="bold">After</text>
+
+  <rect x="510" y="200" width="100" height="40" rx="5" class="metric-after"/>
+  <text x="560" y="220" class="label" font-size="11" font-weight="bold">Bugs: 0</text>
+
+  <rect x="510" y="250" width="100" height="40" rx="5" class="metric-after"/>
+  <text x="560" y="270" class="label" font-size="11" font-weight="bold">Code Smells: 0</text>
+
+  <rect x="510" y="300" width="100" height="40" rx="5" class="metric-after"/>
+  <text x="560" y="320" class="label" font-size="11" font-weight="bold">Reliability: A</text>
+
+  <!-- Improvement Indicators -->
+  <text x="200" y="220" class="label" font-size="20" fill="#4caf50">✅</text>
+  <text x="230" y="225" class="label" font-size="11" fill="#4caf50">100% resolved</text>
+
+  <text x="200" y="270" class="label" font-size="20" fill="#4caf50">✅</text>
+  <text x="230" y="275" class="label" font-size="11" fill="#4caf50">100% resolved</text>
+
+  <text x="200" y="320" class="label" font-size="20" fill="#4caf50">⬆️</text>
+  <text x="230" y="325" class="label" font-size="11" fill="#4caf50">2 levels up</text>
+
+  <!-- Central Arrow -->
+  <path d="M 150 270 L 510 270" class="edge" stroke="#4caf50" stroke-width="4"/>
+  <text x="330" y="260" class="label" font-size="12" fill="#4caf50" font-weight="bold">Perfect Improvement</text>
+</svg>
