@@ -28,7 +28,7 @@
 	"lang_switcher_en": "English",
 	"lang_switcher_ko": "한국어",
 	"about_title": "About Me",
-	"about_content": "저는 결과물 뒤에 숨겨진 의사결정의 궤적(Trajectory)을 가치 있게 만드는 사고 궤적 아키텍트입니다.<br/> 전기전자공학 전공 이후 기술 지원, 영업, 사업 전략 경험을 바탕으로 복잡한 문제의 논리적 경로를 설계하고 AI와 협업해 실제 소프트웨어로 구현합니다.<br/> Intel 개발자 과정과 아래 프로젝트에서 LLM/컴퓨터 비전 기반 기능을 설계·구현하고, 성능 최적화와 서비스 배포까지 경험했습니다.<br/> 빠른 실험보다 검증 가능한 추론 과정, 안정적인 릴리즈, 고객 중심 의사결정을 우선합니다.<br/>",
+	"about_content": "저는 결과물 뒤에 숨겨진 의사결정의 궤적(Trajectory)을 가치 있게 만드는 사고 궤적 아키텍트입니다.<br/> 전기전자공학 전공 이후 기술 지원, 영업, 사업 전략 경험을 바탕으로 복잡한 문제의 논리적 경로를 설계하고 AI와 협업해 실제 소프트웨어로 구현합니다.<br/> Intel 개발자 과정과 아래 프로젝트에서 LLM/컴퓨터 비전 기반 기능을 설계·구현하고, 성능 최적화와 서비스 배포까지 경험했습니다.<br/> 빠른 실험, 검증 가능한 추론 과정, 고객 중심 의사결정을 우선합니다.<br/>",
 	"section_title_projects": "Projects",
 	"section_title_experience": "Experience",
 	"section_title_education": "Education",
