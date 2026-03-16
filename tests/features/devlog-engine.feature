@@ -23,6 +23,13 @@ Feature: Devlog graph state and engine bridge
     Then publication must be blocked when prerequisites are not published
     And publication must become idempotent once status is already published
 
+  Scenario: publish uses secret-driven mocked platform delivery
+    Given GitHub Actions injects platform secrets for publish
+    When operators request publication for a draft node
+    Then Nim engine must pass secret values through execution context
+    And Nim engine must record mocked success responses per requested platform
+    And state.json channels must be updated to published without real API calls
+
   Scenario: GitHub Actions persists engine state changes safely
     Given workflow_dispatch is used as temporary GUI
     When manual dispatch inputs a command and target node

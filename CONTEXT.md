@@ -19,6 +19,9 @@
 - 배포/동기화/그래프 생성 비즈니스 로직은 Nim CLI(`devlog`) 내부에 캡슐화하고, GitHub Actions나 향후 `/admin`은 CLI 호출만 수행해야 한다.
 - GitHub Actions는 임시 GUI로 사용하며 `workflow_dispatch` 입력과 `GITHUB_STEP_SUMMARY` 출력을 제공해야 한다.
 - Nim CLI 실행으로 `state.json`이 변경되면 워크플로는 변경분을 `main`에 자동 커밋/푸시하고 커밋 메시지에 `[skip ci]`를 포함해야 한다.
+- publish 워크플로는 `X_API_KEY`, `LINKEDIN_ACCESS_TOKEN`, `DEVTO_API_KEY`를 Secrets에서 주입해 Nim 엔진에 전달해야 한다.
+- 초기 publish 구현은 외부 API 호출 대신 플랫폼별 Mock 성공 응답을 기록하고 `state.json` 채널 상태를 갱신해야 한다.
+- 이미 `published` 상태인 노드의 publish 재호출은 API/Mock 호출 없이 `already_published`를 반환하는 멱등성 규칙을 지켜야 한다.
 
 ## 2) URL 아키텍처 규칙
 

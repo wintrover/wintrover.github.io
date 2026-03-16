@@ -7,6 +7,12 @@ const
 proc nowIso(): string =
   format(getTime().utc, "yyyy-MM-dd'T'HH:mm:ss'Z'")
 
+proc resolveStateFilePath(): string =
+  let fromEnv = getEnv("DEVLOG_STATE_PATH", "").strip()
+  if fromEnv.len > 0:
+    return fromEnv
+  StateFilePath
+
 proc defaultState(): JsonNode =
   result = %*{
     "version": "1.0.0",
@@ -217,6 +223,39 @@ proc parsePlatforms(csv: string): seq[string] =
   result = toSeq(unique.items)
   result.sort()
 
+proc authEnvName(platform: string): string =
+  case platform
+  of "x":
+    "X_API_KEY"
+  of "linkedin":
+    "LINKEDIN_ACCESS_TOKEN"
+  of "devto":
+    "DEVTO_API_KEY"
+  else:
+    ""
+
+proc buildMockDelivery(platform: string): JsonNode =
+  let envName = authEnvName(platform)
+  let hasSecret = envName.len > 0 and getEnv(envName, "").strip().len > 0
+  %*{
+    "platform": platform,
+    "result": "mock_success",
+    "api_called": false,
+    "auth_env": envName,
+    "auth_configured": hasSecret,
+    "published_at": nowIso()
+  }
+
+proc buildAuthContext(platforms: seq[string]): JsonNode =
+  result = newJObject()
+  for platform in platforms:
+    let envName = authEnvName(platform)
+    let hasSecret = envName.len > 0 and getEnv(envName, "").strip().len > 0
+    result[platform] = %*{
+      "env": envName,
+      "configured": hasSecret
+    }
+
 proc publishNode(state: var JsonNode, nodeId: string, requestedPlatforms: seq[string]): JsonNode =
   let nodeIndex = findNodeIndexById(state, nodeId)
   if nodeIndex < 0:
@@ -249,10 +288,14 @@ proc publishNode(state: var JsonNode, nodeId: string, requestedPlatforms: seq[st
     nodes.elems[nodeIndex] = node
     state["nodes"] = nodes
     state["updated_at"] = %nowIso()
+    let platforms = if requestedPlatforms.len == 0: @["x", "linkedin", "devto"] else: requestedPlatforms
     return %*{
       "command": "publish",
       "node_id": nodeId,
-      "result": "already_published"
+      "result": "already_published",
+      "platforms": platforms,
+      "api_called": false,
+      "auth_context": buildAuthContext(platforms)
     }
 
   node["status"] = %"published"
@@ -268,8 +311,14 @@ proc publishNode(state: var JsonNode, nodeId: string, requestedPlatforms: seq[st
   channels["blog"] = %"published"
 
   let platforms = if requestedPlatforms.len == 0: @["x", "linkedin", "devto"] else: requestedPlatforms
+  ensureObject(node, "deliveries")
+  var deliveries = node["deliveries"]
+  var deliveryLog = newJArray()
   for platform in platforms:
+    let delivery = buildMockDelivery(platform)
     channels[platform] = %"published"
+    deliveries[platform] = delivery
+    deliveryLog.add(delivery)
 
   nodes.elems[nodeIndex] = node
   state["nodes"] = nodes
@@ -279,7 +328,9 @@ proc publishNode(state: var JsonNode, nodeId: string, requestedPlatforms: seq[st
     "command": "publish",
     "node_id": nodeId,
     "result": "published",
-    "platforms": platforms
+    "platforms": platforms,
+    "auth_context": buildAuthContext(platforms),
+    "delivery_log": deliveryLog
   }
 
 proc buildGraphPayload(state: JsonNode): JsonNode =
@@ -333,15 +384,17 @@ proc buildDotGraph(state: JsonNode): string =
   lines.join("\n")
 
 proc runSync() =
-  var state = loadState()
+  let stateFilePath = resolveStateFilePath()
+  var state = loadState(stateFilePath)
   let summary = syncState(state)
-  saveState(state)
+  saveState(state, stateFilePath)
   echo pretty(summary)
 
 proc runPublish(nodeId: string, platformsCsv: string) =
-  var state = loadState()
+  let stateFilePath = resolveStateFilePath()
+  var state = loadState(stateFilePath)
   let result = publishNode(state, nodeId, parsePlatforms(platformsCsv))
-  saveState(state)
+  saveState(state, stateFilePath)
   echo pretty(result)
   let status = result.getOrDefault("result").getStr("")
   if status == "not_found":
@@ -350,7 +403,7 @@ proc runPublish(nodeId: string, platformsCsv: string) =
     quit(3)
 
 proc runGraph(formatArg: string) =
-  let state = loadState()
+  let state = loadState(resolveStateFilePath())
   let normalizedFormat = formatArg.strip().toLowerAscii()
   if normalizedFormat == "dot":
     echo buildDotGraph(state)

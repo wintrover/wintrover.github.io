@@ -17,6 +17,7 @@ describe("Devlog 엔진 중심 아키텍처 검증", () => {
 			"state.json defines graph-oriented node and edge schema",
 			"devlog CLI exposes sync publish and graph commands",
 			"publish requires dependency integrity before transition",
+			"publish uses secret-driven mocked platform delivery",
 			"GitHub Actions persists engine state changes safely",
 		];
 		const scenarios = [...feature.matchAll(/^\s*Scenario:\s*(.+)$/gm)].map(
@@ -65,6 +66,24 @@ describe("Devlog 엔진 중심 아키텍처 검증", () => {
 		expect(engine).toContain('command == "graph"');
 		expect(engine).toContain("checkPublishDependencies");
 		expect(engine).toContain("buildGraphPayload");
+		expect(engine).toContain("X_API_KEY");
+		expect(engine).toContain("LINKEDIN_ACCESS_TOKEN");
+		expect(engine).toContain("DEVTO_API_KEY");
+		expect(engine).toContain("mock_success");
+		expect(engine).toContain("already_published");
+		expect(engine).toContain('"api_called": false');
+		expect(
+			engine.indexOf(
+				'if node.getOrDefault("status").getStr("") == "published"',
+			),
+		).toBeGreaterThan(0);
+		expect(
+			engine.indexOf(
+				'if node.getOrDefault("status").getStr("") == "published"',
+			),
+		).toBeLessThan(
+			engine.indexOf("let delivery = buildMockDelivery(platform)"),
+		);
 	});
 
 	test("Given Actions 브리지 When 워크플로 검증 Then 상태 영속 커밋과 루프 방지 규칙을 포함한다", () => {
@@ -78,6 +97,11 @@ describe("Devlog 엔진 중심 아키텍처 검증", () => {
 		expect(workflow).toContain("git commit -m");
 		expect(workflow).toContain("[skip ci]");
 		expect(workflow).toContain("git push origin HEAD:main");
+		expect(workflow).toContain("X_API_KEY: ${{ secrets.X_API_KEY }}");
+		expect(workflow).toContain(
+			"LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}",
+		);
+		expect(workflow).toContain("DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}");
 		expect(gitignore).not.toContain("state.json");
 	});
 });
