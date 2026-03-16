@@ -1,0 +1,986 @@
+{
+	"version": "1.0.0",
+	"updated_at": "2026-03-16T02:29:42Z",
+	"nodes": [
+		{
+			"id": "thought:core:axiom-integrity-001",
+			"path": "thoughts/axiom-integrity-001",
+			"kind": "thought",
+			"status": "published",
+			"timestamps": {
+				"created_at": "2026-03-15T09:00:00Z",
+				"updated_at": "2026-03-16T00:00:00Z",
+				"published_at": "2026-03-16T00:00:00Z"
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T00:00:00Z"
+			},
+			"meta": {
+				"title": "Axiom Integrity Baseline",
+				"locale": "en"
+			}
+		},
+		{
+			"id": "thought:core:devlog-engine-001",
+			"path": "thoughts/devlog-engine-001",
+			"kind": "thought",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-15T10:00:00Z",
+				"updated_at": "2026-03-16T00:00:00Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": ["thought:core:axiom-integrity-001"],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T00:00:00Z"
+			},
+			"meta": {
+				"title": "Devlog Engine Interface Bridge",
+				"locale": "en"
+			}
+		},
+		{
+			"id": "post:en:project:2025-06-25-1",
+			"path": "src/posts/project/2025-06-25-1.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-15T11:00:00Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": ["thought:core:devlog-engine-001"],
+				"dependencies_satisfied": false,
+				"last_checked_at": "2026-03-16T02:29:42Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-06-25-1",
+				"locale": "en",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:en:project:2025-06-29-2",
+			"path": "src/posts/project/2025-06-29-2.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-06-29-2",
+				"locale": "en",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:en:project:2025-07-01-3",
+			"path": "src/posts/project/2025-07-01-3.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-07-01-3",
+				"locale": "en",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:en:project:2025-07-06-4",
+			"path": "src/posts/project/2025-07-06-4.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-07-06-4",
+				"locale": "en",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:en:project:2025-07-18-5",
+			"path": "src/posts/project/2025-07-18-5.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-07-18-5",
+				"locale": "en",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:ko:project:2025-06-25-1",
+			"path": "src/posts/ko/project/2025-06-25-1.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-06-25-1",
+				"locale": "ko",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:ko:project:2025-06-29-2",
+			"path": "src/posts/ko/project/2025-06-29-2.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-06-29-2",
+				"locale": "ko",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:ko:project:2025-07-01-3",
+			"path": "src/posts/ko/project/2025-07-01-3.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-07-01-3",
+				"locale": "ko",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:ko:project:2025-07-06-4",
+			"path": "src/posts/ko/project/2025-07-06-4.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-07-06-4",
+				"locale": "ko",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:ko:project:2025-07-18-5",
+			"path": "src/posts/ko/project/2025-07-18-5.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-07-18-5",
+				"locale": "ko",
+				"category": "project"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-08-05-6",
+			"path": "src/posts/ko/company/2025-08-05-6.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-05-6",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-08-10-7",
+			"path": "src/posts/ko/company/2025-08-10-7.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-10-7",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-08-17-8",
+			"path": "src/posts/ko/company/2025-08-17-8.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-17-8",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-08-23-9",
+			"path": "src/posts/ko/company/2025-08-23-9.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-23-9",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-08-31-10",
+			"path": "src/posts/ko/company/2025-08-31-10.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-31-10",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-09-23-11",
+			"path": "src/posts/ko/company/2025-09-23-11.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-09-23-11",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-10-26-12",
+			"path": "src/posts/ko/company/2025-10-26-12.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-10-26-12",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-11-10-13",
+			"path": "src/posts/ko/company/2025-11-10-13.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-11-10-13",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2025-11-30-14",
+			"path": "src/posts/ko/company/2025-11-30-14.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-11-30-14",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2026-01-08-16",
+			"path": "src/posts/ko/company/2026-01-08-16.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2026-01-08-16",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2026-01-12-17",
+			"path": "src/posts/ko/company/2026-01-12-17.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2026-01-12-17",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:ko:company:2026-02-01-18",
+			"path": "src/posts/ko/company/2026-02-01-18.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2026-02-01-18",
+				"locale": "ko",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-08-05-6",
+			"path": "src/posts/company/2025-08-05-6.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-05-6",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-08-10-7",
+			"path": "src/posts/company/2025-08-10-7.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-10-7",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-08-17-8",
+			"path": "src/posts/company/2025-08-17-8.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-17-8",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-08-23-9",
+			"path": "src/posts/company/2025-08-23-9.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-23-9",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-08-31-10",
+			"path": "src/posts/company/2025-08-31-10.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-08-31-10",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-09-23-11",
+			"path": "src/posts/company/2025-09-23-11.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-09-23-11",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-10-26-12",
+			"path": "src/posts/company/2025-10-26-12.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-10-26-12",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-11-10-13",
+			"path": "src/posts/company/2025-11-10-13.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-11-10-13",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2025-11-30-14",
+			"path": "src/posts/company/2025-11-30-14.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2025-11-30-14",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2026-01-08-16",
+			"path": "src/posts/company/2026-01-08-16.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2026-01-08-16",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2026-01-12-17",
+			"path": "src/posts/company/2026-01-12-17.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2026-01-12-17",
+				"locale": "en",
+				"category": "company"
+			}
+		},
+		{
+			"id": "post:en:company:2026-02-01-18",
+			"path": "src/posts/company/2026-02-01-18.md",
+			"kind": "post",
+			"status": "draft",
+			"timestamps": {
+				"created_at": "2026-03-16T02:29:33Z",
+				"updated_at": "2026-03-16T02:29:33Z",
+				"published_at": null
+			},
+			"integrity": {
+				"requires": [],
+				"dependencies_satisfied": true,
+				"last_checked_at": "2026-03-16T02:29:33Z"
+			},
+			"channels": {
+				"blog": "pending",
+				"x": "pending",
+				"linkedin": "pending",
+				"devto": "pending"
+			},
+			"meta": {
+				"title": "2026-02-01-18",
+				"locale": "en",
+				"category": "company"
+			}
+		}
+	],
+	"edges": [
+		{
+			"id": "edge:thought-parent:devlog-engine",
+			"from": "thought:core:axiom-integrity-001",
+			"to": "thought:core:devlog-engine-001",
+			"relation": "parent_thought_id",
+			"status": "active",
+			"timestamps": {
+				"created_at": "2026-03-15T10:00:00Z"
+			}
+		},
+		{
+			"id": "edge:derived-from:post-2025-06-25-1",
+			"from": "thought:core:devlog-engine-001",
+			"to": "post:en:project:2025-06-25-1",
+			"relation": "derived_from",
+			"status": "active",
+			"timestamps": {
+				"created_at": "2026-03-15T11:00:00Z"
+			}
+		}
+	]
+}

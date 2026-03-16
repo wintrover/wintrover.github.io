@@ -10,6 +10,15 @@
 - 이 프로젝트는 커밋 히스토리와 대화 로그에서 개발자의 사고방식을 추출해 블로그 포스팅으로 전환하는 Devlog 프로젝트다.
 - 결과물은 단순 작업 기록이 아니라 문제 정의, 의사결정, 시행착오, 개선 근거를 재구성한 학습 가능한 개발 기록이어야 한다.
 
+## 1-1) Devlog/Axiom 엔진 아키텍처 규칙
+
+- 배포 상태의 진실 원천은 UI가 아니라 루트 `state.json`이며, 구조는 그래프(Node/Edge) 모델을 따른다.
+- Node는 최소한 `id`, `path`, `kind`, `status`, `timestamps`, `integrity`를 포함해 포스트와 사고 조각의 상태를 기술해야 한다.
+- Edge는 최소한 `from`, `to`, `relation`, `status`를 포함해 `parent_thought_id`, `derived_from` 같은 사고 연결을 표현해야 한다.
+- 무결성 검증은 단순 `published` 플래그가 아니라 의존성(`requires`)의 충족 여부를 계산하는 방식이어야 한다.
+- 배포/동기화/그래프 생성 비즈니스 로직은 Nim CLI(`devlog`) 내부에 캡슐화하고, GitHub Actions나 향후 `/admin`은 CLI 호출만 수행해야 한다.
+- GitHub Actions는 임시 GUI로 사용하며 `workflow_dispatch` 입력과 `GITHUB_STEP_SUMMARY` 출력으로만 인터페이스를 제공한다.
+
 ## 2) URL 아키텍처 규칙
 
 - 기본 언어는 영어(English)이며 루트 경로 `/`를 사용한다.
