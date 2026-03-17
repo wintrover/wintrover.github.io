@@ -502,14 +502,17 @@ async function publishToLinkedIn(
 			process.env.LINKEDIN_API_VERSION ||
 			DEFAULT_LINKEDIN_VERSION,
 	);
-	const publishRequest = async (url: string, includeVersionHeader: boolean) => {
+	const publishRequest = async (
+		url: string,
+		versionHeaderName: "Linkedin-Version" | "LinkedIn-Version" | null,
+	) => {
 		const headers: Record<string, string> = {
 			Authorization: `Bearer ${accessToken}`,
 			"Content-Type": "application/json",
 			"X-Restli-Protocol-Version": "2.0.0",
 		};
-		if (includeVersionHeader) {
-			headers["LinkedIn-Version"] = linkedInVersion;
+		if (versionHeaderName) {
+			headers[versionHeaderName] = linkedInVersion;
 		}
 		return fetch(url, {
 			method: "POST",
@@ -517,29 +520,45 @@ async function publishToLinkedIn(
 			body: JSON.stringify(payload),
 		});
 	};
-	let response = await publishRequest(LINKEDIN_POSTS_API_URL, true);
-	if (!response.ok) {
-		let errorPayload = await response.text();
-		if (
-			response.status === 426 &&
-			/(NONEXISTENT_VERSION|INVALID_VERSION)/i.test(errorPayload)
-		) {
-			response = await publishRequest(
-				"https://api.linkedin.com/rest/posts",
-				false,
-			);
-			if (!response.ok) {
-				errorPayload = await response.text();
-			}
-		}
+	const attempts: string[] = [];
+	const attemptChain: {
+		url: string;
+		versionHeaderName: "Linkedin-Version" | "LinkedIn-Version" | null;
+	}[] = [
+		{ url: LINKEDIN_POSTS_API_URL, versionHeaderName: "Linkedin-Version" },
+		{ url: LINKEDIN_POSTS_API_URL, versionHeaderName: "LinkedIn-Version" },
+		{
+			url: "https://api.linkedin.com/rest/posts",
+			versionHeaderName: "Linkedin-Version",
+		},
+	];
+	let response: Response | null = null;
+	let errorPayload = "";
+	for (const attempt of attemptChain) {
+		response = await publishRequest(attempt.url, attempt.versionHeaderName);
 		if (response.ok) {
 			return {
 				url: post.canonicalUrl,
 				detail: `published:${payload.author}`,
 			};
 		}
+		errorPayload = await response.text();
+		attempts.push(
+			`header=${attempt.versionHeaderName ?? "none"},url=${attempt.url},status=${response.status},payload=${errorPayload}`,
+		);
+		const isVersionError = response.status === 400 || response.status === 426;
+		if (
+			!isVersionError ||
+			!/(VERSION_MISSING|NONEXISTENT_VERSION|INVALID_VERSION)/i.test(
+				errorPayload,
+			)
+		) {
+			break;
+		}
+	}
+	if (response) {
 		throw new Error(
-			`LinkedIn API failed (${response.status}): ${errorPayload}`,
+			`LinkedIn API failed (${response.status}): ${errorPayload}; attempts=${attempts.join(" || ")}`,
 		);
 	}
 	return {
