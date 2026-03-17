@@ -488,7 +488,6 @@ async function publishToLinkedIn(
 			"Content-Type": "application/json",
 			"X-Restli-Protocol-Version": "2.0.0",
 			"Linkedin-Version": linkedInVersion,
-			"LinkedIn-Version": linkedInVersion,
 		},
 		body: JSON.stringify(payload),
 	});
