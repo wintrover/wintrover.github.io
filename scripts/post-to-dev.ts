@@ -58,7 +58,7 @@ const DEPLOY_LOCK = path.join(DEPLOY_ROOT, "lock");
 const STATUS_SNAPSHOT_PATH = path.join(STATE_DATA_ROOT, "STATUS.md");
 const DEFAULT_PUBLIC_BASE_URL = "https://wintrover.github.io/";
 const DEFAULT_LINKEDIN_PERSON_URN = "urn:li:person:binfyrHJAK";
-const DEFAULT_LINKEDIN_VERSION = "202502";
+const DEFAULT_LINKEDIN_VERSION = "202603";
 const LINKEDIN_POSTS_API_URL = normalizeLinkedInPostsApiUrl(
 	process.env.LINKEDIN_POSTS_API_URL || "https://api.linkedin.com/rest/posts",
 );

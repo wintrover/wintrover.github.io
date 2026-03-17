@@ -76,7 +76,7 @@ jobs:
           STATE_DATA_ROOT: ./database
           DEPLOY_TARGET: ${{ github.event.inputs.target || 'content/posts' }}
           DEPLOY_PLATFORMS: ${{ github.event.inputs.platforms || 'devto,linkedin' }}
-          LINKEDIN_VERSION: "202502"
+          LINKEDIN_VERSION: "202603"
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
