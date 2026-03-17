@@ -1,6 +1,6 @@
 {
   "state": "failed",
-  "updatedAt": "2026-03-17T14:06:00.968Z",
-  "detail": "LinkedIn API failed (400): {\"status\":400,\"code\":\"VERSION_MISSING\",\"message\":\"A version must be present. Please specify a version by adding the LinkedIn-Version header.\"}",
+  "updatedAt": "2026-03-17T14:08:31.195Z",
+  "detail": "LinkedIn API failed (426): {\"status\":426,\"code\":\"NONEXISTENT_VERSION\",\"message\":\"Requested version 20250201 is not active\"}; attempts=header=Linkedin-Version,url=https://api.linkedin.com/rest/posts,status=426,payload={\"status\":426,\"code\":\"NONEXISTENT_VERSION\",\"message\":\"Requested version 20250201 is not active\"} || header=LinkedIn-Version,url=https://api.linkedin.com/rest/posts,status=426,payload={\"status\":426,\"code\":\"NONEXISTENT_VERSION\",\"message\":\"Requested version 20250201 is not active\"} || header=Linkedin-Version,url=https://api.linkedin.com/rest/posts,status=426,payload={\"status\":426,\"code\":\"NONEXISTENT_VERSION\",\"message\":\"Requested version 20250201 is not active\"}",
   "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/content/posts/ko/project/2026-03-17-19.md"
 }
