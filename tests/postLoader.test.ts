@@ -216,7 +216,7 @@ describe("postLoader", () => {
 		vi.doUnmock("../src/lib/categories.json");
 	});
 
-	test("비배열 tags 입력은 무시되어 빈 배열로 처리된다", async () => {
+	test("문자열 tags 입력이 generic token이면 카테고리 구성 태그로 정규화된다", async () => {
 		vi.resetModules();
 		vi.doMock("../src/lib/utils", async () => {
 			const actual =
@@ -241,6 +241,14 @@ describe("postLoader", () => {
 		});
 		expect(posts[0].tags).toEqual(["CVFactory"]);
 		vi.doUnmock("../src/lib/utils");
+	});
+
+	test("문자열 tags 입력이 일반 토큰이면 그대로 유지된다", async () => {
+		const posts = await loadAllPosts({
+			"../posts/project/string-tag.md":
+				"---\ntitle: String Tag\ntags: Devlog\n---\nBody",
+		});
+		expect(posts[0].tags).toEqual(["Devlog"]);
 	});
 
 	test("loadPostBySlug - 메타데이터 폴백 확인 (Line 120-138 coverage)", async () => {
@@ -519,6 +527,14 @@ describe("postLoader", () => {
 		};
 		const posts = await loadAllPosts(mockModules);
 		expect(posts[0].slug).toBe("test-file");
+	});
+
+	test("한글 title로 slugify 결과가 비면 fileName slug를 사용한다", async () => {
+		const posts = await loadAllPosts({
+			"posts/2026-03-17-19.md":
+				'---\ntitle: "확률적 지능의 시대"\ncategory: Project\n---\nBody',
+		});
+		expect(posts[0].slug).toBe("2026-03-17-19");
 	});
 
 	test("Error handling during parsing - Non-Error object", async () => {
