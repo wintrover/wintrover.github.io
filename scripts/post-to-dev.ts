@@ -59,8 +59,9 @@ const STATUS_SNAPSHOT_PATH = path.join(STATE_DATA_ROOT, "STATUS.md");
 const DEFAULT_PUBLIC_BASE_URL = "https://wintrover.github.io/";
 const DEFAULT_LINKEDIN_PERSON_URN = "urn:li:person:binfyrHJAK";
 const DEFAULT_LINKEDIN_VERSION = "202502";
-const LINKEDIN_POSTS_API_URL =
-	process.env.LINKEDIN_POSTS_API_URL || "https://api.linkedin.com/rest/posts";
+const LINKEDIN_POSTS_API_URL = normalizeLinkedInPostsApiUrl(
+	process.env.LINKEDIN_POSTS_API_URL || "https://api.linkedin.com/rest/posts",
+);
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
 export const DEPLOY_POSTS_ROOT_RELATIVE = "content/posts";
 const DEPLOY_POSTS_ROOT = path.resolve(
@@ -73,6 +74,17 @@ function normalizeLinkedInVersion(rawVersion: string) {
 	if (/^\d{6}(\.\d{2})?$/.test(trimmed)) return trimmed;
 	if (/^\d{8}$/.test(trimmed)) return trimmed.slice(0, 6);
 	return DEFAULT_LINKEDIN_VERSION;
+}
+
+function normalizeLinkedInPostsApiUrl(rawUrl: string) {
+	try {
+		const url = new URL(rawUrl.trim());
+		url.pathname = "/rest/posts";
+		url.search = "";
+		return url.toString();
+	} catch {
+		return "https://api.linkedin.com/rest/posts";
+	}
 }
 
 function normalizePublicBaseUrl(url: string) {
