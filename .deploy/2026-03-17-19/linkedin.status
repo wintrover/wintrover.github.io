@@ -1,6 +1,6 @@
 {
   "state": "failed",
-  "updatedAt": "2026-03-17T14:03:39.964Z",
+  "updatedAt": "2026-03-17T14:06:00.968Z",
   "detail": "LinkedIn API failed (400): {\"status\":400,\"code\":\"VERSION_MISSING\",\"message\":\"A version must be present. Please specify a version by adding the LinkedIn-Version header.\"}",
   "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/content/posts/ko/project/2026-03-17-19.md"
 }
