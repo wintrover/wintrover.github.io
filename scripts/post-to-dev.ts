@@ -502,18 +502,42 @@ async function publishToLinkedIn(
 			process.env.LINKEDIN_API_VERSION ||
 			DEFAULT_LINKEDIN_VERSION,
 	);
-	const response = await fetch(LINKEDIN_POSTS_API_URL, {
-		method: "POST",
-		headers: {
+	const publishRequest = async (url: string, includeVersionHeader: boolean) => {
+		const headers: Record<string, string> = {
 			Authorization: `Bearer ${accessToken}`,
 			"Content-Type": "application/json",
 			"X-Restli-Protocol-Version": "2.0.0",
-			"Linkedin-Version": linkedInVersion,
-		},
-		body: JSON.stringify(payload),
-	});
+		};
+		if (includeVersionHeader) {
+			headers["Linkedin-Version"] = linkedInVersion;
+		}
+		return fetch(url, {
+			method: "POST",
+			headers,
+			body: JSON.stringify(payload),
+		});
+	};
+	let response = await publishRequest(LINKEDIN_POSTS_API_URL, true);
 	if (!response.ok) {
-		const errorPayload = await response.text();
+		let errorPayload = await response.text();
+		if (
+			response.status === 426 &&
+			/(NONEXISTENT_VERSION|INVALID_VERSION)/i.test(errorPayload)
+		) {
+			response = await publishRequest(
+				"https://api.linkedin.com/rest/posts",
+				false,
+			);
+			if (!response.ok) {
+				errorPayload = await response.text();
+			}
+		}
+		if (response.ok) {
+			return {
+				url: post.canonicalUrl,
+				detail: `published:${payload.author}`,
+			};
+		}
 		throw new Error(
 			`LinkedIn API failed (${response.status}): ${errorPayload}`,
 		);

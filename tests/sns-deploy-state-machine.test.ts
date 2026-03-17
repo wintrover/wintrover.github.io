@@ -110,6 +110,8 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(script).toContain("fallback URN is used");
 		expect(script).toContain("normalizeLinkedInVersion(");
 		expect(script).toContain("normalizeLinkedInPostsApiUrl(");
+		expect(script).toContain("NONEXISTENT_VERSION");
+		expect(script).toContain("publishRequest(");
 		expect(script).toContain("trimmed.slice(0, 6)");
 	});
 
