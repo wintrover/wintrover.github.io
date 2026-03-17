@@ -113,6 +113,14 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(script).toContain("normalizeLinkedInPostsApiUrl(");
 		expect(script).toContain("NONEXISTENT_VERSION");
 		expect(script).toContain("publishRequest(");
+		expect(script).toContain("buildLinkedInCommentary(");
+		expect(script).toContain("resolveEnglishLinkedInIntro(");
+		expect(script).toContain("linkedInIntro:");
+		expect(script).toContain('join("\\n\\n")');
+		expect(script).toContain("hasHangul(");
+		expect(script).toContain(
+			"I shared a new post about engineering decisions and quality automation. Read it here.",
+		);
 		expect(script).toContain("trimmed.slice(0, 6)");
 	});
 

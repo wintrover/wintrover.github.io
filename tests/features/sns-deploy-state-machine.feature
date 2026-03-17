@@ -20,6 +20,8 @@ Feature: SNS deployment state machine
     When LinkedIn request body is created
     Then posting endpoint must use rest/posts with Posts API payload schema
     And author must use person URN resolved from v2/me and continue with fallback urn:li:person:binfyrHJAK when profile lookup fails
+    And LinkedIn commentary intro must be English-only
+    And LinkedIn commentary must place canonical link in a separate paragraph with one blank line
     And markdown image paths must be converted to absolute https://wintrover.github.io/ URLs
 
   Scenario: action persists deploy state to isolated DB branch
