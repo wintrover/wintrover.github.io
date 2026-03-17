@@ -25,10 +25,39 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
+
+      - name: Checkout deploy state branch
+        id: checkout_state
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: deploy
+          path: state-data
+          fetch-depth: 0
+
+      - name: Initialize deploy state branch when missing
+        if: steps.checkout_state.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf state-data
+          mkdir -p state-data
+          cd state-data
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git checkout --orphan deploy
+          mkdir -p .deploy
+          touch STATUS.md
+          git add .deploy STATUS.md
+          git commit -m "chore(deploy): bootstrap state branch [skip ci]"
+          git push origin HEAD:deploy
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -41,6 +70,7 @@ jobs:
       - name: Run SNS deployment
         env:
           BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/
+          STATE_DATA_ROOT: ./state-data
           DEPLOY_PLATFORMS: ${{ inputs.platforms }}
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
@@ -52,6 +82,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p state-data/.deploy
+          if [ -d .deploy ]; then cp -R .deploy/. state-data/.deploy/; fi
+          if [ -f STATUS.md ]; then cp STATUS.md state-data/STATUS.md; fi
+          cd state-data
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .deploy STATUS.md
@@ -60,4 +94,14 @@ jobs:
             exit 0
           fi
           git commit -m "chore(deploy): persist sns status snapshot [skip ci]"
-          git push origin HEAD:main
+          for attempt in 1 2 3; do
+            if git push origin HEAD:deploy; then
+              echo "Push succeeded on attempt ${attempt}."
+              exit 0
+            fi
+            if [ "${attempt}" = "3" ]; then
+              echo "Push failed after 3 attempts."
+              exit 1
+            fi
+            git pull --rebase origin deploy
+          done

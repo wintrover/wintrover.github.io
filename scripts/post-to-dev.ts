@@ -48,8 +48,10 @@ type PreparedPost = {
 	firstImageUrl: string | null;
 };
 
-const DEPLOY_ROOT = ".deploy";
+const STATE_DATA_ROOT = path.resolve(process.env.STATE_DATA_ROOT || ".");
+const DEPLOY_ROOT = path.join(STATE_DATA_ROOT, ".deploy");
 const DEPLOY_LOCK = path.join(DEPLOY_ROOT, "lock");
+const STATUS_SNAPSHOT_PATH = path.join(STATE_DATA_ROOT, "STATUS.md");
 const DEFAULT_PUBLIC_BASE_URL = "https://wintrover.github.io/";
 const DEFAULT_LINKEDIN_PERSON_URN = "urn:li:person:binfyrHJAK";
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
@@ -624,7 +626,8 @@ async function loadCurrentStatus(slugs: string[]) {
 async function updateStatusSnapshot(slugs: string[]) {
 	const snapshotRecords = await loadCurrentStatus(slugs);
 	const markdown = buildStatusMarkdown(snapshotRecords);
-	await fs.writeFile(path.resolve("STATUS.md"), markdown, "utf-8");
+	await fs.mkdir(path.dirname(STATUS_SNAPSHOT_PATH), { recursive: true });
+	await fs.writeFile(STATUS_SNAPSHOT_PATH, markdown, "utf-8");
 }
 
 async function acquireSoftLock() {

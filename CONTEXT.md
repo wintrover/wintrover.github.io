@@ -23,11 +23,14 @@
 - 초기 publish 구현은 외부 API 호출 대신 플랫폼별 Mock 성공 응답을 기록하고 `state.json` 채널 상태를 갱신해야 한다.
 - 이미 `published` 상태인 노드의 publish 재호출은 API/Mock 호출 없이 `already_published`를 반환하는 멱등성 규칙을 지켜야 한다.
 - SNS 배포 워크플로는 Git 파일시스템 상태머신을 사용해야 하며 `.deploy/lock` Soft Lock으로 중복 실행을 방지해야 한다.
+- `main` 브랜치는 코드와 콘텐츠만 관리하고, 배포 상태는 소스코드가 없는 독립 `deploy` 브랜치(이하 deploy 브랜치)에서만 관리해야 한다.
 - 포스트별 플랫폼 상태는 `.deploy/[post-slug]/[platform].status`를 SSOT로 기록하고 `.success`/`.failed` 마커로 재시도 여부를 결정해야 한다.
 - 상태머신 규칙은 `.success`가 있으면 Skip, `.failed` 또는 상태 파일 부재면 재배포 시도를 수행해야 한다.
 - LinkedIn 배포는 `v2/ugcPosts`를 사용하고 Author는 `LINKEDIN_PERSON_URN`(기본값 `urn:li:person:binfyrHJAK`)을 적용해야 한다.
 - DEV.to 및 LinkedIn 본문의 이미지 링크는 `https://wintrover.github.io/` 기반 절대 경로로 치환해야 한다.
-- 모든 플랫폼 시도 결과는 `GITHUB_STEP_SUMMARY` 마크다운 표와 루트 `STATUS.md`에 동시 반영해야 하며, `.deploy/`와 `STATUS.md`는 단일 커밋으로 영속화해야 한다.
+- 모든 플랫폼 시도 결과는 `GITHUB_STEP_SUMMARY` 마크다운 표와 `deploy` 브랜치의 `STATUS.md`에 동시 반영해야 하며, 상태 스냅샷은 `deploy` 브랜치에서만 단일 커밋으로 영속화해야 한다.
+- SNS 배포 워크플로는 `main`과 `deploy` 브랜치를 이중 체크아웃하고, 배포 후 `state-data` 저장소에서 `git pull --rebase` 기반 최대 3회 재시도 후 원자적으로 푸시해야 한다.
+- `main` 브랜치에는 `.deploy/` 상태 데이터를 커밋하거나 푸시하면 안 된다.
 
 ## 2) URL 아키텍처 규칙
 
