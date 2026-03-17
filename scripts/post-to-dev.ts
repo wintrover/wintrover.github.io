@@ -614,7 +614,6 @@ async function collectMarkdownFiles(dirPath: string): Promise<string[]> {
 		entries.map(async (entry) => {
 			const fullPath = path.join(dirPath, entry.name);
 			if (entry.isDirectory()) {
-				if (fullPath.includes(`${path.sep}ko${path.sep}`)) return [];
 				return collectMarkdownFiles(fullPath);
 			}
 			if (entry.isFile() && entry.name.endsWith(".md")) return [fullPath];

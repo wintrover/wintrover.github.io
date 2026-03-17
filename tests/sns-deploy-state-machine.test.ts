@@ -74,6 +74,14 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(workflow).toContain("path: database");
 		expect(workflow).toContain("ref: DB");
 		expect(workflow).toContain("bun scripts/post-to-dev.ts");
+		expect(workflow).toContain("DEPLOY_TARGET:");
+		expect(workflow).toContain("github.event.inputs.target || 'content/posts'");
+		expect(workflow).toContain(
+			"github.event.inputs.platforms || 'devto,linkedin'",
+		);
+		expect(workflow).toContain(
+			'run: bun scripts/post-to-dev.ts "${DEPLOY_TARGET}" "${DEPLOY_PLATFORMS}"',
+		);
 		expect(workflow).toContain("STATE_DATA_ROOT: ./database");
 		expect(workflow).toContain(
 			"LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}",
@@ -109,6 +117,20 @@ describe("SNS 배포 상태 머신 검증", () => {
 				force: true,
 			});
 			fs.rmSync(outsideFile, { force: true });
+		}
+	});
+
+	test("Given 배포 스캔 When ko 경로 파일 존재 Then 배포 후보에서 제외되지 않는다", async () => {
+		const postsRoot = path.join(root, DEPLOY_POSTS_ROOT_RELATIVE);
+		const koDir = path.join(postsRoot, "ko", "project");
+		const koFile = path.join(koDir, "ko-inclusion-e2e.md");
+		fs.mkdirSync(koDir, { recursive: true });
+		fs.writeFileSync(koFile, "# ko inclusion");
+		try {
+			const discovered = await discoverPostFiles();
+			expect(discovered).toContain(koFile);
+		} finally {
+			fs.rmSync(koFile, { force: true });
 		}
 	});
 
