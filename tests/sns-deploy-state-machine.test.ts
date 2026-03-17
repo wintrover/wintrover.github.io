@@ -108,6 +108,8 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(script).toContain("distribution:");
 		expect(script).toContain('"Linkedin-Version"');
 		expect(script).toContain("fallback URN is used");
+		expect(script).toContain("normalizeLinkedInVersion(");
+		expect(script).toContain("trimmed.slice(0, 6)");
 	});
 
 	test("Given 배포 스캔 When 기본 탐색 Then content/posts 하위 물리 파일만 수집한다", async () => {

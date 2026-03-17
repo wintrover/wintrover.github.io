@@ -68,6 +68,13 @@ const DEPLOY_POSTS_ROOT = path.resolve(
 	DEPLOY_POSTS_ROOT_RELATIVE,
 );
 
+function normalizeLinkedInVersion(rawVersion: string) {
+	const trimmed = rawVersion.trim();
+	if (/^\d{6}(\.\d{2})?$/.test(trimmed)) return trimmed;
+	if (/^\d{8}$/.test(trimmed)) return trimmed.slice(0, 6);
+	return DEFAULT_LINKEDIN_VERSION;
+}
+
 function normalizePublicBaseUrl(url: string) {
 	try {
 		if (typeof url !== "string" || !url) return DEFAULT_PUBLIC_BASE_URL;
@@ -266,10 +273,11 @@ async function resolveLinkedInPersonUrn(
 	fallbackUrn: string,
 ) {
 	const configuredUrn = normalizeLinkedInPersonUrn(fallbackUrn);
-	const linkedInVersion =
+	const linkedInVersion = normalizeLinkedInVersion(
 		process.env.LINKEDIN_VERSION ||
-		process.env.LINKEDIN_API_VERSION ||
-		DEFAULT_LINKEDIN_VERSION;
+			process.env.LINKEDIN_API_VERSION ||
+			DEFAULT_LINKEDIN_VERSION,
+	);
 	const readProfile = async (includeVersionHeader: boolean) => {
 		const headers: Record<string, string> = {
 			Authorization: `Bearer ${accessToken}`,
@@ -477,10 +485,11 @@ async function publishToLinkedIn(
 	personUrn: string,
 ) {
 	const payload = buildLinkedInPostsPayload(post, personUrn);
-	const linkedInVersion =
+	const linkedInVersion = normalizeLinkedInVersion(
 		process.env.LINKEDIN_VERSION ||
-		process.env.LINKEDIN_API_VERSION ||
-		DEFAULT_LINKEDIN_VERSION;
+			process.env.LINKEDIN_API_VERSION ||
+			DEFAULT_LINKEDIN_VERSION,
+	);
 	const response = await fetch(LINKEDIN_POSTS_API_URL, {
 		method: "POST",
 		headers: {
