@@ -1,6 +1,6 @@
 {
   "state": "failed",
-  "updatedAt": "2026-03-17T13:57:38.535Z",
+  "updatedAt": "2026-03-17T14:00:35.291Z",
   "detail": "LinkedIn API failed (426): {\"status\":426,\"code\":\"NONEXISTENT_VERSION\",\"message\":\"Requested version 20250201 is not active\"}",
   "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/content/posts/ko/project/2026-03-17-19.md"
 }
