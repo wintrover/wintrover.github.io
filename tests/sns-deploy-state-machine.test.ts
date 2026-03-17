@@ -99,6 +99,16 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(workflow).toContain("git push origin HEAD:DB");
 	});
 
+	test("Given LinkedIn 배포 스크립트 When 검사 Then Posts API 스키마와 person URN 검증을 사용한다", () => {
+		const script = read("scripts/post-to-dev.ts");
+		expect(script).toContain("https://api.linkedin.com/restli/v2/posts");
+		expect(script).toContain("https://api.linkedin.com/v2/me");
+		expect(script).toContain("commentary:");
+		expect(script).toContain('visibility: "PUBLIC"');
+		expect(script).toContain("distribution:");
+		expect(script).toContain('"LinkedIn-Version"');
+	});
+
 	test("Given 배포 스캔 When 기본 탐색 Then content/posts 하위 물리 파일만 수집한다", async () => {
 		const postsRoot = path.join(root, DEPLOY_POSTS_ROOT_RELATIVE);
 		const insideDir = path.join(postsRoot, "isolation-e2e");
@@ -181,6 +191,8 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(context).toContain("Git 파일시스템 상태머신");
 		expect(context).toContain(".deploy/lock");
 		expect(context).toContain(".deploy/[post-slug]/[platform].status");
+		expect(context).toContain("restli/v2/posts");
+		expect(context).toContain("v2/me");
 		expect(context).toContain("GITHUB_STEP_SUMMARY");
 		expect(context).toContain("배포 후보 물리 파일 목록 스냅샷");
 		expect(context).toContain("터미널 로그");
