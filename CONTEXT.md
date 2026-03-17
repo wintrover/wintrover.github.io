@@ -40,6 +40,7 @@
 - 영어 콘텐츠의 표준 URL은 루트 기반(`/post/:slug/`, `/resume/`)으로 유지한다.
 - 신규 포스팅 등록 시 영어 원문과 한국어 버전을 기본으로 동시 작성하며, 파일명은 동일한 `YYYY-MM-DD-N.md`를 사용한다. 경로는 영어 `src/posts/{project|company}/`, 한국어 `src/posts/ko/{project|company}/`를 따른다.
 - 신규 포스팅의 기본 분류는 `Project` 카테고리와 `Devlog` 태그를 사용한다. `Company Work` 카테고리는 재직 중 회사 업무 회고를 작성할 때만 사용한다.
+- 동일 slug의 한영 포스트 중 한쪽 본문을 각색하면 다른 언어 버전도 동일한 메시지로 동기화한다.
 
 ## 3) 빌드 및 Mermaid 파이프라인 불변 규칙
 
