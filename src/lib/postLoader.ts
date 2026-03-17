@@ -55,6 +55,12 @@ function normalizeTags(tags: unknown) {
 	if (Array.isArray(tags)) {
 		return tags.map((t) => String(t)).filter(Boolean);
 	}
+	if (typeof tags === "string") {
+		return tags
+			.split(",")
+			.map((tag) => tag.trim())
+			.filter(Boolean);
+	}
 	return [];
 }
 
@@ -122,7 +128,11 @@ function determineCategoryFromPath(filePath: string) {
 
 function derivePostSlug(data: PostFrontMatter, fileName: string) {
 	const title = typeof data.title === "string" ? data.title : "";
-	return slugify(title || fileName || "");
+	const titleSlug = slugify(title);
+	if (titleSlug) {
+		return titleSlug;
+	}
+	return slugify(fileName || "");
 }
 
 function processPostMetadata(
