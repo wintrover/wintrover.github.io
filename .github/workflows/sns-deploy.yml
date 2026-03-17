@@ -9,7 +9,7 @@ on:
       target:
         description: "Markdown file or directory target"
         required: false
-        default: "src/posts"
+        default: "content/posts"
         type: string
       platforms:
         description: "Comma separated platforms (devto,linkedin)"
