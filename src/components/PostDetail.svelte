@@ -384,11 +384,24 @@ void goBack;
   }
 
   :global(.markdown-content) {
-    word-break: break-word;
-    overflow-wrap: anywhere;
+    word-break: normal;
+    overflow-wrap: break-word;
     min-width: 0;
     max-width: 100%;
     color: #d4d4d8;
+  }
+
+  :global(html:lang(ko) .post-title) {
+    letter-spacing: 0;
+    line-height: 1.34;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  :global(html:lang(ko) .markdown-content) {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    line-break: auto;
   }
 
   :global(.markdown-content > *) {
