@@ -60,8 +60,7 @@ const DEFAULT_PUBLIC_BASE_URL = "https://wintrover.github.io/";
 const DEFAULT_LINKEDIN_PERSON_URN = "urn:li:person:binfyrHJAK";
 const DEFAULT_LINKEDIN_VERSION = "202502";
 const LINKEDIN_POSTS_API_URL =
-	process.env.LINKEDIN_POSTS_API_URL ||
-	"https://api.linkedin.com/restli/v2/posts";
+	process.env.LINKEDIN_POSTS_API_URL || "https://api.linkedin.com/rest/posts";
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
 export const DEPLOY_POSTS_ROOT_RELATIVE = "content/posts";
 const DEPLOY_POSTS_ROOT = path.resolve(
@@ -488,6 +487,7 @@ async function publishToLinkedIn(
 			Authorization: `Bearer ${accessToken}`,
 			"Content-Type": "application/json",
 			"X-Restli-Protocol-Version": "2.0.0",
+			"Linkedin-Version": linkedInVersion,
 			"LinkedIn-Version": linkedInVersion,
 		},
 		body: JSON.stringify(payload),

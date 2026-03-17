@@ -18,7 +18,7 @@ Feature: SNS deployment state machine
   Scenario: platform APIs are called with required identity and absolute image URLs
     Given deployment script posts to LinkedIn and Dev.to directly
     When LinkedIn request body is created
-    Then posting endpoint must use restli/v2/posts with Posts API payload schema
+    Then posting endpoint must use rest/posts with Posts API payload schema
     And author must use person URN resolved from v2/me and continue with fallback urn:li:person:binfyrHJAK when profile lookup fails
     And markdown image paths must be converted to absolute https://wintrover.github.io/ URLs
 
