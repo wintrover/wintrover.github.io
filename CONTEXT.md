@@ -28,7 +28,7 @@
 - 배포 상태는 소스코드가 없는 독립 `DB` 브랜치(이하 DB 브랜치)에서만 관리해야 한다.
 - 포스트별 플랫폼 상태는 `.deploy/[post-slug]/[platform].status`를 SSOT로 기록하고 `.success`/`.failed` 마커로 재시도 여부를 결정해야 한다.
 - 상태머신 규칙은 `.success`가 있으면 Skip, `.failed` 또는 상태 파일 부재면 재배포 시도를 수행해야 한다.
-- LinkedIn 배포는 `restli/v2/posts`를 사용하고 Posts API 페이로드(`author`, `commentary`, `visibility`)를 적용해야 하며 Author는 `v2/me`로 확인한 person URN을 우선 주입하고 `LINKEDIN_PERSON_URN`(기본값 `urn:li:person:binfyrHJAK`)을 fallback으로 사용해야 한다.
+- LinkedIn 배포는 `restli/v2/posts`를 사용하고 Posts API 페이로드(`author`, `commentary`, `visibility`)를 적용해야 하며 Author는 `v2/me`로 확인한 person URN을 우선 주입하되 프로필 조회 권한 이슈가 발생하면 `LINKEDIN_PERSON_URN`(기본값 `urn:li:person:binfyrHJAK`) fallback으로 배포를 지속해야 한다.
 - DEV.to 및 LinkedIn 본문의 이미지 링크는 `https://wintrover.github.io/` 기반 절대 경로로 치환해야 한다.
 - 모든 플랫폼 시도 결과는 `GITHUB_STEP_SUMMARY` 마크다운 표와 `DB` 브랜치의 `STATUS.md`에 동시 반영해야 하며, 상태 스냅샷은 `DB` 브랜치에서만 단일 커밋으로 영속화해야 한다.
 - SNS 배포 워크플로는 `deploy`와 `DB` 브랜치를 이중 체크아웃하고, 배포 후 `database` 저장소에서 `git pull --rebase` 기반 최대 3회 재시도 후 원자적으로 푸시해야 한다.

@@ -19,7 +19,7 @@ Feature: SNS deployment state machine
     Given deployment script posts to LinkedIn and Dev.to directly
     When LinkedIn request body is created
     Then posting endpoint must use restli/v2/posts with Posts API payload schema
-    And author must use person URN resolved from v2/me with fallback urn:li:person:binfyrHJAK
+    And author must use person URN resolved from v2/me and continue with fallback urn:li:person:binfyrHJAK when profile lookup fails
     And markdown image paths must be converted to absolute https://wintrover.github.io/ URLs
 
   Scenario: action persists deploy state to isolated DB branch

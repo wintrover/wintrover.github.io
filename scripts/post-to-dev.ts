@@ -271,26 +271,66 @@ async function resolveLinkedInPersonUrn(
 		process.env.LINKEDIN_VERSION ||
 		process.env.LINKEDIN_API_VERSION ||
 		DEFAULT_LINKEDIN_VERSION;
-	const profileResponse = await fetch("https://api.linkedin.com/v2/me", {
-		method: "GET",
-		headers: {
+	const readProfile = async (includeVersionHeader: boolean) => {
+		const headers: Record<string, string> = {
 			Authorization: `Bearer ${accessToken}`,
 			"X-Restli-Protocol-Version": "2.0.0",
-			"LinkedIn-Version": linkedInVersion,
-		},
-	});
-	if (!profileResponse.ok) {
-		const errorPayload = await profileResponse.text();
-		throw new Error(
-			`LinkedIn profile API failed (${profileResponse.status}): ${errorPayload}`,
+		};
+		if (includeVersionHeader) {
+			headers["Linkedin-Version"] = linkedInVersion;
+		}
+		const profileResponse = await fetch("https://api.linkedin.com/v2/me", {
+			method: "GET",
+			headers,
+		});
+		if (!profileResponse.ok) {
+			const errorPayload = await profileResponse.text();
+			return {
+				ok: false,
+				errorPayload,
+				status: profileResponse.status,
+				profileUrn: "",
+			};
+		}
+		const profile = (await profileResponse.json()) as LinkedInProfileResponse;
+		const profileUrn =
+			typeof profile.id === "string" && profile.id.trim()
+				? `urn:li:person:${profile.id.trim()}`
+				: "";
+		return {
+			ok: true,
+			errorPayload: "",
+			status: profileResponse.status,
+			profileUrn,
+		};
+	};
+	try {
+		let profileResult = await readProfile(true);
+		if (!profileResult.ok && /NO_VERSION/i.test(profileResult.errorPayload)) {
+			profileResult = await readProfile(false);
+		}
+		if (profileResult.ok && profileResult.profileUrn) {
+			return profileResult.profileUrn;
+		}
+		if (!profileResult.ok) {
+			logWarn(
+				"post-to-dev",
+				"LinkedIn profile lookup failed, fallback URN is used",
+				{
+					status: profileResult.status,
+					errorPayload: profileResult.errorPayload,
+				},
+			);
+		}
+	} catch (error) {
+		logWarn(
+			"post-to-dev",
+			"LinkedIn profile lookup threw error, fallback URN is used",
+			{
+				error,
+			},
 		);
 	}
-	const profile = (await profileResponse.json()) as LinkedInProfileResponse;
-	const profileUrn =
-		typeof profile.id === "string" && profile.id.trim()
-			? `urn:li:person:${profile.id.trim()}`
-			: "";
-	if (profileUrn) return profileUrn;
 	if (configuredUrn) return configuredUrn;
 	return DEFAULT_LINKEDIN_PERSON_URN;
 }
