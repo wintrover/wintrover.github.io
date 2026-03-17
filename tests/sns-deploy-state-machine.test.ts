@@ -74,6 +74,14 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(workflow).toContain("path: database");
 		expect(workflow).toContain("ref: DB");
 		expect(workflow).toContain("bun scripts/post-to-dev.ts");
+		expect(workflow).toContain("DEPLOY_TARGET:");
+		expect(workflow).toContain("github.event.inputs.target || 'content/posts'");
+		expect(workflow).toContain(
+			"github.event.inputs.platforms || 'devto,linkedin'",
+		);
+		expect(workflow).toContain(
+			'run: bun scripts/post-to-dev.ts "${DEPLOY_TARGET}" "${DEPLOY_PLATFORMS}"',
+		);
 		expect(workflow).toContain("STATE_DATA_ROOT: ./database");
 		expect(workflow).toContain(
 			"LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}",
@@ -93,12 +101,27 @@ describe("SNS 배포 상태 머신 검증", () => {
 
 	test("Given LinkedIn 배포 스크립트 When 검사 Then Posts API 스키마와 person URN 검증을 사용한다", () => {
 		const script = read("scripts/post-to-dev.ts");
-		expect(script).toContain("https://api.linkedin.com/restli/v2/posts");
+		expect(script).toContain("https://api.linkedin.com/rest/posts");
 		expect(script).toContain("https://api.linkedin.com/v2/me");
 		expect(script).toContain("commentary:");
 		expect(script).toContain('visibility: "PUBLIC"');
 		expect(script).toContain("distribution:");
 		expect(script).toContain('"LinkedIn-Version"');
+		expect(script).toContain('"Linkedin-Version"');
+		expect(script).toContain("fallback URN is used");
+		expect(script).toContain("normalizeLinkedInVersion(");
+		expect(script).toContain("normalizeLinkedInPostsApiUrl(");
+		expect(script).toContain("NONEXISTENT_VERSION");
+		expect(script).toContain("publishRequest(");
+		expect(script).toContain("buildLinkedInCommentary(");
+		expect(script).toContain("resolveEnglishLinkedInIntro(");
+		expect(script).toContain("linkedInIntro:");
+		expect(script).toContain('join("\\n\\n")');
+		expect(script).toContain("hasHangul(");
+		expect(script).toContain(
+			"I shared a new post about engineering decisions and quality automation. Read it here.",
+		);
+		expect(script).toContain("trimmed.slice(0, 6)");
 	});
 
 	test("Given 배포 스캔 When 기본 탐색 Then content/posts 하위 물리 파일만 수집한다", async () => {
@@ -119,6 +142,20 @@ describe("SNS 배포 상태 머신 검증", () => {
 				force: true,
 			});
 			fs.rmSync(outsideFile, { force: true });
+		}
+	});
+
+	test("Given 배포 스캔 When ko 경로 파일 존재 Then 배포 후보에서 제외되지 않는다", async () => {
+		const postsRoot = path.join(root, DEPLOY_POSTS_ROOT_RELATIVE);
+		const koDir = path.join(postsRoot, "ko", "project");
+		const koFile = path.join(koDir, "ko-inclusion-e2e.md");
+		fs.mkdirSync(koDir, { recursive: true });
+		fs.writeFileSync(koFile, "# ko inclusion");
+		try {
+			const discovered = await discoverPostFiles();
+			expect(discovered).toContain(koFile);
+		} finally {
+			fs.rmSync(koFile, { force: true });
 		}
 	});
 
@@ -169,7 +206,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(context).toContain("Git 파일시스템 상태머신");
 		expect(context).toContain(".deploy/lock");
 		expect(context).toContain(".deploy/[post-slug]/[platform].status");
-		expect(context).toContain("restli/v2/posts");
+		expect(context).toContain("rest/posts");
 		expect(context).toContain("v2/me");
 		expect(context).toContain("GITHUB_STEP_SUMMARY");
 		expect(context).toContain("배포 후보 물리 파일 목록 스냅샷");

@@ -42,6 +42,7 @@ type PreparedPost = {
 	filePath: string;
 	title: string;
 	description?: string;
+	linkedInIntro: string;
 	canonicalUrl: string;
 	tags: string[];
 	bodyMarkdown: string;
@@ -58,16 +59,34 @@ const DEPLOY_LOCK = path.join(DEPLOY_ROOT, "lock");
 const STATUS_SNAPSHOT_PATH = path.join(STATE_DATA_ROOT, "STATUS.md");
 const DEFAULT_PUBLIC_BASE_URL = "https://wintrover.github.io/";
 const DEFAULT_LINKEDIN_PERSON_URN = "urn:li:person:binfyrHJAK";
-const DEFAULT_LINKEDIN_VERSION = "202502";
-const LINKEDIN_POSTS_API_URL =
-	process.env.LINKEDIN_POSTS_API_URL ||
-	"https://api.linkedin.com/restli/v2/posts";
+const DEFAULT_LINKEDIN_VERSION = "202603";
+const LINKEDIN_POSTS_API_URL = normalizeLinkedInPostsApiUrl(
+	process.env.LINKEDIN_POSTS_API_URL || "https://api.linkedin.com/rest/posts",
+);
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
 export const DEPLOY_POSTS_ROOT_RELATIVE = "content/posts";
 const DEPLOY_POSTS_ROOT = path.resolve(
 	process.cwd(),
 	DEPLOY_POSTS_ROOT_RELATIVE,
 );
+
+function normalizeLinkedInVersion(rawVersion: string) {
+	const trimmed = rawVersion.trim();
+	if (/^\d{6}(\.\d{2})?$/.test(trimmed)) return trimmed;
+	if (/^\d{8}$/.test(trimmed)) return trimmed.slice(0, 6);
+	return DEFAULT_LINKEDIN_VERSION;
+}
+
+function normalizeLinkedInPostsApiUrl(rawUrl: string) {
+	try {
+		const url = new URL(rawUrl.trim());
+		url.pathname = "/rest/posts";
+		url.search = "";
+		return url.toString();
+	} catch {
+		return "https://api.linkedin.com/rest/posts";
+	}
+}
 
 function normalizePublicBaseUrl(url: string) {
 	try {
@@ -255,6 +274,43 @@ function sanitizeTextForLinkedIn(text: string) {
 		.trim();
 }
 
+function hasHangul(text: string) {
+	return /[가-힣]/.test(text);
+}
+
+function buildLinkedInCommentary(intro: string, canonicalUrl: string) {
+	const introLine = sanitizeTextForLinkedIn(intro);
+	const linkLine = sanitizeTextForLinkedIn(canonicalUrl);
+	return [introLine, linkLine].filter(Boolean).join("\n\n");
+}
+
+async function resolveEnglishLinkedInIntro(
+	filePath: string,
+	fallbackDescription: string | undefined,
+) {
+	const fallbackIntro =
+		"I shared a new post about engineering decisions and quality automation. Read it here.";
+	const relative = path.relative(DEPLOY_POSTS_ROOT, filePath);
+	let englishIntroSource = fallbackDescription || "";
+	if (relative.startsWith(`ko${path.sep}`)) {
+		const englishRelative = relative.slice(`ko${path.sep}`.length);
+		const englishPath = path.join(DEPLOY_POSTS_ROOT, englishRelative);
+		if (await fileExists(englishPath)) {
+			const englishMarkdownWithMeta = await fs.readFile(englishPath, "utf-8");
+			const { data: englishFrontmatter } = matter(englishMarkdownWithMeta);
+			const typedEnglishFrontmatter = englishFrontmatter as Frontmatter;
+			englishIntroSource = String(
+				typedEnglishFrontmatter.excerpt ||
+					typedEnglishFrontmatter.description ||
+					"",
+			).trim();
+		}
+	}
+	const normalizedIntro = sanitizeTextForLinkedIn(englishIntroSource);
+	if (!normalizedIntro || hasHangul(normalizedIntro)) return fallbackIntro;
+	return normalizedIntro;
+}
+
 function normalizeLinkedInPersonUrn(value: string) {
 	const trimmed = value.trim();
 	if (!trimmed) return "";
@@ -267,30 +323,71 @@ async function resolveLinkedInPersonUrn(
 	fallbackUrn: string,
 ) {
 	const configuredUrn = normalizeLinkedInPersonUrn(fallbackUrn);
-	const linkedInVersion =
+	const linkedInVersion = normalizeLinkedInVersion(
 		process.env.LINKEDIN_VERSION ||
-		process.env.LINKEDIN_API_VERSION ||
-		DEFAULT_LINKEDIN_VERSION;
-	const profileResponse = await fetch("https://api.linkedin.com/v2/me", {
-		method: "GET",
-		headers: {
+			process.env.LINKEDIN_API_VERSION ||
+			DEFAULT_LINKEDIN_VERSION,
+	);
+	const readProfile = async (includeVersionHeader: boolean) => {
+		const headers: Record<string, string> = {
 			Authorization: `Bearer ${accessToken}`,
 			"X-Restli-Protocol-Version": "2.0.0",
-			"LinkedIn-Version": linkedInVersion,
-		},
-	});
-	if (!profileResponse.ok) {
-		const errorPayload = await profileResponse.text();
-		throw new Error(
-			`LinkedIn profile API failed (${profileResponse.status}): ${errorPayload}`,
+		};
+		if (includeVersionHeader) {
+			headers["Linkedin-Version"] = linkedInVersion;
+		}
+		const profileResponse = await fetch("https://api.linkedin.com/v2/me", {
+			method: "GET",
+			headers,
+		});
+		if (!profileResponse.ok) {
+			const errorPayload = await profileResponse.text();
+			return {
+				ok: false,
+				errorPayload,
+				status: profileResponse.status,
+				profileUrn: "",
+			};
+		}
+		const profile = (await profileResponse.json()) as LinkedInProfileResponse;
+		const profileUrn =
+			typeof profile.id === "string" && profile.id.trim()
+				? `urn:li:person:${profile.id.trim()}`
+				: "";
+		return {
+			ok: true,
+			errorPayload: "",
+			status: profileResponse.status,
+			profileUrn,
+		};
+	};
+	try {
+		let profileResult = await readProfile(true);
+		if (!profileResult.ok && /NO_VERSION/i.test(profileResult.errorPayload)) {
+			profileResult = await readProfile(false);
+		}
+		if (profileResult.ok && profileResult.profileUrn) {
+			return profileResult.profileUrn;
+		}
+		if (!profileResult.ok) {
+			logWarn(
+				"post-to-dev",
+				"LinkedIn profile lookup failed, fallback URN is used",
+				{
+					status: profileResult.status,
+					errorPayload: profileResult.errorPayload,
+				},
+			);
+		}
+	} catch (error) {
+		logWarn(
+			"post-to-dev",
+			"LinkedIn profile lookup threw error, fallback URN is used",
+			{
+				error,
+			},
 		);
 	}
-	const profile = (await profileResponse.json()) as LinkedInProfileResponse;
-	const profileUrn =
-		typeof profile.id === "string" && profile.id.trim()
-			? `urn:li:person:${profile.id.trim()}`
-			: "";
-	if (profileUrn) return profileUrn;
 	if (configuredUrn) return configuredUrn;
 	return DEFAULT_LINKEDIN_PERSON_URN;
 }
@@ -299,16 +396,10 @@ export function buildLinkedInPostsPayload(
 	post: PreparedPost,
 	authorUrn: string,
 ) {
-	const bodyLines = [
-		post.title,
-		post.description || "",
-		post.canonicalUrl,
-		post.firstImageUrl || "",
-	].filter(Boolean);
 	return {
 		author:
 			normalizeLinkedInPersonUrn(authorUrn) || DEFAULT_LINKEDIN_PERSON_URN,
-		commentary: sanitizeTextForLinkedIn(bodyLines.join("\n\n")),
+		commentary: buildLinkedInCommentary(post.linkedInIntro, post.canonicalUrl),
 		visibility: "PUBLIC",
 		distribution: {
 			feedDistribution: "MAIN_FEED",
@@ -354,6 +445,10 @@ async function preparePost(filePath: string, publicBaseUrl: string) {
 		String(
 			typedFrontmatter.excerpt || typedFrontmatter.description || "",
 		).trim() || undefined;
+	const linkedInIntro = await resolveEnglishLinkedInIntro(
+		filePath,
+		descriptionRaw,
+	);
 	const coverImage =
 		typeof typedFrontmatter.cover_image === "string" &&
 		typedFrontmatter.cover_image
@@ -364,6 +459,7 @@ async function preparePost(filePath: string, publicBaseUrl: string) {
 		filePath,
 		title: clampTitle(titleRaw),
 		description: descriptionRaw,
+		linkedInIntro,
 		canonicalUrl,
 		tags,
 		bodyMarkdown,
@@ -438,24 +534,68 @@ async function publishToLinkedIn(
 	personUrn: string,
 ) {
 	const payload = buildLinkedInPostsPayload(post, personUrn);
-	const linkedInVersion =
+	const linkedInVersion = normalizeLinkedInVersion(
 		process.env.LINKEDIN_VERSION ||
-		process.env.LINKEDIN_API_VERSION ||
-		DEFAULT_LINKEDIN_VERSION;
-	const response = await fetch(LINKEDIN_POSTS_API_URL, {
-		method: "POST",
-		headers: {
+			process.env.LINKEDIN_API_VERSION ||
+			DEFAULT_LINKEDIN_VERSION,
+	);
+	const publishRequest = async (
+		url: string,
+		versionHeaderName: "Linkedin-Version" | "LinkedIn-Version" | null,
+	) => {
+		const headers: Record<string, string> = {
 			Authorization: `Bearer ${accessToken}`,
 			"Content-Type": "application/json",
 			"X-Restli-Protocol-Version": "2.0.0",
-			"LinkedIn-Version": linkedInVersion,
+		};
+		if (versionHeaderName) {
+			headers[versionHeaderName] = linkedInVersion;
+		}
+		return fetch(url, {
+			method: "POST",
+			headers,
+			body: JSON.stringify(payload),
+		});
+	};
+	const attempts: string[] = [];
+	const attemptChain: {
+		url: string;
+		versionHeaderName: "Linkedin-Version" | "LinkedIn-Version" | null;
+	}[] = [
+		{ url: LINKEDIN_POSTS_API_URL, versionHeaderName: "Linkedin-Version" },
+		{ url: LINKEDIN_POSTS_API_URL, versionHeaderName: "LinkedIn-Version" },
+		{
+			url: "https://api.linkedin.com/rest/posts",
+			versionHeaderName: "Linkedin-Version",
 		},
-		body: JSON.stringify(payload),
-	});
-	if (!response.ok) {
-		const errorPayload = await response.text();
+	];
+	let response: Response | null = null;
+	let errorPayload = "";
+	for (const attempt of attemptChain) {
+		response = await publishRequest(attempt.url, attempt.versionHeaderName);
+		if (response.ok) {
+			return {
+				url: post.canonicalUrl,
+				detail: `published:${payload.author}`,
+			};
+		}
+		errorPayload = await response.text();
+		attempts.push(
+			`header=${attempt.versionHeaderName ?? "none"},url=${attempt.url},status=${response.status},payload=${errorPayload}`,
+		);
+		const isVersionError = response.status === 400 || response.status === 426;
+		if (
+			!isVersionError ||
+			!/(VERSION_MISSING|NONEXISTENT_VERSION|INVALID_VERSION)/i.test(
+				errorPayload,
+			)
+		) {
+			break;
+		}
+	}
+	if (response) {
 		throw new Error(
-			`LinkedIn API failed (${response.status}): ${errorPayload}`,
+			`LinkedIn API failed (${response.status}): ${errorPayload}; attempts=${attempts.join(" || ")}`,
 		);
 	}
 	return {
@@ -664,7 +804,6 @@ async function collectMarkdownFiles(dirPath: string): Promise<string[]> {
 		entries.map(async (entry) => {
 			const fullPath = path.join(dirPath, entry.name);
 			if (entry.isDirectory()) {
-				if (fullPath.includes(`${path.sep}ko${path.sep}`)) return [];
 				return collectMarkdownFiles(fullPath);
 			}
 			if (entry.isFile() && entry.name.endsWith(".md")) return [fullPath];

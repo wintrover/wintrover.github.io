@@ -18,8 +18,10 @@ Feature: SNS deployment state machine
   Scenario: platform APIs are called with required identity and absolute image URLs
     Given deployment script posts to LinkedIn and Dev.to directly
     When LinkedIn request body is created
-    Then posting endpoint must use restli/v2/posts with Posts API payload schema
-    And author must use person URN resolved from v2/me with fallback urn:li:person:binfyrHJAK
+    Then posting endpoint must use rest/posts with Posts API payload schema
+    And author must use person URN resolved from v2/me and continue with fallback urn:li:person:binfyrHJAK when profile lookup fails
+    And LinkedIn commentary intro must be English-only
+    And LinkedIn commentary must place canonical link in a separate paragraph with one blank line
     And markdown image paths must be converted to absolute https://wintrover.github.io/ URLs
 
   Scenario: action persists deploy state to isolated DB branch
@@ -39,7 +41,9 @@ Feature: SNS deployment state machine
   Scenario: deploy target discovery is isolated to physical files under content/posts
     Given deployment script resolves candidates from current working directory
     When target path is omitted or provided explicitly
+    And workflow is triggered by push event without manual inputs
     Then only existing .md files under content/posts may enter deployment
+    And ko locale subtree under content/posts must remain deploy-eligible
     And paths outside content/posts must be rejected
     And GITHUB_STEP_SUMMARY must include scanned root and candidate file snapshot
     And terminal logs must include scanned root and candidate file snapshot
