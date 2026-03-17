@@ -14,6 +14,8 @@
 		"test:all": "npm run test",
 		"test:coverage": "vitest run --coverage",
 		"post:devto": "tsx scripts/post-to-dev.ts",
+		"gate:procedure:ci": "tsx scripts/procedure-gate.ts --mode=ci",
+		"gate:procedure:staged": "tsx scripts/procedure-gate.ts --mode=staged",
 		"images:generate:ci": "tsx scripts/image-tools.ts generate-images-ci",
 		"svg:to-png": "tsx scripts/image-tools.ts svg-to-png",
 		"mcp:code-index": "code-index-mcp",

@@ -100,4 +100,5 @@
 - **3단계 (TDD)**: 정의된 시나리오에 따라 실패하는 테스트 코드를 먼저 작성한다.
 - **4단계 (Implementation)**: 테스트를 통과하기 위한 **최소한의 코드 변경**만 반영한다.
 - **5단계 (Verification)**: 최종 검증 시 테스트 통과 및 `scripts/build-github.ts` 실행 결과가 이 문서와 일치하는지 확인한다.
+- 구현 파일 변경은 `CONTEXT.md`, `tests/features/*.feature`, `tests/**/*.test.ts` 변경 증거가 함께 있어야 하며, 해당 검증은 `scripts/procedure-gate.ts`와 CI 워크플로로 자동 차단한다.
 - 이 절차 중 하나라도 누락되거나 순서가 뒤바뀔 경우, 에이전트는 즉시 작업을 중단하고 절차를 복구해야 한다.

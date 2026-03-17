@@ -49,3 +49,10 @@ repos:
         pass_filenames: false
         always_run: true
         priority: 0
+    -   id: procedure-gate
+        name: procedure-gate
+        entry: node -e "require('node:child_process').execSync('npm run -s gate:procedure:staged',{stdio:'inherit',shell:true})"
+        language: system
+        pass_filenames: false
+        always_run: true
+        priority: 0
