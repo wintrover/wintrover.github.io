@@ -31,33 +31,33 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Checkout deploy state branch
+      - name: Checkout DB state branch
         id: checkout_state
         continue-on-error: true
         uses: actions/checkout@v4
         with:
-          ref: deploy
-          path: state-data
+          ref: DB
+          path: database
           fetch-depth: 0
 
-      - name: Initialize deploy state branch when missing
+      - name: Initialize DB state branch when missing
         if: steps.checkout_state.outcome == 'failure'
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf state-data
-          mkdir -p state-data
-          cd state-data
+          rm -rf database
+          mkdir -p database
+          cd database
           git init
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git checkout --orphan deploy
+          git checkout --orphan DB
           mkdir -p .deploy
           touch STATUS.md
           git add .deploy STATUS.md
           git commit -m "chore(deploy): bootstrap state branch [skip ci]"
-          git push origin HEAD:deploy
+          git push origin HEAD:DB
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -70,7 +70,7 @@ jobs:
       - name: Run SNS deployment
         env:
           BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/
-          STATE_DATA_ROOT: ./state-data
+          STATE_DATA_ROOT: ./database
           DEPLOY_PLATFORMS: ${{ inputs.platforms }}
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
@@ -82,10 +82,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p state-data/.deploy
-          if [ -d .deploy ]; then cp -R .deploy/. state-data/.deploy/; fi
-          if [ -f STATUS.md ]; then cp STATUS.md state-data/STATUS.md; fi
-          cd state-data
+          mkdir -p database/.deploy
+          if [ -d .deploy ]; then cp -R .deploy/. database/.deploy/; fi
+          if [ -f STATUS.md ]; then cp STATUS.md database/STATUS.md; fi
+          cd database
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .deploy STATUS.md
@@ -95,7 +95,7 @@ jobs:
           fi
           git commit -m "chore(deploy): persist sns status snapshot [skip ci]"
           for attempt in 1 2 3; do
-            if git push origin HEAD:deploy; then
+            if git push origin HEAD:DB; then
               echo "Push succeeded on attempt ${attempt}."
               exit 0
             fi
@@ -103,5 +103,5 @@ jobs:
               echo "Push failed after 3 attempts."
               exit 1
             fi
-            git pull --rebase origin deploy
+            git pull --rebase origin DB
           done

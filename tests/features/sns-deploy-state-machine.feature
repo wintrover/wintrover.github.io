@@ -21,14 +21,15 @@ Feature: SNS deployment state machine
     Then author must use LINKEDIN_PERSON_URN with fallback urn:li:person:binfyrHJAK
     And markdown image paths must be converted to absolute https://wintrover.github.io/ URLs
 
-  Scenario: action persists deploy state to isolated deploy branch
-    Given workflow checks out main source and deploy state branches separately
+  Scenario: action persists deploy state to isolated DB branch
+    Given workflow checks out main source and DB state branches separately
     When deployment script completes with STATE_DATA_ROOT path
     Then GITHUB_STEP_SUMMARY must include a markdown result table
-    And state-data/STATUS.md must visualize post by platform status
-    And state-data branch must commit and push .deploy and STATUS.md only
+    And database/STATUS.md must visualize post by platform status
+    And DB branch must commit and push .deploy and STATUS.md only
+    And if DB branch does not exist, workflow must bootstrap it as orphan branch
 
   Scenario: state persistence push handles conflict with bounded rebase retries
-    Given deploy branch may advance during workflow execution
+    Given DB branch may advance during workflow execution
     When state push fails on first attempt
     Then workflow must run git pull --rebase and retry push up to 3 times
