@@ -55,6 +55,11 @@ const STATUS_SNAPSHOT_PATH = path.join(STATE_DATA_ROOT, "STATUS.md");
 const DEFAULT_PUBLIC_BASE_URL = "https://wintrover.github.io/";
 const DEFAULT_LINKEDIN_PERSON_URN = "urn:li:person:binfyrHJAK";
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
+export const DEPLOY_POSTS_ROOT_RELATIVE = "content/posts";
+const DEPLOY_POSTS_ROOT = path.resolve(
+	process.cwd(),
+	DEPLOY_POSTS_ROOT_RELATIVE,
+);
 
 function normalizePublicBaseUrl(url: string) {
 	try {
@@ -534,10 +539,62 @@ export function buildStatusMarkdown(records: DeploymentRecord[]) {
 	].join("\n");
 }
 
-async function writeGithubSummary(records: DeploymentRecord[]) {
+function toWorkspaceRelative(filePath: string) {
+	const relative = path.relative(process.cwd(), filePath);
+	return relative.replace(/\\/g, "/");
+}
+
+export function buildDeploymentInputSnapshotMarkdown(
+	scannedRoot: string,
+	candidateFiles: string[],
+) {
+	const root = toWorkspaceRelative(scannedRoot);
+	const rows = candidateFiles
+		.map((candidate) => toWorkspaceRelative(candidate))
+		.sort((a, b) => a.localeCompare(b))
+		.map((candidate) => `| ${candidate} |`);
+	return [
+		"## Deployment Input Snapshot",
+		"",
+		"| Scanned Root |",
+		"| --- |",
+		`| ${root} |`,
+		"",
+		"| Candidate File |",
+		"| --- |",
+		...rows,
+		"",
+	].join("\n");
+}
+
+export function buildDeploymentInputSnapshotLog(
+	scannedRoot: string,
+	candidateFiles: string[],
+) {
+	const root = toWorkspaceRelative(scannedRoot);
+	const candidates = candidateFiles
+		.map((candidate) => toWorkspaceRelative(candidate))
+		.sort((a, b) => a.localeCompare(b));
+	return [
+		`[deploy-input] scanned-root=${root}`,
+		...candidates.map((candidate) => `[deploy-input] candidate=${candidate}`),
+		"",
+	].join("\n");
+}
+
+async function writeGithubSummary(
+	records: DeploymentRecord[],
+	scannedRoot: string,
+	candidateFiles: string[],
+) {
 	const summaryPath = process.env.GITHUB_STEP_SUMMARY;
 	if (!summaryPath) return;
+	const snapshotMarkdown = buildDeploymentInputSnapshotMarkdown(
+		scannedRoot,
+		candidateFiles,
+	);
 	const lines = [
+		snapshotMarkdown,
 		"## SNS Deployment Result",
 		"",
 		"| Post | Platform | State | Detail |",
@@ -567,16 +624,33 @@ async function collectMarkdownFiles(dirPath: string): Promise<string[]> {
 	return nested.flat();
 }
 
-async function discoverPostFiles(targetInput?: string) {
-	if (targetInput) {
-		const resolved = path.resolve(targetInput);
-		const stat = await fs.stat(resolved);
-		if (stat.isDirectory()) {
-			return collectMarkdownFiles(resolved);
-		}
-		return [resolved];
+function isPathInsideDeployPostsRoot(resolvedPath: string) {
+	const relative = path.relative(DEPLOY_POSTS_ROOT, resolvedPath);
+	return (
+		relative === "" ||
+		(!relative.startsWith("..") && !path.isAbsolute(relative))
+	);
+}
+
+export async function discoverPostFiles(targetInput?: string) {
+	const effectiveTarget = targetInput
+		? path.resolve(targetInput)
+		: DEPLOY_POSTS_ROOT;
+	if (!isPathInsideDeployPostsRoot(effectiveTarget)) {
+		throw new Error(
+			`Deployment target must be inside ${DEPLOY_POSTS_ROOT_RELATIVE}: ${effectiveTarget}`,
+		);
 	}
-	return collectMarkdownFiles(path.resolve("src/posts"));
+	const stat = await fs.stat(effectiveTarget);
+	if (stat.isDirectory()) {
+		return collectMarkdownFiles(effectiveTarget);
+	}
+	if (!effectiveTarget.toLowerCase().endsWith(".md")) {
+		throw new Error(
+			`Deployment target must be a markdown file: ${effectiveTarget}`,
+		);
+	}
+	return [effectiveTarget];
 }
 
 function parsePlatforms(raw?: string): Platform[] {
@@ -723,6 +797,9 @@ async function runDeployment(targetInput?: string, platformsArg?: string) {
 	const publicBaseUrl = normalizePublicBaseUrl(
 		process.env.BLOG_PUBLIC_BASE_URL || DEFAULT_PUBLIC_BASE_URL,
 	);
+	const scannedRoot = targetInput
+		? path.resolve(targetInput)
+		: DEPLOY_POSTS_ROOT;
 	const postFiles = await discoverPostFiles(targetInput);
 	const allPostFiles = await discoverPostFiles();
 	if (postFiles.length === 0) {
@@ -731,6 +808,7 @@ async function runDeployment(targetInput?: string, platformsArg?: string) {
 	const platforms = parsePlatforms(
 		platformsArg || process.env.DEPLOY_PLATFORMS,
 	);
+	process.stdout.write(buildDeploymentInputSnapshotLog(scannedRoot, postFiles));
 	const records: DeploymentRecord[] = [];
 	await acquireSoftLock();
 	try {
@@ -741,7 +819,7 @@ async function runDeployment(targetInput?: string, platformsArg?: string) {
 				records.push(record);
 			}
 		}
-		await writeGithubSummary(records);
+		await writeGithubSummary(records, scannedRoot, postFiles);
 		await updateStatusSnapshot(
 			allPostFiles.map((filePath) => path.basename(filePath, ".md")),
 		);
