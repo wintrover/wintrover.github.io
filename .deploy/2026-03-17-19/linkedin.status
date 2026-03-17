@@ -1,6 +1,6 @@
 {
   "state": "failed",
-  "updatedAt": "2026-03-17T13:11:32.106Z",
+  "updatedAt": "2026-03-17T13:18:59.863Z",
   "detail": "LinkedIn profile API failed (403): {\"status\":403,\"serviceErrorCode\":100,\"code\":\"ACCESS_DENIED\",\"message\":\"Not enough permissions to access: me.GET.NO_VERSION\"}",
   "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/content/posts/ko/project/2026-03-17-19.md"
 }
