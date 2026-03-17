@@ -244,12 +244,42 @@ describe("PostDetail Component", () => {
 		expect(pre).not.toBeNull();
 		expect(table).not.toBeNull();
 		expect(getComputedStyle(markdown as HTMLElement).overflowWrap).toBe(
-			"anywhere",
+			"break-word",
 		);
 		expect(getComputedStyle(pre as HTMLElement).maxWidth).toBe("100%");
 		expect(getComputedStyle(pre as HTMLElement).boxSizing).toBe("border-box");
 		expect(getComputedStyle(table as HTMLElement).display).toBe("block");
 		expect(getComputedStyle(table as HTMLElement).overflowX).toBe("auto");
+	});
+
+	test("한국어 문서에서는 markdown 줄바꿈이 글자 단위로 과분할되지 않아야 함", async () => {
+		document.documentElement.lang = "ko";
+		const koreanPost = {
+			...mockPost,
+			title: "한국어 타이포 테스트",
+			html: `
+				<div class="markdown-content">
+					<p>한국어 문장은 자연스러운 어절 단위로 줄바꿈되어야 합니다.</p>
+					<pre><code>${"a".repeat(260)}</code></pre>
+				</div>
+			`,
+		};
+		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(koreanPost);
+
+		render(PostDetail, { params: { slug: "korean-post" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("한국어 타이포 테스트")).toBeInTheDocument();
+		});
+
+		const markdown = document.querySelector(".markdown-content");
+		expect(markdown).not.toBeNull();
+		expect(getComputedStyle(markdown as HTMLElement).wordBreak).toBe(
+			"keep-all",
+		);
+		expect(getComputedStyle(markdown as HTMLElement).overflowWrap).toBe(
+			"break-word",
+		);
 	});
 
 	test("포스트 데이터 로딩 중 에러 발생 시 처리 확인", async () => {
