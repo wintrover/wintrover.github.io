@@ -106,6 +106,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(script).toContain("commentary:");
 		expect(script).toContain('visibility: "PUBLIC"');
 		expect(script).toContain("distribution:");
+		expect(script).toContain('"LinkedIn-Version"');
 		expect(script).toContain('"Linkedin-Version"');
 		expect(script).toContain("fallback URN is used");
 		expect(script).toContain("normalizeLinkedInVersion(");

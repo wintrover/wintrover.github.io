@@ -509,7 +509,7 @@ async function publishToLinkedIn(
 			"X-Restli-Protocol-Version": "2.0.0",
 		};
 		if (includeVersionHeader) {
-			headers["Linkedin-Version"] = linkedInVersion;
+			headers["LinkedIn-Version"] = linkedInVersion;
 		}
 		return fetch(url, {
 			method: "POST",
