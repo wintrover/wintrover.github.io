@@ -48,12 +48,20 @@ type PreparedPost = {
 	firstImageUrl: string | null;
 };
 
+type LinkedInProfileResponse = {
+	id?: string;
+};
+
 const STATE_DATA_ROOT = path.resolve(process.env.STATE_DATA_ROOT || ".");
 const DEPLOY_ROOT = path.join(STATE_DATA_ROOT, ".deploy");
 const DEPLOY_LOCK = path.join(DEPLOY_ROOT, "lock");
 const STATUS_SNAPSHOT_PATH = path.join(STATE_DATA_ROOT, "STATUS.md");
 const DEFAULT_PUBLIC_BASE_URL = "https://wintrover.github.io/";
 const DEFAULT_LINKEDIN_PERSON_URN = "urn:li:person:binfyrHJAK";
+const DEFAULT_LINKEDIN_VERSION = "202502";
+const LINKEDIN_POSTS_API_URL =
+	process.env.LINKEDIN_POSTS_API_URL ||
+	"https://api.linkedin.com/restli/v2/posts";
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
 export const DEPLOY_POSTS_ROOT_RELATIVE = "content/posts";
 const DEPLOY_POSTS_ROOT = path.resolve(
@@ -247,6 +255,71 @@ function sanitizeTextForLinkedIn(text: string) {
 		.trim();
 }
 
+function normalizeLinkedInPersonUrn(value: string) {
+	const trimmed = value.trim();
+	if (!trimmed) return "";
+	if (trimmed.startsWith("urn:li:person:")) return trimmed;
+	return `urn:li:person:${trimmed}`;
+}
+
+async function resolveLinkedInPersonUrn(
+	accessToken: string,
+	fallbackUrn: string,
+) {
+	const configuredUrn = normalizeLinkedInPersonUrn(fallbackUrn);
+	const linkedInVersion =
+		process.env.LINKEDIN_VERSION ||
+		process.env.LINKEDIN_API_VERSION ||
+		DEFAULT_LINKEDIN_VERSION;
+	const profileResponse = await fetch("https://api.linkedin.com/v2/me", {
+		method: "GET",
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			"X-Restli-Protocol-Version": "2.0.0",
+			"LinkedIn-Version": linkedInVersion,
+		},
+	});
+	if (!profileResponse.ok) {
+		const errorPayload = await profileResponse.text();
+		throw new Error(
+			`LinkedIn profile API failed (${profileResponse.status}): ${errorPayload}`,
+		);
+	}
+	const profile = (await profileResponse.json()) as LinkedInProfileResponse;
+	const profileUrn =
+		typeof profile.id === "string" && profile.id.trim()
+			? `urn:li:person:${profile.id.trim()}`
+			: "";
+	if (profileUrn) return profileUrn;
+	if (configuredUrn) return configuredUrn;
+	return DEFAULT_LINKEDIN_PERSON_URN;
+}
+
+export function buildLinkedInPostsPayload(
+	post: PreparedPost,
+	authorUrn: string,
+) {
+	const bodyLines = [
+		post.title,
+		post.description || "",
+		post.canonicalUrl,
+		post.firstImageUrl || "",
+	].filter(Boolean);
+	return {
+		author:
+			normalizeLinkedInPersonUrn(authorUrn) || DEFAULT_LINKEDIN_PERSON_URN,
+		commentary: sanitizeTextForLinkedIn(bodyLines.join("\n\n")),
+		visibility: "PUBLIC",
+		distribution: {
+			feedDistribution: "MAIN_FEED",
+			targetEntities: [],
+			thirdPartyDistributionChannels: [],
+		},
+		lifecycleState: "PUBLISHED",
+		isReshareDisabledByAuthor: false,
+	};
+}
+
 async function preparePost(filePath: string, publicBaseUrl: string) {
 	const markdownWithMeta = await fs.readFile(filePath, "utf-8");
 	const { data: frontmatter, content } = matter(markdownWithMeta);
@@ -364,41 +437,18 @@ async function publishToLinkedIn(
 	accessToken: string,
 	personUrn: string,
 ) {
-	const bodyLines = [
-		post.title,
-		post.description || "",
-		post.canonicalUrl,
-		post.firstImageUrl || "",
-	].filter(Boolean);
-	const commentary = sanitizeTextForLinkedIn(bodyLines.join("\n\n"));
-	const payload = {
-		author: personUrn || DEFAULT_LINKEDIN_PERSON_URN,
-		lifecycleState: "PUBLISHED",
-		specificContent: {
-			"com.linkedin.ugc.ShareContent": {
-				shareCommentary: {
-					text: commentary,
-				},
-				shareMediaCategory: "ARTICLE",
-				media: [
-					{
-						status: "READY",
-						originalUrl: post.canonicalUrl,
-						title: { text: post.title },
-					},
-				],
-			},
-		},
-		visibility: {
-			"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
-		},
-	};
-	const response = await fetch("https://api.linkedin.com/v2/ugcPosts", {
+	const payload = buildLinkedInPostsPayload(post, personUrn);
+	const linkedInVersion =
+		process.env.LINKEDIN_VERSION ||
+		process.env.LINKEDIN_API_VERSION ||
+		DEFAULT_LINKEDIN_VERSION;
+	const response = await fetch(LINKEDIN_POSTS_API_URL, {
 		method: "POST",
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
 			"Content-Type": "application/json",
 			"X-Restli-Protocol-Version": "2.0.0",
+			"LinkedIn-Version": linkedInVersion,
 		},
 		body: JSON.stringify(payload),
 	});
@@ -410,7 +460,7 @@ async function publishToLinkedIn(
 	}
 	return {
 		url: post.canonicalUrl,
-		detail: "published",
+		detail: `published:${payload.author}`,
 	};
 }
 
@@ -764,9 +814,13 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 			return record;
 		}
 		const accessToken = process.env.LINKEDIN_ACCESS_TOKEN;
-		const personUrn =
+		const configuredUrn =
 			process.env.LINKEDIN_PERSON_URN || DEFAULT_LINKEDIN_PERSON_URN;
 		if (!accessToken) throw new Error("LINKEDIN_ACCESS_TOKEN is not set");
+		const personUrn = await resolveLinkedInPersonUrn(
+			accessToken,
+			configuredUrn,
+		);
 		const result = await publishToLinkedIn(post, accessToken, personUrn);
 		const record: DeploymentRecord = {
 			slug: post.slug,
