@@ -22,7 +22,8 @@ Feature: SNS deployment state machine
     And markdown image paths must be converted to absolute https://wintrover.github.io/ URLs
 
   Scenario: action persists deploy state to isolated DB branch
-    Given workflow checks out main source and DB state branches separately
+    Given workflow triggers on push to deploy branch and supports workflow_dispatch
+    And workflow checks out deploy source and DB state branches separately
     When deployment script completes with STATE_DATA_ROOT path
     Then GITHUB_STEP_SUMMARY must include a markdown result table
     And database/STATUS.md must visualize post by platform status

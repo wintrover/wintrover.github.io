@@ -60,7 +60,11 @@ describe("SNS 배포 상태 머신 검증", () => {
 
 	test("Given workflow 파일 When 검사 Then 상태 파일 커밋과 시크릿 주입을 포함한다", () => {
 		const workflow = read(".github/workflows/sns-deploy.yml");
+		expect(workflow).toContain("push:");
+		expect(workflow).toContain("branches:");
+		expect(workflow).toContain("- deploy");
 		expect(workflow).toContain("workflow_dispatch:");
+		expect(workflow).toContain("ref: deploy");
 		expect(workflow).toContain("path: database");
 		expect(workflow).toContain("ref: DB");
 		expect(workflow).toContain("bun scripts/post-to-dev.ts");

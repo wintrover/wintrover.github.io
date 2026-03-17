@@ -1,6 +1,9 @@
 name: SNS Deploy State Machine
 
 on:
+  push:
+    branches:
+      - deploy
   workflow_dispatch:
     inputs:
       target:
@@ -25,10 +28,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main branch
+      - name: Checkout deploy branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: deploy
           fetch-depth: 0
 
       - name: Checkout DB state branch
