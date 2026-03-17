@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import dotenv from "dotenv";
 import matter from "gray-matter";
-import { logError } from "../src/lib/log";
+import { logError, logWarn } from "../src/lib/log";
 import { processMermaidDiagrams } from "./image-tools";
 
 type Frontmatter = Record<string, unknown> & {
@@ -24,9 +24,39 @@ type DevToArticleResponse = {
 	url?: string;
 };
 
+type Platform = "devto" | "linkedin";
+
+type PublishState = "success" | "failed" | "skipped" | "unknown";
+
+type DeploymentRecord = {
+	slug: string;
+	platform: Platform;
+	state: PublishState;
+	updatedAt: string;
+	detail: string;
+	postPath: string;
+};
+
+type PreparedPost = {
+	slug: string;
+	filePath: string;
+	title: string;
+	description?: string;
+	canonicalUrl: string;
+	tags: string[];
+	bodyMarkdown: string;
+	firstImageUrl: string | null;
+};
+
+const DEPLOY_ROOT = ".deploy";
+const DEPLOY_LOCK = path.join(DEPLOY_ROOT, "lock");
+const DEFAULT_PUBLIC_BASE_URL = "https://wintrover.github.io/";
+const DEFAULT_LINKEDIN_PERSON_URN = "urn:li:person:binfyrHJAK";
+const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
+
 function normalizePublicBaseUrl(url: string) {
 	try {
-		if (typeof url !== "string" || !url) return "https://wintrover.github.io/";
+		if (typeof url !== "string" || !url) return DEFAULT_PUBLIC_BASE_URL;
 		const trimmed = url.trim().replace(/["']/g, "");
 		const u = new URL(
 			trimmed.startsWith("http")
@@ -38,7 +68,7 @@ function normalizePublicBaseUrl(url: string) {
 		}
 		return u.toString();
 	} catch {
-		return "https://wintrover.github.io/";
+		return DEFAULT_PUBLIC_BASE_URL;
 	}
 }
 
@@ -174,159 +204,553 @@ export async function absolutizeImagesInMarkdown(
 	return out;
 }
 
-async function postToDev(filePath: string) {
-	const devtoApiKey = process.env.DEVTO_API_KEY;
-	const publicBaseUrlRaw =
-		process.env.BLOG_PUBLIC_BASE_URL || "https://wintrover.github.io/";
-	const publicBaseUrl = normalizePublicBaseUrl(publicBaseUrlRaw);
-	if (!devtoApiKey) {
-		logError("post-to-dev", "DEVTO_API_KEY is not set.", {
-			error: new Error("DEVTO_API_KEY is not set."),
-		});
-		process.exit(1);
+function clampTitle(title: string) {
+	if (!title) return "";
+	return title.length <= 128 ? title : `${title.slice(0, 125)}...`;
+}
+
+function toTags(rawTags: Frontmatter["tags"]) {
+	const normalizedTags = Array.isArray(rawTags)
+		? rawTags
+		: typeof rawTags === "string"
+			? rawTags.split(/[,\s]+/).filter(Boolean)
+			: [];
+	const sanitized = Array.from(
+		new Set(
+			normalizedTags
+				.map((t: unknown) =>
+					String(t)
+						.toLowerCase()
+						.replace(/[^a-z0-9]/g, ""),
+				)
+				.filter(Boolean),
+		),
+	);
+	return sanitized.slice(0, 4);
+}
+
+function sanitizeTextForLinkedIn(text: string) {
+	return text
+		.replace(/```[\s\S]*?```/g, " ")
+		.replace(/`[^`]+`/g, " ")
+		.replace(/!\[[^\]]*]\(([^)]+)\)/g, "$1")
+		.replace(/\[[^\]]+]\(([^)]+)\)/g, "$1")
+		.replace(/<[^>]+>/g, " ")
+		.replace(/\s+/g, " ")
+		.trim();
+}
+
+async function preparePost(filePath: string, publicBaseUrl: string) {
+	const markdownWithMeta = await fs.readFile(filePath, "utf-8");
+	const { data: frontmatter, content } = matter(markdownWithMeta);
+	const typedFrontmatter = frontmatter as Frontmatter;
+	const tags = toTags(typedFrontmatter.tags);
+	const mermaidOutputDir = path.join("public", "images");
+	const baseName = path.basename(filePath, path.extname(filePath));
+	const m = baseName.match(/^(\d{4}-\d{2}-\d{2})(?:-(\d+))?/);
+	const datePart = m?.[1] || String(typedFrontmatter.date || "");
+	const numPart = m?.[2] || "0";
+	const filenameBase = `${datePart}-${numPart}`;
+	const { content: processedContent } = await processMermaidDiagrams(
+		content,
+		publicBaseUrl,
+		mermaidOutputDir,
+		filenameBase,
+	);
+	const firstImageRef = { url: null as string | null };
+	const bodyMarkdown = await absolutizeImagesInMarkdown(
+		processedContent,
+		publicBaseUrl,
+		firstImageRef,
+	);
+	const titleRaw =
+		String(typedFrontmatter.title || "").trim() ||
+		path.basename(filePath, path.extname(filePath));
+	const slug = path.basename(filePath, path.extname(filePath));
+	const canonicalUrl =
+		String(typedFrontmatter.canonical_url || "").trim() ||
+		`${publicBaseUrl}post/${slugifyTitle(titleRaw)}/`;
+	const descriptionRaw =
+		String(
+			typedFrontmatter.excerpt || typedFrontmatter.description || "",
+		).trim() || undefined;
+	const coverImage =
+		typeof typedFrontmatter.cover_image === "string" &&
+		typedFrontmatter.cover_image
+			? absolutizeSrc(typedFrontmatter.cover_image, publicBaseUrl)
+			: firstImageRef.url;
+	return {
+		slug,
+		filePath,
+		title: clampTitle(titleRaw),
+		description: descriptionRaw,
+		canonicalUrl,
+		tags,
+		bodyMarkdown,
+		firstImageUrl: coverImage,
+	} satisfies PreparedPost;
+}
+
+async function publishToDevto(post: PreparedPost, apiKey: string) {
+	const article = {
+		title: post.title,
+		published: false,
+		body_markdown: post.bodyMarkdown,
+		tags: post.tags,
+		description: post.description,
+		canonical_url: post.canonicalUrl,
+		cover_image: post.firstImageUrl || undefined,
+	};
+	const checkResponse = await fetch(
+		"https://dev.to/api/articles/me/all?per_page=1000",
+		{
+			headers: { "api-key": apiKey },
+		},
+	);
+	let existingId: number | null = null;
+	if (checkResponse.ok) {
+		const rawArticles = await checkResponse.json();
+		const articles = Array.isArray(rawArticles)
+			? rawArticles.filter(
+					(v): v is DevToArticleSummary =>
+						typeof v === "object" &&
+						v !== null &&
+						typeof (v as DevToArticleSummary).id === "number" &&
+						typeof (v as DevToArticleSummary).title === "string",
+				)
+			: [];
+		const found = articles.find((a) => a.title === article.title);
+		if (found) existingId = found.id;
 	}
-	try {
-		const markdownWithMeta = await fs.readFile(filePath, "utf-8");
-		const { data: frontmatter, content } = matter(markdownWithMeta);
-		const typedFrontmatter = frontmatter as Frontmatter;
-		const rawTags = typedFrontmatter.tags;
-		const normalizedTags = Array.isArray(rawTags)
-			? rawTags
-			: typeof rawTags === "string"
-				? rawTags.split(/[,\s]+/).filter(Boolean)
-				: [];
-		const sanitized = Array.from(
-			new Set(
-				normalizedTags
-					.map((t: unknown) =>
-						String(t)
-							.toLowerCase()
-							.replace(/[^a-z0-9]/g, ""),
-					)
-					.filter(Boolean),
-			),
-		);
-		const tags = sanitized.slice(0, 4);
-		console.log("🔄 Processing Mermaid diagrams...");
-		const mermaidOutputDir = path.join("public", "images");
-		const baseName = path.basename(filePath, path.extname(filePath));
-		const m = baseName.match(/^(\d{4}-\d{2}-\d{2})(?:-(\d+))?/);
-		const datePart = m?.[1] || String(typedFrontmatter.date || "");
-		const numPart = m?.[2] || "0";
-		const filenameBase = `${datePart}-${numPart}`;
-		const { content: processedContent, images: mermaidImages } =
-			await processMermaidDiagrams(
-				content,
-				publicBaseUrl,
-				mermaidOutputDir,
-				filenameBase,
-			);
-		if (mermaidImages.length > 0) {
-			console.log(
-				`✅ Successfully converted ${mermaidImages.length} Mermaid diagram(s) to images`,
-			);
-			mermaidImages.forEach((img) => {
-				console.log(`   📊 ${img.filename} -> ${img.url}`);
-			});
-		} else {
-			console.log("ℹ️  No Mermaid diagrams found in content");
-		}
-		const firstImageRef = { url: null as string | null };
-		const bodyMarkdown = await absolutizeImagesInMarkdown(
-			processedContent,
-			publicBaseUrl,
-			firstImageRef,
-		);
-		const slug = slugifyTitle(
-			typedFrontmatter.title || path.basename(filePath, path.extname(filePath)),
-		);
-		const canonicalUrl =
-			typedFrontmatter.canonical_url || `${publicBaseUrl}#/post/${slug}`;
-		const clampTitle = (t: string) => {
-			if (!t) return "";
-			return t.length <= 128 ? t : `${t.slice(0, 125)}...`;
-		};
-		const article = {
-			title: clampTitle(String(typedFrontmatter.title ?? "")),
-			published: false,
-			body_markdown: bodyMarkdown,
-			tags,
-			description:
-				typedFrontmatter.excerpt || typedFrontmatter.description || undefined,
-			canonical_url: canonicalUrl,
-			cover_image:
-				typedFrontmatter.cover_image || firstImageRef.url || undefined,
-		};
-
-		// Check if article exists
-		console.log(`🔍 Checking if article "${article.title}" already exists...`);
-		const checkResponse = await fetch(
-			"https://dev.to/api/articles/me/all?per_page=1000",
-			{
-				headers: { "api-key": devtoApiKey },
-			},
-		);
-
-		let existingId = null;
-		if (checkResponse.ok) {
-			const rawArticles = await checkResponse.json();
-			const articles = Array.isArray(rawArticles)
-				? rawArticles.filter(
-						(v): v is DevToArticleSummary =>
-							typeof v === "object" &&
-							v !== null &&
-							typeof (v as DevToArticleSummary).id === "number" &&
-							typeof (v as DevToArticleSummary).title === "string",
-					)
-				: [];
-			const found = articles.find((a) => a.title === article.title);
-			if (found) {
-				existingId = found.id;
-				console.log(`✅ Found existing article ID: ${existingId}`);
-			}
-		}
-
-		let response;
-		if (existingId) {
-			console.log(`🔄 Updating existing article ${existingId}...`);
-			response = await fetch(`https://dev.to/api/articles/${existingId}`, {
+	const response = existingId
+		? await fetch(`https://dev.to/api/articles/${existingId}`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 					Accept: "application/vnd.forem.api-v1+json",
-					"api-key": devtoApiKey,
+					"api-key": apiKey,
 				},
 				body: JSON.stringify({ article }),
-			});
-		} else {
-			console.log("✨ Creating new draft...");
-			response = await fetch("https://dev.to/api/articles", {
+			})
+		: await fetch("https://dev.to/api/articles", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					Accept: "application/vnd.forem.api-v1+json",
-					"api-key": devtoApiKey,
+					"api-key": apiKey,
 				},
 				body: JSON.stringify({ article }),
 			});
-		}
+	if (!response.ok) {
+		const errorPayload = await response.text();
+		throw new Error(`DEV.to API failed (${response.status}): ${errorPayload}`);
+	}
+	const result = (await response.json()) as DevToArticleResponse;
+	return {
+		url: result.url || "",
+		detail: existingId ? "updated" : "created",
+	};
+}
 
-		if (response.ok) {
-			const result = (await response.json()) as DevToArticleResponse;
-			console.log(
-				`Successfully ${existingId ? "updated" : "created"} draft: ${result.url}`,
-			);
-		} else {
-			const error = await response.json();
-			logError("post-to-dev", "Failed to create draft", {
-				apiError: error,
-				error: new Error("Failed to create draft"),
-			});
-			process.exit(1);
+async function publishToLinkedIn(
+	post: PreparedPost,
+	accessToken: string,
+	personUrn: string,
+) {
+	const bodyLines = [
+		post.title,
+		post.description || "",
+		post.canonicalUrl,
+		post.firstImageUrl || "",
+	].filter(Boolean);
+	const commentary = sanitizeTextForLinkedIn(bodyLines.join("\n\n"));
+	const payload = {
+		author: personUrn || DEFAULT_LINKEDIN_PERSON_URN,
+		lifecycleState: "PUBLISHED",
+		specificContent: {
+			"com.linkedin.ugc.ShareContent": {
+				shareCommentary: {
+					text: commentary,
+				},
+				shareMediaCategory: "ARTICLE",
+				media: [
+					{
+						status: "READY",
+						originalUrl: post.canonicalUrl,
+						title: { text: post.title },
+					},
+				],
+			},
+		},
+		visibility: {
+			"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+		},
+	};
+	const response = await fetch("https://api.linkedin.com/v2/ugcPosts", {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			"Content-Type": "application/json",
+			"X-Restli-Protocol-Version": "2.0.0",
+		},
+		body: JSON.stringify(payload),
+	});
+	if (!response.ok) {
+		const errorPayload = await response.text();
+		throw new Error(
+			`LinkedIn API failed (${response.status}): ${errorPayload}`,
+		);
+	}
+	return {
+		url: post.canonicalUrl,
+		detail: "published",
+	};
+}
+
+function statusPaths(slug: string, platform: Platform) {
+	const baseDir = path.join(DEPLOY_ROOT, slug);
+	return {
+		baseDir,
+		status: path.join(baseDir, `${platform}.status`),
+		success: path.join(baseDir, `${platform}.success`),
+		failed: path.join(baseDir, `${platform}.failed`),
+	};
+}
+
+async function fileExists(filePath: string) {
+	try {
+		await fs.access(filePath);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+export function evaluateDeploymentDecision(
+	hasSuccessMarker: boolean,
+	hasFailedMarker: boolean,
+) {
+	if (hasSuccessMarker) return "skip";
+	if (hasFailedMarker) return "attempt";
+	return "attempt";
+}
+
+async function writePlatformStatus(
+	record: DeploymentRecord,
+	skipWriteMarkers: boolean,
+) {
+	const paths = statusPaths(record.slug, record.platform);
+	await fs.mkdir(paths.baseDir, { recursive: true });
+	await fs.writeFile(
+		paths.status,
+		JSON.stringify(
+			{
+				state: record.state,
+				updatedAt: record.updatedAt,
+				detail: record.detail,
+				postPath: record.postPath,
+			},
+			null,
+			2,
+		),
+	);
+	if (skipWriteMarkers) return;
+	if (record.state === "success") {
+		await fs.rm(paths.failed, { force: true });
+		await fs.writeFile(
+			paths.success,
+			JSON.stringify(
+				{
+					state: record.state,
+					updatedAt: record.updatedAt,
+					detail: record.detail,
+					postPath: record.postPath,
+				},
+				null,
+				2,
+			),
+		);
+	}
+	if (record.state === "failed") {
+		await fs.rm(paths.success, { force: true });
+		await fs.writeFile(
+			paths.failed,
+			JSON.stringify(
+				{
+					state: record.state,
+					updatedAt: record.updatedAt,
+					detail: record.detail,
+					postPath: record.postPath,
+				},
+				null,
+				2,
+			),
+		);
+	}
+}
+
+function summarizeState(state: PublishState) {
+	if (state === "success") return "✅ success";
+	if (state === "failed") return "❌ failed";
+	if (state === "skipped") return "⏭️ skipped";
+	return "⚪ unknown";
+}
+
+export function buildStatusMarkdown(records: DeploymentRecord[]) {
+	const grouped = new Map<
+		string,
+		{
+			devto: PublishState;
+			linkedin: PublishState;
+			updatedAt: string;
 		}
+	>();
+	for (const record of records) {
+		const prev = grouped.get(record.slug) || {
+			devto: "unknown",
+			linkedin: "unknown",
+			updatedAt: record.updatedAt,
+		};
+		if (record.platform === "devto") prev.devto = record.state;
+		if (record.platform === "linkedin") prev.linkedin = record.state;
+		if (record.updatedAt > prev.updatedAt) prev.updatedAt = record.updatedAt;
+		grouped.set(record.slug, prev);
+	}
+	const rows = [...grouped.entries()]
+		.sort(([a], [b]) => a.localeCompare(b))
+		.map(
+			([slug, status]) =>
+				`| ${slug} | ${summarizeState(status.devto)} | ${summarizeState(status.linkedin)} | ${status.updatedAt} |`,
+		);
+	return [
+		"# SNS Deployment Status",
+		"",
+		"| Post Slug | Dev.to | LinkedIn | Updated At |",
+		"| --- | --- | --- | --- |",
+		...rows,
+		"",
+	].join("\n");
+}
+
+async function writeGithubSummary(records: DeploymentRecord[]) {
+	const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+	if (!summaryPath) return;
+	const lines = [
+		"## SNS Deployment Result",
+		"",
+		"| Post | Platform | State | Detail |",
+		"| --- | --- | --- | --- |",
+		...records.map(
+			(record) =>
+				`| ${record.slug} | ${record.platform} | ${summarizeState(record.state)} | ${record.detail.replace(/\|/g, "\\|")} |`,
+		),
+		"",
+	];
+	await fs.appendFile(summaryPath, lines.join("\n"));
+}
+
+async function collectMarkdownFiles(dirPath: string): Promise<string[]> {
+	const entries = await fs.readdir(dirPath, { withFileTypes: true });
+	const nested = await Promise.all(
+		entries.map(async (entry) => {
+			const fullPath = path.join(dirPath, entry.name);
+			if (entry.isDirectory()) {
+				if (fullPath.includes(`${path.sep}ko${path.sep}`)) return [];
+				return collectMarkdownFiles(fullPath);
+			}
+			if (entry.isFile() && entry.name.endsWith(".md")) return [fullPath];
+			return [];
+		}),
+	);
+	return nested.flat();
+}
+
+async function discoverPostFiles(targetInput?: string) {
+	if (targetInput) {
+		const resolved = path.resolve(targetInput);
+		const stat = await fs.stat(resolved);
+		if (stat.isDirectory()) {
+			return collectMarkdownFiles(resolved);
+		}
+		return [resolved];
+	}
+	return collectMarkdownFiles(path.resolve("src/posts"));
+}
+
+function parsePlatforms(raw?: string): Platform[] {
+	const normalized = String(raw || "")
+		.split(",")
+		.map((s) => s.trim().toLowerCase())
+		.filter(Boolean);
+	const values = normalized.length > 0 ? normalized : SUPPORTED_PLATFORMS;
+	const filtered = values.filter((v): v is Platform =>
+		SUPPORTED_PLATFORMS.includes(v as Platform),
+	);
+	if (filtered.length === 0) return SUPPORTED_PLATFORMS;
+	return Array.from(new Set(filtered));
+}
+
+async function loadCurrentStatus(slugs: string[]) {
+	const records: DeploymentRecord[] = [];
+	for (const slug of slugs) {
+		for (const platform of SUPPORTED_PLATFORMS) {
+			const paths = statusPaths(slug, platform);
+			const successExists = await fileExists(paths.success);
+			const failedExists = await fileExists(paths.failed);
+			let state: PublishState = "unknown";
+			if (successExists) state = "success";
+			else if (failedExists) state = "failed";
+			let detail = "n/a";
+			try {
+				const raw = await fs.readFile(paths.status, "utf-8");
+				const parsed = JSON.parse(raw) as { detail?: string };
+				if (parsed.detail) detail = parsed.detail;
+			} catch {
+				detail = "n/a";
+			}
+			records.push({
+				slug,
+				platform,
+				state,
+				updatedAt: new Date().toISOString(),
+				detail,
+				postPath: "",
+			});
+		}
+	}
+	return records;
+}
+
+async function updateStatusSnapshot(slugs: string[]) {
+	const snapshotRecords = await loadCurrentStatus(slugs);
+	const markdown = buildStatusMarkdown(snapshotRecords);
+	await fs.writeFile(path.resolve("STATUS.md"), markdown, "utf-8");
+}
+
+async function acquireSoftLock() {
+	await fs.mkdir(DEPLOY_ROOT, { recursive: true });
+	if (await fileExists(DEPLOY_LOCK)) {
+		throw new Error(
+			"Soft lock exists at .deploy/lock. Another deployment run is in progress.",
+		);
+	}
+	await fs.writeFile(
+		DEPLOY_LOCK,
+		JSON.stringify(
+			{
+				pid: process.pid,
+				runId: process.env.GITHUB_RUN_ID || "local",
+				createdAt: new Date().toISOString(),
+			},
+			null,
+			2,
+		),
+	);
+}
+
+async function releaseSoftLock() {
+	await fs.rm(DEPLOY_LOCK, { force: true });
+}
+
+async function attemptPublish(post: PreparedPost, platform: Platform) {
+	const updatedAt = new Date().toISOString();
+	const paths = statusPaths(post.slug, platform);
+	const hasSuccess = await fileExists(paths.success);
+	const hasFailed = await fileExists(paths.failed);
+	const decision = evaluateDeploymentDecision(hasSuccess, hasFailed);
+	if (decision === "skip") {
+		const record: DeploymentRecord = {
+			slug: post.slug,
+			platform,
+			state: "skipped",
+			updatedAt,
+			detail: "success marker exists",
+			postPath: post.filePath,
+		};
+		await writePlatformStatus(record, true);
+		return record;
+	}
+	try {
+		if (platform === "devto") {
+			const apiKey = process.env.DEVTO_API_KEY;
+			if (!apiKey) throw new Error("DEVTO_API_KEY is not set");
+			const result = await publishToDevto(post, apiKey);
+			const record: DeploymentRecord = {
+				slug: post.slug,
+				platform,
+				state: "success",
+				updatedAt,
+				detail: `${result.detail}${result.url ? `: ${result.url}` : ""}`,
+				postPath: post.filePath,
+			};
+			await writePlatformStatus(record, false);
+			return record;
+		}
+		const accessToken = process.env.LINKEDIN_ACCESS_TOKEN;
+		const personUrn =
+			process.env.LINKEDIN_PERSON_URN || DEFAULT_LINKEDIN_PERSON_URN;
+		if (!accessToken) throw new Error("LINKEDIN_ACCESS_TOKEN is not set");
+		const result = await publishToLinkedIn(post, accessToken, personUrn);
+		const record: DeploymentRecord = {
+			slug: post.slug,
+			platform,
+			state: "success",
+			updatedAt,
+			detail: `${result.detail}${result.url ? `: ${result.url}` : ""}`,
+			postPath: post.filePath,
+		};
+		await writePlatformStatus(record, false);
+		return record;
 	} catch (error) {
-		logError("post-to-dev", "An error occurred", { error });
-		process.exit(1);
+		const message = error instanceof Error ? error.message : String(error);
+		const record: DeploymentRecord = {
+			slug: post.slug,
+			platform,
+			state: "failed",
+			updatedAt,
+			detail: message,
+			postPath: post.filePath,
+		};
+		await writePlatformStatus(record, false);
+		return record;
+	}
+}
+
+async function runDeployment(targetInput?: string, platformsArg?: string) {
+	const publicBaseUrl = normalizePublicBaseUrl(
+		process.env.BLOG_PUBLIC_BASE_URL || DEFAULT_PUBLIC_BASE_URL,
+	);
+	const postFiles = await discoverPostFiles(targetInput);
+	const allPostFiles = await discoverPostFiles();
+	if (postFiles.length === 0) {
+		throw new Error("No markdown files found for deployment.");
+	}
+	const platforms = parsePlatforms(
+		platformsArg || process.env.DEPLOY_PLATFORMS,
+	);
+	const records: DeploymentRecord[] = [];
+	await acquireSoftLock();
+	try {
+		for (const filePath of postFiles) {
+			const prepared = await preparePost(filePath, publicBaseUrl);
+			for (const platform of platforms) {
+				const record = await attemptPublish(prepared, platform);
+				records.push(record);
+			}
+		}
+		await writeGithubSummary(records);
+		await updateStatusSnapshot(
+			allPostFiles.map((filePath) => path.basename(filePath, ".md")),
+		);
+		const hasFailed = records.some((r) => r.state === "failed");
+		if (hasFailed) {
+			logWarn("post-to-dev", "Some platform deployments failed.", {
+				failedCount: records.filter((r) => r.state === "failed").length,
+			});
+		}
+		return records;
+	} finally {
+		await releaseSoftLock();
 	}
 }
 
@@ -390,12 +814,10 @@ function isUCloudUrl(url: string) {
 
 if (process.argv[1] && path.basename(process.argv[1]) === "post-to-dev.ts") {
 	dotenv.config({ path: ".env.local" });
-	const postFilePath = process.argv[2];
-	if (!postFilePath) {
-		logError("post-to-dev", "Please provide a path to a markdown file.", {
-			error: new Error("Missing markdown file path"),
-		});
+	const targetInput = process.argv[2];
+	const platformsArg = process.argv[3];
+	runDeployment(targetInput, platformsArg).catch((error) => {
+		logError("post-to-dev", "An error occurred", { error });
 		process.exit(1);
-	}
-	postToDev(path.resolve(postFilePath));
+	});
 }

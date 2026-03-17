@@ -22,6 +22,12 @@
 - publish 워크플로는 `X_API_KEY`, `LINKEDIN_ACCESS_TOKEN`, `DEVTO_API_KEY`를 Secrets에서 주입해 Nim 엔진에 전달해야 한다.
 - 초기 publish 구현은 외부 API 호출 대신 플랫폼별 Mock 성공 응답을 기록하고 `state.json` 채널 상태를 갱신해야 한다.
 - 이미 `published` 상태인 노드의 publish 재호출은 API/Mock 호출 없이 `already_published`를 반환하는 멱등성 규칙을 지켜야 한다.
+- SNS 배포 워크플로는 Git 파일시스템 상태머신을 사용해야 하며 `.deploy/lock` Soft Lock으로 중복 실행을 방지해야 한다.
+- 포스트별 플랫폼 상태는 `.deploy/[post-slug]/[platform].status`를 SSOT로 기록하고 `.success`/`.failed` 마커로 재시도 여부를 결정해야 한다.
+- 상태머신 규칙은 `.success`가 있으면 Skip, `.failed` 또는 상태 파일 부재면 재배포 시도를 수행해야 한다.
+- LinkedIn 배포는 `v2/ugcPosts`를 사용하고 Author는 `LINKEDIN_PERSON_URN`(기본값 `urn:li:person:binfyrHJAK`)을 적용해야 한다.
+- DEV.to 및 LinkedIn 본문의 이미지 링크는 `https://wintrover.github.io/` 기반 절대 경로로 치환해야 한다.
+- 모든 플랫폼 시도 결과는 `GITHUB_STEP_SUMMARY` 마크다운 표와 루트 `STATUS.md`에 동시 반영해야 하며, `.deploy/`와 `STATUS.md`는 단일 커밋으로 영속화해야 한다.
 
 ## 2) URL 아키텍처 규칙
 
