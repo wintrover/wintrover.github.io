@@ -12,6 +12,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 	const feature = read("tests/features/context-architecture.feature");
 	const context = read("CONTEXT.md");
 	const buildScript = read("scripts/build-github.ts");
+	const pagesWorkflow = read(".github/workflows/pages-deploy.yml");
 	const imageTools = read("scripts/image-tools.ts");
 	const locale = read("src/lib/locale.ts");
 	const config = read("src/lib/config.ts");
@@ -59,6 +60,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Build and Mermaid pipelines keep critical invariants",
 			"Mermaid image naming and fallback handling remain deterministic",
 			"Transient post loading failures must be retryable",
+			"Pages workflow injects analytics env from secrets with vars fallback",
 		];
 		const scenarios = [...feature.matchAll(/^\s*Scenario:\s*(.+)$/gm)].map(
 			(match) => match[1].trim(),
@@ -185,6 +187,15 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"`${base}${localePrefix}/post/${post.slug}/`",
 		);
 		expect(buildScript).not.toContain("`${base}/en/post/");
+	});
+
+	test("Given Pages workflow When 빌드 env 매핑 Then analytics 변수는 secrets 우선 vars fallback 규칙을 따른다", () => {
+		expect(pagesWorkflow).toContain(
+			"VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID || vars.VITE_GA_MEASUREMENT_ID }}",
+		);
+		expect(pagesWorkflow).toContain(
+			"VITE_GOOGLE_SITE_VERIFICATION: ${{ vars.VITE_GOOGLE_SITE_VERIFICATION || secrets.VITE_GOOGLE_SITE_VERIFICATION }}",
+		);
 	});
 
 	test("Given image-tools.ts When Mermaid 처리 검증 Then 추출-렌더-치환-폴백을 유지한다", () => {

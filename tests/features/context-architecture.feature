@@ -130,3 +130,10 @@ Feature: Context SSoT architecture and UI invariants
     When the same slug is requested again after a failure
     Then post detail loading should retry fetch for that slug
     And posts store loading should retry after previous failure
+
+  Scenario: Pages workflow injects analytics env from secrets with vars fallback
+    Given GitHub Actions builds static pages for deployment
+    When analytics environment variables are mapped for build
+    Then GA4 measurement ID should read from secrets first
+    And GA4 measurement ID should allow vars fallback
+    And GSC verification token should allow vars or secrets injection
