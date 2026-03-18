@@ -1,0 +1,58 @@
+repos:
+-   repo: builtin
+    hooks:
+    -   id: trailing-whitespace
+        priority: 0
+    -   id: end-of-file-fixer
+        priority: 0
+    -   id: check-yaml
+        priority: 0
+    -   id: check-added-large-files
+        priority: 0
+
+-   repo: https://github.com/biomejs/pre-commit
+    rev: v2.3.10
+    hooks:
+    -   id: biome-check
+        priority: 0
+
+-   repo: local
+    hooks:
+    -   id: typescript-typecheck
+        name: typescript-typecheck
+        entry: node -e "require('node:child_process').execSync('npm run -s typecheck',{stdio:'inherit',shell:true})"
+        language: system
+        pass_filenames: false
+        files: ^src/
+        types_or: [ts, tsx]
+        priority: 0
+    -   id: knip
+        name: knip
+        entry: node -e "require('node:child_process').execSync('npm run -s knip',{stdio:'inherit',shell:true})"
+        language: system
+        pass_filenames: false
+        files: ^src/
+        types_or: [ts, tsx, javascript, jsx, json]
+        priority: 0
+    -   id: dependency-cruiser
+        name: dependency-cruiser
+        entry: node -e "require('node:child_process').execSync('npm run -s depcruise',{stdio:'inherit',shell:true})"
+        language: system
+        pass_filenames: false
+        files: ^src/
+        types_or: [ts, tsx, javascript, jsx]
+        priority: 0
+    -   id: vitest-coverage
+        name: vitest-coverage
+        entry: node -e "require('node:child_process').execSync('npm run -s test:coverage',{stdio:'inherit',shell:true})"
+        language: system
+        pass_filenames: false
+        always_run: true
+        priority: 0
+    -   id: procedure-gate
+        name: procedure-gate
+        entry: node -e "require('node:child_process').execSync('npm run -s gate:procedure:staged',{stdio:'inherit',shell:true})"
+        language: system
+        pass_filenames: false
+        always_run: true
+        priority: 0

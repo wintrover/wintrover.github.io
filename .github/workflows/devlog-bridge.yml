@@ -1,0 +1,130 @@
+name: Devlog Engine Bridge
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "CLI command (sync | publish | graph)"
+        required: true
+        type: choice
+        options:
+          - sync
+          - publish
+          - graph
+      node_id:
+        description: "Target node id for publish"
+        required: false
+        type: string
+      platforms:
+        description: "Comma separated platforms for publish (x,linkedin,devto)"
+        required: false
+        type: string
+      graph_format:
+        description: "Graph format (json | dot)"
+        required: false
+        type: choice
+        options:
+          - json
+          - dot
+        default: json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: devlog-bridge-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Nim
+        uses: jiro4989/setup-nim-action@v2
+        with:
+          nim-version: "2.0.0"
+
+      - name: Execute Devlog CLI
+        id: execute
+        shell: bash
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          COMMAND="${{ inputs.command }}"
+          NODE_ID="${{ inputs.node_id }}"
+          PLATFORMS="${{ inputs.platforms }}"
+          GRAPH_FORMAT="${{ inputs.graph_format }}"
+
+          case "$COMMAND" in
+            sync)
+              nim c -r engine/devlog.nim sync > devlog-output.txt
+              ;;
+            publish)
+              if [ -z "$NODE_ID" ]; then
+                echo "publish command requires node_id input" >&2
+                exit 1
+              fi
+              nim c -r engine/devlog.nim publish "$NODE_ID" "$PLATFORMS" > devlog-output.txt
+              ;;
+            graph)
+              nim c -r engine/devlog.nim graph "$GRAPH_FORMAT" > devlog-output.txt
+              ;;
+            *)
+              echo "unsupported command: $COMMAND" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Persist state.json to main
+        if: ${{ success() && (inputs.command == 'sync' || inputs.command == 'publish') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- state.json; then
+            echo "No state.json changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          git commit -m "chore(devlog): persist state snapshot [skip ci]"
+          git push origin HEAD:main
+
+      - name: Render summary dashboard
+        if: always()
+        shell: bash
+        run: |
+          echo "## Devlog Engine Dashboard" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Field | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Command | \`${{ inputs.command }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Node ID | \`${{ inputs.node_id || 'n/a' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Platforms | \`${{ inputs.platforms || 'default' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Graph Format | \`${{ inputs.graph_format || 'json' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Exit Status | \`${{ job.status }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "<details><summary>CLI Output</summary>" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat devlog-output.txt >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "</details>" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload CLI artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: devlog-cli-output
+          path: devlog-output.txt
