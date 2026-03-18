@@ -1,5 +1,6 @@
 import { mount } from "svelte";
 import App from "./App.svelte";
+import { initAnalytics } from "./lib/analytics";
 import { siteOrigin } from "./lib/config";
 import {
 	detectLocaleFromRuntime,
@@ -65,6 +66,8 @@ if (typeof document !== "undefined") {
 		canonical.href = `${siteOrigin}${localeBase(locale)}`;
 	}
 }
+
+initAnalytics();
 
 const target = document.getElementById("app");
 let app;

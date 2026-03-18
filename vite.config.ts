@@ -17,6 +17,8 @@ export default defineConfig(({ mode }) => {
 	process.env.VITE_OG_IMAGE_ALT ??= meta.ogImageAlt;
 	process.env.VITE_CANONICAL_PATH ??=
 		process.env.VITE_LOCALE === "ko" ? "/ko/" : "/";
+	process.env.VITE_GA_MEASUREMENT_ID ??= "";
+	process.env.VITE_GOOGLE_SITE_VERIFICATION ??= "";
 
 	return {
 		plugins: [
