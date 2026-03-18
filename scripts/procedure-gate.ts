@@ -82,15 +82,35 @@ function resolveCiRange() {
 	return "HEAD~1...HEAD";
 }
 
+function diffNameOnlyByRange(range: string) {
+	const safeRange = range.replace(/"/g, "");
+	try {
+		const stdout = execSync(`git --no-pager diff --name-only "${safeRange}"`, {
+			encoding: "utf-8",
+		});
+		return stdout.split(/\r?\n/).filter(Boolean);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		const canFallback =
+			message.includes("no merge base") && safeRange.includes("...");
+		if (!canFallback) throw error;
+		const fallbackRange = safeRange.replace("...", "..");
+		const stdout = execSync(
+			`git --no-pager diff --name-only "${fallbackRange}"`,
+			{ encoding: "utf-8" },
+		);
+		return stdout.split(/\r?\n/).filter(Boolean);
+	}
+}
+
 function getChangedFiles(mode: "ci" | "staged") {
-	const range =
-		mode === "staged" ? "--cached" : resolveCiRange().replace(/"/g, "");
-	const command =
-		mode === "staged"
-			? "git --no-pager diff --name-only --cached"
-			: `git --no-pager diff --name-only "${range}"`;
-	const stdout = execSync(command, { encoding: "utf-8" });
-	return stdout.split(/\r?\n/).filter(Boolean);
+	if (mode === "staged") {
+		const stdout = execSync("git --no-pager diff --name-only --cached", {
+			encoding: "utf-8",
+		});
+		return stdout.split(/\r?\n/).filter(Boolean);
+	}
+	return diffNameOnlyByRange(resolveCiRange());
 }
 
 function parseModeArg(args: string[]) {

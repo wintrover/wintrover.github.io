@@ -20,6 +20,7 @@ describe("절차 게이트 강제 검증", () => {
 			"implementation change requires context bdd and test evidence",
 			"documentation-only change should not be blocked",
 			"CI gate must run on pull_request and push",
+			"rewritten history in CI must still produce changed file list",
 		]);
 	});
 
@@ -53,5 +54,14 @@ describe("절차 게이트 강제 검증", () => {
 		expect(workflow).toContain("pull_request:");
 		expect(workflow).toContain("push:");
 		expect(workflow).toContain("pnpm run gate:procedure:ci");
+	});
+
+	test("Given CI 병합베이스 없음 When diff 실패 Then 절차 게이트가 two-dot으로 폴백한다", () => {
+		const script = read("scripts/procedure-gate.ts");
+		expect(script).toContain("no merge base");
+		expect(script).toContain('safeRange.includes("...")');
+		expect(script).toContain(
+			'const fallbackRange = safeRange.replace("...", "..")',
+		);
 	});
 });

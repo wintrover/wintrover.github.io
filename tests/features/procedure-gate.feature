@@ -19,3 +19,8 @@ Feature: AGENTS 절차 게이트 강제
     Given GitHub workflow is configured for procedure gate
     When maintainers open PR or push to main
     Then workflow must execute gate script and fail on violation
+
+  Scenario: rewritten history in CI must still produce changed file list
+    Given branch history can be force-rewritten without a merge base
+    When CI computes changed files for procedure gate
+    Then gate must fallback from three-dot to two-dot diff
