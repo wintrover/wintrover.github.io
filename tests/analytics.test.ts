@@ -87,4 +87,16 @@ describe("analytics", () => {
 			}),
 		);
 	});
+
+	test("기본 gtag 큐 형식은 arguments 객체를 유지한다", () => {
+		delete (window as Window & { gtag?: unknown }).gtag;
+		startAnalytics("G-TEST1234");
+
+		const queue =
+			(window as Window & { dataLayer?: unknown[] }).dataLayer ?? [];
+		expect(queue.length).toBeGreaterThan(0);
+		const first = queue[0] as Record<string, unknown>;
+		expect(Array.isArray(first)).toBe(false);
+		expect(first[0]).toBe("js");
+	});
 });

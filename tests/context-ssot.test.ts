@@ -60,6 +60,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Build and Mermaid pipelines keep critical invariants",
 			"Mermaid image naming and fallback handling remain deterministic",
 			"Transient post loading failures must be retryable",
+			"Post path category mapping must be prototype-safe",
 			"Pages workflow injects analytics env from secrets with vars fallback",
 		];
 		const scenarios = [...feature.matchAll(/^\s*Scenario:\s*(.+)$/gm)].map(

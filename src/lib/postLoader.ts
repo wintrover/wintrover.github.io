@@ -114,15 +114,18 @@ function determineCategoryFromPath(filePath: string) {
 	const folderName =
 		pathParts.length >= 2 ? pathParts[pathParts.length - 2] : "";
 	const key = folderName.toLowerCase();
-	const fromConfig = categories.categories?.[key]?.name;
+	const fromConfig = Object.hasOwn(categories.categories, key)
+		? categories.categories[key]?.name
+		: undefined;
 	if (fromConfig) return fromConfig;
-	const fallbackByKey: Record<string, string> = {
-		project: "Project",
-		company: "Company Work",
-		tutorial: "Tutorial",
-		general: "General",
-	};
-	if (fallbackByKey[key]) return fallbackByKey[key];
+	const fallbackByKey = new Map<string, string>([
+		["project", "Project"],
+		["company", "Company Work"],
+		["tutorial", "Tutorial"],
+		["general", "General"],
+	]);
+	const fallback = fallbackByKey.get(key);
+	if (fallback) return fallback;
 	return categories.defaultCategory;
 }
 

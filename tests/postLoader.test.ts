@@ -77,7 +77,9 @@ describe("postLoader", () => {
 					const path = hasFolder
 						? `../posts/${folder}/${name}.md`
 						: `posts/${name}.md`;
-					const posts = await loadAllPosts({ [path]: "---\n---" });
+					const modules = Object.create(null) as Record<string, string | null>;
+					modules[path] = "---\n---";
+					const posts = await loadAllPosts(modules);
 					expect(posts).toHaveLength(1);
 					expect(posts[0].fileName).toBe(name);
 					expect(posts[0].folder).toBe(hasFolder ? folder : "posts");
@@ -85,6 +87,16 @@ describe("postLoader", () => {
 			),
 			{ numRuns: 50 },
 		);
+	});
+
+	test("__proto__ 폴더명도 안전하게 처리된다", async () => {
+		const posts = await loadAllPosts({
+			"../posts/__proto__/a.md": "---\n---",
+		});
+		expect(posts).toHaveLength(1);
+		expect(posts[0].fileName).toBe("a");
+		expect(posts[0].folder).toBe("__proto__");
+		expect(posts[0].category).toBe("General");
 	});
 
 	test("Metadata fallback logic - All cases for coverage", async () => {

@@ -131,6 +131,12 @@ Feature: Context SSoT architecture and UI invariants
     Then post detail loading should retry fetch for that slug
     And posts store loading should retry after previous failure
 
+  Scenario: Post path category mapping must be prototype-safe
+    Given post metadata is derived from markdown file paths
+    When folder segments contain special prototype-like keys such as "__proto__"
+    Then category mapping should only use own-key lookups
+    And post parsing should still produce a valid post result
+
   Scenario: Pages workflow injects analytics env from secrets with vars fallback
     Given GitHub Actions builds static pages for deployment
     When analytics environment variables are mapped for build

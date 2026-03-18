@@ -40,9 +40,9 @@ export function resolvePagePath(
 function ensureGtag(win: AnalyticsWindow) {
 	win.dataLayer = win.dataLayer || [];
 	if (typeof win.gtag !== "function") {
-		win.gtag = ((...args: Parameters<Gtag>) => {
-			win.dataLayer?.push(args);
-		}) as Gtag;
+		win.gtag = function (..._args: Parameters<Gtag>) {
+			win.dataLayer?.push(arguments);
+		} as unknown as Gtag;
 	}
 	return win.gtag;
 }
