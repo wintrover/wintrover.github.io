@@ -1,0 +1,91 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .box { fill: #f9f9f9; stroke: #333; stroke-width: 2; rx: 5; }
+      .client { fill: #e3f2fd; }
+      .processing { fill: #fff3e0; }
+      .server { fill: #e8f5e8; }
+      .tech { fill: #fce4ec; }
+      .removed { fill: #ffcdd2; }
+      .improved { fill: #c8e6c9; }
+      .text { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .title { font-size: 14px; font-weight: bold; }
+      .arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+
+  <!-- Client Side -->
+  <g>
+    <rect x="20" y="20" width="180" height="140" class="box client" />
+    <text x="110" y="40" class="text title">Client Side</text>
+    <rect x="30" y="50" width="80" height="25" class="box" />
+    <text x="70" y="67" class="text">Web Browser</text>
+    <rect x="120" y="50" width="70" height="25" class="box" />
+    <text x="155" y="67" class="text">Camera Manager</text>
+    <rect x="30" y="85" width="70" height="25" class="box" />
+    <text x="65" y="102" class="text">Face Detection</text>
+    <rect x="110" y="85" width="70" height="25" class="box improved" />
+    <text x="145" y="102" class="text">MediaPipe</text>
+    <rect x="30" y="120" width="70" height="25" class="box" />
+    <text x="65" y="137" class="text">Quality Check</text>
+    <rect x="110" y="120" width="70" height="25" class="box improved" />
+    <text x="145" y="137" class="text">Canvas API</text>
+  </g>
+
+  <!-- Processing Layer -->
+  <g>
+    <rect x="220" y="20" width="180" height="140" class="box processing" />
+    <text x="310" y="40" class="text title">Processing Layer</text>
+    <rect x="230" y="50" width="80" height="25" class="box" />
+    <text x="270" y="67" class="text">Document Manager</text>
+    <rect x="320" y="50" width="70" height="25" class="box" />
+    <text x="355" y="67" class="text">ID Detection</text>
+    <rect x="230" y="85" width="70" height="25" class="box" />
+    <text x="265" y="102" class="text">Canny Edge</text>
+    <rect x="310" y="85" width="80" height="25" class="box improved" />
+    <text x="350" y="102" class="text">Bounding Box</text>
+    <rect x="270" y="120" width="70" height="25" class="box" />
+    <text x="305" y="137" class="text">Auto Capture</text>
+  </g>
+
+  <!-- Server Side -->
+  <g>
+    <rect x="420" y="20" width="180" height="140" class="box server" />
+    <text x="510" y="40" class="text title">Server Side</text>
+    <rect x="430" y="50" width="70" height="25" class="box" />
+    <text x="465" y="67" class="text">Express.js</text>
+    <rect x="510" y="50" width="80" height="25" class="box" />
+    <text x="550" y="67" class="text">KYC Processor</text>
+    <rect x="430" y="85" width="70" height="25" class="box" />
+    <text x="465" y="102" class="text">Face Validator</text>
+    <rect x="510" y="85" width="80" height="25" class="box" />
+    <text x="550" y="102" class="text">Image Quality</text>
+    <rect x="470" y="120" width="70" height="25" class="box" />
+    <text x="505" y="137" class="text">MariaDB</text>
+  </g>
+
+  <!-- Technology Evolution -->
+  <g>
+    <rect x="620" y="20" width="160" height="140" class="box tech" />
+    <text x="700" y="40" class="text title">Tech Evolution</text>
+    <rect x="630" y="50" width="60" height="25" class="box removed" />
+    <text x="660" y="67" class="text">OpenCV.js</text>
+    <text x="700" y="67" class="text">→ Removed</text>
+    <rect x="630" y="85" width="60" height="25" class="box improved" />
+    <text x="660" y="102" class="text">Canvas API</text>
+    <text x="720" y="102" class="text">→ Direct</text>
+    <rect x="630" y="120" width="60" height="25" class="box improved" />
+    <text x="660" y="137" class="text">MediaPipe</text>
+    <text x="720" y="137" class="text">→ Core</text>
+  </g>
+
+  <!-- Arrows -->
+  <line x1="200" y1="110" x2="220" y2="110" class="arrow" />
+  <line x1="400" y1="110" x2="420" y2="110" class="arrow" />
+
+  <!-- Title -->
+  <text x="400" y="200" class="text title" style="font-size: 18px;">Face Recognition Project Architecture</text>
+</svg>

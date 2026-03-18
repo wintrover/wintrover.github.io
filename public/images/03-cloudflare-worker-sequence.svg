@@ -1,0 +1,80 @@
+<svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .actor { fill: #f9f9f9; stroke: #333; stroke-width: 2; }
+      .label { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .lifeline { stroke: #ddd; stroke-width: 2; stroke-dasharray: 5,5; }
+      .message { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .return { stroke: #666; stroke-width: 1; fill: none; marker-end: url(#arrowhead); stroke-dasharray: 3,3; }
+      .arrowhead { fill: #333; }
+      .note { fill: #fff3cd; stroke: #856404; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrowhead" />
+    </marker>
+  </defs>
+
+  <!-- Actors -->
+  <rect x="50" y="30" width="100" height="40" rx="5" class="actor"/>
+  <text x="100" y="55" class="label" font-weight="bold">Client</text>
+
+  <rect x="250" y="30" width="120" height="40" rx="5" class="actor" fill="#ff6b35"/>
+  <text x="310" y="55" class="label" fill="white" font-weight="bold">Cloudflare</text>
+
+  <rect x="450" y="30" width="100" height="40" rx="5" class="actor" fill="#0066cc"/>
+  <text x="500" y="55" class="label" fill="white" font-weight="bold">Django API</text>
+
+  <rect x="650" y="30" width="100" height="40" rx="5" class="actor" fill="#336791"/>
+  <text x="700" y="55" class="label" fill="white" font-weight="bold">Database</text>
+
+  <!-- Lifelines -->
+  <line x1="100" y1="70" x2="100" y2="450" class="lifeline"/>
+  <line x1="310" y1="70" x2="310" y2="450" class="lifeline"/>
+  <line x1="500" y1="70" x2="500" y2="450" class="lifeline"/>
+  <line x1="700" y1="70" x2="700" y2="450" class="lifeline"/>
+
+  <!-- Messages -->
+  <!-- 1. Request -->
+  <path d="M 100 100 L 310 100" class="message"/>
+  <text x="205" y="95" class="label" font-size="11">1. API Request</text>
+
+  <!-- 2. Cache Check -->
+  <rect x="280" y="120" width="60" height="30" class="note"/>
+  <text x="310" y="140" class="label" font-size="10">Cache Check</text>
+
+  <!-- 3. Forward to Django -->
+  <path d="M 310 170 L 500 170" class="message"/>
+  <text x="405" y="165" class="label" font-size="11">2. Forward Request</text>
+
+  <!-- 4. Database Query -->
+  <path d="M 500 200 L 700 200" class="message"/>
+  <text x="600" y="195" class="label" font-size="11">3. Query Data</text>
+
+  <!-- 5. Database Response -->
+  <path d="M 700 230 L 500 230" class="return"/>
+  <text x="600" y="225" class="label" font-size="11">4. Return Data</text>
+
+  <!-- 6. Django Response -->
+  <path d="M 500 260 L 310 260" class="return"/>
+  <text x="405" y="255" class="label" font-size="11">5. API Response</text>
+
+  <!-- 7. Cache Store -->
+  <rect x="280" y="280" width="60" height="30" class="note"/>
+  <text x="310" y="300" class="label" font-size="10">Cache Store</text>
+
+  <!-- 8. Client Response -->
+  <path d="M 310 330 L 100 330" class="return"/>
+  <text x="205" y="325" class="label" font-size="11">6. Cached Response</text>
+
+  <!-- 9. Subsequent Request -->
+  <path d="M 100 370 L 310 370" class="message"/>
+  <text x="205" y="365" class="label" font-size="11">7. Next Request</text>
+
+  <!-- 10. Cache Hit -->
+  <path d="M 310 400 L 100 400" class="return"/>
+  <text x="205" y="395" class="label" font-size="11">8. Cache Hit (Fast!)</text>
+
+  <!-- Performance Note -->
+  <rect x="50" y="420" width="200" height="25" class="note"/>
+  <text x="150" y="437" class="label" font-size="10">Edge caching reduces latency</text>
+</svg>
