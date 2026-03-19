@@ -76,4 +76,20 @@ describe("post localization synchronization", () => {
 			),
 		);
 	});
+
+	test("Given refined Korean narrative When syncing localized copy Then English preserves matched nuance and paragraph intent", () => {
+		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+		const en = read("src/posts/project/2026-03-19-20.md");
+
+		expect(ko).toContain("괴로워하며 근원을 파고들었다");
+		expect(en).toContain("in agony, drilling into the root cause");
+		expect(ko).toContain("검토 노동의 지옥");
+		expect(en).toContain("hell of review labor");
+		expect(ko).toContain("생산성과 성능, 안정성의 삼위일체");
+		expect(en).toContain("Trinity of Productivity, Performance, and Stability");
+		expect(ko).toContain("AI가 만든 쓰레기를 치우는 청소부");
+		expect(en).toContain("janitors cleaning up AI-generated trash");
+		expect(ko).toContain("### 1. 사고 궤적 시스템: 의도의 박제");
+		expect(en).toContain("### 1. Thought Trajectory System: Freezing Intent");
+	});
 });

@@ -19,3 +19,8 @@ Feature: Post localization synchronization
     Given a Korean and English post share the same slug
     When readability separators are added with dashed hr lines
     Then both localized copies should keep identical upper and lower delimiter boundaries
+
+  Scenario: localized rewrite preserves paragraph nuance and rhetorical tone
+    Given a Korean source post is refined for stronger narrative emphasis
+    When the paired English post is updated to match the same slug
+    Then the English copy should preserve the Korean paragraph flow and intensity of core claims
