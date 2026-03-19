@@ -14,6 +14,7 @@ description: 블로그 포스트 및 코드의 품질을 보장하기 위한 최
 - **의존성 및 빌드 검증**: 엄격한 의존성 정합성이 필요한 빌드 확인은 `pnpm build`를 사용한다.
 - **GitHub Actions 확인**: `gh` 명령어만 사용한다. (예: `gh run list`, `gh run view`)
 - **Git 명령어 페이저 비활성화**: 모든 git 명령어는 반드시 `git --no-pager <subcommand>` 형식으로 실행한다.
+- **공식 문서 탐색**: Context7은 MCP가 아닌 CLI(`ctx7` 또는 `npx ctx7`)만 사용한다.
 - **로깅 일관성**: 앱 코드에서 `console.error` 직접 호출이 남아있지 않은지 확인한다. (`src/lib/log.ts` 예외)
 - **테스트 표준**:
   - 테스트는 `fast-check` 기반 Property-Based Testing(PBT)을 우선 적용한다.
