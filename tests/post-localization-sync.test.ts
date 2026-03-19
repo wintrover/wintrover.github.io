@@ -41,4 +41,39 @@ describe("post localization synchronization", () => {
 			),
 		);
 	});
+
+	test("Given paired localized post When applying dashed delimiters Then both copies keep matching boundaries", () => {
+		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+		const en = read("src/posts/project/2026-03-19-20.md");
+		const delimiter =
+			'<hr style="border: 0; border-top: 1px dashed #52525b; margin: 1.2rem 0;" />';
+
+		const koCount = ko.match(new RegExp(delimiter, "g"))?.length ?? 0;
+		const enCount = en.match(new RegExp(delimiter, "g"))?.length ?? 0;
+
+		expect(koCount).toBe(4);
+		expect(enCount).toBe(4);
+		expect(koCount).toBe(enCount);
+		expect(ko).toContain("### 1) 의도의 결핍");
+		expect(en).toContain("### 1) Deficit of Intent");
+		expect(ko).toContain("## 다시 되찾는 빌딩의 기쁨");
+		expect(en).toContain("## Reclaiming the Joy of Building");
+	});
+
+	test("PBT: Given delimiter policy When scanning paired posts Then both localized copies keep the same delimiter token", () => {
+		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+		const en = read("src/posts/project/2026-03-19-20.md");
+
+		fc.assert(
+			fc.property(
+				fc.constantFrom(
+					'<hr style="border: 0; border-top: 1px dashed #52525b; margin: 1.2rem 0;" />',
+				),
+				(token) => {
+					expect(ko.includes(token)).toBe(true);
+					expect(en.includes(token)).toBe(true);
+				},
+			),
+		);
+	});
 });
