@@ -24,3 +24,9 @@ Feature: AGENTS 절차 게이트 강제
     Given branch history can be force-rewritten without a merge base
     When CI computes changed files for procedure gate
     Then gate must fallback from three-dot to two-dot diff
+
+  Scenario: context7 proxy must preserve downstream framing compatibility
+    Given MCP client can send either Content-Length or NDJSON requests
+    When context7 toolname proxy receives initialize and tools/list
+    Then proxy must parse both framing styles without timeout
+    And proxy responses must follow detected downstream framing

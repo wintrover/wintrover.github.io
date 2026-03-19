@@ -21,6 +21,7 @@ describe("절차 게이트 강제 검증", () => {
 			"documentation-only change should not be blocked",
 			"CI gate must run on pull_request and push",
 			"rewritten history in CI must still produce changed file list",
+			"context7 proxy must preserve downstream framing compatibility",
 		]);
 	});
 
@@ -62,6 +63,22 @@ describe("절차 게이트 강제 검증", () => {
 		expect(script).toContain('safeRange.includes("...")');
 		expect(script).toContain(
 			'const fallbackRange = safeRange.replace("...", "..")',
+		);
+	});
+
+	test("Given context7 프록시 변경 When 검사 Then 다운스트림 프레이밍 호환이 유지된다", () => {
+		const proxy = read("scripts/context7-toolname-proxy.mjs");
+		const context = read("CONTEXT.md");
+		expect(proxy).toContain('let downstreamFraming = "content-length"');
+		expect(proxy).toContain("function writeDownstreamMessage(stream, payload)");
+		expect(proxy).toContain('onMessage(JSON.parse(line), "ndjson")');
+		expect(proxy).toContain(
+			'onMessage(JSON.parse(bodyText), "content-length")',
+		);
+		expect(proxy).toContain("allowNdjson: true");
+		expect(proxy).toContain("tolerateLeadingNoise: true");
+		expect(context).toContain(
+			"MCP 프록시(`scripts/context7-toolname-proxy.mjs`)",
 		);
 	});
 });
