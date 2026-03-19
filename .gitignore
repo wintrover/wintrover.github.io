@@ -56,6 +56,6 @@ stryker_output.txt
 # Scripts
 *.cjs
 !*.config.cjs
-!.dependency-cruiser.cjs
+!.dependency-cruiser.json
 
 !resume/**/*.json

@@ -30,3 +30,9 @@ Feature: AGENTS 절차 게이트 강제
     When context7 toolname proxy receives initialize and tools/list
     Then proxy must parse both framing styles without timeout
     And proxy responses must follow detected downstream framing
+
+  Scenario: runtime scripts must avoid js extension leftovers
+    Given repository enforces TypeScript-first runtime scripts
+    When gate checks critical script and config paths
+    Then context7 proxy path must be scripts/context7-toolname-proxy.ts
+    And dependency cruiser config must be JSON based

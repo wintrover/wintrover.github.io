@@ -22,6 +22,7 @@ describe("절차 게이트 강제 검증", () => {
 			"CI gate must run on pull_request and push",
 			"rewritten history in CI must still produce changed file list",
 			"context7 proxy must preserve downstream framing compatibility",
+			"runtime scripts must avoid js extension leftovers",
 		]);
 	});
 
@@ -67,7 +68,7 @@ describe("절차 게이트 강제 검증", () => {
 	});
 
 	test("Given context7 프록시 변경 When 검사 Then 다운스트림 프레이밍 호환이 유지된다", () => {
-		const proxy = read("scripts/context7-toolname-proxy.mjs");
+		const proxy = read("scripts/context7-toolname-proxy.ts");
 		const context = read("CONTEXT.md");
 		expect(proxy).toContain('let downstreamFraming = "content-length"');
 		expect(proxy).toContain("function writeDownstreamMessage(stream, payload)");
@@ -78,7 +79,30 @@ describe("절차 게이트 강제 검증", () => {
 		expect(proxy).toContain("allowNdjson: true");
 		expect(proxy).toContain("tolerateLeadingNoise: true");
 		expect(context).toContain(
-			"MCP 프록시(`scripts/context7-toolname-proxy.mjs`)",
+			"MCP 프록시(`scripts/context7-toolname-proxy.ts`)",
 		);
+	});
+
+	test("Given 스크립트 정책 When 검사 Then js 확장자 잔존이 제거된다", () => {
+		const context = read("CONTEXT.md");
+		const pkg = read("package.json");
+		expect(context).toContain(
+			"런타임/설정 스크립트는 `.js/.mjs/.cjs` 대신 TypeScript 또는 JSON 기반",
+		);
+		expect(pkg).toContain(
+			'"depcruise": "depcruise --config .dependency-cruiser.json src"',
+		);
+		expect(fs.existsSync(path.join(root, ".dependency-cruiser.cjs"))).toBe(
+			false,
+		);
+		expect(fs.existsSync(path.join(root, ".dependency-cruiser.json"))).toBe(
+			true,
+		);
+		expect(
+			fs.existsSync(path.join(root, "scripts/context7-toolname-proxy.ts")),
+		).toBe(true);
+		expect(
+			fs.existsSync(path.join(root, "scripts/context7-toolname-proxy.mjs")),
+		).toBe(false);
 	});
 });

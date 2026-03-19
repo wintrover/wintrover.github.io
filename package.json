@@ -26,7 +26,8 @@
 		"prepare": "node -e \"const fs=require('node:fs'); const cp=require('node:child_process'); const hasBun=(()=>{try{cp.execSync('bun --version',{stdio:'ignore'});return true;}catch{return false;}})(); if (fs.existsSync('.git')) { try { if (hasBun) { cp.execSync('bun x prek install --overwrite --hook-type pre-commit', { stdio: 'inherit' }); } else { cp.execSync('npx prek install --overwrite --hook-type pre-commit', { stdio: 'inherit' }); } } catch { cp.execSync('npx prek install --overwrite --hook-type pre-commit', { stdio: 'inherit' }); } }\"",
 		"stryker": "stryker run",
 		"knip": "knip",
-		"depcruise": "depcruise src"
+		"depcruise": "depcruise --config .dependency-cruiser.json src",
+		"mcp:context7-proxy": "tsx scripts/context7-toolname-proxy.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.10",

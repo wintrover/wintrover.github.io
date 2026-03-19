@@ -125,5 +125,6 @@
 - **5단계 (Verification)**: 최종 검증 시 테스트 통과 및 `scripts/build-github.ts` 실행 결과가 이 문서와 일치하는지 확인한다.
 - 구현 파일 변경은 `CONTEXT.md`, `tests/features/*.feature`, `tests/**/*.test.ts` 변경 증거가 함께 있어야 하며, 해당 검증은 `scripts/procedure-gate.ts`와 CI 워크플로로 자동 차단한다.
 - CI 절차 게이트의 변경 파일 계산은 기본적으로 three-dot diff를 사용하되, 히스토리 재작성으로 merge base가 없을 때 two-dot diff로 폴백해 차단 규칙을 계속 적용한다.
-- MCP 프록시(`scripts/context7-toolname-proxy.mjs`)는 다운스트림 입력 프레이밍으로 Content-Length와 NDJSON을 모두 수용하고, 감지된 프레이밍과 동일한 형식으로 응답해야 한다.
+- MCP 프록시(`scripts/context7-toolname-proxy.ts`)는 다운스트림 입력 프레이밍으로 Content-Length와 NDJSON을 모두 수용하고, 감지된 프레이밍과 동일한 형식으로 응답해야 한다.
+- 레포지토리 루트의 런타임/설정 스크립트는 `.js/.mjs/.cjs` 대신 TypeScript 또는 JSON 기반으로 유지한다.
 - 이 절차 중 하나라도 누락되거나 순서가 뒤바뀔 경우, 에이전트는 즉시 작업을 중단하고 절차를 복구해야 한다.
