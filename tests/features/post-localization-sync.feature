@@ -24,3 +24,4 @@ Feature: Post localization synchronization
     Given a Korean source post is refined for stronger narrative emphasis
     When the paired English post is updated to match the same slug
     Then the English copy should preserve the Korean paragraph flow and intensity of core claims
+    And the formal verification section should preserve probabilistic-limit arguments and numeric claims

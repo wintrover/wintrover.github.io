@@ -87,6 +87,12 @@ describe("post localization synchronization", () => {
 		expect(en).toContain("hell of review labor");
 		expect(ko).toContain("생산성과 성능, 안정성의 삼위일체");
 		expect(en).toContain("Trinity of Productivity, Performance, and Stability");
+		expect(ko).toContain("99% 정확도의 AI 코드를 다시 99% 정확도의 AI가 검사");
+		expect(en).toContain(
+			"99%-accurate AI inspecting code produced by another 99%-accurate AI",
+		);
+		expect(ko).toContain("거의 확실함'은 '확실하지 않음'");
+		expect(en).toContain('"almost certain" is a synonym for "not certain."');
 		expect(ko).toContain("AI가 만든 쓰레기를 치우는 청소부");
 		expect(en).toContain("janitors cleaning up AI-generated trash");
 		expect(ko).toContain("### 1. 사고 궤적 시스템: 의도의 박제");
