@@ -44,7 +44,7 @@ $: {
 	const tagLabel = filterResult.tagLabel ? `#${filterResult.tagLabel}` : "";
 
 	seoTitle = params.category
-		? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} - wintrover`
+		? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""}`
 		: blogDefaultSeo.title;
 	seoDescription = params.category
 		? isKo

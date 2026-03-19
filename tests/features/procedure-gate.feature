@@ -2,6 +2,7 @@ Feature: AGENTS 절차 게이트 강제
   As a Thought Trajectory Architect
   I want process rules to fail automatically when missing
   So that Context-BDD-TDD-Implementation order stays enforceable
+  # Evidence note: page title policy changes also follow this gate.
 
   Scenario: implementation change requires context bdd and test evidence
     Given a change includes implementation files

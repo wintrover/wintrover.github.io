@@ -28,7 +28,7 @@ describe("buildPostDetailSeo", () => {
 			resolvedLocale: "en",
 		});
 
-		expect(seo.seoTitle).toBe("Detailed Post - wintrover");
+		expect(seo.seoTitle).toBe("Detailed Post");
 		expect(seo.seoDescription).toBe("Detailed excerpt");
 		expect(seo.canonicalUrl).toContain("/post/detailed-post/");
 		expect(seo.structuredData).toContain('"@type":"BlogPosting"');
@@ -42,7 +42,7 @@ describe("buildPostDetailSeo", () => {
 			resolvedLocale: "ko",
 		});
 
-		expect(seo.seoTitle).toBe("Post not found - wintrover");
+		expect(seo.seoTitle).toBe("Post not found");
 		expect(seo.seoDescription).toContain("doesn't exist");
 		expect(seo.canonicalUrl).toContain("/ko/");
 		expect(seo.structuredData).toBe("");
@@ -56,7 +56,7 @@ describe("buildPostDetailSeo", () => {
 			resolvedLocale: "en",
 		});
 
-		expect(seo.seoTitle).toBe("Loading post - wintrover");
+		expect(seo.seoTitle).toBe("Post");
 		expect(seo.seoDescription).toBe("");
 		expect(seo.canonicalUrl).toContain("/");
 		expect(seo.structuredData).toBe("");

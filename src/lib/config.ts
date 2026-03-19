@@ -113,7 +113,7 @@ export function buildPostDetailSeo(args: {
 	const localeRoot = `${origin}${localePathPrefix}/`;
 
 	if (post) {
-		const seoTitle = `${post.title} - wintrover`;
+		const seoTitle = post.title;
 		const seoDescription = post.excerpt || post.title;
 		const canonicalUrl = slug
 			? `${origin}${localePathPrefix}/post/${slug}/`
@@ -142,7 +142,7 @@ export function buildPostDetailSeo(args: {
 
 	if (!loading) {
 		return {
-			seoTitle: "Post not found - wintrover",
+			seoTitle: "Post not found",
 			seoDescription:
 				"The post you're looking for doesn't exist or has been moved.",
 			canonicalUrl: localeRoot,
@@ -151,7 +151,7 @@ export function buildPostDetailSeo(args: {
 	}
 
 	return {
-		seoTitle: "Loading post - wintrover",
+		seoTitle: "Post",
 		seoDescription: "",
 		canonicalUrl: localeRoot,
 		structuredData: "",

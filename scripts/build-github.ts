@@ -213,7 +213,7 @@ function buildPostLandingPages(dist: string, locale: "ko" | "en") {
 	for (const post of posts) {
 		const canonical = `${siteOrigin}${localePrefix}/post/${post.slug}/`;
 		const redirect = `${localePrefix}/#/post/${post.slug}`;
-		const title = `${post.title} - wintrover`;
+		const title = post.title;
 		const description = post.description || post.title;
 		const jsonLd = {
 			"@context": "https://schema.org",

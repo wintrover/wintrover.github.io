@@ -366,7 +366,7 @@ describe("PostDetail Component", () => {
 		render(PostDetail, { params: { slug: "detailed-post" } });
 
 		await waitFor(() => {
-			expect(document.title).toBe("Detailed Post - wintrover");
+			expect(document.title).toBe("Detailed Post");
 		});
 
 		// Check if meta tags were searched/created
