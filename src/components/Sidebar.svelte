@@ -139,11 +139,11 @@ void isActive;
               {group.category.label} ({group.category.count})
             </button>
             {#if group.tags.length > 0}
-              <ul class="tag-tree">
+              <ul class="subtopic-tree">
                 {#each group.tags as tag}
-                  <li class="tag-node">
+                  <li class="subtopic-node">
                     <button
-                      class="category-link tag-item {isActive(tag, currentActivePath) ? 'active' : ''}"
+                      class="category-link subtopic-item {isActive(tag, currentActivePath) ? 'active' : ''}"
                       on:click={() => selectCategory(tag)}
                     >
                       {tag.label} ({tag.count})
@@ -250,7 +250,7 @@ void isActive;
 
   .motion-stagger-list > li,
   .motion-stagger-list .category-node,
-  .motion-stagger-list .tag-node {
+  .motion-stagger-list .subtopic-node {
     animation: sideReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
@@ -291,14 +291,14 @@ void isActive;
     padding-left: 0.5rem;
   }
 
-  .tag-tree {
+  .subtopic-tree {
     list-style: none;
     margin: 0.1rem 0 0.18rem 0.4rem;
     padding: 0 0 0 0.7rem;
     border-left: 1px solid rgb(63 63 70 / 70%);
   }
 
-  .tag-node {
+  .subtopic-node {
     margin-bottom: 0.1rem;
   }
 
@@ -334,28 +334,20 @@ void isActive;
     border-color: rgb(82 82 91);
   }
 
-  .category-link.tag-item {
+  .category-link.subtopic-item {
     font-size: 0.76rem;
     color: #a1a1aa;
     padding-left: 0.95rem;
-    position: relative;
   }
 
-  .category-link.tag-item:before {
-    content: "#";
-    position: absolute;
-    left: 0.35rem;
-    color: #52525b;
-  }
-
-  .category-link.tag-item:hover {
+  .category-link.subtopic-item:hover {
     color: #d4d4d8;
     background: rgb(39 39 42 / 40%);
     border-color: rgb(63 63 70 / 70%);
     padding-left: 0.95rem;
   }
 
-  .category-link.tag-item.active {
+  .category-link.subtopic-item.active {
     color: #f4f4f5;
     font-weight: 500;
     background: rgb(39 39 42 / 65%);
@@ -378,7 +370,7 @@ void isActive;
     .motion-reveal,
     .motion-stagger-list > li,
     .motion-stagger-list .category-node,
-    .motion-stagger-list .tag-node {
+    .motion-stagger-list .subtopic-node {
       animation-duration: 0.01ms;
       animation-iteration-count: 1;
     }

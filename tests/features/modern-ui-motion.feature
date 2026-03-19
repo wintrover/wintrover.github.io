@@ -32,3 +32,8 @@ Feature: Modern UI motion across core blog surfaces
     Given I render the app shell after selecting a category
     When I move to a non-list route like /resume
     Then category active styling should be cleared to match current location
+
+  Scenario: Sidebar nested subtopics are constrained to approved list
+    Given I render the app shell with category nested items
+    When I inspect nested labels under category nodes
+    Then nested items should only include SMBholdings CVFactory and Devlog

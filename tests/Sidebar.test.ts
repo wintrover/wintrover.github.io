@@ -87,9 +87,10 @@ describe("Sidebar Component", () => {
 		expect(screen.getByText(/All Posts \(3\)/)).toBeInTheDocument();
 		expect(screen.getByText(/Project \(2\)/)).toBeInTheDocument();
 		expect(screen.getByText(/Company Work \(1\)/)).toBeInTheDocument();
-		expect(screen.getByText(/Svelte \(2\)/)).toBeInTheDocument();
-		expect(screen.getByText(/Vitest \(1\)/)).toBeInTheDocument();
+		expect(screen.getByText(/CVFactory \(0\)/)).toBeInTheDocument();
 		expect(screen.getByText(/SMBholdings \(0\)/)).toBeInTheDocument();
+		expect(screen.queryByText(/Svelte \(2\)/)).toBeNull();
+		expect(screen.queryByText(/Vitest \(1\)/)).toBeNull();
 		expect(
 			screen.getByText("Thought Trajectory Architect"),
 		).toBeInTheDocument();
@@ -129,14 +130,14 @@ describe("Sidebar Component", () => {
 		expect(push).toHaveBeenCalledWith("/");
 	});
 
-	test("태그 클릭 시 selectedCategory가 업데이트되고 태그 경로로 이동해야 함", async () => {
+	test("서브주제 클릭 시 selectedCategory가 업데이트되고 태그 경로로 이동해야 함", async () => {
 		render(Sidebar);
 
-		const tagButton = screen.getByText(/Vitest \(1\)/);
+		const tagButton = screen.getByText(/SMBholdings \(0\)/);
 		await fireEvent.click(tagButton);
 
-		expect(get(selectedCategory)).toBe("Company Work - vitest");
-		expect(push).toHaveBeenCalledWith("/category/company-work/tag/vitest");
+		expect(get(selectedCategory)).toBe("Company Work - smbholdings");
+		expect(push).toHaveBeenCalledWith("/category/company-work/tag/smbholdings");
 	});
 
 	test("아바타는 링크가 아니고 클릭 시 이동하지 않아야 함", async () => {
@@ -268,13 +269,13 @@ describe("Sidebar Component", () => {
 		);
 	});
 
-	test("buildSidebarData는 configured 태그와 포스트 태그를 병합해야 함", () => {
+	test("buildSidebarData는 허용된 서브주제만 포함해야 함", () => {
 		const generatedPosts: Post[] = [
 			{
 				fileName: "a",
 				title: "A",
 				category: "Company Work",
-				tags: ["Vitest"],
+				tags: ["AI", "SMBholdings"],
 				slug: "a",
 				date: "2024-01-01",
 				excerpt: "",
@@ -295,15 +296,9 @@ describe("Sidebar Component", () => {
 
 		expect(result.allPostsItem.count).toBe(1);
 		expect(companyGroup).toBeDefined();
-		expect(companyGroup?.tags.map((tag) => tag.label)).toEqual([
-			"SMBholdings",
-			"Vitest",
-		]);
+		expect(companyGroup?.tags.map((tag) => tag.label)).toEqual(["SMBholdings"]);
 		expect(
 			companyGroup?.tags.find((tag) => tag.label === "SMBholdings")?.count,
-		).toBe(0);
-		expect(
-			companyGroup?.tags.find((tag) => tag.label === "Vitest")?.count,
 		).toBe(1);
 	});
 

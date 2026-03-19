@@ -17,6 +17,17 @@ type CategoryConfigLike = {
 	categories?: Record<string, { name?: unknown; tags?: unknown }>;
 };
 
+const sidebarSubtopics = ["SMBholdings", "CVFactory", "Devlog"] as const;
+const subtopicLabelByLowercase = Object.fromEntries(
+	sidebarSubtopics.map((subtopic) => [subtopic.toLowerCase(), subtopic]),
+) as Record<string, string>;
+
+function resolveSidebarSubtopicLabel(raw: string): string | null {
+	const normalized = raw.trim().toLowerCase();
+	if (!normalized) return null;
+	return subtopicLabelByLowercase[normalized] ?? null;
+}
+
 export type SidebarItem = {
 	label: string;
 	slug: string;
@@ -86,7 +97,9 @@ export function buildSidebarData(
 		const tags = entry?.tags;
 		if (typeof name === "string" && name) {
 			configuredTagsByCategoryName[name] = Array.isArray(tags)
-				? tags.map((tag) => String(tag)).filter(Boolean)
+				? tags
+						.map((tag) => resolveSidebarSubtopicLabel(String(tag)))
+						.filter((tag): tag is string => Boolean(tag))
 				: [];
 		}
 	}
@@ -107,8 +120,10 @@ export function buildSidebarData(
 			tagCountByCategory[post.category] =
 				tagCountByCategory[post.category] || {};
 			for (const tag of post.tags) {
-				tagCountByCategory[post.category][tag] =
-					(tagCountByCategory[post.category][tag] || 0) + 1;
+				const subtopicLabel = resolveSidebarSubtopicLabel(String(tag));
+				if (!subtopicLabel) continue;
+				tagCountByCategory[post.category][subtopicLabel] =
+					(tagCountByCategory[post.category][subtopicLabel] || 0) + 1;
 			}
 		}
 	}
@@ -138,8 +153,8 @@ export function buildSidebarData(
 			const fromConfig = configuredTagsByCategoryName[name] ?? [];
 			const fromPosts = Object.keys(tagCountByCategory[name] ?? {});
 			const tags = Array.from(new Set([...fromConfig, ...fromPosts]))
-				.map((tag) => String(tag).trim())
-				.filter(Boolean)
+				.map((tag) => resolveSidebarSubtopicLabel(String(tag)))
+				.filter((tag): tag is string => Boolean(tag))
 				.sort((a, b) => a.localeCompare(b));
 
 			for (const tag of tags) {
