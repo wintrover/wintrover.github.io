@@ -22,7 +22,7 @@ export const site = {
 		},
 		{
 			id: "linkedin",
-			url: "https://linkedin.com/in/suhyok-yun-1934b713a",
+			url: "https://www.linkedin.com/in/suhyok-yoon-1934b713a/",
 			iconClass: "fab fa-linkedin",
 		},
 	] satisfies SocialLink[],
