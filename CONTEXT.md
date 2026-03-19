@@ -56,6 +56,7 @@
 - 동일 slug의 한영 포스트 동기화 시 제목 계층, 문단 분할, 수사 강도(은유·강조 어휘)까지 원문의 논리 흐름과 뉘앙스를 보존한다.
 - 공개 포스트 본문에는 작성 프로세스용 체크리스트(예: Verification Checklist, Length Guidelines)를 남기지 않는다.
 - 이력서 소셜의 LinkedIn 링크는 `https://www.linkedin.com/in/<slug>/` 형식의 canonical URL을 사용한다.
+- 이력서 메타 타이틀은 로케일 공통으로 `resume` 표기를 사용한다.
 
 ## 3) 빌드 및 Mermaid 파이프라인 불변 규칙
 

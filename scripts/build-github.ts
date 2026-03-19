@@ -162,7 +162,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 	);
 	const raw = fs.readFileSync(resumeLocalePath, "utf8");
 	const json = JSON.parse(raw) as ResumeLocaleJson;
-	const title = String(json?.meta?.title ?? "wintrover's resume");
+	const title = String(json?.meta?.title ?? "resume");
 	const description = String(
 		json?.meta?.description ??
 			"Thought Trajectory Architect shaping AI products by making decision trajectories explicit and executable.",

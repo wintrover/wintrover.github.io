@@ -23,7 +23,7 @@ describe("ResumePage", () => {
 			`link[rel="stylesheet"][href="${site.fontAwesomeStylesheetUrl}"]`,
 		);
 		expect(fa).toBeInTheDocument();
-		expect(document.title).toBe("wintrover's resume");
+		expect(document.title).toBe("resume");
 
 		expect(
 			screen.getByRole("heading", { level: 1, name: "Suhyok Yun" }),

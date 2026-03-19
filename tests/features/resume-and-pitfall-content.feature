@@ -12,3 +12,8 @@ Feature: Resume link and pitfall post cleanup
     Given pitfall post content is published for readers
     When the article reaches the ending section
     Then authoring process checklist headings must not remain in body text
+
+  Scenario: resume meta title uses unified short label
+    Given resume locale metadata is configured for both Korean and English
+    When title fields are resolved for runtime and build fallback
+    Then meta title and og title should use "resume" consistently

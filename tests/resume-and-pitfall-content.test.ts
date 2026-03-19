@@ -18,6 +18,7 @@ describe("이력서 링크 및 pitfall 포스트 정리 검증", () => {
 		expect(scenarios).toEqual([
 			"resume social linkedin uses canonical profile URL",
 			"pitfall post excludes authoring process checklist text",
+			"resume meta title uses unified short label",
 		]);
 	});
 
@@ -35,5 +36,18 @@ describe("이력서 링크 및 pitfall 포스트 정리 검증", () => {
 		);
 		expect(post).not.toContain("### Verification Checklist");
 		expect(post).not.toContain("### Length Guidelines");
+	});
+
+	test('Given resume 로케일 메타 When 검사 Then title/og_title이 "resume"으로 통일된다', () => {
+		const en = read("src/lib/resume/locales/en.json");
+		const ko = read("src/lib/resume/locales/ko.json");
+		const buildScript = read("scripts/build-github.ts");
+		expect(en).toContain('"title": "resume"');
+		expect(en).toContain('"og_title": "resume"');
+		expect(ko).toContain('"title": "resume"');
+		expect(ko).toContain('"og_title": "resume"');
+		expect(buildScript).toContain(
+			'const title = String(json?.meta?.title ?? "resume")',
+		);
 	});
 });
