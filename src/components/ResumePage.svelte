@@ -40,7 +40,10 @@ function t(key: string): string {
 	<link rel="alternate" hreflang="x-default" href={`${siteOrigin}/`} />
 	<meta name="description" content={t("meta.description")} />
 	<meta name="keywords" content={t("meta.keywords")} />
-	<meta name="robots" content="index,follow" />
+	<meta
+		name="robots"
+		content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+	/>
 	<meta property="og:title" content={t("meta.og_title")} />
 	<meta property="og:description" content={t("meta.og_description")} />
 	<meta property="og:type" content={t("meta.og_type")} />

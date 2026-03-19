@@ -57,6 +57,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"Post route hero motion must replay on route entry",
 			"Build output verification enforces deployment entrypoints",
 			"Sitemap generation preserves locale architecture",
+			"GEO robots directives preserve AI discoverability controls",
 			"Build and Mermaid pipelines keep critical invariants",
 			"Mermaid image naming and fallback handling remain deterministic",
 			"Transient post loading failures must be retryable",
@@ -188,6 +189,20 @@ describe("SSoT context 규칙 전수 검증", () => {
 			"`${base}${localePrefix}/post/${post.slug}/`",
 		);
 		expect(buildScript).not.toContain("`${base}/en/post/");
+	});
+
+	test("Given GEO 정책 When robots와 메타 검증 Then AI 검색 제어 지시어를 유지한다", () => {
+		const indexTemplate = read("index.html");
+		expect(context).toContain(
+			"max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+		);
+		expect(indexTemplate).toContain(
+			'content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"',
+		);
+		expect(buildScript).toContain("const robotsMetaContent =");
+		expect(buildScript).toContain('content="${robotsMetaContent}"');
+		expect(buildScript).toContain("User-agent: Google-Extended");
+		expect(buildScript).toContain("Allow: /");
 	});
 
 	test("Given Pages workflow When 빌드 env 매핑 Then analytics 변수는 secrets 우선 vars fallback 규칙을 따른다", () => {

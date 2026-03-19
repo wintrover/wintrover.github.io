@@ -21,6 +21,8 @@ type ResumeMeta = {
 type ResumeLocaleJson = {
 	meta?: ResumeMeta;
 };
+const robotsMetaContent =
+	"index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
 
 function run(cmd: string, args: string[], env: Env = {}) {
 	execFileSync(cmd, args, {
@@ -181,7 +183,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 		`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
 		`<title>${xmlEscape(title)}</title>` +
 		`<meta name="description" content="${xmlEscape(description)}"/>` +
-		`<meta name="robots" content="index,follow"/>` +
+		`<meta name="robots" content="${robotsMetaContent}"/>` +
 		`<link rel="canonical" href="${xmlEscape(canonical)}"/>` +
 		`<link rel="alternate" hreflang="ko" href="${siteOrigin}/ko/resume/"/>` +
 		`<link rel="alternate" hreflang="en" href="${siteOrigin}/resume/"/>` +
@@ -238,7 +240,7 @@ function buildPostLandingPages(dist: string, locale: "ko" | "en") {
 			`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
 			`<title>${xmlEscape(title)}</title>` +
 			`<meta name="description" content="${xmlEscape(description)}"/>` +
-			`<meta name="robots" content="index,follow"/>` +
+			`<meta name="robots" content="${robotsMetaContent}"/>` +
 			`<link rel="canonical" href="${xmlEscape(canonical)}"/>` +
 			`<meta property="og:title" content="${xmlEscape(post.title)}"/>` +
 			`<meta property="og:description" content="${xmlEscape(description)}"/>` +
@@ -305,6 +307,10 @@ function buildRobots(dist: string) {
 	const content =
 		`User-agent: *\n` +
 		`Allow: /\n` +
+		`\n` +
+		`User-agent: Google-Extended\n` +
+		`Allow: /\n` +
+		`\n` +
 		`Sitemap: https://wintrover.github.io/sitemap.xml\n`;
 	writeFile(path.join(dist, "robots.txt"), content);
 }

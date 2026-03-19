@@ -192,6 +192,10 @@ void goBack;
 	{#if seoDescription}
 		<meta name="description" content={seoDescription} />
 	{/if}
+	<meta
+		name="robots"
+		content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+	/>
 	<meta property="og:title" content={seoTitle} />
 	<meta property="og:description" content={seoDescription} />
 	<meta property="og:type" content={post ? "article" : "website"} />

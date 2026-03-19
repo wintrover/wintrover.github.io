@@ -112,6 +112,12 @@ Feature: Context SSoT architecture and UI invariants
     And English posts must use "/post/{slug}/"
     And no canonical "/en/" post URL should be emitted
 
+  Scenario: GEO robots directives preserve AI discoverability controls
+    Given static and runtime pages publish SEO robots directives
+    When pages and robots.txt are generated
+    Then robots meta should include "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+    And robots.txt should keep a Google-Extended group for AI policy separation
+
   Scenario: Build and Mermaid pipelines keep critical invariants
     Given build-github.ts and image-tools.ts are part of release flow
     When pipeline safety checks are executed
