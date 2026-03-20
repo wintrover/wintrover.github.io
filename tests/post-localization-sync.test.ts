@@ -134,4 +134,22 @@ describe("post localization synchronization", () => {
 			),
 		);
 	});
+
+	test("Given readability refinement When validating flow-block layout Then arrow flow and numbered verification procedure stay intact", () => {
+		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+
+		expect(ko).toContain("이 시스템은 단순한 기록이 아니다.\\");
+		expect(ko).toContain(
+			"요구사항 입력\\\n→ 설계자의 의도를 구조화된 형태로 캡처\\\n→ 이후 모든 생성/검증 과정에서 “기준점”으로 사용\\\n→ 코드가 아니라 “의도”를 기준으로 정합성 검증",
+		);
+		expect(ko).toContain(
+			"1. 의도를 검증 가능한 규칙으로 변환\n2. 이 규칙이 어떤 상황에서도 깨지지 않는지 확인\n3. 규칙을 깨는 반례가 존재하는지 자동 탐색\n4. 반례가 발견되면 코드 생성 자체를 중단\n5. 모든 조건을 만족할 때만 코드 생성",
+		);
+		expect(ko).toContain("예를 들어:\\");
+		expect(ko).toContain(
+			"“사용자는 자신의 데이터만 조회할 수 있어야 한다”라는 보안 조건이 있다면,\\",
+		);
+		expect(ko).toContain("사용자는 자신의 데이터만 조회할 수 있어야 한다.\\");
+		expect(ko).toContain("해당 로직은 생성되지 않는다.");
+	});
 });

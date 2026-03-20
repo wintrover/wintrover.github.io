@@ -31,3 +31,9 @@ Feature: Post localization synchronization
     When the section structure and protected lines are reviewed
     Then dashed hr separators and heading hierarchy should remain unchanged
     And trailing backslashes and protected verification phrases should be preserved verbatim
+
+  Scenario: partial edit keeps flow-block layout and numbered verification procedure
+    Given I refine readability in a localized post section
+    When I review thought-flow and formal-verification paragraphs
+    Then flow lines with arrow connectors should preserve blank lines and trailing backslashes
+    And formal verification steps should remain an ordered numbered list
