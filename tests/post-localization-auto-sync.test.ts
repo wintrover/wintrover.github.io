@@ -13,10 +13,25 @@ describe("post localization auto sync", () => {
 	test("Given KO formal-verification anchors When syncing same slug Then EN section is automatically patched", () => {
 		const koPath = "src/posts/ko/project/2026-03-19-20.md";
 		const ko = read(koPath);
-		const en = read("src/posts/project/2026-03-19-20.md").replace(
+		const enAfterSectionTrim = read(
+			"src/posts/project/2026-03-19-20.md",
+		).replace(
 			/\nThis verification is not a post-hoc review\.[\s\S]*?We create a state where bugs cannot exist\.\n/m,
 			"\n",
 		);
+		const en = enAfterSectionTrim
+			.replace(
+				/\nThis system is not a simple log\.[\s\S]*?In short, code is only one output that must satisfy this intent\.\n/m,
+				"\n",
+			)
+			.replace(
+				/\nLanguage choice is not a matter of taste\.[\s\S]*?Intent and constraints are verified first, before they are converted into code\.\n/m,
+				"\n",
+			)
+			.replace(
+				/\nAI writes code\.\\\nArchright creates a state where that code cannot be wrong\.\n/m,
+				"\n",
+			);
 
 		const result = syncEnglishContentForSlug(koPath, ko, en);
 
@@ -28,6 +43,15 @@ describe("post localization auto sync", () => {
 		expect(result.content).toContain("For example:\\");
 		expect(result.content).toContain(
 			"If a request is sent with another user's ID:\\",
+		);
+		expect(result.content).toContain("This system is not a simple log.\\");
+		expect(result.content).toContain("Requirements input\\");
+		expect(result.content).toContain(
+			"Intent (high level) → Constraints (intermediate form) → Code (low level)\\",
+		);
+		expect(result.content).toContain("AI writes code.\\");
+		expect(result.content).toContain(
+			"Archright creates a state where that code cannot be wrong.",
 		);
 		expect(result.content).toContain(
 			"→ it is immediately detected as a counterexample and code generation is stopped.\\",

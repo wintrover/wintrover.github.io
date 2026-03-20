@@ -45,3 +45,4 @@ Feature: Post localization synchronization
     When Korean formal-verification anchors are present
     Then the EN formal-verification section should be patched automatically
     And the counterexample branch lines and trailing backslashes should be preserved
+    And intent-flow and layer-chain lines should be synchronized in the EN body

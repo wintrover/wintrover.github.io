@@ -98,6 +98,18 @@ describe("post localization synchronization", () => {
 		expect(en).toContain("janitors cleaning up AI-generated trash");
 		expect(ko).toContain("### 1. 사고 궤적 시스템: 의도의 박제");
 		expect(en).toContain("### 1. Thought Trajectory System: Freezing Intent");
+		expect(ko).toContain("요구사항 입력\\");
+		expect(en).toContain("Requirements input\\");
+		expect(ko).toContain(
+			"의도 (고수준) → 제약 조건 (중간 표현) → 코드 (저수준)\\",
+		);
+		expect(en).toContain(
+			"Intent (high level) → Constraints (intermediate form) → Code (low level)\\",
+		);
+		expect(ko).toContain("Archright는 그 코드가 틀릴 수 없는 상태를 만든다.");
+		expect(en).toContain(
+			"Archright creates a state where that code cannot be wrong.",
+		);
 	});
 
 	test("Given partial localized edit When verifying fixed markdown markers Then separators, headings, backslashes, and protected phrases remain intact", () => {
