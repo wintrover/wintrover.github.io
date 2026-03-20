@@ -184,10 +184,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Notify Slack on failure
-        if: secrets.SLACK_WEBHOOK_URL != ''
-        shell: bash
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: env.SLACK_WEBHOOK_URL != ''
+        shell: bash
         run: |
           set -euo pipefail
           payload=$(cat <<'JSON'
@@ -199,7 +199,10 @@ jobs:
           curl -X POST -H "Content-type: application/json" --data "${payload}" "${SLACK_WEBHOOK_URL}"
 
       - name: Notify email on failure
-        if: secrets.SMTP_SERVER != '' && secrets.ALERT_EMAIL_TO != ''
+        env:
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+        if: env.SMTP_SERVER != '' && env.ALERT_EMAIL_TO != ''
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
