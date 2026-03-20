@@ -98,4 +98,40 @@ describe("post localization synchronization", () => {
 		expect(ko).toContain("### 1. 사고 궤적 시스템: 의도의 박제");
 		expect(en).toContain("### 1. Thought Trajectory System: Freezing Intent");
 	});
+
+	test("Given partial localized edit When verifying fixed markdown markers Then separators, headings, backslashes, and protected phrases remain intact", () => {
+		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+		const delimiter =
+			'<hr style="border: 0; border-top: 1px dashed #52525b; margin: 1.2rem 0;" />';
+
+		expect(ko).toContain(
+			`${delimiter}\n\n### 1) 의도의 결핍: 이 코드는 내 설계 맥락에 정말 부합하는가?`,
+		);
+		expect(ko).toContain(
+			`${delimiter}\n\n### 1. 사고 궤적 시스템: 의도의 박제`,
+		);
+		expect(ko).toContain(`${delimiter}\n\n## 다시 되찾는 빌딩의 기쁨`);
+		expect(ko).toContain(
+			"최근 대두되는 AI 코드 리뷰(Claude Review 등)는 99% 정확도의 AI 코드를 다시 99% 정확도의 AI가 검사하는 방식이다.\\",
+		);
+		expect(ko).toContain(
+			"Archright는 Z3 Solver, Lean 4, Cedar와 같은 수학적 검증 및 권한 설정 도구를 엔진에 내재화한다.\\",
+		);
+	});
+
+	test("PBT: Given protected lines When checking partial edits Then trailing backslashes and exact lines stay unchanged", () => {
+		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+
+		fc.assert(
+			fc.property(
+				fc.constantFrom(
+					"최근 대두되는 AI 코드 리뷰(Claude Review 등)는 99% 정확도의 AI 코드를 다시 99% 정확도의 AI가 검사하는 방식이다.\\",
+					"Archright는 Z3 Solver, Lean 4, Cedar와 같은 수학적 검증 및 권한 설정 도구를 엔진에 내재화한다.\\",
+				),
+				(line) => {
+					expect(ko.includes(line)).toBe(true);
+				},
+			),
+		);
+	});
 });

@@ -25,3 +25,9 @@ Feature: Post localization synchronization
     When the paired English post is updated to match the same slug
     Then the English copy should preserve the Korean paragraph flow and intensity of core claims
     And the formal verification section should preserve probabilistic-limit arguments and numeric claims
+
+  Scenario: partial edit keeps markdown readability markers and fixed phrases
+    Given I partially edit an existing localized post
+    When the section structure and protected lines are reviewed
+    Then dashed hr separators and heading hierarchy should remain unchanged
+    And trailing backslashes and protected verification phrases should be preserved verbatim
