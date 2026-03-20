@@ -8,6 +8,7 @@ import {
 	DEPLOY_POSTS_ROOT_RELATIVE,
 	discoverPostFiles,
 	evaluateDeploymentDecision,
+	isLinkedInDryRunEnabled,
 	resolveCanonicalSlug,
 } from "../scripts/post-to-dev";
 
@@ -86,13 +87,20 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(workflow).toContain("DEPLOY_TARGET:");
 		expect(workflow).toContain('DEPLOY_PREFLIGHT_ONLY: "true"');
 		expect(workflow).toContain("MAX_PUBLISH_PER_RUN:");
+		expect(workflow).toContain("linkedin_dry_run:");
 		expect(workflow).toContain(
 			"github.event.inputs.platforms || 'devto,linkedin'",
+		);
+		expect(workflow).toContain(
+			"github.event.inputs.linkedin_dry_run || 'false'",
 		);
 		expect(workflow).toContain(
 			'run: bun scripts/post-to-dev.ts "${DEPLOY_TARGET}" "${DEPLOY_PLATFORMS}"',
 		);
 		expect(workflow).toContain("STATE_DATA_ROOT: ./database");
+		expect(workflow).toContain(
+			"LINKEDIN_DRY_RUN: ${{ needs.preflight.outputs.linkedin_dry_run }}",
+		);
 		expect(workflow).toContain(
 			"LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}",
 		);
@@ -140,11 +148,25 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(script).toContain("resolveEnglishLinkedInIntro(");
 		expect(script).toContain("linkedInIntro:");
 		expect(script).toContain('join("\\n\\n")');
+		expect(script).toContain("buildLinkedInDryRunPreview(");
+		expect(script).toContain("LINKEDIN_DRY_RUN");
+		expect(script).toContain("[linkedin-dry-run] payload=");
 		expect(script).toContain("hasHangul(");
 		expect(script).toContain(
 			"I shared a new post about engineering decisions and quality automation. Read it here.",
 		);
 		expect(script).toContain("trimmed.slice(0, 6)");
+	});
+
+	test("Given dry-run 입력값 When 플래그 해석 Then truthy 문자열만 활성화된다", () => {
+		expect(isLinkedInDryRunEnabled("true")).toBe(true);
+		expect(isLinkedInDryRunEnabled(" 1 ")).toBe(true);
+		expect(isLinkedInDryRunEnabled("yes")).toBe(true);
+		expect(isLinkedInDryRunEnabled("on")).toBe(true);
+		expect(isLinkedInDryRunEnabled("false")).toBe(false);
+		expect(isLinkedInDryRunEnabled("0")).toBe(false);
+		expect(isLinkedInDryRunEnabled("")).toBe(false);
+		expect(isLinkedInDryRunEnabled(undefined)).toBe(false);
 	});
 
 	test("Given 배포 스캔 When target 누락 Then 즉시 거부한다", async () => {
@@ -276,6 +298,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(context).toContain("DB 브랜치");
 		expect(context).toContain("database");
 		expect(context).toContain("MAX_PUBLISH_PER_RUN");
+		expect(context).toContain("linkedin_dry_run=true");
 		expect(context).toContain("bulk-backfill");
 	});
 });
