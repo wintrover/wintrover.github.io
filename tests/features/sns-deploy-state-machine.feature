@@ -19,6 +19,7 @@ Feature: SNS deployment state machine
     Given deployment script posts to LinkedIn and Dev.to directly
     When LinkedIn request body is created
     Then posting endpoint must use rest/posts with Posts API payload schema
+    And workflow_dispatch linkedin_dry_run=true must skip LinkedIn publish API call and print preview payload
     And author must use person URN resolved from v2/me and continue with fallback urn:li:person:binfyrHJAK when profile lookup fails
     And LinkedIn commentary intro must be English-only
     And LinkedIn commentary must place canonical link in a separate paragraph with one blank line

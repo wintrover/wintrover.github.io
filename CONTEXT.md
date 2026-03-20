@@ -32,6 +32,7 @@
 - LinkedIn 배포는 `rest/posts`를 사용하고 Posts API 페이로드(`author`, `commentary`, `visibility`)를 적용해야 하며 Author는 `v2/me`로 확인한 person URN을 우선 주입하되 프로필 조회 권한 이슈가 발생하면 `LINKEDIN_PERSON_URN`(기본값 `urn:li:person:binfyrHJAK`) fallback으로 배포를 지속해야 한다.
 - LinkedIn `commentary`는 소개 문단과 링크 문단을 `\n\n`으로 분리해야 하며 링크는 별도 단락으로 출력해야 한다.
 - LinkedIn 소개 문단은 영어로만 작성해야 하며 동일 slug의 영어 원문(`src/posts/**`) excerpt/description을 우선 사용하고, 영어 문단을 확보하지 못하면 영어 기본 소개문을 사용해야 한다.
+- SNS 배포 워크플로는 `workflow_dispatch` 입력 `linkedin_dry_run=true`일 때 LinkedIn 발행 API 호출을 생략하고 canonical URL·commentary·payload 미리보기만 출력해야 한다.
 - DEV.to 및 LinkedIn 본문의 이미지 링크는 `https://wintrover.github.io/` 기반 절대 경로로 치환해야 한다.
 - 모든 플랫폼 시도 결과는 `GITHUB_STEP_SUMMARY` 마크다운 표와 `DB` 브랜치의 `STATUS.md`에 동시 반영해야 하며, 상태 스냅샷은 `DB` 브랜치에서만 단일 커밋으로 영속화해야 한다.
 - SNS 배포 워크플로는 `deploy`와 `DB` 브랜치를 이중 체크아웃하고, 배포 후 `database` 저장소에서 `git pull --rebase` 기반 최대 3회 재시도 후 원자적으로 푸시해야 한다.

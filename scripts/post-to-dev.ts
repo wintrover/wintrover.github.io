@@ -104,6 +104,18 @@ function normalizeLinkedInPostsApiUrl(rawUrl: string) {
 	}
 }
 
+export function isLinkedInDryRunEnabled(raw?: string) {
+	const normalized = String(raw || "")
+		.trim()
+		.toLowerCase();
+	return (
+		normalized === "1" ||
+		normalized === "true" ||
+		normalized === "yes" ||
+		normalized === "on"
+	);
+}
+
 function normalizePublicBaseUrl(url: string) {
 	try {
 		if (typeof url !== "string" || !url) return DEFAULT_PUBLIC_BASE_URL;
@@ -633,6 +645,23 @@ async function publishToLinkedIn(
 	};
 }
 
+function buildLinkedInDryRunPreview(
+	post: PreparedPost,
+	personUrn: string,
+	linkedInVersion: string,
+) {
+	const payload = buildLinkedInPostsPayload(post, personUrn);
+	return [
+		"[linkedin-dry-run] publish skipped",
+		`[linkedin-dry-run] canonical-url=${post.canonicalUrl}`,
+		`[linkedin-dry-run] commentary=${payload.commentary}`,
+		`[linkedin-dry-run] payload=${JSON.stringify(payload)}`,
+		`[linkedin-dry-run] linkedin-version=${linkedInVersion}`,
+		`[linkedin-dry-run] endpoint=${LINKEDIN_POSTS_API_URL}`,
+		"",
+	].join("\n");
+}
+
 function statusPaths(postKey: string, platform: Platform) {
 	const baseDir = path.join(DEPLOY_ROOT, ...postKey.split("/"));
 	return {
@@ -1033,6 +1062,30 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 		const accessToken = process.env.LINKEDIN_ACCESS_TOKEN;
 		const configuredUrn =
 			process.env.LINKEDIN_PERSON_URN || DEFAULT_LINKEDIN_PERSON_URN;
+		const linkedInVersion = normalizeLinkedInVersion(
+			process.env.LINKEDIN_VERSION ||
+				process.env.LINKEDIN_API_VERSION ||
+				DEFAULT_LINKEDIN_VERSION,
+		);
+		const linkedInDryRun = isLinkedInDryRunEnabled(
+			process.env.LINKEDIN_DRY_RUN,
+		);
+		if (linkedInDryRun) {
+			process.stdout.write(
+				buildLinkedInDryRunPreview(post, configuredUrn, linkedInVersion),
+			);
+			const record: DeploymentRecord = {
+				slug: post.slug,
+				postKey: post.postKey,
+				platform,
+				state: "skipped",
+				updatedAt,
+				detail: "linkedin dry-run preview only (not published)",
+				postPath: post.filePath,
+			};
+			await writePlatformStatus(record, true);
+			return record;
+		}
 		if (!accessToken) throw new Error("LINKEDIN_ACCESS_TOKEN is not set");
 		const personUrn = await resolveLinkedInPersonUrn(
 			accessToken,

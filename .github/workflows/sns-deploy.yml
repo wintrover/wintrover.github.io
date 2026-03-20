@@ -20,6 +20,11 @@ on:
         required: false
         default: "1"
         type: string
+      linkedin_dry_run:
+        description: "Preview LinkedIn payload only without publishing"
+        required: false
+        default: "false"
+        type: string
 
 permissions:
   contents: write
@@ -35,6 +40,7 @@ jobs:
       deploy_target: ${{ steps.resolve_target.outputs.deploy_target }}
       deploy_platforms: ${{ steps.resolve_target.outputs.deploy_platforms }}
       max_publish_per_run: ${{ steps.resolve_target.outputs.max_publish_per_run }}
+      linkedin_dry_run: ${{ steps.resolve_target.outputs.linkedin_dry_run }}
     steps:
       - name: Checkout deploy branch
         uses: actions/checkout@v4
@@ -49,6 +55,7 @@ jobs:
           set -euo pipefail
           DEPLOY_PLATFORMS="${{ github.event.inputs.platforms || 'devto,linkedin' }}"
           MAX_PUBLISH_PER_RUN="${{ github.event.inputs.max_publish_per_run || '1' }}"
+          LINKEDIN_DRY_RUN="${{ github.event.inputs.linkedin_dry_run || 'false' }}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.target }}" ]; then
             DEPLOY_TARGET="${{ github.event.inputs.target }}"
           else
@@ -71,6 +78,7 @@ jobs:
           echo "deploy_target=${DEPLOY_TARGET}" >> "$GITHUB_OUTPUT"
           echo "deploy_platforms=${DEPLOY_PLATFORMS}" >> "$GITHUB_OUTPUT"
           echo "max_publish_per_run=${MAX_PUBLISH_PER_RUN}" >> "$GITHUB_OUTPUT"
+          echo "linkedin_dry_run=${LINKEDIN_DRY_RUN}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -143,6 +151,7 @@ jobs:
           DEPLOY_TARGET: ${{ needs.preflight.outputs.deploy_target }}
           DEPLOY_PLATFORMS: ${{ needs.preflight.outputs.deploy_platforms }}
           MAX_PUBLISH_PER_RUN: ${{ needs.preflight.outputs.max_publish_per_run }}
+          LINKEDIN_DRY_RUN: ${{ needs.preflight.outputs.linkedin_dry_run }}
           LINKEDIN_VERSION: "202603"
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
