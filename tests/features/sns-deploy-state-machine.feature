@@ -9,7 +9,7 @@ Feature: SNS deployment state machine
     Then the workflow must stop before publishing APIs are called
 
   Scenario: per-platform state file decides retry and skip behavior
-    Given each post tracks platform state in .deploy/<slug>/<platform>.status
+    Given each post tracks platform state in .deploy/<postKey>/<platform>.status
     When .success marker exists
     Then deployment for that platform must be skipped
     And when .failed marker exists or no state file exists
@@ -39,11 +39,20 @@ Feature: SNS deployment state machine
     Then workflow must run git pull --rebase and retry push up to 3 times
 
   Scenario: deploy target discovery is isolated to physical files under src/posts
-    Given deployment script resolves candidates from current working directory
-    When target path is omitted or provided explicitly
+    Given deployment script requires an explicit target path
+    When target path is provided explicitly
     And workflow is triggered by push event without manual inputs
-    Then only existing .md files under src/posts may enter deployment
-    And ko locale subtree under src/posts must remain deploy-eligible
+    Then only one existing .md file under src/posts may enter deployment
+    And ko locale subtree under src/posts must be excluded from deployment candidates
+    And directory target must be rejected immediately
     And paths outside src/posts must be rejected
     And GITHUB_STEP_SUMMARY must include scanned root and candidate file snapshot
     And terminal logs must include scanned root and candidate file snapshot
+
+  Scenario: preflight and publish are separated with environment approval
+    Given workflow computes candidate file count before publish
+    When candidate file count is greater than MAX_PUBLISH_PER_RUN
+    Then workflow must hard fail before publish step
+    And preflight summary must include scanned root and candidate snapshot
+    And publish job must run only after environment approval
+    And bulk backfill must run only in a dedicated manual workflow with batch limit

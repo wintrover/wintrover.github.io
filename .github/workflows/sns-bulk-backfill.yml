@@ -1,0 +1,145 @@
+name: SNS Bulk Backfill
+
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: "Markdown targets under src/posts, one per line"
+        required: true
+        type: string
+      platforms:
+        description: "Comma separated platforms (devto,linkedin)"
+        required: false
+        default: "devto,linkedin"
+        type: string
+      batch_size:
+        description: "Maximum files to publish in this run"
+        required: false
+        default: "5"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sns-bulk-backfill-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    environment: sns-bulk-backfill
+    steps:
+      - name: Checkout deploy branch
+        uses: actions/checkout@v4
+        with:
+          ref: deploy
+          fetch-depth: 0
+
+      - name: Checkout DB state branch
+        id: checkout_state
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: DB
+          path: database
+          fetch-depth: 0
+
+      - name: Initialize DB state branch when missing
+        if: steps.checkout_state.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf database
+          mkdir -p database
+          cd database
+          git --no-pager init
+          git --no-pager config user.name "github-actions[bot]"
+          git --no-pager config user.email "github-actions[bot]@users.noreply.github.com"
+          git --no-pager remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git --no-pager checkout --orphan DB
+          mkdir -p .deploy
+          touch STATUS.md
+          git --no-pager add .deploy STATUS.md
+          git --no-pager commit -m "chore(deploy): bootstrap state branch [skip ci]"
+          git --no-pager push origin HEAD:DB
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate targets and batch size
+        id: validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          BATCH_SIZE="${{ github.event.inputs.batch_size || '5' }}"
+          if ! [[ "${BATCH_SIZE}" =~ ^[0-9]+$ ]] || [ "${BATCH_SIZE}" -le 0 ]; then
+            echo "batch_size must be a positive integer."
+            exit 1
+          fi
+          mapfile -t lines < <(printf '%s\n' "${{ github.event.inputs.targets }}" | sed '/^\s*$/d')
+          if [ "${#lines[@]}" -eq 0 ]; then
+            echo "At least one target is required."
+            exit 1
+          fi
+          if [ "${#lines[@]}" -gt "${BATCH_SIZE}" ]; then
+            echo "Target count ${#lines[@]} exceeds batch_size ${BATCH_SIZE}."
+            exit 1
+          fi
+          {
+            echo "targets<<EOF"
+            printf '%s\n' "${lines[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "batch_size=${BATCH_SIZE}" >> "$GITHUB_OUTPUT"
+
+      - name: Run bulk backfill
+        shell: bash
+        env:
+          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/
+          STATE_DATA_ROOT: ./database
+          DEPLOY_PLATFORMS: ${{ github.event.inputs.platforms || 'devto,linkedin' }}
+          LINKEDIN_VERSION: "202603"
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+        run: |
+          set -euo pipefail
+          while IFS= read -r target; do
+            [ -n "${target}" ] || continue
+            bun scripts/post-to-dev.ts "${target}" "${DEPLOY_PLATFORMS}"
+          done <<< "${{ steps.validate.outputs.targets }}"
+
+      - name: Persist deployment state
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p database/.deploy
+          if [ -d .deploy ]; then cp -R .deploy/. database/.deploy/; fi
+          if [ -f STATUS.md ]; then cp STATUS.md database/STATUS.md; fi
+          cd database
+          git --no-pager config user.name "github-actions[bot]"
+          git --no-pager config user.email "github-actions[bot]@users.noreply.github.com"
+          git --no-pager add .deploy STATUS.md
+          if git --no-pager diff --cached --quiet; then
+            echo "No deployment state changes."
+            exit 0
+          fi
+          git --no-pager commit -m "chore(deploy): persist bulk backfill status snapshot [skip ci]"
+          for attempt in 1 2 3; do
+            if git --no-pager push origin HEAD:DB; then
+              echo "Push succeeded on attempt ${attempt}."
+              exit 0
+            fi
+            if [ "${attempt}" = "3" ]; then
+              echo "Push failed after 3 attempts."
+              exit 1
+            fi
+            git --no-pager pull --rebase origin DB
+          done
