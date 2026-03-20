@@ -76,6 +76,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(workflow).toContain("workflow_dispatch:");
 		expect(workflow).toContain("preflight:");
 		expect(workflow).toContain("publish:");
+		expect(workflow).toContain("notify-on-failure:");
 		expect(workflow).toContain("environment: sns-publish");
 		expect(workflow).toContain("ref: deploy");
 		expect(workflow).toContain("path: database");
@@ -106,6 +107,8 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(workflow).toContain("git --no-pager pull --rebase origin DB");
 		expect(workflow).toContain("git --no-pager push origin HEAD:DB");
 		expect(workflow).toContain("Notify Slack on failure");
+		expect(workflow).toContain("needs.preflight.result");
+		expect(workflow).toContain("needs.publish.result");
 	});
 
 	test("Given bulk backfill workflow 파일 When 검사 Then 수동 승인과 배치 제한을 포함한다", () => {

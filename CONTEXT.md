@@ -41,6 +41,7 @@
 - SNS 배포 실행 시 터미널 로그에도 스캔 기준 루트와 배포 후보 물리 파일 목록 스냅샷을 동일하게 출력해 워크플로 로그 검색으로 입력 집합을 재구성 가능해야 한다.
 - SNS 배포 스크립트 입력 계약은 디렉터리 target을 즉시 거부하고 `src/posts/` 내부(단, `src/posts/ko/` 제외)의 단일 `.md` 파일만 허용해야 한다.
 - SNS 배포 워크플로는 preflight 단계에서 후보 파일 수를 계산해 `MAX_PUBLISH_PER_RUN`(기본값 1) 초과 시 하드 실패해야 하며, `scanned-root`/`candidate` 요약 출력과 환경 승인 이후에만 publish를 실행해야 한다.
+- SNS 배포 워크플로는 preflight 또는 publish 실패 시 `notify-on-failure` 단계에서 Slack/Email 알림을 시도해야 한다.
 - 대량 재처리는 일반 SNS 배포 워크플로에서 금지하고, 수동 승인과 배치 제한을 가진 `sns-bulk-backfill` 전용 워크플로에서만 허용해야 한다.
 - `src/posts/ko/` 로케일 서브트리의 물리 `.md` 파일은 배포 후보에서 제외해야 한다.
 

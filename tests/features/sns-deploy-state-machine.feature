@@ -55,4 +55,5 @@ Feature: SNS deployment state machine
     Then workflow must hard fail before publish step
     And preflight summary must include scanned root and candidate snapshot
     And publish job must run only after environment approval
+    And workflow must trigger failure notification when preflight or publish fails
     And bulk backfill must run only in a dedicated manual workflow with batch limit
