@@ -8,6 +8,7 @@ import {
 	DEPLOY_POSTS_ROOT_RELATIVE,
 	discoverPostFiles,
 	evaluateDeploymentDecision,
+	resolveCanonicalSlug,
 } from "../scripts/post-to-dev";
 
 const root = process.cwd();
@@ -245,6 +246,21 @@ describe("SNS 배포 상태 머신 검증", () => {
 		);
 		expect(snapshot).toContain(
 			"[deploy-input] candidate=src/posts/company/b.md",
+		);
+	});
+
+	test("Given canonical slug 생성 When 제목에 apostrophe 포함 Then 앱 라우팅 slug와 동일해야 한다", () => {
+		const slug = resolveCanonicalSlug(
+			path.join(
+				root,
+				DEPLOY_POSTS_ROOT_RELATIVE,
+				"project",
+				"2026-03-19-20.md",
+			),
+			"Why We Still Don't Trust AI-Generated Code: The Archright Trinity",
+		);
+		expect(slug).toBe(
+			"why-we-still-don-t-trust-ai-generated-code-the-archright-trinity",
 		);
 	});
 

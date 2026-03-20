@@ -26,6 +26,57 @@ describe("postLoader", () => {
 		expect(post?.title).toBe(targetPost.title);
 	});
 
+	test("loadPostBySlug - legacy canonical slug도 호환되어야 함", async () => {
+		const modules = {
+			"src/posts/project/2026-03-19-20.md":
+				"---\ntitle: Why We Still Don't Trust AI-Generated Code: The Archright Trinity\n---",
+		};
+		const post = await loadPostBySlug(
+			"why-we-still-dont-trust-ai-generated-code-the-archright-trinity",
+			modules,
+		);
+		expect(post).not.toBeNull();
+		expect(post?.slug).toBe(
+			"why-we-still-don-t-trust-ai-generated-code-the-archright-trinity",
+		);
+	});
+
+	test("loadPostBySlug - legacy slug 비교 분기에서 불일치면 null이어야 함", async () => {
+		const post = await loadPostBySlug("not-matching-slug", {
+			"src/posts/project/2026-03-19-20.md":
+				"---\ntitle: Why We Still Don't Trust AI-Generated Code: The Archright Trinity\n---",
+		});
+		expect(post).toBeNull();
+	});
+
+	test("loadPostBySlug - legacy slug 계산 시 빈 title이면 fileName fallback을 사용한다", async () => {
+		const post = await loadPostBySlug("x", {
+			".md": '---\ntitle: ""\n---',
+		});
+		expect(post).toBeNull();
+	});
+
+	test("loadPostBySlug - 파싱 실패 포스트는 continue 처리되어야 함", async () => {
+		vi.resetModules();
+		vi.doMock("../src/lib/markdown", async () => {
+			const actual = await vi.importActual<
+				typeof import("../src/lib/markdown")
+			>("../src/lib/markdown");
+			return {
+				...actual,
+				renderMarkdownBody: () => {
+					throw new Error("parse fail");
+				},
+			};
+		});
+		const { loadPostBySlug } = await import("../src/lib/postLoader");
+		const post = await loadPostBySlug("a", {
+			"src/posts/project/a.md": "---\ntitle: A\n---\nBody",
+		});
+		expect(post).toBeNull();
+		vi.doUnmock("../src/lib/markdown");
+	});
+
 	test("PBT: loadAllPosts는 date 기준 내림차순으로 정렬되어야 함", async () => {
 		await fc.assert(
 			fc.asyncProperty(

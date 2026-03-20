@@ -3,6 +3,7 @@ import path from "node:path";
 import dotenv from "dotenv";
 import matter from "gray-matter";
 import { logError, logWarn } from "../src/lib/log";
+import { slugify } from "../src/lib/utils";
 import { processMermaidDiagrams } from "./image-tools";
 
 type Frontmatter = Record<string, unknown> & {
@@ -121,13 +122,10 @@ function normalizePublicBaseUrl(url: string) {
 	}
 }
 
-function slugifyTitle(title: string) {
-	return String(title)
-		.toLowerCase()
-		.replace(/[^\w\s-]/g, "")
-		.replace(/\s+/g, "-")
-		.replace(/-+/g, "-")
-		.trim();
+export function resolveCanonicalSlug(filePath: string, title: string) {
+	const fallbackSlug = path.basename(filePath, path.extname(filePath));
+	const titleSlug = slugify(String(title || ""));
+	return titleSlug || fallbackSlug;
 }
 
 export function absolutizeSrc(src: string, publicBaseUrl: string): string;
@@ -454,9 +452,10 @@ async function preparePost(filePath: string, publicBaseUrl: string) {
 		path.basename(filePath, path.extname(filePath));
 	const slug = path.basename(filePath, path.extname(filePath));
 	const postKey = toPostKey(filePath);
+	const canonicalSlug = resolveCanonicalSlug(filePath, titleRaw);
 	const canonicalUrl =
 		String(typedFrontmatter.canonical_url || "").trim() ||
-		`${publicBaseUrl}post/${slugifyTitle(titleRaw)}/`;
+		`${publicBaseUrl}post/${canonicalSlug}/`;
 	const descriptionRaw =
 		String(
 			typedFrontmatter.excerpt || typedFrontmatter.description || "",
