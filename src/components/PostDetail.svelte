@@ -24,6 +24,12 @@ let canonicalUrl = "";
 let structuredData = "";
 let routeMotionKey = "post";
 
+function normalizeRouteSlug(rawSlug?: string) {
+	return String(rawSlug || "")
+		.replace(/^\/+|\/+$/g, "")
+		.trim();
+}
+
 async function loadPostData(slug: string) {
 	if (!slug) return;
 	if (currentSlug === slug) return;
@@ -82,7 +88,7 @@ $: resolvedLocale = detectLocaleFromRuntime(
 );
 
 $: {
-	const slug = params?.slug ?? "";
+	const slug = normalizeRouteSlug(params?.slug);
 	routeMotionKey = slug || "post";
 	const seo = buildPostDetailSeo({ post, loading, slug, resolvedLocale });
 	seoTitle = seo.seoTitle;
@@ -92,8 +98,9 @@ $: {
 }
 
 onMount(() => {
-	if (params?.slug) {
-		loadPostData(params.slug);
+	const slug = normalizeRouteSlug(params?.slug);
+	if (slug) {
+		loadPostData(slug);
 	}
 });
 
@@ -101,8 +108,8 @@ $: if (params) {
 	// params 변경 감지 (디버깅용 로그 삭제됨)
 }
 
-$: if (params?.slug) {
-	loadPostData(params.slug);
+$: if (normalizeRouteSlug(params?.slug)) {
+	loadPostData(normalizeRouteSlug(params?.slug));
 }
 
 $: if (!loading && post) {

@@ -46,6 +46,7 @@ Feature: SNS deployment state machine
     And ko locale subtree under src/posts must be excluded from deployment candidates
     And directory target must be rejected immediately
     And paths outside src/posts must be rejected
+    And canonical slug for deployment URL must follow app slugify behavior for apostrophes
     And GITHUB_STEP_SUMMARY must include scanned root and candidate file snapshot
     And terminal logs must include scanned root and candidate file snapshot
 

@@ -138,6 +138,15 @@ function derivePostSlug(data: PostFrontMatter, fileName: string) {
 	return slugify(fileName || "");
 }
 
+function toLegacyCanonicalSlug(value: string) {
+	return String(value)
+		.toLowerCase()
+		.replace(/[^\w\s-]/g, "")
+		.replace(/\s+/g, "-")
+		.replace(/-+/g, "-")
+		.trim();
+}
+
 function processPostMetadata(
 	filePath: string,
 	data: PostFrontMatter,
@@ -253,12 +262,22 @@ export async function loadPostBySlug(
 	modulesOverride?: Record<string, string | null>,
 ): Promise<Post | null> {
 	try {
+		const normalizedSlug = String(slug || "")
+			.trim()
+			.toLowerCase();
 		const modules: Record<string, string | null> =
 			modulesOverride || (await getPostFiles());
 		for (const [path, content] of Object.entries(modules)) {
 			if (content === null || content === undefined) continue;
 			const post = parsePostFromModule(path, content);
-			if (post && post.slug === slug) {
+			if (!post) continue;
+			if (post.slug === normalizedSlug) {
+				return post;
+			}
+			const legacyCanonicalSlug = toLegacyCanonicalSlug(
+				post.title || post.fileName,
+			);
+			if (legacyCanonicalSlug === normalizedSlug) {
 				return post;
 			}
 		}
