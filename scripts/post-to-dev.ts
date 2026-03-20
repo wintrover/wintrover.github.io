@@ -64,7 +64,7 @@ const LINKEDIN_POSTS_API_URL = normalizeLinkedInPostsApiUrl(
 	process.env.LINKEDIN_POSTS_API_URL || "https://api.linkedin.com/rest/posts",
 );
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
-export const DEPLOY_POSTS_ROOT_RELATIVE = "content/posts";
+export const DEPLOY_POSTS_ROOT_RELATIVE = "src/posts";
 const DEPLOY_POSTS_ROOT = path.resolve(
 	process.cwd(),
 	DEPLOY_POSTS_ROOT_RELATIVE,

@@ -9,7 +9,7 @@ on:
       target:
         description: "Markdown file or directory target"
         required: false
-        default: "content/posts"
+        default: "src/posts"
         type: string
       platforms:
         description: "Comma separated platforms (devto,linkedin)"
@@ -74,7 +74,7 @@ jobs:
         env:
           BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/
           STATE_DATA_ROOT: ./database
-          DEPLOY_TARGET: ${{ github.event.inputs.target || 'content/posts' }}
+          DEPLOY_TARGET: ${{ github.event.inputs.target || 'src/posts' }}
           DEPLOY_PLATFORMS: ${{ github.event.inputs.platforms || 'devto,linkedin' }}
           LINKEDIN_VERSION: "202603"
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}

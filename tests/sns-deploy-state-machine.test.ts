@@ -30,7 +30,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 			"platform APIs are called with required identity and absolute image URLs",
 			"action persists deploy state to isolated DB branch",
 			"state persistence push handles conflict with bounded rebase retries",
-			"deploy target discovery is isolated to physical files under content/posts",
+			"deploy target discovery is isolated to physical files under src/posts",
 		]);
 	});
 
@@ -69,13 +69,13 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(workflow).toContain("branches:");
 		expect(workflow).toContain("- deploy");
 		expect(workflow).toContain("workflow_dispatch:");
-		expect(workflow).toContain('default: "content/posts"');
+		expect(workflow).toContain('default: "src/posts"');
 		expect(workflow).toContain("ref: deploy");
 		expect(workflow).toContain("path: database");
 		expect(workflow).toContain("ref: DB");
 		expect(workflow).toContain("bun scripts/post-to-dev.ts");
 		expect(workflow).toContain("DEPLOY_TARGET:");
-		expect(workflow).toContain("github.event.inputs.target || 'content/posts'");
+		expect(workflow).toContain("github.event.inputs.target || 'src/posts'");
 		expect(workflow).toContain(
 			"github.event.inputs.platforms || 'devto,linkedin'",
 		);
@@ -124,7 +124,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(script).toContain("trimmed.slice(0, 6)");
 	});
 
-	test("Given 배포 스캔 When 기본 탐색 Then content/posts 하위 물리 파일만 수집한다", async () => {
+	test("Given 배포 스캔 When 기본 탐색 Then src/posts 하위 물리 파일만 수집한다", async () => {
 		const postsRoot = path.join(root, DEPLOY_POSTS_ROOT_RELATIVE);
 		const insideDir = path.join(postsRoot, "isolation-e2e");
 		const insideFile = path.join(insideDir, "inside-post.md");
@@ -159,7 +159,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 		}
 	});
 
-	test("Given 배포 스캔 When content/posts 외부 경로 입력 Then 즉시 거부한다", async () => {
+	test("Given 배포 스캔 When src/posts 외부 경로 입력 Then 즉시 거부한다", async () => {
 		const outsideFile = path.join(root, "outside-reject.md");
 		fs.writeFileSync(outsideFile, "# outside");
 		try {
@@ -181,8 +181,8 @@ describe("SNS 배포 상태 머신 검증", () => {
 		);
 		expect(snapshot).toContain("## Deployment Input Snapshot");
 		expect(snapshot).toContain("| Scanned Root |");
-		expect(snapshot).toContain("content/posts/project/a.md");
-		expect(snapshot).toContain("content/posts/company/b.md");
+		expect(snapshot).toContain("src/posts/project/a.md");
+		expect(snapshot).toContain("src/posts/company/b.md");
 	});
 
 	test("Given 배포 후보 목록 When 로그 스냅샷 생성 Then 터미널 검색 가능한 텍스트로 요약된다", () => {
@@ -193,12 +193,12 @@ describe("SNS 배포 상태 머신 검증", () => {
 				path.join(root, DEPLOY_POSTS_ROOT_RELATIVE, "company", "b.md"),
 			],
 		);
-		expect(snapshot).toContain("[deploy-input] scanned-root=content/posts");
+		expect(snapshot).toContain("[deploy-input] scanned-root=src/posts");
 		expect(snapshot).toContain(
-			"[deploy-input] candidate=content/posts/project/a.md",
+			"[deploy-input] candidate=src/posts/project/a.md",
 		);
 		expect(snapshot).toContain(
-			"[deploy-input] candidate=content/posts/company/b.md",
+			"[deploy-input] candidate=src/posts/company/b.md",
 		);
 	});
 

@@ -38,12 +38,12 @@ Feature: SNS deployment state machine
     When state push fails on first attempt
     Then workflow must run git pull --rebase and retry push up to 3 times
 
-  Scenario: deploy target discovery is isolated to physical files under content/posts
+  Scenario: deploy target discovery is isolated to physical files under src/posts
     Given deployment script resolves candidates from current working directory
     When target path is omitted or provided explicitly
     And workflow is triggered by push event without manual inputs
-    Then only existing .md files under content/posts may enter deployment
-    And ko locale subtree under content/posts must remain deploy-eligible
-    And paths outside content/posts must be rejected
+    Then only existing .md files under src/posts may enter deployment
+    And ko locale subtree under src/posts must remain deploy-eligible
+    And paths outside src/posts must be rejected
     And GITHUB_STEP_SUMMARY must include scanned root and candidate file snapshot
     And terminal logs must include scanned root and candidate file snapshot
