@@ -1,6 +1,6 @@
 {
-  "state": "success",
-  "updatedAt": "2026-03-17T10:12:45.718Z",
-  "detail": "updated: https://dev.to/wintrover/debugging-a-production-kyc-system-a-multi-layer-problem-solving-guide-i-wrote-after-3-days-of-1k9k",
+  "state": "skipped",
+  "updatedAt": "2026-03-20T07:06:28.320Z",
+  "detail": "success marker exists",
   "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/src/posts/company/2025-10-26-12.md"
 }

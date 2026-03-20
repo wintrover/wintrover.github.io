@@ -1,6 +1,6 @@
 {
-  "state": "success",
-  "updatedAt": "2026-03-17T10:12:51.039Z",
-  "detail": "created: https://dev.to/wintrover/from-celeryredis-to-temporal-a-journey-toward-idempotency-and-reliable-workflows-3hi5-temp-slug-7879287",
+  "state": "skipped",
+  "updatedAt": "2026-03-20T07:06:28.323Z",
+  "detail": "success marker exists",
   "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/src/posts/company/2026-01-08-16.md"
 }

@@ -1,6 +1,6 @@
 {
-  "state": "failed",
-  "updatedAt": "2026-03-17T10:12:39.385Z",
-  "detail": "DEV.to API failed (429): Retry later\n",
-  "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/src/posts/project/2025-07-18-5.md"
+  "state": "skipped",
+  "updatedAt": "2026-03-20T07:05:56.626Z",
+  "detail": "success marker exists",
+  "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/src/posts/ko/project/2025-07-18-5.md"
 }

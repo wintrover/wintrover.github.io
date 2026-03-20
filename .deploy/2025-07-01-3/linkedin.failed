@@ -1,6 +1,0 @@
-{
-  "state": "failed",
-  "updatedAt": "2026-03-17T10:12:37.733Z",
-  "detail": "LinkedIn API failed (403): {\"status\":403,\"serviceErrorCode\":100,\"code\":\"ACCESS_DENIED\",\"message\":\"Field Value validation failed in REQUEST_BODY: Data Processing Exception while processing fields [/author]\"}",
-  "postPath": "/home/runner/work/wintrover.github.io/wintrover.github.io/src/posts/project/2025-07-01-3.md"
-}
