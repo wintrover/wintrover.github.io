@@ -16,7 +16,8 @@ describe("post localization synchronization", () => {
 
 		expect(ko).toContain("AI는 믿을 수 없다. 그러니 다시 손으로 코딩하라.");
 		expect(en).toContain("AI is not trustworthy. Go back to coding by hand.");
-		expect(ko).toContain("이건 엔지니어링이 아니다. 비용 이연이다.");
+		expect(ko).toContain("이건 엔지니어링이 아니다.");
+		expect(ko).toContain("비용 이연이다.");
 		expect(en).toContain("That is not engineering. It is deferred cost.");
 		expect(ko).toContain("그래서 나는 Archright를 만들기로 했다.");
 		expect(en).toContain("That decision is what led to Archright.");

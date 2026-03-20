@@ -31,6 +31,7 @@ Feature: Post localization synchronization
     When the section structure and protected lines are reviewed
     Then dashed hr separators and heading hierarchy should remain unchanged
     And trailing backslashes and protected verification phrases should be preserved verbatim
+    And readability-driven sentence splits should keep original core claims intact
 
   Scenario: partial edit keeps flow-block layout and numbered verification procedure
     Given I refine readability in a localized post section
