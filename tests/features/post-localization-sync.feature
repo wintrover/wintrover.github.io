@@ -39,3 +39,9 @@ Feature: Post localization synchronization
     Then flow lines with arrow connectors should preserve blank lines and trailing backslashes
     And formal verification steps should remain an ordered numbered list
     And the verification example may add an explicit counterexample branch before the final rejection line
+
+  Scenario: KO change auto patches EN section with nuance-locked structure
+    Given a Korean post and English post share the same slug
+    When Korean formal-verification anchors are present
+    Then the EN formal-verification section should be patched automatically
+    And the counterexample branch lines and trailing backslashes should be preserved
