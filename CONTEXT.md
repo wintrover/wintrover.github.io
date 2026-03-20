@@ -26,11 +26,12 @@
 - `main` 브랜치는 포스팅 작성과 코드 개발의 기본 브랜치로 사용하고 SNS 배포 트리거 대상으로 사용하지 않는다.
 - `deploy` 브랜치는 실제 SNS 배포가 일어나는 프로덕션 브랜치로 사용해야 한다.
 - 배포 상태는 소스코드가 없는 독립 `DB` 브랜치(이하 DB 브랜치)에서만 관리해야 한다.
-- 포스트별 플랫폼 상태는 `.deploy/[post-slug]/[platform].status`를 SSOT로 기록하고 `.success`/`.failed` 마커로 재시도 여부를 결정해야 한다.
+- 포스트별 플랫폼 상태는 `.deploy/[post-key]/[platform].status`를 SSOT로 기록하고 `.success`/`.failed` 마커로 재시도 여부를 결정해야 한다.
+- 플랫폼 상태 파일(`.status`)에는 외부 플랫폼 식별자(`postId`, `url`)를 저장해 중복 발행 방지 정확도를 유지해야 한다.
 - 상태머신 규칙은 `.success`가 있으면 Skip, `.failed` 또는 상태 파일 부재면 재배포 시도를 수행해야 한다.
 - LinkedIn 배포는 `rest/posts`를 사용하고 Posts API 페이로드(`author`, `commentary`, `visibility`)를 적용해야 하며 Author는 `v2/me`로 확인한 person URN을 우선 주입하되 프로필 조회 권한 이슈가 발생하면 `LINKEDIN_PERSON_URN`(기본값 `urn:li:person:binfyrHJAK`) fallback으로 배포를 지속해야 한다.
 - LinkedIn `commentary`는 소개 문단과 링크 문단을 `\n\n`으로 분리해야 하며 링크는 별도 단락으로 출력해야 한다.
-- LinkedIn 소개 문단은 영어로만 작성해야 하며 `src/posts/ko/**` 배포 시에는 동일 slug의 영어 원문(`src/posts/**`) excerpt/description을 우선 사용하고, 영어 문단을 확보하지 못하면 영어 기본 소개문을 사용해야 한다.
+- LinkedIn 소개 문단은 영어로만 작성해야 하며 동일 slug의 영어 원문(`src/posts/**`) excerpt/description을 우선 사용하고, 영어 문단을 확보하지 못하면 영어 기본 소개문을 사용해야 한다.
 - DEV.to 및 LinkedIn 본문의 이미지 링크는 `https://wintrover.github.io/` 기반 절대 경로로 치환해야 한다.
 - 모든 플랫폼 시도 결과는 `GITHUB_STEP_SUMMARY` 마크다운 표와 `DB` 브랜치의 `STATUS.md`에 동시 반영해야 하며, 상태 스냅샷은 `DB` 브랜치에서만 단일 커밋으로 영속화해야 한다.
 - SNS 배포 워크플로는 `deploy`와 `DB` 브랜치를 이중 체크아웃하고, 배포 후 `database` 저장소에서 `git pull --rebase` 기반 최대 3회 재시도 후 원자적으로 푸시해야 한다.
@@ -38,8 +39,10 @@
 - SNS 배포 스캔 대상은 현재 워킹 디렉토리의 `src/posts/` 아래에 실제로 존재하는 물리적 `.md` 파일로만 제한해야 하며, 이 경로 밖의 입력·Git 이력·캐시 인덱스 결과를 배포 후보로 허용하면 안 된다.
 - SNS 배포 실행 시 `GITHUB_STEP_SUMMARY`에는 스캔 기준 루트와 배포 후보 물리 파일 목록 스냅샷을 함께 기록해 실행 시점 입력 집합을 추적 가능해야 한다.
 - SNS 배포 실행 시 터미널 로그에도 스캔 기준 루트와 배포 후보 물리 파일 목록 스냅샷을 동일하게 출력해 워크플로 로그 검색으로 입력 집합을 재구성 가능해야 한다.
-- SNS 배포 워크플로는 `push` 이벤트에서도 `target=src/posts`, `platforms=devto,linkedin` 기본값을 강제해 수동 입력 부재로 인한 루트 오탐 스캔을 허용하면 안 된다.
-- `src/posts/ko/` 로케일 서브트리의 물리 `.md` 파일은 배포 후보에서 제외하면 안 된다.
+- SNS 배포 스크립트 입력 계약은 디렉터리 target을 즉시 거부하고 `src/posts/` 내부(단, `src/posts/ko/` 제외)의 단일 `.md` 파일만 허용해야 한다.
+- SNS 배포 워크플로는 preflight 단계에서 후보 파일 수를 계산해 `MAX_PUBLISH_PER_RUN`(기본값 1) 초과 시 하드 실패해야 하며, `scanned-root`/`candidate` 요약 출력과 환경 승인 이후에만 publish를 실행해야 한다.
+- 대량 재처리는 일반 SNS 배포 워크플로에서 금지하고, 수동 승인과 배치 제한을 가진 `sns-bulk-backfill` 전용 워크플로에서만 허용해야 한다.
+- `src/posts/ko/` 로케일 서브트리의 물리 `.md` 파일은 배포 후보에서 제외해야 한다.
 
 ## 2) URL 아키텍처 규칙
 

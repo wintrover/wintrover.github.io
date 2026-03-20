@@ -21,6 +21,7 @@ type DevToArticleSummary = {
 };
 
 type DevToArticleResponse = {
+	id?: number;
 	url?: string;
 };
 
@@ -30,15 +31,29 @@ type PublishState = "success" | "failed" | "skipped" | "unknown";
 
 type DeploymentRecord = {
 	slug: string;
+	postKey: string;
 	platform: Platform;
 	state: PublishState;
 	updatedAt: string;
 	detail: string;
 	postPath: string;
+	externalPostId?: string;
+	externalPostUrl?: string;
+};
+
+type PersistedPlatformStatus = {
+	state?: PublishState;
+	updatedAt?: string;
+	detail?: string;
+	postPath?: string;
+	postKey?: string;
+	externalPostId?: string;
+	externalPostUrl?: string;
 };
 
 type PreparedPost = {
 	slug: string;
+	postKey: string;
 	filePath: string;
 	title: string;
 	description?: string;
@@ -438,6 +453,7 @@ async function preparePost(filePath: string, publicBaseUrl: string) {
 		String(typedFrontmatter.title || "").trim() ||
 		path.basename(filePath, path.extname(filePath));
 	const slug = path.basename(filePath, path.extname(filePath));
+	const postKey = toPostKey(filePath);
 	const canonicalUrl =
 		String(typedFrontmatter.canonical_url || "").trim() ||
 		`${publicBaseUrl}post/${slugifyTitle(titleRaw)}/`;
@@ -456,6 +472,7 @@ async function preparePost(filePath: string, publicBaseUrl: string) {
 			: firstImageRef.url;
 	return {
 		slug,
+		postKey,
 		filePath,
 		title: clampTitle(titleRaw),
 		description: descriptionRaw,
@@ -522,9 +539,11 @@ async function publishToDevto(post: PreparedPost, apiKey: string) {
 		throw new Error(`DEV.to API failed (${response.status}): ${errorPayload}`);
 	}
 	const result = (await response.json()) as DevToArticleResponse;
+	const postId = existingId ?? result.id;
 	return {
 		url: result.url || "",
 		detail: existingId ? "updated" : "created",
+		postId: typeof postId === "number" ? String(postId) : undefined,
 	};
 }
 
@@ -574,9 +593,20 @@ async function publishToLinkedIn(
 	for (const attempt of attemptChain) {
 		response = await publishRequest(attempt.url, attempt.versionHeaderName);
 		if (response.ok) {
+			const restliId = response.headers.get("x-restli-id") || undefined;
+			let responsePostId: string | undefined;
+			try {
+				const raw = (await response.json()) as { id?: string };
+				if (typeof raw.id === "string" && raw.id) {
+					responsePostId = raw.id;
+				}
+			} catch {
+				responsePostId = undefined;
+			}
 			return {
 				url: post.canonicalUrl,
 				detail: `published:${payload.author}`,
+				postId: restliId || responsePostId,
 			};
 		}
 		errorPayload = await response.text();
@@ -604,8 +634,8 @@ async function publishToLinkedIn(
 	};
 }
 
-function statusPaths(slug: string, platform: Platform) {
-	const baseDir = path.join(DEPLOY_ROOT, slug);
+function statusPaths(postKey: string, platform: Platform) {
+	const baseDir = path.join(DEPLOY_ROOT, ...postKey.split("/"));
 	return {
 		baseDir,
 		status: path.join(baseDir, `${platform}.status`),
@@ -623,6 +653,15 @@ async function fileExists(filePath: string) {
 	}
 }
 
+async function readPlatformStatus(filePath: string) {
+	try {
+		const raw = await fs.readFile(filePath, "utf-8");
+		return JSON.parse(raw) as PersistedPlatformStatus;
+	} catch {
+		return null;
+	}
+}
+
 export function evaluateDeploymentDecision(
 	hasSuccessMarker: boolean,
 	hasFailedMarker: boolean,
@@ -636,53 +675,26 @@ async function writePlatformStatus(
 	record: DeploymentRecord,
 	skipWriteMarkers: boolean,
 ) {
-	const paths = statusPaths(record.slug, record.platform);
+	const paths = statusPaths(record.postKey, record.platform);
+	const payload = {
+		state: record.state,
+		updatedAt: record.updatedAt,
+		detail: record.detail,
+		postPath: record.postPath,
+		postKey: record.postKey,
+		externalPostId: record.externalPostId,
+		externalPostUrl: record.externalPostUrl,
+	};
 	await fs.mkdir(paths.baseDir, { recursive: true });
-	await fs.writeFile(
-		paths.status,
-		JSON.stringify(
-			{
-				state: record.state,
-				updatedAt: record.updatedAt,
-				detail: record.detail,
-				postPath: record.postPath,
-			},
-			null,
-			2,
-		),
-	);
+	await fs.writeFile(paths.status, JSON.stringify(payload, null, 2));
 	if (skipWriteMarkers) return;
 	if (record.state === "success") {
 		await fs.rm(paths.failed, { force: true });
-		await fs.writeFile(
-			paths.success,
-			JSON.stringify(
-				{
-					state: record.state,
-					updatedAt: record.updatedAt,
-					detail: record.detail,
-					postPath: record.postPath,
-				},
-				null,
-				2,
-			),
-		);
+		await fs.writeFile(paths.success, JSON.stringify(payload, null, 2));
 	}
 	if (record.state === "failed") {
 		await fs.rm(paths.success, { force: true });
-		await fs.writeFile(
-			paths.failed,
-			JSON.stringify(
-				{
-					state: record.state,
-					updatedAt: record.updatedAt,
-					detail: record.detail,
-					postPath: record.postPath,
-				},
-				null,
-				2,
-			),
-		);
+		await fs.writeFile(paths.failed, JSON.stringify(payload, null, 2));
 	}
 }
 
@@ -703,7 +715,7 @@ export function buildStatusMarkdown(records: DeploymentRecord[]) {
 		}
 	>();
 	for (const record of records) {
-		const prev = grouped.get(record.slug) || {
+		const prev = grouped.get(record.postKey) || {
 			devto: "unknown",
 			linkedin: "unknown",
 			updatedAt: record.updatedAt,
@@ -711,18 +723,18 @@ export function buildStatusMarkdown(records: DeploymentRecord[]) {
 		if (record.platform === "devto") prev.devto = record.state;
 		if (record.platform === "linkedin") prev.linkedin = record.state;
 		if (record.updatedAt > prev.updatedAt) prev.updatedAt = record.updatedAt;
-		grouped.set(record.slug, prev);
+		grouped.set(record.postKey, prev);
 	}
 	const rows = [...grouped.entries()]
 		.sort(([a], [b]) => a.localeCompare(b))
 		.map(
-			([slug, status]) =>
-				`| ${slug} | ${summarizeState(status.devto)} | ${summarizeState(status.linkedin)} | ${status.updatedAt} |`,
+			([postKey, status]) =>
+				`| ${postKey} | ${summarizeState(status.devto)} | ${summarizeState(status.linkedin)} | ${status.updatedAt} |`,
 		);
 	return [
 		"# SNS Deployment Status",
 		"",
-		"| Post Slug | Dev.to | LinkedIn | Updated At |",
+		"| Post Key | Dev.to | LinkedIn | Updated At |",
 		"| --- | --- | --- | --- |",
 		...rows,
 		"",
@@ -732,6 +744,26 @@ export function buildStatusMarkdown(records: DeploymentRecord[]) {
 function toWorkspaceRelative(filePath: string) {
 	const relative = path.relative(process.cwd(), filePath);
 	return relative.replace(/\\/g, "/");
+}
+
+function toPostKey(filePath: string) {
+	const relative = toWorkspaceRelative(filePath);
+	if (relative.toLowerCase().endsWith(".md")) {
+		return relative.slice(0, -3);
+	}
+	return relative;
+}
+
+function slugFromPostKey(postKey: string) {
+	return path.posix.basename(postKey);
+}
+
+function resolveMaxPublishPerRun() {
+	const raw = process.env.MAX_PUBLISH_PER_RUN;
+	if (!raw) return 1;
+	const parsed = Number(raw);
+	if (!Number.isFinite(parsed) || parsed <= 0) return 1;
+	return Math.floor(parsed);
 }
 
 export function buildDeploymentInputSnapshotMarkdown(
@@ -787,11 +819,11 @@ async function writeGithubSummary(
 		snapshotMarkdown,
 		"## SNS Deployment Result",
 		"",
-		"| Post | Platform | State | Detail |",
+		"| Post Key | Platform | State | Detail |",
 		"| --- | --- | --- | --- |",
 		...records.map(
 			(record) =>
-				`| ${record.slug} | ${record.platform} | ${summarizeState(record.state)} | ${record.detail.replace(/\|/g, "\\|")} |`,
+				`| ${record.postKey} | ${record.platform} | ${summarizeState(record.state)} | ${record.detail.replace(/\|/g, "\\|")} |`,
 		),
 		"",
 	];
@@ -804,8 +836,10 @@ async function collectMarkdownFiles(dirPath: string): Promise<string[]> {
 		entries.map(async (entry) => {
 			const fullPath = path.join(dirPath, entry.name);
 			if (entry.isDirectory()) {
+				if (isPathInsideKoPostsRoot(fullPath)) return [];
 				return collectMarkdownFiles(fullPath);
 			}
+			if (isPathInsideKoPostsRoot(fullPath)) return [];
 			if (entry.isFile() && entry.name.endsWith(".md")) return [fullPath];
 			return [];
 		}),
@@ -821,18 +855,37 @@ function isPathInsideDeployPostsRoot(resolvedPath: string) {
 	);
 }
 
+function isPathInsideKoPostsRoot(resolvedPath: string) {
+	const koRoot = path.join(DEPLOY_POSTS_ROOT, "ko");
+	const relative = path.relative(koRoot, resolvedPath);
+	return (
+		relative === "" ||
+		(!relative.startsWith("..") && !path.isAbsolute(relative))
+	);
+}
+
 export async function discoverPostFiles(targetInput?: string) {
-	const effectiveTarget = targetInput
-		? path.resolve(targetInput)
-		: DEPLOY_POSTS_ROOT;
+	if (!targetInput) {
+		throw new Error(
+			"Deployment target is required and must be a markdown file.",
+		);
+	}
+	const effectiveTarget = path.resolve(targetInput);
 	if (!isPathInsideDeployPostsRoot(effectiveTarget)) {
 		throw new Error(
 			`Deployment target must be inside ${DEPLOY_POSTS_ROOT_RELATIVE}: ${effectiveTarget}`,
 		);
 	}
+	if (isPathInsideKoPostsRoot(effectiveTarget)) {
+		throw new Error(
+			`Deployment target must exclude ${path.join(DEPLOY_POSTS_ROOT_RELATIVE, "ko")}: ${effectiveTarget}`,
+		);
+	}
 	const stat = await fs.stat(effectiveTarget);
 	if (stat.isDirectory()) {
-		return collectMarkdownFiles(effectiveTarget);
+		throw new Error(
+			`Deployment target must be a markdown file: ${effectiveTarget}`,
+		);
 	}
 	if (!effectiveTarget.toLowerCase().endsWith(".md")) {
 		throw new Error(
@@ -840,6 +893,10 @@ export async function discoverPostFiles(targetInput?: string) {
 		);
 	}
 	return [effectiveTarget];
+}
+
+async function discoverAllDeployEligiblePostFiles() {
+	return collectMarkdownFiles(DEPLOY_POSTS_ROOT);
 }
 
 function parsePlatforms(raw?: string): Platform[] {
@@ -855,39 +912,36 @@ function parsePlatforms(raw?: string): Platform[] {
 	return Array.from(new Set(filtered));
 }
 
-async function loadCurrentStatus(slugs: string[]) {
+async function loadCurrentStatus(postKeys: string[]) {
 	const records: DeploymentRecord[] = [];
-	for (const slug of slugs) {
+	for (const postKey of postKeys) {
 		for (const platform of SUPPORTED_PLATFORMS) {
-			const paths = statusPaths(slug, platform);
+			const paths = statusPaths(postKey, platform);
 			const successExists = await fileExists(paths.success);
 			const failedExists = await fileExists(paths.failed);
 			let state: PublishState = "unknown";
 			if (successExists) state = "success";
 			else if (failedExists) state = "failed";
-			let detail = "n/a";
-			try {
-				const raw = await fs.readFile(paths.status, "utf-8");
-				const parsed = JSON.parse(raw) as { detail?: string };
-				if (parsed.detail) detail = parsed.detail;
-			} catch {
-				detail = "n/a";
-			}
+			const parsed = await readPlatformStatus(paths.status);
+			const detail = parsed?.detail || "n/a";
 			records.push({
-				slug,
+				slug: slugFromPostKey(postKey),
+				postKey,
 				platform,
 				state,
 				updatedAt: new Date().toISOString(),
 				detail,
 				postPath: "",
+				externalPostId: parsed?.externalPostId,
+				externalPostUrl: parsed?.externalPostUrl,
 			});
 		}
 	}
 	return records;
 }
 
-async function updateStatusSnapshot(slugs: string[]) {
-	const snapshotRecords = await loadCurrentStatus(slugs);
+async function updateStatusSnapshot(postKeys: string[]) {
+	const snapshotRecords = await loadCurrentStatus(postKeys);
 	const markdown = buildStatusMarkdown(snapshotRecords);
 	await fs.mkdir(path.dirname(STATUS_SNAPSHOT_PATH), { recursive: true });
 	await fs.writeFile(STATUS_SNAPSHOT_PATH, markdown, "utf-8");
@@ -920,13 +974,35 @@ async function releaseSoftLock() {
 
 async function attemptPublish(post: PreparedPost, platform: Platform) {
 	const updatedAt = new Date().toISOString();
-	const paths = statusPaths(post.slug, platform);
+	const paths = statusPaths(post.postKey, platform);
 	const hasSuccess = await fileExists(paths.success);
 	const hasFailed = await fileExists(paths.failed);
+	const persisted = await readPlatformStatus(paths.status);
+	const hasExternalPostIdentity = Boolean(
+		persisted?.externalPostId || persisted?.externalPostUrl,
+	);
+	const hasPersistedSuccessWithExternalIdentity =
+		persisted?.state === "success" && hasExternalPostIdentity;
+	if (hasPersistedSuccessWithExternalIdentity) {
+		const record: DeploymentRecord = {
+			slug: post.slug,
+			postKey: post.postKey,
+			platform,
+			state: "skipped",
+			updatedAt,
+			detail: "success status with external identity exists",
+			postPath: post.filePath,
+			externalPostId: persisted?.externalPostId,
+			externalPostUrl: persisted?.externalPostUrl,
+		};
+		await writePlatformStatus(record, true);
+		return record;
+	}
 	const decision = evaluateDeploymentDecision(hasSuccess, hasFailed);
 	if (decision === "skip") {
 		const record: DeploymentRecord = {
 			slug: post.slug,
+			postKey: post.postKey,
 			platform,
 			state: "skipped",
 			updatedAt,
@@ -943,11 +1019,14 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 			const result = await publishToDevto(post, apiKey);
 			const record: DeploymentRecord = {
 				slug: post.slug,
+				postKey: post.postKey,
 				platform,
 				state: "success",
 				updatedAt,
 				detail: `${result.detail}${result.url ? `: ${result.url}` : ""}`,
 				postPath: post.filePath,
+				externalPostId: result.postId,
+				externalPostUrl: result.url || undefined,
 			};
 			await writePlatformStatus(record, false);
 			return record;
@@ -963,11 +1042,14 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 		const result = await publishToLinkedIn(post, accessToken, personUrn);
 		const record: DeploymentRecord = {
 			slug: post.slug,
+			postKey: post.postKey,
 			platform,
 			state: "success",
 			updatedAt,
 			detail: `${result.detail}${result.url ? `: ${result.url}` : ""}`,
 			postPath: post.filePath,
+			externalPostId: result.postId,
+			externalPostUrl: result.url || undefined,
 		};
 		await writePlatformStatus(record, false);
 		return record;
@@ -975,6 +1057,7 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 		const message = error instanceof Error ? error.message : String(error);
 		const record: DeploymentRecord = {
 			slug: post.slug,
+			postKey: post.postKey,
 			platform,
 			state: "failed",
 			updatedAt,
@@ -994,14 +1077,25 @@ async function runDeployment(targetInput?: string, platformsArg?: string) {
 		? path.resolve(targetInput)
 		: DEPLOY_POSTS_ROOT;
 	const postFiles = await discoverPostFiles(targetInput);
-	const allPostFiles = await discoverPostFiles();
 	if (postFiles.length === 0) {
 		throw new Error("No markdown files found for deployment.");
+	}
+	const maxPublishPerRun = resolveMaxPublishPerRun();
+	if (postFiles.length > maxPublishPerRun) {
+		throw new Error(
+			`Candidate file count ${postFiles.length} exceeds MAX_PUBLISH_PER_RUN=${maxPublishPerRun}`,
+		);
 	}
 	const platforms = parsePlatforms(
 		platformsArg || process.env.DEPLOY_PLATFORMS,
 	);
 	process.stdout.write(buildDeploymentInputSnapshotLog(scannedRoot, postFiles));
+	if (
+		String(process.env.DEPLOY_PREFLIGHT_ONLY || "").toLowerCase() === "true"
+	) {
+		await writeGithubSummary([], scannedRoot, postFiles);
+		return [];
+	}
 	const records: DeploymentRecord[] = [];
 	await acquireSoftLock();
 	try {
@@ -1013,9 +1107,11 @@ async function runDeployment(targetInput?: string, platformsArg?: string) {
 			}
 		}
 		await writeGithubSummary(records, scannedRoot, postFiles);
-		await updateStatusSnapshot(
-			allPostFiles.map((filePath) => path.basename(filePath, ".md")),
+		const allPostFiles = await discoverAllDeployEligiblePostFiles();
+		const allPostKeys = Array.from(
+			new Set(allPostFiles.map((filePath) => toPostKey(filePath))),
 		);
+		await updateStatusSnapshot(allPostKeys);
 		const hasFailed = records.some((r) => r.state === "failed");
 		if (hasFailed) {
 			logWarn("post-to-dev", "Some platform deployments failed.", {

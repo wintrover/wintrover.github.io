@@ -7,14 +7,18 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: "Markdown file or directory target"
+        description: "Single markdown file target under src/posts (excluding src/posts/ko)"
         required: false
-        default: "src/posts"
         type: string
       platforms:
         description: "Comma separated platforms (devto,linkedin)"
         required: false
         default: "devto,linkedin"
+        type: string
+      max_publish_per_run:
+        description: "Maximum candidate files allowed per run"
+        required: false
+        default: "1"
         type: string
 
 permissions:
@@ -25,8 +29,70 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  preflight:
     runs-on: ubuntu-latest
+    outputs:
+      deploy_target: ${{ steps.resolve_target.outputs.deploy_target }}
+      deploy_platforms: ${{ steps.resolve_target.outputs.deploy_platforms }}
+      max_publish_per_run: ${{ steps.resolve_target.outputs.max_publish_per_run }}
+    steps:
+      - name: Checkout deploy branch
+        uses: actions/checkout@v4
+        with:
+          ref: deploy
+          fetch-depth: 0
+
+      - name: Resolve deployment target and guard candidate count
+        id: resolve_target
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOY_PLATFORMS="${{ github.event.inputs.platforms || 'devto,linkedin' }}"
+          MAX_PUBLISH_PER_RUN="${{ github.event.inputs.max_publish_per_run || '1' }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.target }}" ]; then
+            DEPLOY_TARGET="${{ github.event.inputs.target }}"
+          else
+            BASE="${{ github.event.before }}"
+            if [ -z "${BASE}" ] || [ "${BASE}" = "0000000000000000000000000000000000000000" ]; then
+              BASE="$(git --no-pager rev-parse HEAD~1)"
+            fi
+            mapfile -t candidates < <(git --no-pager diff --name-only "${BASE}" "${GITHUB_SHA}" -- 'src/posts/**/*.md' ':(exclude)src/posts/ko/**')
+            if [ "${#candidates[@]}" -eq 0 ]; then
+              echo "No deploy-eligible markdown changes found in src/posts (excluding src/posts/ko)."
+              exit 1
+            fi
+            if [ "${#candidates[@]}" -gt 1 ]; then
+              printf 'Too many deploy candidates (%s):\n' "${#candidates[@]}"
+              printf '%s\n' "${candidates[@]}"
+              exit 1
+            fi
+            DEPLOY_TARGET="${candidates[0]}"
+          fi
+          echo "deploy_target=${DEPLOY_TARGET}" >> "$GITHUB_OUTPUT"
+          echo "deploy_platforms=${DEPLOY_PLATFORMS}" >> "$GITHUB_OUTPUT"
+          echo "max_publish_per_run=${MAX_PUBLISH_PER_RUN}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run preflight snapshot
+        env:
+          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/
+          DEPLOY_PREFLIGHT_ONLY: "true"
+          DEPLOY_TARGET: ${{ steps.resolve_target.outputs.deploy_target }}
+          DEPLOY_PLATFORMS: ${{ steps.resolve_target.outputs.deploy_platforms }}
+          MAX_PUBLISH_PER_RUN: ${{ steps.resolve_target.outputs.max_publish_per_run }}
+        run: bun scripts/post-to-dev.ts "${DEPLOY_TARGET}" "${DEPLOY_PLATFORMS}"
+
+  publish:
+    needs: preflight
+    runs-on: ubuntu-latest
+    environment: sns-publish
     steps:
       - name: Checkout deploy branch
         uses: actions/checkout@v4
@@ -51,16 +117,16 @@ jobs:
           rm -rf database
           mkdir -p database
           cd database
-          git init
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git checkout --orphan DB
+          git --no-pager init
+          git --no-pager config user.name "github-actions[bot]"
+          git --no-pager config user.email "github-actions[bot]@users.noreply.github.com"
+          git --no-pager remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git --no-pager checkout --orphan DB
           mkdir -p .deploy
           touch STATUS.md
-          git add .deploy STATUS.md
-          git commit -m "chore(deploy): bootstrap state branch [skip ci]"
-          git push origin HEAD:DB
+          git --no-pager add .deploy STATUS.md
+          git --no-pager commit -m "chore(deploy): bootstrap state branch [skip ci]"
+          git --no-pager push origin HEAD:DB
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -74,8 +140,9 @@ jobs:
         env:
           BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/
           STATE_DATA_ROOT: ./database
-          DEPLOY_TARGET: ${{ github.event.inputs.target || 'src/posts' }}
-          DEPLOY_PLATFORMS: ${{ github.event.inputs.platforms || 'devto,linkedin' }}
+          DEPLOY_TARGET: ${{ needs.preflight.outputs.deploy_target }}
+          DEPLOY_PLATFORMS: ${{ needs.preflight.outputs.deploy_platforms }}
+          MAX_PUBLISH_PER_RUN: ${{ needs.preflight.outputs.max_publish_per_run }}
           LINKEDIN_VERSION: "202603"
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
@@ -91,16 +158,16 @@ jobs:
           if [ -d .deploy ]; then cp -R .deploy/. database/.deploy/; fi
           if [ -f STATUS.md ]; then cp STATUS.md database/STATUS.md; fi
           cd database
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .deploy STATUS.md
-          if git diff --cached --quiet; then
+          git --no-pager config user.name "github-actions[bot]"
+          git --no-pager config user.email "github-actions[bot]@users.noreply.github.com"
+          git --no-pager add .deploy STATUS.md
+          if git --no-pager diff --cached --quiet; then
             echo "No deployment state changes."
             exit 0
           fi
-          git commit -m "chore(deploy): persist sns status snapshot [skip ci]"
+          git --no-pager commit -m "chore(deploy): persist sns status snapshot [skip ci]"
           for attempt in 1 2 3; do
-            if git push origin HEAD:DB; then
+            if git --no-pager push origin HEAD:DB; then
               echo "Push succeeded on attempt ${attempt}."
               exit 0
             fi
@@ -108,5 +175,45 @@ jobs:
               echo "Push failed after 3 attempts."
               exit 1
             fi
-            git pull --rebase origin DB
+            git --no-pager pull --rebase origin DB
           done
+
+  notify-on-failure:
+    needs: [preflight, publish]
+    if: always() && (needs.preflight.result == 'failure' || needs.publish.result == 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack on failure
+        if: secrets.SLACK_WEBHOOK_URL != ''
+        shell: bash
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+          payload=$(cat <<'JSON'
+          {
+            "text": "SNS deploy failed.\nworkflow=${{ github.workflow }}\nrun=${{ github.run_id }}\nref=${{ github.ref_name }}\ntarget=${{ needs.preflight.outputs.deploy_target }}\npreflight=${{ needs.preflight.result }}\npublish=${{ needs.publish.result }}"
+          }
+          JSON
+          )
+          curl -X POST -H "Content-type: application/json" --data "${payload}" "${SLACK_WEBHOOK_URL}"
+
+      - name: Notify email on failure
+        if: secrets.SMTP_SERVER != '' && secrets.ALERT_EMAIL_TO != ''
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT || 587 }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "[SNS Deploy] Failed run ${{ github.run_id }}"
+          to: ${{ secrets.ALERT_EMAIL_TO }}
+          from: ${{ secrets.ALERT_EMAIL_FROM || secrets.ALERT_EMAIL_TO }}
+          body: |
+            SNS deploy workflow failed.
+            workflow: ${{ github.workflow }}
+            run: ${{ github.run_id }}
+            ref: ${{ github.ref_name }}
+            target: ${{ needs.preflight.outputs.deploy_target }}
+            preflight: ${{ needs.preflight.result }}
+            publish: ${{ needs.publish.result }}
