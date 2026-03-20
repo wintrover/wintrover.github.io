@@ -149,7 +149,11 @@ describe("post localization synchronization", () => {
 		expect(ko).toContain(
 			"“사용자는 자신의 데이터만 조회할 수 있어야 한다”라는 보안 조건이 있다면,\\",
 		);
-		expect(ko).toContain("사용자는 자신의 데이터만 조회할 수 있어야 한다.\\");
-		expect(ko).toContain("해당 로직은 생성되지 않는다.");
+		expect(ko).toContain("사용자는 자신의 데이터만 조회할 수 있어야 한다.");
+		expect(ko).toContain("다른 사용자의 ID로 요청을 보내는 경우");
+		expect(ko).toContain("→ 즉시 반례로 탐지되고 코드 생성이 중단된다");
+		expect(ko).toContain(
+			"→ 이 조건을 깨는 경우가 하나라도 발견되면, 해당 로직은 생성되지 않는다.",
+		);
 	});
 });

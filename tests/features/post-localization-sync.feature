@@ -37,3 +37,4 @@ Feature: Post localization synchronization
     When I review thought-flow and formal-verification paragraphs
     Then flow lines with arrow connectors should preserve blank lines and trailing backslashes
     And formal verification steps should remain an ordered numbered list
+    And the verification example may add an explicit counterexample branch before the final rejection line
