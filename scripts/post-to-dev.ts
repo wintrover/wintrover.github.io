@@ -299,40 +299,17 @@ function sanitizeTextForLinkedIn(text: string) {
 		.trim();
 }
 
-function hasHangul(text: string) {
-	return /[가-힣]/.test(text);
-}
-
 function buildLinkedInCommentary(intro: string, canonicalUrl: string) {
 	const introLine = sanitizeTextForLinkedIn(intro);
 	const linkLine = sanitizeTextForLinkedIn(canonicalUrl);
 	return [introLine, linkLine].filter(Boolean).join("\n\n");
 }
 
-async function resolveEnglishLinkedInIntro(
-	filePath: string,
-	fallbackDescription: string | undefined,
-) {
+function resolveLinkedInIntro(fallbackDescription: string | undefined) {
 	const fallbackIntro =
 		"I shared a new post about engineering decisions and quality automation. Read it here.";
-	const relative = path.relative(DEPLOY_POSTS_ROOT, filePath);
-	let englishIntroSource = fallbackDescription || "";
-	if (relative.startsWith(`ko${path.sep}`)) {
-		const englishRelative = relative.slice(`ko${path.sep}`.length);
-		const englishPath = path.join(DEPLOY_POSTS_ROOT, englishRelative);
-		if (await fileExists(englishPath)) {
-			const englishMarkdownWithMeta = await fs.readFile(englishPath, "utf-8");
-			const { data: englishFrontmatter } = matter(englishMarkdownWithMeta);
-			const typedEnglishFrontmatter = englishFrontmatter as Frontmatter;
-			englishIntroSource = String(
-				typedEnglishFrontmatter.excerpt ||
-					typedEnglishFrontmatter.description ||
-					"",
-			).trim();
-		}
-	}
-	const normalizedIntro = sanitizeTextForLinkedIn(englishIntroSource);
-	if (!normalizedIntro || hasHangul(normalizedIntro)) return fallbackIntro;
+	const normalizedIntro = sanitizeTextForLinkedIn(fallbackDescription || "");
+	if (!normalizedIntro) return fallbackIntro;
 	return normalizedIntro;
 }
 
@@ -472,10 +449,7 @@ async function preparePost(filePath: string, publicBaseUrl: string) {
 		String(
 			typedFrontmatter.excerpt || typedFrontmatter.description || "",
 		).trim() || undefined;
-	const linkedInIntro = await resolveEnglishLinkedInIntro(
-		filePath,
-		descriptionRaw,
-	);
+	const linkedInIntro = resolveLinkedInIntro(descriptionRaw);
 	const coverImage =
 		typeof typedFrontmatter.cover_image === "string" &&
 		typedFrontmatter.cover_image
