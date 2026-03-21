@@ -26,12 +26,12 @@ void getKeywords;
 				in:fly={{ y: 12, duration: 320 + index * 14, delay: 30 + index * 25 }}
 			>
 				<div class="meta">
+					<span class="meta-date">{formatDate(post.date)}</span>
 					<div class="keyword-list">
 						{#each getKeywords(post) as keyword}
 							<span class="keyword-badge">{keyword}</span>
 						{/each}
 					</div>
-					<span>{formatDate(post.date)}</span>
 				</div>
 				<button
 					class="title-link"
@@ -109,8 +109,9 @@ void getKeywords;
 		flex-wrap: wrap;
 	}
 
-	.meta span {
+	.meta-date {
 		color: #71717a;
+		white-space: nowrap;
 	}
 
 	.title-link {
