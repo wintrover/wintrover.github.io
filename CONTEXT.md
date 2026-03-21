@@ -55,7 +55,7 @@
 - 배포 스크립트의 canonical URL slug 생성은 앱 라우터의 `slugify` 규칙과 동일해야 하며, 아포스트로피가 포함된 제목도 동일 slug로 정규화해야 한다.
 - 포스트 로더는 기존 canonical slug(`dont`)와 현재 slug(`don-t`)를 모두 조회 호환해 과거 링크의 Post not found를 방지해야 한다.
 - 신규 포스팅 등록 시 영어 원문과 한국어 버전을 기본으로 동시 작성하며, 파일명은 동일한 `YYYY-MM-DD-N.md`를 사용한다. 경로는 영어 `src/posts/{project|company}/`, 한국어 `src/posts/ko/{project|company}/`를 따른다.
-- 신규 포스팅의 기본 분류는 `Project` 카테고리와 `Devlog` 태그를 사용한다. `Company Work` 카테고리는 재직 중 회사 업무 회고를 작성할 때만 사용한다.
+- 신규 포스팅의 기본 분류는 `Personal project` 카테고리와 `Devlog` 태그를 사용한다. `Company Work` 카테고리는 재직 중 회사 업무 회고를 작성할 때만 사용한다.
 - 포스트 Front Matter는 `---` 구분자를 사용해야 하며 `tags`가 문자열로 입력되어도 태그 집합으로 정규화되어 렌더링되어야 한다.
 - 포스트 경로 기반 카테고리/폴더 판별은 `__proto__` 같은 프로토타입 키 입력에도 영향을 받지 않도록 own-key 조회만 사용해야 한다.
 - 동일 slug의 한영 포스트 중 한쪽 본문을 각색하면 다른 언어 버전도 동일한 메시지로 동기화한다.

@@ -1,7 +1,7 @@
 {
 	"categories": {
 		"project": {
-			"name": "Project",
+			"name": "Personal project",
 			"description": "개인 프로젝트 관련 포스트",
 			"slug": "project",
 			"color": "#28a745",
