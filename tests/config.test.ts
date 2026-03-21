@@ -100,10 +100,10 @@ describe("brand metadata ssot", () => {
 
 		expect(en.ogTitle).toBe(blogDefaultSeo.title);
 		expect(en.metaDescription).toContain("Thought Trajectory Architect");
-		expect(en.ogImageAlt).toBe("wintrover profile image");
+		expect(en.ogImageAlt).toBe("Axiom profile image");
 
 		expect(ko.ogTitle).toContain("사고 궤적 아키텍트");
 		expect(ko.metaDescription).toContain("블로그와 이력서");
-		expect(ko.ogImageAlt).toBe("wintrover 프로필 이미지");
+		expect(ko.ogImageAlt).toBe("Axiom 프로필 이미지");
 	});
 });

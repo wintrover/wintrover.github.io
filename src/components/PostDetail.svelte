@@ -18,7 +18,7 @@ let loading = true;
 
 let currentSlug: string | null = null;
 let resolvedLocale: "ko" | "en" = "en";
-let seoTitle = "wintrover";
+let seoTitle = "Axiom";
 let seoDescription = "";
 let canonicalUrl = "";
 let structuredData = "";
@@ -209,7 +209,7 @@ void goBack;
 	<meta property="og:url" content={canonicalUrl} />
 	<meta property="og:image" content={defaultOgImage} />
 	<meta property="og:image:alt" content={post?.title ?? seoTitle} />
-	<meta property="og:site_name" content="wintrover" />
+	<meta property="og:site_name" content="Axiom" />
 	<link rel="canonical" href={canonicalUrl} />
 	{#if structuredData}
 		<script type="application/ld+json">{structuredData}</script>

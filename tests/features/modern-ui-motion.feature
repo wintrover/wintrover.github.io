@@ -36,4 +36,4 @@ Feature: Modern UI motion across core blog surfaces
   Scenario: Sidebar nested subtopics are constrained to approved list
     Given I render the app shell with category nested items
     When I inspect nested labels under category nodes
-    Then nested items should only include SMBholdings CVFactory and Devlog
+    Then nested items should only include SMBholdings CVFactory and Axiom

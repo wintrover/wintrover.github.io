@@ -143,7 +143,7 @@ describe("Sidebar Component", () => {
 	test("아바타는 링크가 아니고 클릭 시 이동하지 않아야 함", async () => {
 		render(Sidebar);
 
-		const avatar = screen.getByAltText(/wintrover/i); // 대소문자 무시
+		const avatar = screen.getByAltText(/axiom/i); // 대소문자 무시
 		await fireEvent.click(avatar);
 
 		expect(get(selectedCategory)).toBe("all");
