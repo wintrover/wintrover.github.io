@@ -17,3 +17,8 @@ Feature: Resume link and pitfall post cleanup
     Given resume locale metadata is configured for both Korean and English
     When title fields are resolved for runtime and build fallback
     Then meta title and og title should use "resume" consistently
+
+  Scenario: resume Archright naming and github profile stay aligned
+    Given resume project and social links are defined in locale and site config
+    When the resume is rendered
+    Then the featured project title should use "Archright" and the GitHub URL should use https://github.com/Archright

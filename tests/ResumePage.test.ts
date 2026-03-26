@@ -34,9 +34,10 @@ describe("ResumePage", () => {
 		expect(
 			screen.getByRole("heading", { level: 3, name: "Projects" }),
 		).toBeInTheDocument();
+		expect(screen.getByText("Archright")).toBeInTheDocument();
 		expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
 			"href",
-			"https://github.com/wintrover",
+			"https://github.com/Archright",
 		);
 		expect(document.querySelector(".section.motion-reveal")).not.toBeNull();
 		expect(document.querySelector(".cards.motion-stagger-list")).not.toBeNull();

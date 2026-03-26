@@ -34,7 +34,7 @@
 	"section_title_education": "Education",
 	"projects": {
 		"devlog": {
-			"title": "Axiom",
+			"title": "Archright",
 			"quote": "A project that analyzes developer–AI conversation history and generates technical blog posts with explicit causality across hypothesis, attempt, and evidence.",
 			"description": "- Modeled session data with a Nim-first domain architecture focused on static safety<br/>- Implemented a ReasoningTrace pipeline to extract hypothesis-attempt-evidence flow<br/>- Designed a Unix-style capture | render | verify CLI workflow<br/>- Strengthened output reliability and workflow integrity with MCP gateway integration and verification tests"
 		},
