@@ -17,7 +17,7 @@ export const site = {
 	socialLinks: [
 		{
 			id: "github",
-			url: "https://github.com/Archright",
+			url: "https://github.com/wintrover",
 			iconClass: "fab fa-github",
 		},
 		{

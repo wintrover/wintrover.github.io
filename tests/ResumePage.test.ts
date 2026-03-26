@@ -37,7 +37,7 @@ describe("ResumePage", () => {
 		expect(screen.getByText("Archright")).toBeInTheDocument();
 		expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
 			"href",
-			"https://github.com/Archright",
+			"https://github.com/wintrover",
 		);
 		expect(document.querySelector(".section.motion-reveal")).not.toBeNull();
 		expect(document.querySelector(".cards.motion-stagger-list")).not.toBeNull();

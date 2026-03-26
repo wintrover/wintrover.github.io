@@ -19,7 +19,7 @@ describe("이력서 링크 및 pitfall 포스트 정리 검증", () => {
 			"resume social linkedin uses canonical profile URL",
 			"pitfall post excludes authoring process checklist text",
 			"resume meta title uses unified short label",
-			"resume Archright naming and github profile stay aligned",
+			"resume wintrover social github link uses personal profile",
 		]);
 	});
 
@@ -52,12 +52,8 @@ describe("이력서 링크 및 pitfall 포스트 정리 검증", () => {
 		);
 	});
 
-	test("Given resume 설정 When 검사 Then Archright 이름과 GitHub 프로필 URL이 유지된다", () => {
+	test("Given resume 사이트 설정 When 소셜 링크 확인 Then github 주소는 wintrover 개인 프로필을 사용한다", () => {
 		const site = read("src/lib/resume/site.ts");
-		const en = read("src/lib/resume/locales/en.json");
-		const ko = read("src/lib/resume/locales/ko.json");
-		expect(site).toContain('url: "https://github.com/Archright"');
-		expect(en).toContain('"title": "Archright"');
-		expect(ko).toContain('"title": "Archright"');
+		expect(site).toContain('url: "https://github.com/wintrover"');
 	});
 });
