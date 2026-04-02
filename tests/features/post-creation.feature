@@ -1,5 +1,5 @@
 # Post creation standard - validates bilingual post requirements
-# Updated: metric bar alignment formatting
+# Updated: metric bar alignment formatting (Korean Trust Gap gap reduced)
 Feature: Post creation standard
 
   Scenario: bilingual posts exist for new technical content
