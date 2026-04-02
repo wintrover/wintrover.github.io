@@ -1,5 +1,5 @@
 // Post creation standard tests - validates bilingual post requirements
-// Updated: metric bar alignment in verification asymmetry section (Korean Trust Gap gap reduced)
+// Updated: metric bar alignment, sidebar h4 padding
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
