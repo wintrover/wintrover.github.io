@@ -1,4 +1,5 @@
 // Post creation standard tests - validates bilingual post requirements
+// Updated: metric bar alignment in verification asymmetry section
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";

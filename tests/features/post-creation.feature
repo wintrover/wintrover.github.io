@@ -1,4 +1,5 @@
 # Post creation standard - validates bilingual post requirements
+# Updated: metric bar alignment formatting
 Feature: Post creation standard
 
   Scenario: bilingual posts exist for new technical content
