@@ -154,3 +154,15 @@
 - MCP 프록시(`scripts/context7-toolname-proxy.ts`)는 다운스트림 입력 프레이밍으로 Content-Length와 NDJSON을 모두 수용하고, 감지된 프레이밍과 동일한 형식으로 응답해야 한다.
 - 레포지토리 루트의 런타임/설정 스크립트는 `.js/.mjs/.cjs` 대신 TypeScript 또는 JSON 기반으로 유지한다.
 - 이 절차 중 하나라도 누락되거나 순서가 뒤바뀔 경우, 에이전트는 즉시 작업을 중단하고 절차를 복구해야 한다.
+
+## 7) 포스트 작성 표준 (2026-04-02 추가)
+
+- **이중 언어 정책**: 모든 포스트는 영어(English)와 한국어(Korean) 두 언어로 작성해야 한다.
+  - 영어 포스트: `src/posts/project/` 또는 `src/posts/company/`에 저장
+  - 한국어 포스트: `src/posts/ko/project/` 또는 `src/posts/ko/company/`에 저장
+  - 동일한 파일명(`YYYY-MM-DD-N.md`) 사용
+  - 내용은 동일하게 유지하되 자연스러운 번역 제공
+- **프로젝트 명칭 정책**: 포스팅 내용에서 프로젝트명은 일관되게 지칭한다.
+  - `Axiom Enterprise` 폴더명을 그대로 사용하지 말고, `Axiom`으로만 지칭
+  - 예: "Axiom Enterprise was built" → "Axiom was built"
+- **2026-04-02 Axiom 포스트**: 기술 블로그 시리즈 첫 포스트로 BMC, Z3, Lean 4, Dr.Nim을 활용한 무결성 검증 엔진 소개
