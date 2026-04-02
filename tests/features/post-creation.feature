@@ -1,3 +1,4 @@
+# Post creation standard - validates bilingual post requirements
 Feature: Post creation standard
 
   Scenario: bilingual posts exist for new technical content

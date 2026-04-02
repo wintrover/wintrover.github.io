@@ -1,3 +1,4 @@
+// Post creation standard tests - validates bilingual post requirements
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
