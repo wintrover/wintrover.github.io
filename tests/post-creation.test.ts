@@ -1,5 +1,5 @@
 // Post creation standard tests - validates bilingual post requirements
-// Updated: metric bar alignment, sidebar h4 padding, post content wording
+// Updated: metric bar alignment, sidebar h4 padding, post content wording, mission statement
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
