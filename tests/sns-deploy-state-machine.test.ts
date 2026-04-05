@@ -35,6 +35,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 			"deploy target discovery is isolated to physical files under src/posts",
 			"preflight and publish are separated with environment approval",
 			"deploy candidate discovery must not use git history",
+			"post_key uses basename only without full path",
 		]);
 	});
 
@@ -333,5 +334,16 @@ describe("SNS 배포 상태 머신 검증", () => {
 		const refLines = lines.filter((line) => line.includes("@ref REQ-DEPLOY"));
 		expect(refLines.length).toBeGreaterThan(0);
 		expect(refLines.some((line) => line.includes("REQ-DEPLOY-09"))).toBe(true);
+	});
+
+	test("Given workflow 파일 When 검사 Then post_key에 basename을 사용한다", () => {
+		const workflow = read(".github/workflows/sns-deploy.yml");
+		const preflightSection = workflow.slice(
+			workflow.indexOf("preflight:"),
+			workflow.indexOf("publish:"),
+		);
+		expect(preflightSection).toContain('basename "$post" .md');
+		expect(preflightSection).toContain("post_key=");
+		expect(preflightSection).toContain(".deploy/${post_key}/devto.success");
 	});
 });

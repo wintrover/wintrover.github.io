@@ -46,6 +46,7 @@
 - [REQ-DEPLOY-14] SNS 배포 워크플로는 preflight 또는 publish 실패 시 `notify-on-failure` 단계에서 Slack/Email 알림을 시도해야 한다.
 - [REQ-DEPLOY-15] 대량 재처리는 일반 SNS 배포 워크플로에서 금지하고, 수동 승인과 배치 제한을 가진 `sns-bulk-backfill` 전용 워크플로에서만 허용해야 한다.
 - [REQ-DEPLOY-16] `src/posts/ko/` 로케일 서브트리의 물리 `.md` 파일은 배포 후보에서 제외해야 한다.
+- [REQ-DEPLOY-17] 배포 후보 선정 시 `post_key`는 파일명(`basename`)만 사용하며 전체 경로를 포함하지 않아야 한다.
 
 ## 2) URL 아키텍처 규칙
 

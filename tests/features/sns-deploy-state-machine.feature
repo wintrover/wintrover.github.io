@@ -70,3 +70,10 @@ Feature: SNS deployment state machine
     And candidate discovery must check .deploy/[postKey]/[platform].success markers
     And only posts without .success markers qualify as deployment candidates
     And git diff based candidate detection is explicitly forbidden
+
+  # @ref REQ-DEPLOY-17
+  Scenario: post_key uses basename only without full path
+    Given workflow fetches DB branch state for candidate discovery
+    When workflow calculates post_key for .success marker path
+    Then post_key must use basename of file without path prefix
+    And .deploy structure must match post_key basename format

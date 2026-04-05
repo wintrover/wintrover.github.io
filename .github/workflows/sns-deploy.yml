@@ -82,7 +82,7 @@ jobs:
             mapfile -t all_posts < <(find src/posts -name '*.md' ! -path 'src/posts/ko/*' -type f | sort)
             declare -a candidates=()
             for post in "${all_posts[@]}"; do
-              post_key="${post%.md}"
+              post_key="$(basename "$post" .md)"
               devto_success=".deploy/${post_key}/devto.success"
               linkedin_success=".deploy/${post_key}/linkedin.success"
               if [ ! -f "$devto_success" ] || [ ! -f "$linkedin_success" ]; then
