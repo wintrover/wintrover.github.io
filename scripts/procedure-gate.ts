@@ -9,6 +9,11 @@ type GateResult = {
 	changedFiles: string[];
 };
 
+type RefValidationResult = {
+	ok: boolean;
+	unresolvedRefs: string[];
+};
+
 const IMPLEMENTATION_PREFIXES = [
 	"src/",
 	"scripts/",
@@ -18,6 +23,7 @@ const IMPLEMENTATION_PREFIXES = [
 
 const TEST_FILE_REGEX = /^tests\/.+\.test\.[cm]?[jt]sx?$/;
 const FEATURE_FILE_REGEX = /^tests\/features\/.+\.feature$/;
+const REF_PATTERN = /@ref\s+(REQ-[A-Z]+-\d+)/g;
 
 function normalizeFiles(files: string[]) {
 	return files.map((file) => file.trim().replace(/\\/g, "/")).filter(Boolean);
@@ -27,6 +33,77 @@ function matchesImplementationFile(filePath: string) {
 	if (filePath === "CONTEXT.md") return false;
 	if (filePath.startsWith("tests/")) return false;
 	return IMPLEMENTATION_PREFIXES.some((prefix) => filePath.startsWith(prefix));
+}
+
+function extractRefsFromFile(filePath: string): string[] {
+	try {
+		const content = fs.readFileSync(filePath, "utf-8");
+		const refs: string[] = [];
+		let match: RegExpExecArray | null;
+		while ((match = REF_PATTERN.exec(content)) !== null) {
+			refs.push(match[1]);
+		}
+		return [...new Set(refs)];
+	} catch {
+		return [];
+	}
+}
+
+function extractRefsFromContext(): Set<string> {
+	try {
+		const content = fs.readFileSync("CONTEXT.md", "utf-8");
+		const refs: Set<string> = new Set();
+		let match: RegExpExecArray | null;
+		while ((match = REF_PATTERN.exec(content)) !== null) {
+			refs.add(match[1]);
+		}
+		const bracketPattern = /\[REQ-[A-Z]+-\d+\]/g;
+		while ((match = bracketPattern.exec(content)) !== null) {
+			refs.add(match[0].slice(1, -1));
+		}
+		return refs;
+	} catch {
+		return new Set();
+	}
+}
+
+function extractRefsFromFeatures(): Set<string> {
+	const refs: Set<string> = new Set();
+	const featuresDir = "tests/features";
+	try {
+		if (!fs.existsSync(featuresDir)) return refs;
+		const files = fs
+			.readdirSync(featuresDir)
+			.filter((f) => f.endsWith(".feature"));
+		for (const file of files) {
+			const content = fs.readFileSync(path.join(featuresDir, file), "utf-8");
+			let match: RegExpExecArray | null;
+			while ((match = REF_PATTERN.exec(content)) !== null) {
+				refs.add(match[1]);
+			}
+		}
+	} catch {}
+	return refs;
+}
+
+function validateRefs(changedFiles: string[]): RefValidationResult {
+	const allRefsInContext = extractRefsFromContext();
+	const allRefsInFeatures = extractRefsFromFeatures();
+	const combinedRefs = new Set([...allRefsInContext, ...allRefsInFeatures]);
+	const unresolvedRefs: string[] = [];
+	for (const file of changedFiles) {
+		if (!matchesImplementationFile(file)) continue;
+		const fileRefs = extractRefsFromFile(file);
+		for (const ref of fileRefs) {
+			if (!combinedRefs.has(ref)) {
+				unresolvedRefs.push(`${file} -> ${ref}`);
+			}
+		}
+	}
+	return {
+		ok: unresolvedRefs.length === 0,
+		unresolvedRefs,
+	};
 }
 
 export function evaluateProcedureGate(changedFiles: string[]): GateResult {
@@ -47,9 +124,26 @@ export function evaluateProcedureGate(changedFiles: string[]): GateResult {
 	if (!hasContext) missing.push("CONTEXT.md");
 	if (!hasFeature) missing.push("tests/features/*.feature");
 	if (!hasTest) missing.push("tests/**/*.test.ts");
+	if (missing.length > 0) {
+		return {
+			ok: false,
+			missing,
+			requiresEvidence,
+			changedFiles: normalized,
+		};
+	}
+	const refValidation = validateRefs(normalized);
+	if (!refValidation.ok) {
+		return {
+			ok: false,
+			missing: refValidation.unresolvedRefs.map((r) => `unresolved @ref: ${r}`),
+			requiresEvidence,
+			changedFiles: normalized,
+		};
+	}
 	return {
-		ok: missing.length === 0,
-		missing,
+		ok: true,
+		missing: [],
 		requiresEvidence,
 		changedFiles: normalized,
 	};

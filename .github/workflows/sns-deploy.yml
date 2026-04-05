@@ -1,3 +1,16 @@
+# @ref REQ-DEPLOY-01: Soft Lock
+# @ref REQ-DEPLOY-02: main 브랜치 미사용
+# @ref REQ-DEPLOY-03: deploy 브랜치 사용
+# @ref REQ-DEPLOY-04: DB 브랜치 상태 관리
+# @ref REQ-DEPLOY-05: .deploy/[post-key]/[platform].status SSOT
+# @ref REQ-DEPLOY-06: 외부 플랫폼 식별자 저장
+# @ref REQ-DEPLOY-07: .success/.failed 마커 멱등성
+# @ref REQ-DEPLOY-09: Git 이력 기반 후보 선정 금지 (물리 파일만)
+# @ref REQ-DEPLOY-12: 디렉터리 target 거부
+# @ref REQ-DEPLOY-13: 후보 파일 수 제한
+# @ref REQ-DEPLOY-14: 실패 시 알림
+# @ref REQ-DEPLOY-15: 대량 재처리 금지
+# @ref REQ-DEPLOY-16: ko 로케일 제외
 name: SNS Deploy State Machine
 
 on:
@@ -48,6 +61,13 @@ jobs:
           ref: deploy
           fetch-depth: 0
 
+      - name: Fetch DB branch for deploy state
+        run: git --no-pager fetch origin DB --depth=1
+
+      - name: Restore deploy state from DB branch
+        run: |
+          git --no-pager checkout FETCH_HEAD -- .deploy/ 2>/dev/null || mkdir -p .deploy
+
       - name: Resolve deployment target and guard candidate count
         id: resolve_target
         shell: bash
@@ -59,17 +79,22 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.target }}" ]; then
             DEPLOY_TARGET="${{ github.event.inputs.target }}"
           else
-            BASE="${{ github.event.before }}"
-            if [ -z "${BASE}" ] || [ "${BASE}" = "0000000000000000000000000000000000000000" ]; then
-              BASE="$(git --no-pager rev-parse HEAD~1)"
-            fi
-            mapfile -t candidates < <(git --no-pager diff --name-only "${BASE}" "${GITHUB_SHA}" -- 'src/posts/**/*.md' ':(exclude)src/posts/ko/**')
+            mapfile -t all_posts < <(find src/posts -name '*.md' ! -path 'src/posts/ko/*' -type f | sort)
+            declare -a candidates=()
+            for post in "${all_posts[@]}"; do
+              post_key="${post%.md}"
+              devto_success=".deploy/${post_key}/devto.success"
+              linkedin_success=".deploy/${post_key}/linkedin.success"
+              if [ ! -f "$devto_success" ] || [ ! -f "$linkedin_success" ]; then
+                candidates+=("$post")
+              fi
+            done
             if [ "${#candidates[@]}" -eq 0 ]; then
-              echo "No deploy-eligible markdown changes found in src/posts (excluding src/posts/ko)."
+              echo "No undeployed posts found in src/posts (excluding src/posts/ko)."
               exit 1
             fi
             if [ "${#candidates[@]}" -gt 1 ]; then
-              printf 'Too many deploy candidates (%s):\n' "${#candidates[@]}"
+              printf 'Too many undeployed candidates (%s):\n' "${#candidates[@]}"
               printf '%s\n' "${candidates[@]}"
               exit 1
             fi

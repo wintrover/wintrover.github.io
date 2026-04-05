@@ -34,6 +34,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 			"state persistence push handles conflict with bounded rebase retries",
 			"deploy target discovery is isolated to physical files under src/posts",
 			"preflight and publish are separated with environment approval",
+			"deploy candidate discovery must not use git history",
 		]);
 	});
 
@@ -299,5 +300,38 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(context).toContain("MAX_PUBLISH_PER_RUN");
 		expect(context).toContain("linkedin_dry_run=true");
 		expect(context).toContain("bulk-backfill");
+	});
+
+	test("Given workflow 파일 When 검사 Then git diff 기반 후보 선정을 사용하지 않는다", () => {
+		const workflow = read(".github/workflows/sns-deploy.yml");
+		const preflightSection = workflow.slice(
+			workflow.indexOf("preflight:"),
+			workflow.indexOf("publish:"),
+		);
+		expect(preflightSection).not.toContain(
+			'git --no-pager diff --name-only "${BASE}"',
+		);
+		expect(preflightSection).not.toContain(
+			'git --no-pager diff --name-only "$BASE"',
+		);
+		expect(preflightSection).not.toContain("github.event.before");
+	});
+
+	test("Given workflow 파일 When 검사 Then DB 브랜치 상태 기반 후보 선정을 사용한다", () => {
+		const workflow = read(".github/workflows/sns-deploy.yml");
+		const preflightSection = workflow.slice(
+			workflow.indexOf("preflight:"),
+			workflow.indexOf("publish:"),
+		);
+		expect(preflightSection).toContain("fetch origin DB");
+		expect(preflightSection).toContain(".success");
+	});
+
+	test("Given workflow 파일 When 검사 Then REQ-DEPLOY 정책 ID를 참조한다", () => {
+		const workflow = read(".github/workflows/sns-deploy.yml");
+		const lines = workflow.split("\n").slice(0, 20);
+		const refLines = lines.filter((line) => line.includes("@ref REQ-DEPLOY"));
+		expect(refLines.length).toBeGreaterThan(0);
+		expect(refLines.some((line) => line.includes("REQ-DEPLOY-09"))).toBe(true);
 	});
 });

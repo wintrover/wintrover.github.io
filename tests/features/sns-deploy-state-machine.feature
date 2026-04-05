@@ -59,3 +59,14 @@ Feature: SNS deployment state machine
     And publish job must run only after environment approval
     And workflow must trigger failure notification when preflight or publish fails
     And bulk backfill must run only in a dedicated manual workflow with batch limit
+
+  # @ref REQ-DEPLOY-09
+  Scenario: deploy candidate discovery must not use git history
+    Given CONTEXT.md prohibits git history based candidate discovery
+    And @ref REQ-DEPLOY-09 requires physical file inspection only
+    When workflow resolves deployment target on push event
+    Then candidate discovery must not use git diff or github.event.before
+    And candidate discovery must first fetch DB branch state
+    And candidate discovery must check .deploy/[postKey]/[platform].success markers
+    And only posts without .success markers qualify as deployment candidates
+    And git diff based candidate detection is explicitly forbidden
