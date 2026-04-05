@@ -219,6 +219,7 @@ void isActive;
 
   .sidebar-module h4 {
     margin: 0 0 0.65rem 0;
+    padding: 0 0.55rem;
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.11em;

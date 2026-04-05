@@ -50,7 +50,7 @@ function t(key: string): string {
 	<meta property="og:url" content={canonicalResumeUrl} />
 	<meta property="og:image" content={defaultOgImage} />
 	<meta property="og:image:alt" content={t("profile_alt")} />
-	<meta property="og:site_name" content="wintrover" />
+	<meta property="og:site_name" content="Axiom" />
 	{#if site.fontAwesomeStylesheetUrl}
 		<link rel="stylesheet" href={site.fontAwesomeStylesheetUrl} />
 	{/if}

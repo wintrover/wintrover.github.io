@@ -182,8 +182,25 @@ describe("postLoader", () => {
 		const posts = await loadAllPosts({
 			"../posts/project/no-tags.md": "---\ntitle: No Tags\n---\nBody",
 		});
-		expect(posts[0].category).toBe("Project");
+		expect(posts[0].category).toBe("Personal project");
 		expect(posts[0].tags).toEqual(["CVFactory"]);
+	});
+
+	test("Project와 Personal project 카테고리는 동일하게 정규화된다", async () => {
+		const posts = await loadAllPosts({
+			"../posts/project/legacy.md":
+				"---\ntitle: Legacy\ncategory: Project\ntags: project\n---\nBody",
+			"../posts/project/new.md":
+				"---\ntitle: New\ncategory: Personal project\ntags: project\n---\nBody",
+		});
+
+		const legacy = posts.find((post) => post.fileName === "legacy");
+		const current = posts.find((post) => post.fileName === "new");
+
+		expect(legacy?.category).toBe("Personal project");
+		expect(current?.category).toBe("Personal project");
+		expect(legacy?.tags).toEqual(["CVFactory"]);
+		expect(current?.tags).toEqual(["CVFactory"]);
 	});
 
 	test("카테고리 기본 태그가 있으면 일반 태그를 구성 태그로 정규화한다", async () => {
@@ -413,7 +430,9 @@ describe("postLoader", () => {
 		};
 
 		const posts = await loadAllPosts(mockModules);
-		expect(posts.find((p) => p.fileName === "a")?.category).toBe("Project");
+		expect(posts.find((p) => p.fileName === "a")?.category).toBe(
+			"Personal project",
+		);
 		expect(posts.find((p) => p.fileName === "b")?.category).toBe(
 			"Company Work",
 		);

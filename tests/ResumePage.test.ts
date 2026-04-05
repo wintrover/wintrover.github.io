@@ -34,6 +34,7 @@ describe("ResumePage", () => {
 		expect(
 			screen.getByRole("heading", { level: 3, name: "Projects" }),
 		).toBeInTheDocument();
+		expect(screen.getByText("Archright")).toBeInTheDocument();
 		expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
 			"href",
 			"https://github.com/wintrover",

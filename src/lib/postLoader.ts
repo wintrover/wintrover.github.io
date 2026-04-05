@@ -46,6 +46,21 @@ export type Post = PostBase & {
 
 const categories = categoryConfig as unknown as CategoryConfig;
 
+function canonicalizeCategoryName(value: string) {
+	const normalized = value.trim().toLowerCase();
+	if (normalized === "project" || normalized === "personal project") {
+		return "personal project";
+	}
+	return normalized;
+}
+
+function normalizeCategoryName(value: string) {
+	if (canonicalizeCategoryName(value) === "personal project") {
+		return "Personal project";
+	}
+	return value.trim();
+}
+
 function splitPathParts(filePath: string) {
 	const parts = String(filePath).split(/[\\/]/);
 	return parts.filter(Boolean);
@@ -65,9 +80,13 @@ function normalizeTags(tags: unknown) {
 }
 
 function normalizeTagsByCategory(tags: string[], categoryName: string) {
-	const normalizedCategoryName = categoryName.trim();
+	const normalizedCategoryName = normalizeCategoryName(categoryName);
+	const normalizedCategoryKey = canonicalizeCategoryName(
+		normalizedCategoryName,
+	);
 	const categoryEntry = Object.values(categories.categories).find(
-		(entry) => String(entry.name).trim() === normalizedCategoryName,
+		(entry) =>
+			canonicalizeCategoryName(String(entry.name)) === normalizedCategoryKey,
 	);
 	const configuredTags = Array.isArray(categoryEntry?.tags)
 		? categoryEntry.tags.map((tag) => String(tag).trim()).filter(Boolean)
@@ -78,11 +97,13 @@ function normalizeTagsByCategory(tags: string[], categoryName: string) {
 	}
 
 	const categorySlug = String(categoryEntry?.slug).trim().toLowerCase();
-	const categoryNameToken = categoryName.trim().toLowerCase();
+	const categoryNameToken = normalizedCategoryName.toLowerCase();
+	const categorySlugToken = slugify(normalizedCategoryName);
 	const genericTokens = new Set(
 		[
 			categorySlug,
 			categoryNameToken,
+			categorySlugToken,
 			"project",
 			"company",
 			"tutorial",
@@ -119,7 +140,7 @@ function determineCategoryFromPath(filePath: string) {
 		: undefined;
 	if (fromConfig) return fromConfig;
 	const fallbackByKey = new Map<string, string>([
-		["project", "Project"],
+		["project", "Personal project"],
 		["company", "Company Work"],
 		["tutorial", "Tutorial"],
 		["general", "General"],
@@ -162,6 +183,7 @@ function processPostMetadata(
 	if (categories.autoAssignByFolder && !category) {
 		category = determineCategoryFromPath(filePath);
 	}
+	category = normalizeCategoryName(category || categories.defaultCategory);
 
 	const htmlContent = renderMarkdownBody(markdownBody);
 	const slug = derivePostSlug(data, fileName);
@@ -180,7 +202,7 @@ function processPostMetadata(
 
 	const normalizedTags = normalizeTagsByCategory(
 		normalizeTags(data.tags),
-		category || categories.defaultCategory,
+		category,
 	);
 
 	return {
@@ -189,7 +211,7 @@ function processPostMetadata(
 		slug,
 		title: title || fileName,
 		date,
-		category: category || categories.defaultCategory,
+		category,
 		tags: normalizedTags,
 		excerpt,
 		folder,

@@ -8,8 +8,8 @@ function read(rel: string) {
 	return fs.readFileSync(path.join(root, rel), "utf-8");
 }
 
-describe("이력서 링크 및 pitfall 포스트 정리 검증", () => {
-	const feature = read("tests/features/resume-and-pitfall-content.feature");
+describe("이력서 콘텐츠 검증", () => {
+	const feature = read("tests/features/resume-content.feature");
 
 	test("Given feature 파일 When 파싱 Then 시나리오가 유지된다", () => {
 		const scenarios = [...feature.matchAll(/^\s*Scenario:\s*(.+)$/gm)].map(
@@ -17,8 +17,8 @@ describe("이력서 링크 및 pitfall 포스트 정리 검증", () => {
 		);
 		expect(scenarios).toEqual([
 			"resume social linkedin uses canonical profile URL",
-			"pitfall post excludes authoring process checklist text",
 			"resume meta title uses unified short label",
+			"resume wintrover social github link uses personal profile",
 		]);
 	});
 
@@ -27,15 +27,6 @@ describe("이력서 링크 및 pitfall 포스트 정리 검증", () => {
 		expect(site).toContain(
 			'url: "https://www.linkedin.com/in/suhyok-yoon-1934b713a/"',
 		);
-	});
-
-	test("Given pitfall 포스트 본문 When 검사 Then 작성 체크리스트 문구가 없다", () => {
-		const post = read("src/posts/company/2026-02-01-18.md");
-		expect(post).not.toContain(
-			"After completion, ensure the following checklist is met:",
-		);
-		expect(post).not.toContain("### Verification Checklist");
-		expect(post).not.toContain("### Length Guidelines");
 	});
 
 	test('Given resume 로케일 메타 When 검사 Then title/og_title이 "resume"으로 통일된다', () => {
@@ -49,5 +40,10 @@ describe("이력서 링크 및 pitfall 포스트 정리 검증", () => {
 		expect(buildScript).toContain(
 			'const title = String(json?.meta?.title ?? "resume")',
 		);
+	});
+
+	test("Given resume 사이트 설정 When 소셜 링크 확인 Then github 주소는 wintrover 개인 프로필을 사용한다", () => {
+		const site = read("src/lib/resume/site.ts");
+		expect(site).toContain('url: "https://github.com/wintrover"');
 	});
 });

@@ -21,7 +21,7 @@ Feature: SNS deployment state machine
     Then posting endpoint must use rest/posts with Posts API payload schema
     And workflow_dispatch linkedin_dry_run=true must skip LinkedIn publish API call and print preview payload
     And author must use person URN resolved from v2/me and continue with fallback urn:li:person:binfyrHJAK when profile lookup fails
-    And LinkedIn commentary intro must be English-only
+    And LinkedIn commentary intro must use current post excerpt/description with fallback intro
     And LinkedIn commentary must place canonical link in a separate paragraph with one blank line
     And markdown image paths must be converted to absolute https://wintrover.github.io/ URLs
 

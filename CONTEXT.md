@@ -31,7 +31,8 @@
 - 상태머신 규칙은 `.success`가 있으면 Skip, `.failed` 또는 상태 파일 부재면 재배포 시도를 수행해야 한다.
 - LinkedIn 배포는 `rest/posts`를 사용하고 Posts API 페이로드(`author`, `commentary`, `visibility`)를 적용해야 하며 Author는 `v2/me`로 확인한 person URN을 우선 주입하되 프로필 조회 권한 이슈가 발생하면 `LINKEDIN_PERSON_URN`(기본값 `urn:li:person:binfyrHJAK`) fallback으로 배포를 지속해야 한다.
 - LinkedIn `commentary`는 소개 문단과 링크 문단을 `\n\n`으로 분리해야 하며 링크는 별도 단락으로 출력해야 한다.
-- LinkedIn 소개 문단은 영어로만 작성해야 하며 동일 slug의 영어 원문(`src/posts/**`) excerpt/description을 우선 사용하고, 영어 문단을 확보하지 못하면 영어 기본 소개문을 사용해야 한다.
+
+- LinkedIn 소개 문단은 배포 대상 포스트의 `excerpt`/`description`을 sanitize한 값을 사용하고, 소개 문단을 확보하지 못하면 영어 기본 소개문을 사용해야 한다.
 - SNS 배포 워크플로는 `workflow_dispatch` 입력 `linkedin_dry_run=true`일 때 LinkedIn 발행 API 호출을 생략하고 canonical URL·commentary·payload 미리보기만 출력해야 한다.
 - DEV.to 및 LinkedIn 본문의 이미지 링크는 `https://wintrover.github.io/` 기반 절대 경로로 치환해야 한다.
 - 모든 플랫폼 시도 결과는 `GITHUB_STEP_SUMMARY` 마크다운 표와 `DB` 브랜치의 `STATUS.md`에 동시 반영해야 하며, 상태 스냅샷은 `DB` 브랜치에서만 단일 커밋으로 영속화해야 한다.
@@ -55,7 +56,7 @@
 - 배포 스크립트의 canonical URL slug 생성은 앱 라우터의 `slugify` 규칙과 동일해야 하며, 아포스트로피가 포함된 제목도 동일 slug로 정규화해야 한다.
 - 포스트 로더는 기존 canonical slug(`dont`)와 현재 slug(`don-t`)를 모두 조회 호환해 과거 링크의 Post not found를 방지해야 한다.
 - 신규 포스팅 등록 시 영어 원문과 한국어 버전을 기본으로 동시 작성하며, 파일명은 동일한 `YYYY-MM-DD-N.md`를 사용한다. 경로는 영어 `src/posts/{project|company}/`, 한국어 `src/posts/ko/{project|company}/`를 따른다.
-- 신규 포스팅의 기본 분류는 `Project` 카테고리와 `Devlog` 태그를 사용한다. `Company Work` 카테고리는 재직 중 회사 업무 회고를 작성할 때만 사용한다.
+- 신규 포스팅의 기본 분류는 `Personal project` 카테고리와 `Archright` 태그를 사용한다. `Company Work` 카테고리는 재직 중 회사 업무 회고를 작성할 때만 사용한다.
 - 포스트 Front Matter는 `---` 구분자를 사용해야 하며 `tags`가 문자열로 입력되어도 태그 집합으로 정규화되어 렌더링되어야 한다.
 - 포스트 경로 기반 카테고리/폴더 판별은 `__proto__` 같은 프로토타입 키 입력에도 영향을 받지 않도록 own-key 조회만 사용해야 한다.
 - 동일 slug의 한영 포스트 중 한쪽 본문을 각색하면 다른 언어 버전도 동일한 메시지로 동기화한다.
@@ -71,7 +72,7 @@
 - 정형 검증 예시 단락에 반례 탐지 설명을 추가할 경우 `다른 사용자 ID` 같은 반례 상황과 `→` 결과 라인을 한 쌍으로 유지하고, 마지막 생성 중단 결론 문장을 누락하지 않는다.
 - 가독성 개선을 위해 한 문장을 여러 줄로 분할할 때는 핵심 주장(예: `이건 엔지니어링이 아니다` / `비용 이연`)의 의미 결합을 유지하고, 원문의 강조 의도를 약화시키지 않는다.
 - 공개 포스트 본문에는 작성 프로세스용 체크리스트(예: Verification Checklist, Length Guidelines)를 남기지 않는다.
-- 이력서 소셜의 LinkedIn 링크는 `https://www.linkedin.com/in/<slug>/` 형식의 canonical URL을 사용한다.
+- 이력서 소셜의 LinkedIn 링크는 `https://www.linkedin.com/in/<slug>/` 형식의 canonical URL을 사용하며, GitHub 링크는 `https://github.com/wintrover` 개인 프로필을 사용한다.
 - 이력서 메타 타이틀은 로케일 공통으로 `resume` 표기를 사용한다.
 
 ## 3) 빌드 및 Mermaid 파이프라인 불변 규칙
@@ -92,7 +93,7 @@
 - 영어는 루트에 배치하므로 `dist/en/index.html` 생성에 의존하지 않는다.
 - Sitemap과 canonical 생성 시 영어는 루트 prefix(`""`), 한국어는 `/ko` prefix를 사용한다.
 - 검색/AI 노출 제어 메타는 `index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1` 정책을 기본으로 유지해야 한다.
-- 브라우저 탭 제목(`<title>`)은 페이지 의미 중심으로 유지하고 브랜드 suffix(`- wintrover`)를 덧붙이지 않는다.
+- 브라우저 탭 제목(`<title>`)은 페이지 의미 중심으로 유지하고 브랜드 suffix(`- Axiom`)를 덧붙이지 않는다.
 - `robots.txt`는 `Google-Extended` 그룹을 명시해 Gemini/Vertex AI 학습·grounding 제어 정책을 분리 가능하게 유지해야 한다.
 - 빌드 검증 단계(`verifyBuildOutput`)는 위 규칙 위반을 실패로 처리해야 한다.
 
@@ -114,6 +115,7 @@
 - 카드 높이 균일성을 해치지 않도록 제목/요약의 표시 방식(line clamp 등)을 일관되게 적용한다.
 - 루트(`/`)·카테고리(`/category/:category`)·태그(`/category/:category/tag/:tag`) 목록은 동일한 포스트 리스트 UI 컴포넌트를 사용한다.
 - 포스트 리스트의 카드 마크업/스타일은 단일 컴포넌트를 SSOT로 삼고, 경로별 페이지는 필터링/SEO/섹션 조합만 담당한다.
+- 포스트 리스트 메타 행은 날짜를 먼저 배치하고 태그는 날짜 바로 오른쪽에 이어서 렌더링한다.
 - 포스트 상세 페이지는 앱 전역 Geist 다크 테마의 색상/타이포 톤과 일관된 시각 체계를 유지한다.
 - 포스트 상세의 배지·버튼·코드블록은 레거시 GitHub 팔레트 대신 zinc 기반 중성 팔레트를 사용한다.
 - 포스트 상세의 제목/본문 타이포 스케일과 줄 간격은 리스트 페이지와 유사한 시각 밀도를 유지한다.
@@ -122,7 +124,7 @@
 - 주요 UI 섹션(홈 히어로·사이드바·리스트·푸터·이력서)은 동일한 모션 톤(부드러운 fade/fly, hover micro-interaction)으로 일관성을 유지한다.
 - 카테고리/태그 라우트 간 전환 시에도 포스트 리스트 진입 모션은 재생되어야 하며, 동일 컴포넌트 재사용으로 모션이 소실되면 안 된다.
 - 모든 신규 모션은 `prefers-reduced-motion` 환경에서 과도한 이동/지연 없이 즉시 또는 최소 전환으로 동작해야 한다.
-- 사이드바 카테고리 하위 항목은 태그 일반 목록이 아니라 서브주제 목록으로 취급하며 `SMBholdings`, `CVFactory`, `Devlog`만 노출한다.
+- 사이드바 카테고리 하위 항목은 태그 일반 목록이 아니라 서브주제 목록으로 취급하며 `SMBholdings`, `CVFactory`, `Archright`만 노출한다.
 
 ### [UI Motion Rule]
 
@@ -153,3 +155,21 @@
 - MCP 프록시(`scripts/context7-toolname-proxy.ts`)는 다운스트림 입력 프레이밍으로 Content-Length와 NDJSON을 모두 수용하고, 감지된 프레이밍과 동일한 형식으로 응답해야 한다.
 - 레포지토리 루트의 런타임/설정 스크립트는 `.js/.mjs/.cjs` 대신 TypeScript 또는 JSON 기반으로 유지한다.
 - 이 절차 중 하나라도 누락되거나 순서가 뒤바뀔 경우, 에이전트는 즉시 작업을 중단하고 절차를 복구해야 한다.
+
+## 7) 포스트 작성 표준 (2026-04-02 추가)
+
+- **이중 언어 정책**: 모든 포스트는 영어(English)와 한국어(Korean) 두 언어로 작성해야 한다.
+  - 영어 포스트: `src/posts/project/` 또는 `src/posts/company/`에 저장
+  - 한국어 포스트: `src/posts/ko/project/` 또는 `src/posts/ko/company/`에 저장
+  - 동일한 파일명(`YYYY-MM-DD-N.md`) 사용
+  - 내용은 동일하게 유지하되 자연스러운 번역 제공
+- **프로젝트 명칭 정책**: 포스팅 내용에서 프로젝트명은 일관되게 지칭한다.
+  - `Axiom Enterprise` 폴더명을 그대로 사용하지 말고, `Axiom`으로만 지칭
+  - 예: "Axiom Enterprise was built" → "Axiom was built"
+- **2026-04-02 Axiom 포스트**: 기술 블로그 시리즈 첫 포스트로 BMC, Z3, Lean 4, Dr.Nim을 활용한 무결성 검증 엔진 소개
+- **2026-04-02 포스트 리라이팅**: Gemini 첨삭 반영 - 서론 재작성, 검증 비대칭성 섹션 추가, BMC 설명 보강
+- **2026-04-02 포맷팅 수정**: 지표 바 그래프 정렬 - 텍스트와 시각적 바의 시작 위치 수직 일치, 고정 폭 적용, 한국어 Trust Gap 공백 조정
+- **2026-04-02 사이드바 스타일**: h4 헤더에 좌우 패딩 추가 (0.55rem)
+- **2026-04-02 포스팅 수정**: "수학적으로 건전" → "수학적으로 증명"으로 표현 변경
+- **2026-04-02 포스팅 미션 문구**: "확률적 출력에서 검증된 산출물" → "비결정론적 출력을 결정론적 자산으로 정제"
+- **2026-04-02 포스팅 다음편 예고**: BMC 구현 → 아키텍처 철학 Rule First 원칙으로 변경

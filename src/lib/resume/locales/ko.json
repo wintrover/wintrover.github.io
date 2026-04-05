@@ -34,7 +34,7 @@
 	"section_title_education": "Education",
 	"projects": {
 		"devlog": {
-			"title": "Devlog",
+			"title": "Archright",
 			"quote": "개발자와 AI 에이전트의 대화 히스토리를 분석해 가설·시도·증거의 인과가 드러나는 기술 블로그를 생성하는 프로젝트입니다.",
 			"description": "- Nim 기반 도메인 설계로 세션 데이터를 정적 검증 가능한 구조로 모델링<br/>- ReasoningTrace 스키마를 통해 가설·시도·증거 흐름을 추출하는 파이프라인 구현<br/>- Unix 철학 기반 capture | render | verify CLI 파이프라인 설계<br/>- MCP 게이트웨이와 검증 테스트를 통해 출력 신뢰성과 워크플로우 일관성 강화"
 		},

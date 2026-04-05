@@ -36,7 +36,7 @@ describe("Sidebar Component", () => {
 		{
 			fileName: "post-1",
 			title: "Post 1",
-			category: "Project",
+			category: "Personal project",
 			tags: ["Svelte"],
 			slug: "post-1",
 			date: "2023-10-01",
@@ -58,7 +58,7 @@ describe("Sidebar Component", () => {
 		{
 			fileName: "post-3",
 			title: "Post 3",
-			category: "Project",
+			category: "Personal project",
 			tags: ["Svelte"],
 			slug: "post-3",
 			date: "2023-10-03",
@@ -85,7 +85,7 @@ describe("Sidebar Component", () => {
 		render(Sidebar);
 
 		expect(screen.getByText(/All Posts \(3\)/)).toBeInTheDocument();
-		expect(screen.getByText(/Project \(2\)/)).toBeInTheDocument();
+		expect(screen.getByText(/Personal project \(2\)/)).toBeInTheDocument();
 		expect(screen.getByText(/Company Work \(1\)/)).toBeInTheDocument();
 		expect(screen.getByText(/CVFactory \(0\)/)).toBeInTheDocument();
 		expect(screen.getByText(/SMBholdings \(0\)/)).toBeInTheDocument();
@@ -112,15 +112,15 @@ describe("Sidebar Component", () => {
 	test("카테고리 클릭 시 selectedCategory가 업데이트되고 경로가 이동해야 함", async () => {
 		render(Sidebar);
 
-		const projectButton = screen.getByText(/Project \(2\)/);
+		const projectButton = screen.getByText(/Personal project \(2\)/);
 		await fireEvent.click(projectButton);
 
-		expect(get(selectedCategory)).toBe("Project");
-		expect(push).toHaveBeenCalledWith("/category/project");
+		expect(get(selectedCategory)).toBe("Personal project");
+		expect(push).toHaveBeenCalledWith("/category/personal-project");
 	});
 
 	test("All Posts 클릭 시 'all'로 설정되고 홈으로 이동해야 함", async () => {
-		selectedCategory.set("Project");
+		selectedCategory.set("Personal project");
 		render(Sidebar);
 
 		const allPostsButton = screen.getByText(/All Posts \(3\)/);
@@ -143,7 +143,7 @@ describe("Sidebar Component", () => {
 	test("아바타는 링크가 아니고 클릭 시 이동하지 않아야 함", async () => {
 		render(Sidebar);
 
-		const avatar = screen.getByAltText(/wintrover/i); // 대소문자 무시
+		const avatar = screen.getByAltText(/axiom/i); // 대소문자 무시
 		await fireEvent.click(avatar);
 
 		expect(get(selectedCategory)).toBe("all");
@@ -213,7 +213,7 @@ describe("Sidebar Component", () => {
 							fc.constant(undefined),
 							fc.constant(""),
 							fc.constantFrom(
-								"Project",
+								"Personal project",
 								"Company Work",
 								"Tech",
 								"Life",
@@ -307,7 +307,7 @@ describe("Sidebar Component", () => {
 			{
 				fileName: "b",
 				title: "B",
-				category: "Project",
+				category: "Personal project",
 				tags: ["Svelte"],
 				slug: "b",
 				date: "2024-01-02",
@@ -318,13 +318,13 @@ describe("Sidebar Component", () => {
 		];
 		const config = {
 			categories: {
-				project: { name: "Project", tags: [] },
+				project: { name: "Personal project", tags: [] },
 			},
 		};
 
 		const result = buildSidebarData(generatedPosts, config);
 		const projectGroup = result.categoryGroups.find(
-			(group) => group.category.label === "Project",
+			(group) => group.category.label === "Personal project",
 		);
 
 		expect(projectGroup).toBeDefined();

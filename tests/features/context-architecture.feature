@@ -143,6 +143,12 @@ Feature: Context SSoT architecture and UI invariants
     Then category mapping should only use own-key lookups
     And post parsing should still produce a valid post result
 
+  Scenario: Legacy Project category should normalize to Personal project
+    Given post metadata category can contain legacy "Project"
+    When post loader normalizes category and tag mapping
+    Then rendered category label should be "Personal project"
+    And category route slug should be "personal-project"
+
   Scenario: Pages workflow injects analytics env from secrets with vars fallback
     Given GitHub Actions builds static pages for deployment
     When analytics environment variables are mapped for build

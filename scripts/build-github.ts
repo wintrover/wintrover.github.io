@@ -165,7 +165,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 	const title = String(json?.meta?.title ?? "resume");
 	const description = String(
 		json?.meta?.description ??
-			"Thought Trajectory Architect shaping AI products by making decision trajectories explicit and executable.",
+			"Axiom, a Thought Trajectory Architect platform shaping AI products by making decision trajectories explicit and executable.",
 	);
 	const canonical = `${siteOrigin}${localePrefix}/resume/`;
 	const redirect = `${localePrefix}/#/resume`;
@@ -173,7 +173,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 	const ogDescription = String(json?.meta?.og_description ?? description);
 	const ogType = String(json?.meta?.og_type ?? "website");
 	const ogImageAlt =
-		locale === "ko" ? "wintrover 프로필 이미지" : "wintrover profile image";
+		locale === "ko" ? "Axiom 프로필 이미지" : "Axiom profile image";
 
 	const html =
 		`<!doctype html>` +
@@ -194,7 +194,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 		`<meta property="og:url" content="${xmlEscape(canonical)}"/>` +
 		`<meta property="og:image" content="${xmlEscape(defaultOgImage)}"/>` +
 		`<meta property="og:image:alt" content="${xmlEscape(ogImageAlt)}"/>` +
-		`<meta property="og:site_name" content="wintrover"/>` +
+		`<meta property="og:site_name" content="Axiom"/>` +
 		`<script>(()=>{location.replace(${JSON.stringify(redirect)});})();</script>` +
 		`</head>` +
 		`<body>` +
@@ -248,7 +248,7 @@ function buildPostLandingPages(dist: string, locale: "ko" | "en") {
 			`<meta property="og:url" content="${xmlEscape(canonical)}"/>` +
 			`<meta property="og:image" content="${xmlEscape(defaultOgImage)}"/>` +
 			`<meta property="og:image:alt" content="${xmlEscape(post.title)}"/>` +
-			`<meta property="og:site_name" content="wintrover"/>` +
+			`<meta property="og:site_name" content="Axiom"/>` +
 			`<script type="application/ld+json">${jsonLdString}</script>` +
 			`<script>(()=>{location.replace(${JSON.stringify(redirect)});})();</script>` +
 			`</head>` +
@@ -316,7 +316,7 @@ function buildRobots(dist: string) {
 }
 
 function verifyBuildOutput(distPath: string) {
-	console.log("🚀 Verifying GitHub Pages build output...");
+	console.log("🚀 Verifying Axiom GitHub Pages build output...");
 	const expectedFiles = [
 		path.join(distPath, "index.html"),
 		path.join(distPath, "ko", "index.html"),
@@ -346,7 +346,7 @@ function verifyBuildOutput(distPath: string) {
 	}
 
 	console.log("✅ Build verification successful");
-	console.log("📦 Ready for GitHub Pages deployment!");
+	console.log("📦 Axiom build is ready for GitHub Pages deployment!");
 }
 
 function main() {

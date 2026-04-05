@@ -75,7 +75,7 @@ void selectPost;
 	<meta property="og:url" content={seoUrl} />
 	<meta property="og:image" content={defaultOgImage} />
 	<meta property="og:image:alt" content={seoTitle} />
-	<meta property="og:site_name" content="wintrover" />
+	<meta property="og:site_name" content="Axiom" />
 	<link rel="canonical" href={seoUrl} />
 </svelte:head>
 

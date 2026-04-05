@@ -145,13 +145,12 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(script).toContain("NONEXISTENT_VERSION");
 		expect(script).toContain("publishRequest(");
 		expect(script).toContain("buildLinkedInCommentary(");
-		expect(script).toContain("resolveEnglishLinkedInIntro(");
+		expect(script).toContain("resolveLinkedInIntro(");
 		expect(script).toContain("linkedInIntro:");
 		expect(script).toContain('join("\\n\\n")');
 		expect(script).toContain("buildLinkedInDryRunPreview(");
 		expect(script).toContain("LINKEDIN_DRY_RUN");
 		expect(script).toContain("[linkedin-dry-run] payload=");
-		expect(script).toContain("hasHangul(");
 		expect(script).toContain(
 			"I shared a new post about engineering decisions and quality automation. Read it here.",
 		);

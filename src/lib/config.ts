@@ -26,8 +26,8 @@ const brandProfile = {
 		en: "Thought Trajectory Architect",
 	},
 	blogTitle: {
-		ko: "wintrover - 사고 궤적 아키텍트",
-		en: "wintrover - Thought Trajectory Architect",
+		ko: "Axiom - 사고 궤적 아키텍트",
+		en: "Axiom - Thought Trajectory Architect",
 	},
 	blogDescription: {
 		ko: "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그.",
@@ -38,8 +38,8 @@ const brandProfile = {
 		en: "Blog and resume of a Thought Trajectory Architect who designs decision trajectories behind AI products.",
 	},
 	ogImageAlt: {
-		ko: "wintrover 프로필 이미지",
-		en: "wintrover profile image",
+		ko: "Axiom 프로필 이미지",
+		en: "Axiom profile image",
 	},
 } as const;
 
@@ -164,7 +164,7 @@ export function getRuntimeOrigin() {
 }
 
 export const siteConfig = {
-	name: "wintrover",
+	name: "Axiom",
 	description: brandProfile.role.en,
 	avatar: `${baseUrl}images/profile.png`,
 	baseUrl,
