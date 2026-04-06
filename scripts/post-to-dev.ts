@@ -750,10 +750,13 @@ function toWorkspaceRelative(filePath: string) {
 
 function toPostKey(filePath: string) {
 	const relative = toWorkspaceRelative(filePath);
-	if (relative.toLowerCase().endsWith(".md")) {
-		return relative.slice(0, -3);
+	const basename = path.basename(relative, path.extname(relative));
+	if (!basename) {
+		throw new Error(
+			`[REQ-DEPLOY-17] Invalid post path: ${filePath}. post_key must be basename only.`,
+		);
 	}
-	return relative;
+	return basename;
 }
 
 function slugFromPostKey(postKey: string) {
