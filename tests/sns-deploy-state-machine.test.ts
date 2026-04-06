@@ -10,6 +10,7 @@ import {
 	evaluateDeploymentDecision,
 	isLinkedInDryRunEnabled,
 	resolveCanonicalSlug,
+	toPostKey,
 } from "../scripts/post-to-dev";
 
 const root = process.cwd();
@@ -345,5 +346,28 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(preflightSection).toContain('basename "$post" .md');
 		expect(preflightSection).toContain("post_key=");
 		expect(preflightSection).toContain(".deploy/${post_key}/devto.success");
+	});
+
+	test("Given toPostKey 함수 When 전체 경로 입력 Then basename만 반환한다", () => {
+		expect(toPostKey("src/posts/project/2026-04-02-21.md")).toBe(
+			"2026-04-02-21",
+		);
+		expect(toPostKey("src/posts/company/2026-03-17-19.md")).toBe(
+			"2026-03-17-19",
+		);
+		expect(toPostKey("/workspace/src/posts/project/2026-01-08-16.md")).toBe(
+			"2026-01-08-16",
+		);
+	});
+
+	test("Given toPostKey 함수 When 이미 basename 입력 Then 그대로 반환한다", () => {
+		expect(toPostKey("2026-04-02-21.md")).toBe("2026-04-02-21");
+		expect(toPostKey("2026-03-17-19")).toBe("2026-03-17-19");
+	});
+
+	test("Given toPostKey 함수 When 빈 문자열 또는 잘못된 경로 Then REQ-DEPLOY-17 에러를 던진다", () => {
+		expect(() => toPostKey("")).toThrow("[REQ-DEPLOY-17]");
+		expect(() => toPostKey("   ")).toThrow("[REQ-DEPLOY-17]");
+		expect(() => toPostKey(".md")).toThrow("[REQ-DEPLOY-17]");
 	});
 });

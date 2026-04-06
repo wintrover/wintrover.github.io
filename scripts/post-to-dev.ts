@@ -748,10 +748,11 @@ function toWorkspaceRelative(filePath: string) {
 	return relative.replace(/\\/g, "/");
 }
 
-function toPostKey(filePath: string) {
+export function toPostKey(filePath: string) {
 	const relative = toWorkspaceRelative(filePath);
-	const basename = path.basename(relative, path.extname(relative));
-	if (!basename) {
+	const ext = path.extname(relative);
+	const basename = path.basename(relative, ext).trim();
+	if (!basename || basename.startsWith(".")) {
 		throw new Error(
 			`[REQ-DEPLOY-17] Invalid post path: ${filePath}. post_key must be basename only.`,
 		);
