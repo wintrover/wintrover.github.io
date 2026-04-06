@@ -77,3 +77,4 @@ Feature: SNS deployment state machine
     When workflow calculates post_key for .success marker path
     Then post_key must use basename of file without path prefix
     And .deploy structure must match post_key basename format
+    And toPostKey function must throw error for invalid paths with REQ-DEPLOY-17 message
