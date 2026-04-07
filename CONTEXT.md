@@ -162,14 +162,13 @@
 ## 7) 포스트 작성 표준 (2026-04-02 추가)
 
 - **이중 언어 정책**: 모든 포스트는 영어(English)와 한국어(Korean) 두 언어로 작성해야 한다.
-  - 영어 포스트: `src/posts/project/` 또는 `src/posts/company/`에 저장
-  - 한국어 포스트: `src/posts/ko/project/` 또는 `src/posts/ko/company/`에 저장
-  - 동일한 파일명(`YYYY-MM-DD-N.md`) 사용
-  - 내용은 동일하게 유지하되 자연스러운 번역 제공
+  - **Archright 카테고리**: Axiom 프로젝트 및 정형 검증 관련 포스트. 영어 `src/posts/archright/`, 한국어 `src/posts/ko/archright/`에 저장한다. frontmatter의 `category` 값을 `Archright`로 설정하고 `tags`에 반드시 `Axiom`을 포함해야 한다 (사이드바 "Axiom" 서브토픽 필터링을 위해 필요).
+  - **Project 카테고리**: 개인 프로젝트 일반. 영어 `src/posts/project/`, 한국어 `src/posts/ko/project/`에 저장하며 frontmatter의 `category` 값을 `Project`로 설정한다.
+  - **Company Work 카테고리**: 재직 중 회사 업무 회고. 영어 `src/posts/company/`, 한국어 `src/posts/ko/company/`에 저장하며 frontmatter의 `category` 값을 `Company Work`로 설정한다.
 - **프로젝트 명칭 정책**: 포스팅 내용에서 프로젝트명은 일관되게 지칭한다.
   - `Axiom Enterprise` 폴더명을 그대로 사용하지 말고, `Axiom`으로만 지칭
   - 예: "Axiom Enterprise was built" → "Axiom was built"
-- **Procedure Gate 예외**: 콘텐츠(`src/posts/`) 파일은 아키텍처의 '실록(History)' 또는 '홍보(Publicity)' 영역에 속하므로 `src/core`에 적용되는 Procedure Gate의 엄격한 증거 의무(`CONTEXT.md`, `tests/features/*.feature`, `tests/**/*.test.ts`)에서 제외된다. 단, `CONTEXT.md`와의 정합성 검토는 유지한다.
+- **Procedure Gate 예외**: 콘텐츠(`src/posts/`) 파일은 아키텍처의 '실록(History)' 또는 '홍보(Publicity)' 영역에 속하므로 `src/core`에 적용되는 Procedure Gate의 엄격한 증거 의무(`CONTEXT.md`, `tests/features/*.feature`, `tests/**/*.test.ts`)에서 제외된다. 단, `CONTEXT.md`와의 정합성 검토는 유지한다. **CI 스킵 금지**: Procedure Gate 예외는 로컬 git hooks(`--no-verify`)에만 적용되며, GitHub Actions CI(`[skip ci]`)는 스킵하면 안 된다. 블로그 배포를 위해 `Pages Build & Deploy` 워크플로우가 반드시 실행되어야 한다.
 - **deploy 브랜치 검증 의무**: `deploy` 브랜치에 푸시한 후에는 반드시 `gh` 명령어로 GitHub Actions 실행 결과를 검증해야 한다.
 - **2026-04-02 Axiom 포스트**: 기술 블로그 시리즈 첫 포스트로 BMC, Z3, Lean 4, Dr.Nim을 활용한 무결성 검증 엔진 소개
 - **2026-04-02 포스트 리라이팅**: Gemini 첨삭 반영 - 서론 재작성, 검증 비대칭성 섹션 추가, BMC 설명 보강

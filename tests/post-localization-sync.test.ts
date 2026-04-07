@@ -11,8 +11,8 @@ function read(rel: string) {
 
 describe("post localization synchronization", () => {
 	test("Given paired localized post When verifying key claims Then both copies preserve the same intent", () => {
-		const ko = read("src/posts/ko/project/2026-03-17-19.md");
-		const en = read("src/posts/project/2026-03-17-19.md");
+		const ko = read("src/posts/ko/archright/2026-03-17-19.md");
+		const en = read("src/posts/archright/2026-03-17-19.md");
 
 		expect(ko).toContain("AI는 믿을 수 없다. 그러니 다시 손으로 코딩하라.");
 		expect(en).toContain("AI is not trustworthy. Go back to coding by hand.");
@@ -26,8 +26,8 @@ describe("post localization synchronization", () => {
 	});
 
 	test("PBT: Given policy terms When scanning localized files Then required synchronization terms exist", () => {
-		const ko = read("src/posts/ko/project/2026-03-17-19.md");
-		const en = read("src/posts/project/2026-03-17-19.md");
+		const ko = read("src/posts/ko/archright/2026-03-17-19.md");
+		const en = read("src/posts/archright/2026-03-17-19.md");
 
 		fc.assert(
 			fc.property(
@@ -44,8 +44,8 @@ describe("post localization synchronization", () => {
 	});
 
 	test("Given paired localized post When applying dashed delimiters Then both copies keep matching boundaries", () => {
-		const ko = read("src/posts/ko/project/2026-03-19-20.md");
-		const en = read("src/posts/project/2026-03-19-20.md");
+		const ko = read("src/posts/ko/archright/2026-03-19-20.md");
+		const en = read("src/posts/archright/2026-03-19-20.md");
 		const delimiter =
 			'<hr style="border: 0; border-top: 1px dashed #52525b; margin: 1.2rem 0;" />';
 
@@ -62,8 +62,8 @@ describe("post localization synchronization", () => {
 	});
 
 	test("PBT: Given delimiter policy When scanning paired posts Then both localized copies keep the same delimiter token", () => {
-		const ko = read("src/posts/ko/project/2026-03-19-20.md");
-		const en = read("src/posts/project/2026-03-19-20.md");
+		const ko = read("src/posts/ko/archright/2026-03-19-20.md");
+		const en = read("src/posts/archright/2026-03-19-20.md");
 
 		fc.assert(
 			fc.property(
@@ -79,8 +79,8 @@ describe("post localization synchronization", () => {
 	});
 
 	test("Given refined Korean narrative When syncing localized copy Then English preserves matched nuance and paragraph intent", () => {
-		const ko = read("src/posts/ko/project/2026-03-19-20.md");
-		const en = read("src/posts/project/2026-03-19-20.md");
+		const ko = read("src/posts/ko/archright/2026-03-19-20.md");
+		const en = read("src/posts/archright/2026-03-19-20.md");
 
 		expect(ko).toContain("괴로워하며 근원을 파고들었다");
 		expect(en).toContain("in agony, drilling into the root cause");
@@ -113,7 +113,7 @@ describe("post localization synchronization", () => {
 	});
 
 	test("Given partial localized edit When verifying fixed markdown markers Then separators, headings, backslashes, and protected phrases remain intact", () => {
-		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+		const ko = read("src/posts/ko/archright/2026-03-19-20.md");
 		const delimiter =
 			'<hr style="border: 0; border-top: 1px dashed #52525b; margin: 1.2rem 0;" />';
 
@@ -133,7 +133,7 @@ describe("post localization synchronization", () => {
 	});
 
 	test("PBT: Given protected lines When checking partial edits Then trailing backslashes and exact lines stay unchanged", () => {
-		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+		const ko = read("src/posts/ko/archright/2026-03-19-20.md");
 
 		fc.assert(
 			fc.property(
@@ -149,7 +149,7 @@ describe("post localization synchronization", () => {
 	});
 
 	test("Given readability refinement When validating flow-block layout Then arrow flow and numbered verification procedure stay intact", () => {
-		const ko = read("src/posts/ko/project/2026-03-19-20.md");
+		const ko = read("src/posts/ko/archright/2026-03-19-20.md");
 
 		expect(ko).toContain("이 시스템은 단순한 기록이 아니다.\\");
 		expect(ko).toContain(

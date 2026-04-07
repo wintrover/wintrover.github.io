@@ -11,10 +11,10 @@ function read(rel: string) {
 
 describe("post localization auto sync", () => {
 	test("Given KO formal-verification anchors When syncing same slug Then EN section is automatically patched", () => {
-		const koPath = "src/posts/ko/project/2026-03-19-20.md";
+		const koPath = "src/posts/ko/archright/2026-03-19-20.md";
 		const ko = read(koPath);
 		const enAfterSectionTrim = read(
-			"src/posts/project/2026-03-19-20.md",
+			"src/posts/archright/2026-03-19-20.md",
 		).replace(
 			/\nThis verification is not a post-hoc review\.[\s\S]*?We create a state where bugs cannot exist\.\n/m,
 			"\n",
@@ -62,12 +62,12 @@ describe("post localization auto sync", () => {
 	});
 
 	test("Given KO anchors missing When syncing Then EN content remains unchanged", () => {
-		const koPath = "src/posts/ko/project/2026-03-19-20.md";
+		const koPath = "src/posts/ko/archright/2026-03-19-20.md";
 		const ko = read(koPath).replace(
 			"다른 사용자의 ID로 요청을 보내는 경우:\\",
 			"다른 사용자 식별자로 요청을 보내는 경우:\\",
 		);
-		const en = read("src/posts/project/2026-03-19-20.md");
+		const en = read("src/posts/archright/2026-03-19-20.md");
 
 		const result = syncEnglishContentForSlug(koPath, ko, en);
 

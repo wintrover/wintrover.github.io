@@ -28,8 +28,8 @@ function parseFrontmatter(content: string) {
 
 describe("post creation standard", () => {
 	const slug = "2026-04-02-21";
-	const enPath = `src/posts/project/${slug}.md`;
-	const koPath = `src/posts/ko/project/${slug}.md`;
+	const enPath = `src/posts/archright/${slug}.md`;
+	const koPath = `src/posts/ko/archright/${slug}.md`;
 
 	test("Given bilingual posts When checking existence Then both English and Korean versions exist", () => {
 		expect(fs.existsSync(path.join(root, enPath))).toBe(true);
@@ -48,7 +48,9 @@ describe("post creation standard", () => {
 		expect(frontmatter?.tags).toBeTruthy();
 		const tags = frontmatter?.tags?.split(",").map((t) => t.trim()) || [];
 		expect(tags.length).toBeGreaterThanOrEqual(3);
-		expect(["Project", "Company Work"]).toContain(frontmatter?.category);
+		expect(["Project", "Company Work", "Archright"]).toContain(
+			frontmatter?.category,
+		);
 		expect(frontmatter?.description).toBeTruthy();
 	});
 
@@ -64,7 +66,9 @@ describe("post creation standard", () => {
 		expect(frontmatter?.tags).toBeTruthy();
 		const tags = frontmatter?.tags?.split(",").map((t) => t.trim()) || [];
 		expect(tags.length).toBeGreaterThanOrEqual(3);
-		expect(["Project", "Company Work"]).toContain(frontmatter?.category);
+		expect(["Project", "Company Work", "Archright"]).toContain(
+			frontmatter?.category,
+		);
 		expect(frontmatter?.description).toBeTruthy();
 	});
 
