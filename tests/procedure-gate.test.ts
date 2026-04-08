@@ -51,6 +51,16 @@ describe("절차 게이트 강제 검증", () => {
 		expect(result.missing).toHaveLength(0);
 	});
 
+	test("Given 포스트 파일 변경 When 판정 Then 게이트가 통과한다 (콘텐츠 예외)", () => {
+		const result = evaluateProcedureGate([
+			"src/posts/archright/2026-04-08-24.md",
+			"src/posts/ko/archright/2026-04-08-24.md",
+		]);
+		expect(result.ok).toBe(true);
+		expect(result.missing).toHaveLength(0);
+		expect(result.requiresEvidence).toBe(false);
+	});
+
 	test("Given workflow 파일 When 검사 Then 절차 게이트가 PR과 push에서 실행된다", () => {
 		const workflow = read(".github/workflows/procedure-gate.yml");
 		expect(workflow).toContain("pull_request:");

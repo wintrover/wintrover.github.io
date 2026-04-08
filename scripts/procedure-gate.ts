@@ -29,9 +29,16 @@ function normalizeFiles(files: string[]) {
 	return files.map((file) => file.trim().replace(/\\/g, "/")).filter(Boolean);
 }
 
+const POSTS_PATHS = ["src/posts/", "src/posts/ko/"];
+
+function isContentFile(filePath: string) {
+	return POSTS_PATHS.some((p) => filePath.startsWith(p));
+}
+
 function matchesImplementationFile(filePath: string) {
 	if (filePath === "CONTEXT.md") return false;
 	if (filePath.startsWith("tests/")) return false;
+	if (isContentFile(filePath)) return false;
 	return IMPLEMENTATION_PREFIXES.some((prefix) => filePath.startsWith(prefix));
 }
 
