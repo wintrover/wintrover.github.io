@@ -168,7 +168,7 @@
 - **프로젝트 명칭 정책**: 포스팅 내용에서 프로젝트명은 일관되게 지칭한다.
   - `Axiom Enterprise` 폴더명을 그대로 사용하지 말고, `Axiom`으로만 지칭
   - 예: "Axiom Enterprise was built" → "Axiom was built"
-- **Procedure Gate 예외**: 콘텐츠(`src/posts/`) 파일은 아키텍처의 '실록(History)' 또는 '홍보(Publicity)' 영역에 속하므로 `src/core`에 적용되는 Procedure Gate의 엄격한 증거 의무(`CONTEXT.md`, `tests/features/*.feature`, `tests/**/*.test.ts`)에서 제외된다. 단, `CONTEXT.md`와의 정합성 검토는 유지한다. **CI 스킵 금지**: Procedure Gate 예외는 로컬 git hooks(`--no-verify`)에만 적용되며, GitHub Actions CI(`[skip ci]`)는 스킵하면 안 된다. 블로그 배포를 위해 `Pages Build & Deploy` 워크플로우가 반드시 실행되어야 한다.
+- **Procedure Gate 예외**: 콘텐츠(`src/posts/`) 파일은 아키텍처의 '실록(History)' 또는 '홍보(Publicity)' 영역에 속하므로 `src/core`에 적용되는 Procedure Gate의 엄격한 증거 의무(`CONTEXT.md`, `tests/features/*.feature`, `tests/**/*.test.ts`)에서 제외된다. `[REQ-PROCEDURE-GATE-07]` 단, `CONTEXT.md`와의 정합성 검토는 유지한다. **CI 스킵 금지**: Procedure Gate 예외는 로컬 git hooks(`--no-verify`)에만 적용되며, GitHub Actions CI(`[skip ci]`)는 스킵하면 안 된다. 블로그 배포를 위해 `Pages Build & Deploy` 워크플로우가 반드시 실행되어야 한다.
 - **deploy 브랜치 검증 의무**: `deploy` 브랜치에 푸시한 후에는 반드시 `gh` 명령어로 GitHub Actions 실행 결과를 검증해야 한다.
 - **2026-04-02 Axiom 포스트**: 기술 블로그 시리즈 첫 포스트로 BMC, Z3, Lean 4, Dr.Nim을 활용한 무결성 검증 엔진 소개
 - **2026-04-02 포스트 리라이팅**: Gemini 첨삭 반영 - 서론 재작성, 검증 비대칭성 섹션 추가, BMC 설명 보강

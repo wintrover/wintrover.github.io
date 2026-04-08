@@ -37,3 +37,11 @@ Feature: AGENTS 절차 게이트 강제
     When gate checks critical script and config paths
     Then context7 proxy path must be scripts/context7-toolname-proxy.ts
     And dependency cruiser config must be JSON based
+
+  @REQ-PROCEDURE-GATE-07
+  Scenario: content files skip procedure gate evidence requirement
+    Given a change includes only files under src/posts/ or src/posts/ko/
+    When gate evaluates changed files
+    Then gate result must pass without requiring CONTEXT.md
+    And gate result must pass without requiring .feature files
+    And gate result must pass without requiring .test.ts files

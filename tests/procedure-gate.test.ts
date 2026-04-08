@@ -23,6 +23,7 @@ describe("절차 게이트 강제 검증", () => {
 			"rewritten history in CI must still produce changed file list",
 			"context7 proxy must preserve downstream framing compatibility",
 			"runtime scripts must avoid js extension leftovers",
+			"content files skip procedure gate evidence requirement",
 		]);
 	});
 
