@@ -26,7 +26,7 @@ on:
       platforms:
         description: "Comma separated platforms (devto,linkedin)"
         required: false
-        default: "devto,linkedin"
+        default: "devto"
         type: string
       max_publish_per_run:
         description: "Maximum candidate files allowed per run"
@@ -73,7 +73,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          DEPLOY_PLATFORMS="${{ github.event.inputs.platforms || 'devto,linkedin' }}"
+          DEPLOY_PLATFORMS="${{ github.event.inputs.platforms || 'devto' }}"
           MAX_PUBLISH_PER_RUN="${{ github.event.inputs.max_publish_per_run || '1' }}"
           LINKEDIN_DRY_RUN="${{ github.event.inputs.linkedin_dry_run || 'false' }}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.target }}" ]; then

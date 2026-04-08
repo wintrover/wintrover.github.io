@@ -91,9 +91,7 @@ describe("SNS 배포 상태 머신 검증", () => {
 		expect(workflow).toContain('DEPLOY_PREFLIGHT_ONLY: "true"');
 		expect(workflow).toContain("MAX_PUBLISH_PER_RUN:");
 		expect(workflow).toContain("linkedin_dry_run:");
-		expect(workflow).toContain(
-			"github.event.inputs.platforms || 'devto,linkedin'",
-		);
+		expect(workflow).toContain("github.event.inputs.platforms || 'devto'");
 		expect(workflow).toContain(
 			"github.event.inputs.linkedin_dry_run || 'false'",
 		);
