@@ -79,6 +79,28 @@ function normalizeTags(tags: unknown) {
 	return [];
 }
 
+function enforceArchrightForAxiomTag(
+	category: string,
+	rawTags: string[],
+	filePath: string,
+): string {
+	const hasAxiom = rawTags.some(
+		(tag) => String(tag).trim().toLowerCase() === "axiom",
+	);
+	if (!hasAxiom) return category;
+
+	const normalizedCategory = normalizeCategoryName(category).toLowerCase();
+	if (normalizedCategory !== "archright") {
+		logWarn(
+			"postLoader",
+			"Axiom 태그를 포함한 포스트가 Archright 카테고리가 아닙니다. 자동으로 Archright로 수정합니다.",
+			{ filePath, originalCategory: category },
+		);
+		return "Archright";
+	}
+	return category;
+}
+
 function normalizeTagsByCategory(tags: string[], categoryName: string) {
 	const normalizedCategoryName = normalizeCategoryName(categoryName);
 	const normalizedCategoryKey = canonicalizeCategoryName(
@@ -185,6 +207,9 @@ function processPostMetadata(
 	}
 	category = normalizeCategoryName(category || categories.defaultCategory);
 
+	const rawTags = normalizeTags(data.tags);
+	category = enforceArchrightForAxiomTag(category, rawTags, filePath);
+
 	const htmlContent = renderMarkdownBody(markdownBody);
 	const slug = derivePostSlug(data, fileName);
 
@@ -200,10 +225,7 @@ function processPostMetadata(
 				? data.description
 				: "";
 
-	const normalizedTags = normalizeTagsByCategory(
-		normalizeTags(data.tags),
-		category,
-	);
+	const normalizedTags = normalizeTagsByCategory(rawTags, category);
 
 	return {
 		...data,

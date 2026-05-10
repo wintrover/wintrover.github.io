@@ -6,8 +6,8 @@ Feature: Post creation standard
     Given a new technical blog post is created
     When the post is saved to the repository
     Then both English and Korean versions should exist with matching filenames
-    And the English post should be in src/posts/project/ or src/posts/company/
-    And the Korean post should be in src/posts/ko/project/ or src/posts/ko/company/
+    And the English post should be in src/posts/project/, src/posts/company/, or src/posts/archright/
+    And the Korean post should be in src/posts/ko/project/, src/posts/ko/company/, or src/posts/ko/archright/
 
   Scenario: frontmatter contains required fields
     Given a new blog post is created
@@ -31,3 +31,11 @@ Feature: Post creation standard
     Then both should have matching section headers
     And both should preserve the same core claims
     And both should have matching frontmatter fields except language-specific content
+
+  Scenario: Axiom tag enforces Archright category
+    Given a blog post contains the Axiom tag
+    When the post is loaded by the postLoader
+    Then its category must be Archright
+    And if the frontmatter or folder assigned a different category
+    Then the loader automatically overrides it to Archright
+    And a warning is logged for the mismatch

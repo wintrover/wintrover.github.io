@@ -14,7 +14,8 @@
 			"slug": "archright",
 			"color": "#ff7b00",
 			"icon": "🧭",
-			"tags": ["Axiom"]
+			"tags": ["Axiom"],
+			"exclusiveTags": ["Axiom"]
 		},
 		"company": {
 			"name": "Company Work",

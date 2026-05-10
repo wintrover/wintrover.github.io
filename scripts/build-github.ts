@@ -315,6 +315,76 @@ function buildRobots(dist: string) {
 	writeFile(path.join(dist, "robots.txt"), content);
 }
 
+function loadCategoryConfig(root: string) {
+	const configPath = path.join(root, "src", "lib", "categories.json");
+	const raw = fs.readFileSync(configPath, "utf-8");
+	return JSON.parse(raw) as {
+		categories?: Record<
+			string,
+			{
+				name?: string;
+				exclusiveTags?: string[];
+			}
+		>;
+	};
+}
+
+function buildExclusiveTagRules(config: ReturnType<typeof loadCategoryConfig>) {
+	const rules = new Map<string, string>();
+	for (const entry of Object.values(config.categories || {})) {
+		if (!entry?.exclusiveTags) continue;
+		for (const tag of entry.exclusiveTags) {
+			rules.set(String(tag).trim().toLowerCase(), String(entry.name || ""));
+		}
+	}
+	return rules;
+}
+
+export function validatePostCategoryTagConsistency(root: string) {
+	const config = loadCategoryConfig(root);
+	const exclusiveRules = buildExclusiveTagRules(config);
+	if (exclusiveRules.size === 0) return;
+
+	const postsRoot = path.join(root, "src", "posts");
+	if (!fs.existsSync(postsRoot)) return;
+
+	const allFiles = walkMarkdownFiles(postsRoot).filter((p) => {
+		const rel = path.relative(postsRoot, p).replaceAll("\\", "/");
+		return !rel.toLowerCase().startsWith("ko/");
+	});
+
+	const violations: string[] = [];
+	for (const filePath of allFiles) {
+		const raw = fs.readFileSync(filePath, "utf-8");
+		const { data } = parseFrontMatter(raw);
+		const category = typeof data.category === "string" ? data.category : "";
+		const tags = Array.isArray(data.tags)
+			? data.tags.map(String)
+			: typeof data.tags === "string"
+				? data.tags
+						.split(",")
+						.map((t) => t.trim())
+						.filter(Boolean)
+				: [];
+
+		for (const tag of tags) {
+			const requiredCategory = exclusiveRules.get(tag.toLowerCase());
+			if (requiredCategory && category !== requiredCategory) {
+				violations.push(
+					`${path.relative(root, filePath)}: exclusive tag "${tag}" requires category "${requiredCategory}", got "${category}"`,
+				);
+			}
+		}
+	}
+
+	if (violations.length > 0) {
+		for (const v of violations) {
+			logError("build-github", `Category/tag consistency violation: ${v}`);
+		}
+		process.exit(1);
+	}
+}
+
 function verifyBuildOutput(distPath: string) {
 	console.log("🚀 Verifying Axiom GitHub Pages build output...");
 	const expectedFiles = [
@@ -349,8 +419,9 @@ function verifyBuildOutput(distPath: string) {
 	console.log("📦 Axiom build is ready for GitHub Pages deployment!");
 }
 
-function main() {
+export function main() {
 	const root = process.cwd();
+	validatePostCategoryTagConsistency(root);
 	const dist = path.join(root, "dist");
 
 	rm(dist);
@@ -372,4 +443,6 @@ function main() {
 	verifyBuildOutput(dist);
 }
 
-main();
+if (process.argv[1] && path.basename(process.argv[1]) === "build-github.ts") {
+	main();
+}

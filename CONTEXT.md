@@ -165,6 +165,7 @@
   - **Archright 카테고리**: Axiom 프로젝트 및 정형 검증 관련 포스트. 영어 `src/posts/archright/`, 한국어 `src/posts/ko/archright/`에 저장한다. frontmatter의 `category` 값을 `Archright`로 설정하고 `tags`에 반드시 `Axiom`을 포함해야 한다 (사이드바 "Axiom" 서브토픽 필터링을 위해 필요).
   - **Project 카테고리**: 개인 프로젝트 일반. 영어 `src/posts/project/`, 한국어 `src/posts/ko/project/`에 저장하며 frontmatter의 `category` 값을 `Project`로 설정한다.
   - **Company Work 카테고리**: 재직 중 회사 업무 회고. 영어 `src/posts/company/`, 한국어 `src/posts/ko/company/`에 저장하며 frontmatter의 `category` 값을 `Company Work`로 설정한다.
+- **카테고리/태그 독점 규칙 (exclusiveTags)**: `categories.json`의 `exclusiveTags`에 선언된 태그는 해당 카테고리에서만 사용할 수 있다. 예: `Axiom` 태그는 반드시 `Archright` 카테고리여야 하며, 빌드(`build-github.ts`)와 절차 게이트(`procedure-gate.ts`)에서 하드 검증되어 위반 시 즉시 실패한다. 런타임에서는 `postLoader.ts`가 자동으로 `Archright`로 덮어쓴다.
 - **프로젝트 명칭 정책**: 포스팅 내용에서 프로젝트명은 일관되게 지칭한다.
   - `Axiom Enterprise` 폴더명을 그대로 사용하지 말고, `Axiom`으로만 지칭
   - 예: "Axiom Enterprise was built" → "Axiom was built"

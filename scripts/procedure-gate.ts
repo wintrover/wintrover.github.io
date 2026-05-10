@@ -116,6 +116,19 @@ function validateRefs(changedFiles: string[]): RefValidationResult {
 export function evaluateProcedureGate(changedFiles: string[]): GateResult {
 	const normalized = normalizeFiles(changedFiles);
 	const requiresEvidence = normalized.some(matchesImplementationFile);
+
+	const frontmatterValidation = validatePostFrontmatterConsistency(normalized);
+	if (!frontmatterValidation.ok) {
+		return {
+			ok: false,
+			missing: frontmatterValidation.violations.map(
+				(v) => `post-frontmatter: ${v}`,
+			),
+			requiresEvidence,
+			changedFiles: normalized,
+		};
+	}
+
 	if (!requiresEvidence) {
 		return {
 			ok: true,
@@ -212,6 +225,91 @@ function getChangedFiles(mode: "ci" | "staged") {
 		return stdout.split(/\r?\n/).filter(Boolean);
 	}
 	return diffNameOnlyByRange(resolveCiRange());
+}
+
+function parseSimpleFrontmatter(content: string): Record<string, unknown> {
+	const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+	if (!match) return {};
+	const yaml = match[1];
+	const data: Record<string, unknown> = {};
+	let currentKey = "";
+
+	for (const line of yaml.split(/\r?\n/)) {
+		const idx = line.indexOf(":");
+		if (idx !== -1) {
+			currentKey = line.slice(0, idx).trim();
+			const value = line.slice(idx + 1).trim();
+			if (value.startsWith("[") && value.endsWith("]")) {
+				data[currentKey] = value
+					.slice(1, -1)
+					.split(",")
+					.map((t) => t.trim())
+					.filter(Boolean);
+			} else if (value) {
+				data[currentKey] = value;
+			} else {
+				data[currentKey] = [];
+			}
+			continue;
+		}
+		if (/^\s*-\s/.test(line) && currentKey) {
+			const item = line.replace(/^\s*-\s*/, "").trim();
+			const arr = Array.isArray(data[currentKey])
+				? (data[currentKey] as string[])
+				: [];
+			arr.push(item);
+			data[currentKey] = arr;
+		}
+	}
+	return data;
+}
+
+function validatePostFrontmatterConsistency(files: string[]): {
+	ok: boolean;
+	violations: string[];
+} {
+	const configPath = "src/lib/categories.json";
+	if (!fs.existsSync(configPath)) return { ok: true, violations: [] };
+	const raw = fs.readFileSync(configPath, "utf-8");
+	const config = JSON.parse(raw) as {
+		categories?: Record<string, { name?: string; exclusiveTags?: string[] }>;
+	};
+	const rules = new Map<string, string>();
+	for (const entry of Object.values(config.categories || {})) {
+		if (!entry?.exclusiveTags) continue;
+		for (const tag of entry.exclusiveTags) {
+			rules.set(String(tag).trim().toLowerCase(), String(entry.name || ""));
+		}
+	}
+	if (rules.size === 0) return { ok: true, violations: [] };
+
+	const violations: string[] = [];
+	for (const filePath of files) {
+		if (!filePath.endsWith(".md")) continue;
+		if (!isContentFile(filePath)) continue;
+		try {
+			const content = fs.readFileSync(filePath, "utf-8");
+			const data = parseSimpleFrontmatter(content);
+			const category = typeof data.category === "string" ? data.category : "";
+			const tags = Array.isArray(data.tags)
+				? data.tags.map(String)
+				: typeof data.tags === "string"
+					? data.tags
+							.split(",")
+							.map((t) => t.trim())
+							.filter(Boolean)
+					: [];
+			for (const tag of tags) {
+				const required = rules.get(tag.toLowerCase());
+				if (required && category !== required) {
+					violations.push(
+						`${filePath}: exclusive tag "${tag}" requires category "${required}", got "${category}"`,
+					);
+				}
+			}
+		} catch {}
+	}
+	return { ok: violations.length === 0, violations };
 }
 
 function parseModeArg(args: string[]) {

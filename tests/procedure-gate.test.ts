@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { evaluateProcedureGate } from "../scripts/procedure-gate";
 
 const root = process.cwd();
@@ -9,7 +9,35 @@ function read(rel: string) {
 	return fs.readFileSync(path.join(root, rel), "utf-8");
 }
 
+function cleanupTempFiles() {
+	const dirs = ["src/posts", "src/posts/ko"];
+	for (const dir of dirs) {
+		if (!fs.existsSync(dir)) continue;
+		const stack: string[] = [dir];
+		while (stack.length > 0) {
+			const current = stack.pop() as string;
+			const entries = fs.readdirSync(current, { withFileTypes: true });
+			for (const entry of entries) {
+				const fullPath = path.join(current, entry.name);
+				if (entry.isDirectory()) {
+					stack.push(fullPath);
+					continue;
+				}
+				if (
+					entry.isFile() &&
+					entry.name.startsWith("temp-") &&
+					entry.name.endsWith(".md")
+				) {
+					fs.unlinkSync(fullPath);
+				}
+			}
+		}
+	}
+}
+
 describe("절차 게이트 강제 검증", () => {
+	beforeEach(cleanupTempFiles);
+	afterEach(cleanupTempFiles);
 	const feature = read("tests/features/procedure-gate.feature");
 
 	test("Given feature 파일 When 파싱 Then 시나리오 카탈로그가 유지된다", () => {
@@ -24,6 +52,7 @@ describe("절차 게이트 강제 검증", () => {
 			"context7 proxy must preserve downstream framing compatibility",
 			"runtime scripts must avoid js extension leftovers",
 			"content files skip procedure gate evidence requirement",
+			"exclusive tag frontmatter mismatch fails the gate",
 		]);
 	});
 
@@ -60,6 +89,30 @@ describe("절차 게이트 강제 검증", () => {
 		expect(result.ok).toBe(true);
 		expect(result.missing).toHaveLength(0);
 		expect(result.requiresEvidence).toBe(false);
+	});
+
+	test("Given exclusive tag 위반 포스트 변경 When 판정 Then 게이트가 실패한다", () => {
+		const tempFile = "src/posts/project/temp-violation.md";
+		fs.mkdirSync(path.dirname(tempFile), { recursive: true });
+		fs.writeFileSync(
+			tempFile,
+			"---\ncategory: Project\ntags: [Axiom]\n---\nBody",
+		);
+		const result = evaluateProcedureGate([tempFile]);
+		expect(result.ok).toBe(false);
+		expect(result.missing.some((m) => m.includes("exclusive tag"))).toBe(true);
+		fs.unlinkSync(tempFile);
+	});
+
+	test("Given exclusive tag 정합성 맞는 포스트 변경 When 판정 Then 게이트가 통과한다", () => {
+		const tempFile = "src/posts/archright/temp-valid.md";
+		fs.writeFileSync(
+			tempFile,
+			"---\ncategory: Archright\ntags: [Axiom]\n---\nBody",
+		);
+		const result = evaluateProcedureGate([tempFile]);
+		expect(result.ok).toBe(true);
+		fs.unlinkSync(tempFile);
 	});
 
 	test("Given workflow 파일 When 검사 Then 절차 게이트가 PR과 push에서 실행된다", () => {

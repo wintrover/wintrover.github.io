@@ -685,6 +685,31 @@ describe("postLoader", () => {
 		vi.doUnmock("../src/lib/utils");
 	});
 
+	test("Axiom 태그를 포함한 포스트는 Archright 카테고리로 강제된다", async () => {
+		const posts = await loadAllPosts({
+			"../posts/project/axiom-misplaced.md":
+				"---\ntitle: Axiom Post\ncategory: Project\ntags: [Axiom, Nim]\n---\nBody",
+		});
+		expect(posts[0].category).toBe("Archright");
+		expect(posts[0].tags).toContain("Axiom");
+	});
+
+	test("Axiom 태그가 없는 포스트는 원래 카테고리를 유지한다", async () => {
+		const posts = await loadAllPosts({
+			"../posts/project/normal.md":
+				"---\ntitle: Normal Post\ncategory: Project\ntags: [CVFactory]\n---\nBody",
+		});
+		expect(posts[0].category).toBe("Personal project");
+	});
+
+	test("Axiom 태그를 포함한 포스트가 이미 Archright면 그대로 유지한다", async () => {
+		const posts = await loadAllPosts({
+			"../posts/archright/correct.md":
+				"---\ntitle: Correct Post\ncategory: Archright\ntags: [Axiom]\n---\nBody",
+		});
+		expect(posts[0].category).toBe("Archright");
+	});
+
 	test("loadAllPosts - modulesOverride가 없을 때 기본 postFiles 사용 확인", async () => {
 		const posts = await loadAllPosts();
 		expect(posts.length).toBeGreaterThan(0);

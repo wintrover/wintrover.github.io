@@ -45,3 +45,8 @@ Feature: AGENTS 절차 게이트 강제
     Then gate result must pass without requiring CONTEXT.md
     And gate result must pass without requiring .feature files
     And gate result must pass without requiring .test.ts files
+
+  Scenario: exclusive tag frontmatter mismatch fails the gate
+    Given categories.json declares an exclusive tag for a category
+    When a changed post file contains that tag with a different category
+    Then the gate must fail with a post-frontmatter violation
