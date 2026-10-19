@@ -13,7 +13,6 @@
 		"test:watch": "vitest",
 		"test:all": "npm run test",
 		"test:coverage": "vitest run --coverage",
-		"post:devto": "tsx scripts/post-to-dev.ts",
 		"sync:post-localization:staged": "tsx scripts/sync-post-localization.ts --mode=staged --write --stage",
 		"sync:post-localization:working": "tsx scripts/sync-post-localization.ts --mode=working --write",
 		"gate:procedure:ci": "tsx scripts/procedure-gate.ts --mode=ci",
