@@ -1,71 +1,55 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { validatePostCategoryTagConsistency } from "../scripts/build-github";
 
-function cleanupTempFiles() {
-	const dirs = ["src/posts", "src/posts/ko"];
-	for (const dir of dirs) {
-		if (!fs.existsSync(dir)) continue;
-		const stack: string[] = [dir];
-		while (stack.length > 0) {
-			const current = stack.pop() as string;
-			const entries = fs.readdirSync(current, { withFileTypes: true });
-			for (const entry of entries) {
-				const fullPath = path.join(current, entry.name);
-				if (entry.isDirectory()) {
-					stack.push(fullPath);
-					continue;
-				}
-				if (
-					entry.isFile() &&
-					entry.name.startsWith("temp-") &&
-					entry.name.endsWith(".md")
-				) {
-					fs.unlinkSync(fullPath);
-				}
-			}
-		}
-	}
+let tempRoot: string;
+
+beforeEach(() => {
+	tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "build-github-"));
+	fs.mkdirSync(path.join(tempRoot, "src", "lib"), { recursive: true });
+	fs.copyFileSync(
+		path.resolve("src/lib/categories.json"),
+		path.join(tempRoot, "src", "lib", "categories.json"),
+	);
+});
+
+afterEach(() => {
+	fs.rmSync(tempRoot, { recursive: true, force: true });
+	vi.restoreAllMocks();
+});
+
+function writePost(relativePath: string, content: string) {
+	const filePath = path.join(tempRoot, "src", "posts", relativePath);
+	fs.mkdirSync(path.dirname(filePath), { recursive: true });
+	fs.writeFileSync(filePath, content);
 }
 
 describe("build-github category/tag consistency", () => {
-	beforeEach(cleanupTempFiles);
-	afterEach(cleanupTempFiles);
-
 	test("Axiom 태그 + Archright 카테고리는 통과한다", () => {
-		const tempDir = "src/posts/archright";
-		const tempFile = path.join(tempDir, "temp-test-valid.md");
-		fs.mkdirSync(tempDir, { recursive: true });
-		fs.writeFileSync(
-			tempFile,
+		writePost(
+			"archright/temp-test-valid.md",
 			"---\ncategory: Archright\ntags: [Axiom]\n---\nBody",
 		);
 		const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
 			throw new Error("process.exit");
 		});
-		validatePostCategoryTagConsistency(process.cwd());
+		validatePostCategoryTagConsistency(tempRoot);
 		expect(exitSpy).not.toHaveBeenCalled();
-		exitSpy.mockRestore();
-		fs.unlinkSync(tempFile);
 	});
 
 	test("Axiom 태그 + Project 카테고리는 빌드 실패한다", () => {
-		const tempDir = "src/posts/project";
-		const tempFile = path.join(tempDir, "temp-test-invalid.md");
-		fs.mkdirSync(tempDir, { recursive: true });
-		fs.writeFileSync(
-			tempFile,
+		writePost(
+			"project/temp-test-invalid.md",
 			"---\ncategory: Project\ntags: [Axiom]\n---\nBody",
 		);
 		const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
 			throw new Error("process.exit");
 		});
-		expect(() => validatePostCategoryTagConsistency(process.cwd())).toThrow(
+		expect(() => validatePostCategoryTagConsistency(tempRoot)).toThrow(
 			"process.exit",
 		);
 		expect(exitSpy).toHaveBeenCalledWith(1);
-		exitSpy.mockRestore();
-		fs.unlinkSync(tempFile);
 	});
 });

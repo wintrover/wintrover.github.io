@@ -1,0 +1,119 @@
+# Draft-first, externally verified single-post publish path.
+# Reconciles an existing DEV.to article by canonical URL, publishes a draft,
+# and only reports success after a public GET confirms publication.
+# Legacy status markers (.success/.failed) are intentionally not used here.
+name: Publish One
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_path:
+        description: "Single markdown file under src/posts"
+        required: true
+        default: "src/posts/archright/2026-05-04-6.md"
+        type: string
+      platform:
+        description: "Publish target platform"
+        required: true
+        default: "devto"
+        type: choice
+        options:
+          - devto
+      dry_run:
+        description: "List and decide only, no write to DEV.to"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      confirm:
+        description: "Type PUBLISH to allow a non-dry-run publish"
+        required: true
+        default: ""
+        type: string
+      fail_injection:
+        description: "Failure injection drill (lost-response handling)"
+        required: true
+        default: "none"
+        type: choice
+        options:
+          - none
+          - pre_post
+          - post_response_loss
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sns-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: sns-publish
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "1"
+        run: pnpm install --frozen-lockfile --prod=false
+
+      - name: Require confirm=PUBLISH for non-dry-run
+        shell: bash
+        env:
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          INPUT_CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          if [ "$INPUT_DRY_RUN" != "true" ] && [ "$INPUT_CONFIRM" != "PUBLISH" ]; then
+            echo "Refusing to publish: dry_run=false requires confirm=PUBLISH."
+            exit 1
+          fi
+
+      - name: Publish single post
+        shell: bash
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/
+          INPUT_POST_PATH: ${{ inputs.post_path }}
+          INPUT_PLATFORM: ${{ inputs.platform }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          INPUT_FAIL_INJECTION: ${{ inputs.fail_injection }}
+        run: |
+          set -euo pipefail
+          ARGS=(--publish-one "$INPUT_POST_PATH" --platform "$INPUT_PLATFORM")
+          if [ "$INPUT_DRY_RUN" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          if [ "$INPUT_FAIL_INJECTION" != "none" ]; then
+            ARGS+=(--fail-injection "$INPUT_FAIL_INJECTION")
+          fi
+          pnpm exec tsx scripts/post-to-dev.ts "${ARGS[@]}"
+
+      - name: Upload publish result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-result
+          path: publish-result.json
+          if-no-files-found: error

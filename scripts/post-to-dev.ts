@@ -52,7 +52,7 @@ type PersistedPlatformStatus = {
 	externalPostUrl?: string;
 };
 
-type PreparedPost = {
+export type PreparedPost = {
 	slug: string;
 	postKey: string;
 	filePath: string;
@@ -80,6 +80,14 @@ const LINKEDIN_POSTS_API_URL = normalizeLinkedInPostsApiUrl(
 	process.env.LINKEDIN_POSTS_API_URL || "https://api.linkedin.com/rest/posts",
 );
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
+const DEFAULT_PLATFORMS: Platform[] = ["devto"];
+
+export function isLinkedInAutoPostEnabled() {
+	return /^(1|true|yes|on)$/i.test(
+		String(process.env.LINKEDIN_AUTOPOST_ENABLED || "").trim(),
+	);
+}
+
 export const DEPLOY_POSTS_ROOT_RELATIVE = "src/posts";
 const DEPLOY_POSTS_ROOT = path.resolve(
 	process.cwd(),
@@ -905,16 +913,21 @@ async function discoverAllDeployEligiblePostFiles() {
 	return collectMarkdownFiles(DEPLOY_POSTS_ROOT);
 }
 
-function parsePlatforms(raw?: string): Platform[] {
+export function parsePlatforms(raw?: string): Platform[] {
 	const normalized = String(raw || "")
 		.split(",")
 		.map((s) => s.trim().toLowerCase())
 		.filter(Boolean);
-	const values = normalized.length > 0 ? normalized : SUPPORTED_PLATFORMS;
+	const values = normalized.length > 0 ? normalized : DEFAULT_PLATFORMS;
+	if (values.includes("linkedin") && !isLinkedInAutoPostEnabled()) {
+		throw new Error(
+			"LinkedIn auto-posting is disabled. Set LINKEDIN_AUTOPOST_ENABLED=true only for an explicitly approved manual run.",
+		);
+	}
 	const filtered = values.filter((v): v is Platform =>
 		SUPPORTED_PLATFORMS.includes(v as Platform),
 	);
-	if (filtered.length === 0) return SUPPORTED_PLATFORMS;
+	if (filtered.length === 0) return DEFAULT_PLATFORMS;
 	return Array.from(new Set(filtered));
 }
 
@@ -1037,6 +1050,20 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 			await writePlatformStatus(record, false);
 			return record;
 		}
+		if (!isLinkedInAutoPostEnabled()) {
+			const record: DeploymentRecord = {
+				slug: post.slug,
+				postKey: post.postKey,
+				platform,
+				state: "failed",
+				updatedAt,
+				detail:
+					"LinkedIn auto-posting is disabled (LINKEDIN_AUTOPOST_ENABLED != true)",
+				postPath: post.filePath,
+			};
+			await writePlatformStatus(record, false);
+			return record;
+		}
 		const accessToken = process.env.LINKEDIN_ACCESS_TOKEN;
 		const configuredUrn =
 			process.env.LINKEDIN_PERSON_URN || DEFAULT_LINKEDIN_PERSON_URN;
@@ -1100,6 +1127,15 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 }
 
 async function runDeployment(targetInput?: string, platformsArg?: string) {
+	if (
+		!/^(1|true|yes|on)$/i.test(
+			String(process.env.PUBLISH_LEGACY_ENABLED || "").trim(),
+		)
+	) {
+		throw new Error(
+			"Legacy publish path is disabled. Use --publish-one for an approved single-post publish.",
+		);
+	}
 	const publicBaseUrl = normalizePublicBaseUrl(
 		process.env.BLOG_PUBLIC_BASE_URL || DEFAULT_PUBLIC_BASE_URL,
 	);
@@ -1212,12 +1248,794 @@ function isUCloudUrl(url: string) {
 	);
 }
 
+export type DevtoArticle = {
+	id: number;
+	title?: string;
+	description?: string;
+	published?: boolean;
+	published_at?: string | null;
+	canonical_url?: string;
+	url?: string;
+	slug?: string;
+	path?: string;
+};
+
+export type DevtoArticleSelection =
+	| { kind: "none" }
+	| { kind: "one"; article: DevtoArticle }
+	| { kind: "ambiguous"; articles: DevtoArticle[] };
+
+export type DevtoReconcileAction =
+	| "create_draft"
+	| "adopt_draft"
+	| "already_published"
+	| "ambiguous";
+
+export type PublishOneFailInjection =
+	| "none"
+	| "pre_post"
+	| "post_response_loss";
+
+export type PublishOneState =
+	| "published_verified"
+	| "already_published"
+	| "draft_found"
+	| "dry_run"
+	| "ambiguous"
+	| "failed"
+	| "unknown";
+
+export type PublishOneMethod =
+	| "created"
+	| "adopted_draft"
+	| "already_published"
+	| "failed"
+	| "unknown"
+	| "none";
+
+export type PublishOneResult = {
+	platform: "devto";
+	postPath: string;
+	canonicalUrl: string;
+	state: PublishOneState;
+	draftId?: number;
+	id?: number;
+	slug?: string;
+	url?: string;
+	observedPublished?: boolean;
+	method: PublishOneMethod;
+	attempts: number;
+	observedAt: string;
+	runUrl?: string;
+};
+
+type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
+type SleepLike = (ms: number) => Promise<void>;
+
+const DEVTO_API_ROOT = "https://dev.to/api";
+const DEVTO_LIST_PAGE_SIZE = 1000;
+const DEVTO_LIST_THROTTLE_MS = 350;
+const DEVTO_VERIFY_ATTEMPTS = 6;
+const DEVTO_VERIFY_SLEEP_MS = 10_000;
+const DEFAULT_DEVTO_USERNAME = "wintrover";
+const DEFAULT_PUBLISH_RESULT_PATH = "publish-result.json";
+
+function devtoSleep(ms: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function asErrorMessage(error: unknown) {
+	return error instanceof Error ? error.message : String(error);
+}
+
+export function normalizeCanonicalUrl(raw: string): string {
+	const trimmed = String(raw || "").trim();
+	if (!trimmed) return "";
+	try {
+		const candidate = /^https?:\/\//i.test(trimmed)
+			? trimmed
+			: `https://${trimmed.replace(/^\/+/, "")}`;
+		const url = new URL(candidate);
+		url.protocol = "https:";
+		url.hostname = url.hostname.toLowerCase();
+		url.search = "";
+		url.hash = "";
+		if (url.port === "80" || url.port === "443") url.port = "";
+		const cleanPath = url.pathname.replace(/^\/+/, "").replace(/\/+$/, "");
+		url.pathname = cleanPath ? `/${cleanPath}/` : "/";
+		return url.toString();
+	} catch {
+		return trimmed;
+	}
+}
+
+function normalizeDevtoTitle(title: string) {
+	return String(title || "")
+		.trim()
+		.toLowerCase()
+		.replace(/\s+/g, " ");
+}
+
+export function parseDevtoArticle(value: unknown): DevtoArticle | null {
+	if (typeof value !== "object" || value === null) return null;
+	const record = value as Record<string, unknown>;
+	if (typeof record.id !== "number" || !Number.isFinite(record.id)) return null;
+	const article: DevtoArticle = { id: record.id };
+	if (typeof record.title === "string") article.title = record.title;
+	if (typeof record.description === "string") {
+		article.description = record.description;
+	}
+	if (typeof record.published === "boolean")
+		article.published = record.published;
+	if (typeof record.published_at === "string") {
+		article.published_at = record.published_at;
+	}
+	if (typeof record.canonical_url === "string") {
+		article.canonical_url = record.canonical_url;
+	}
+	if (typeof record.url === "string") article.url = record.url;
+	if (typeof record.slug === "string") article.slug = record.slug;
+	if (typeof record.path === "string") article.path = record.path;
+	return article;
+}
+
+export function selectExistingDevtoArticle(
+	articles: DevtoArticle[],
+	canonicalUrl: string,
+	title?: string,
+): DevtoArticleSelection {
+	const targetCanonical = normalizeCanonicalUrl(canonicalUrl);
+	const targetTitle = normalizeDevtoTitle(title || "");
+	const canonicalMatches = targetCanonical
+		? articles.filter(
+				(article) =>
+					normalizeCanonicalUrl(article.canonical_url || "") ===
+					targetCanonical,
+			)
+		: [];
+	const titleFallbackMatches =
+		canonicalMatches.length === 0 && targetTitle.length > 0
+			? articles.filter(
+					(article) =>
+						!normalizeCanonicalUrl(article.canonical_url || "") &&
+						normalizeDevtoTitle(article.title || "") === targetTitle,
+				)
+			: [];
+	const matches =
+		canonicalMatches.length > 0 ? canonicalMatches : titleFallbackMatches;
+	if (matches.length === 0) return { kind: "none" };
+	if (matches.length === 1) return { kind: "one", article: matches[0] };
+	return { kind: "ambiguous", articles: matches };
+}
+
+export function decideReconcileAction(
+	selection: DevtoArticleSelection,
+): DevtoReconcileAction {
+	if (selection.kind === "none") return "create_draft";
+	if (selection.kind === "one") {
+		return selection.article.published === true
+			? "already_published"
+			: "adopt_draft";
+	}
+	return "ambiguous";
+}
+
+export function classifyDevtoError(
+	status: number,
+	errorText: string,
+): "failed" | "unknown" {
+	const text = String(errorText || "");
+	if (!Number.isFinite(status) || status <= 0) return "unknown";
+	if (status === 408 || status === 429) return "unknown";
+	if (status >= 500) return "unknown";
+	if (/timeout|timed out|abort|network|fetch failed|econn/i.test(text)) {
+		return "unknown";
+	}
+	if (status >= 400 && status < 500) return "failed";
+	return "unknown";
+}
+
+export function buildDevtoDraftPayload(
+	post: PreparedPost,
+	canonicalUrl: string,
+) {
+	return {
+		article: {
+			title: post.title,
+			published: false,
+			body_markdown: post.bodyMarkdown,
+			tags: post.tags,
+			description: post.description,
+			canonical_url: normalizeCanonicalUrl(canonicalUrl),
+			cover_image: post.firstImageUrl || undefined,
+		},
+	};
+}
+
+export function buildDevtoPublishPayload() {
+	return { article: { published: true } };
+}
+
+export async function listAllDevtoArticles(
+	apiKey: string,
+	options: {
+		fetchFn?: FetchLike;
+		throttleMs?: number;
+		sleepFn?: SleepLike;
+	} = {},
+): Promise<DevtoArticle[]> {
+	const fetchFn = options.fetchFn || fetch;
+	const sleepFn = options.sleepFn || devtoSleep;
+	const throttleMs = options.throttleMs ?? DEVTO_LIST_THROTTLE_MS;
+	const articles: DevtoArticle[] = [];
+	let page = 1;
+	for (;;) {
+		if (page > 1) await sleepFn(throttleMs);
+		let response: Response;
+		try {
+			response = await fetchFn(
+				`${DEVTO_API_ROOT}/articles/me/all?per_page=${DEVTO_LIST_PAGE_SIZE}&page=${page}`,
+				{
+					headers: {
+						"api-key": apiKey,
+						Accept: "application/vnd.forem.api-v1+json",
+					},
+				},
+			);
+		} catch (error) {
+			throw new Error(
+				`DEV.to article list request failed on page ${page}: ${asErrorMessage(error)}`,
+			);
+		}
+		if (!response.ok) {
+			const errorText = await response.text().catch(() => "");
+			throw new Error(
+				`DEV.to article list request failed on page ${page} (${response.status}): ${errorText}`,
+			);
+		}
+		let raw: unknown;
+		try {
+			raw = await response.json();
+		} catch (error) {
+			throw new Error(
+				`DEV.to article list response was not valid JSON on page ${page}: ${asErrorMessage(error)}`,
+			);
+		}
+		const entries = Array.isArray(raw) ? raw : [];
+		for (const entry of entries) {
+			const article = parseDevtoArticle(entry);
+			if (article) articles.push(article);
+		}
+		if (entries.length === 0) break;
+		page += 1;
+	}
+	return articles;
+}
+
+export type DevtoVerification = {
+	verified: boolean;
+	attempts: number;
+	lastStatus: number;
+	observedPublished: boolean | null;
+	canonicalMatched: boolean | null;
+	article: DevtoArticle | null;
+};
+
+export async function verifyPublishedArticle(
+	slug: string,
+	canonicalUrl: string,
+	options: {
+		username?: string;
+		attempts?: number;
+		sleepMs?: number;
+		fetchFn?: FetchLike;
+		sleepFn?: SleepLike;
+	} = {},
+): Promise<DevtoVerification> {
+	const fetchFn = options.fetchFn || fetch;
+	const sleepFn = options.sleepFn || devtoSleep;
+	const maxAttempts = options.attempts ?? DEVTO_VERIFY_ATTEMPTS;
+	const sleepMs = options.sleepMs ?? DEVTO_VERIFY_SLEEP_MS;
+	const username = options.username || DEFAULT_DEVTO_USERNAME;
+	const target = normalizeCanonicalUrl(canonicalUrl);
+	let lastStatus = 0;
+	let lastObservedPublished: boolean | null = null;
+	let lastCanonicalMatched: boolean | null = null;
+	let lastArticle: DevtoArticle | null = null;
+	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		await sleepFn(sleepMs);
+		let response: Response;
+		try {
+			response = await fetchFn(
+				`${DEVTO_API_ROOT}/articles/${encodeURIComponent(username)}/${encodeURIComponent(slug)}`,
+				{ headers: { Accept: "application/vnd.forem.api-v1+json" } },
+			);
+		} catch {
+			lastStatus = 0;
+			continue;
+		}
+		lastStatus = response.status;
+		if (!response.ok) continue;
+		let raw: unknown;
+		try {
+			raw = await response.json();
+		} catch {
+			continue;
+		}
+		const article = parseDevtoArticle(raw);
+		if (!article) continue;
+		lastArticle = article;
+		lastObservedPublished = article.published === true;
+		lastCanonicalMatched = target
+			? normalizeCanonicalUrl(article.canonical_url || "") === target
+			: null;
+		if (lastObservedPublished && lastCanonicalMatched !== false) {
+			return {
+				verified: true,
+				attempts: attempt,
+				lastStatus,
+				observedPublished: lastObservedPublished,
+				canonicalMatched: lastCanonicalMatched,
+				article,
+			};
+		}
+	}
+	return {
+		verified: false,
+		attempts: maxAttempts,
+		lastStatus,
+		observedPublished: lastObservedPublished,
+		canonicalMatched: lastCanonicalMatched,
+		article: lastArticle,
+	};
+}
+
+type DevtoWriteOutcome =
+	| { kind: "ok"; body: unknown }
+	| { kind: "http_error"; status: number; errorText: string }
+	| { kind: "unresolved"; errorText: string };
+
+async function writeDevtoArticle(
+	url: string,
+	method: "POST" | "PUT",
+	apiKey: string,
+	body: unknown,
+	fetchFn: FetchLike,
+): Promise<DevtoWriteOutcome> {
+	let response: Response;
+	try {
+		response = await fetchFn(url, {
+			method,
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/vnd.forem.api-v1+json",
+				"api-key": apiKey,
+			},
+			body: JSON.stringify(body),
+		});
+	} catch (error) {
+		return { kind: "unresolved", errorText: asErrorMessage(error) };
+	}
+	if (!response.ok) {
+		const errorText = await response.text().catch(() => "");
+		return { kind: "http_error", status: response.status, errorText };
+	}
+	try {
+		return { kind: "ok", body: await response.json() };
+	} catch (error) {
+		return { kind: "unresolved", errorText: asErrorMessage(error) };
+	}
+}
+
+export function buildGithubRunUrl(
+	env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+	const server = env.GITHUB_SERVER_URL;
+	const repository = env.GITHUB_REPOSITORY;
+	const runId = env.GITHUB_RUN_ID;
+	if (!server || !repository || !runId) return undefined;
+	return `${server}/${repository}/actions/runs/${runId}`;
+}
+
+export function publishOneExitCode(result: PublishOneResult): number {
+	if (
+		result.state === "published_verified" ||
+		result.state === "already_published" ||
+		result.state === "dry_run"
+	) {
+		return 0;
+	}
+	return 1;
+}
+
+export function buildPublishOneSummary(result: PublishOneResult): string {
+	const lines = [
+		"## Publish One Result",
+		"",
+		`- state: \`${result.state}\``,
+		`- method: \`${result.method}\``,
+		`- post: ${result.postPath}`,
+		`- canonical: ${result.canonicalUrl || "n/a"}`,
+		`- url: ${result.url || "n/a"}`,
+		`- attempts: ${result.attempts}`,
+		`- observed at: ${result.observedAt}`,
+	];
+	if (result.runUrl) lines.push(`- run: ${result.runUrl}`);
+	return `${lines.join("\n")}\n`;
+}
+
+async function writePublishOneOutputs(
+	resultPath: string,
+	result: PublishOneResult,
+) {
+	await fs.writeFile(resultPath, `${JSON.stringify(result, null, 2)}\n`);
+	const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+	if (summaryPath) {
+		await fs.appendFile(summaryPath, buildPublishOneSummary(result));
+	}
+}
+
+export type PublishOneOptions = {
+	postPath: string;
+	platform: "devto";
+	dryRun: boolean;
+	failInjection: PublishOneFailInjection;
+	apiKey?: string;
+	publicBaseUrl?: string;
+	resultPath?: string;
+	username?: string;
+	fetchFn?: FetchLike;
+	sleepFn?: SleepLike;
+	nowFn?: () => Date;
+};
+
+export async function runPublishOne(
+	options: PublishOneOptions,
+): Promise<PublishOneResult> {
+	const fetchFn = options.fetchFn || fetch;
+	const sleepFn = options.sleepFn || devtoSleep;
+	const nowFn = options.nowFn || (() => new Date());
+	const publicBaseUrl = normalizePublicBaseUrl(
+		options.publicBaseUrl ||
+			process.env.BLOG_PUBLIC_BASE_URL ||
+			DEFAULT_PUBLIC_BASE_URL,
+	);
+	const resultPath =
+		options.resultPath ||
+		process.env.PUBLISH_RESULT_PATH ||
+		DEFAULT_PUBLISH_RESULT_PATH;
+	const result: PublishOneResult = {
+		platform: "devto",
+		postPath: options.postPath,
+		canonicalUrl: "",
+		state: "unknown",
+		method: "unknown",
+		attempts: 0,
+		observedAt: nowFn().toISOString(),
+		runUrl: buildGithubRunUrl(),
+	};
+	const finalize = async () => {
+		result.observedAt = nowFn().toISOString();
+		await writePublishOneOutputs(resultPath, result);
+		process.stdout.write(
+			`[publish-one] state=${result.state} method=${result.method} attempts=${result.attempts} result=${resultPath}\n`,
+		);
+		return result;
+	};
+	const failWith = async (
+		state: PublishOneState,
+		method: PublishOneMethod,
+		detail: Record<string, unknown> = {},
+	) => {
+		result.state = state;
+		result.method = method;
+		logError("post-to-dev", `publish-one ended in state=${state}`, {
+			postPath: options.postPath,
+			canonicalUrl: result.canonicalUrl,
+			...detail,
+		});
+		return finalize();
+	};
+
+	let prepared: PreparedPost;
+	try {
+		prepared = await preparePost(options.postPath, publicBaseUrl);
+	} catch (error) {
+		logError("post-to-dev", "publish-one could not prepare the post", {
+			error,
+		});
+		return failWith("failed", "failed");
+	}
+	result.canonicalUrl = normalizeCanonicalUrl(prepared.canonicalUrl);
+	const apiKey = options.apiKey || process.env.DEVTO_API_KEY || "";
+	if (!apiKey) {
+		return failWith("failed", "failed", { detail: "DEVTO_API_KEY is not set" });
+	}
+
+	let articles: DevtoArticle[];
+	try {
+		articles = await listAllDevtoArticles(apiKey, { fetchFn, sleepFn });
+	} catch (error) {
+		logError("post-to-dev", "publish-one could not list existing articles", {
+			error,
+		});
+		return failWith("unknown", "unknown");
+	}
+	process.stdout.write(
+		`[publish-one] listed ${articles.length} existing article(s)\n`,
+	);
+	if (options.failInjection === "pre_post") {
+		return failWith("failed", "failed", {
+			detail: "injected failure before any write (pre_post)",
+		});
+	}
+
+	const selection = selectExistingDevtoArticle(
+		articles,
+		result.canonicalUrl,
+		prepared.title,
+	);
+	const action = decideReconcileAction(selection);
+	if (action === "ambiguous") {
+		return failWith("ambiguous", "failed", {
+			ids:
+				selection.kind === "ambiguous"
+					? selection.articles.map((article) => article.id)
+					: [],
+		});
+	}
+	if (action === "already_published" && selection.kind === "one") {
+		result.state = "already_published";
+		result.method = "already_published";
+		result.id = selection.article.id;
+		result.slug = selection.article.slug || prepared.slug;
+		result.url = selection.article.url;
+		result.observedPublished = true;
+		return finalize();
+	}
+	if (options.dryRun) {
+		result.state = "dry_run";
+		result.method = "none";
+		return finalize();
+	}
+
+	let articleId: number;
+	if (action === "adopt_draft" && selection.kind === "one") {
+		articleId = selection.article.id;
+		result.draftId = articleId;
+		result.slug = selection.article.slug || prepared.slug;
+		result.url = selection.article.url;
+		result.method = "adopted_draft";
+		result.state = "draft_found";
+		process.stdout.write(
+			`[publish-one] adopting existing draft id=${articleId}\n`,
+		);
+	} else {
+		if (options.failInjection === "post_response_loss") {
+			const injectedOutcome = await fetchFn(`${DEVTO_API_ROOT}/articles`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Accept: "application/vnd.forem.api-v1+json",
+					"api-key": apiKey,
+				},
+				body: JSON.stringify(
+					buildDevtoDraftPayload(prepared, result.canonicalUrl),
+				),
+			}).then(
+				() => "responded" as const,
+				() => "rejected" as const,
+			);
+			result.attempts += 1;
+			logError(
+				"post-to-dev",
+				"publish-one discarded the draft create response (injected failure)",
+				{
+					postPath: options.postPath,
+					outcome: injectedOutcome,
+				},
+			);
+			return failWith("unknown", "unknown", {
+				detail: "draft create response lost (injected timeout-like failure)",
+			});
+		}
+		const created = await writeDevtoArticle(
+			`${DEVTO_API_ROOT}/articles`,
+			"POST",
+			apiKey,
+			buildDevtoDraftPayload(prepared, result.canonicalUrl),
+			fetchFn,
+		);
+		result.attempts += 1;
+		if (created.kind === "http_error") {
+			const classification = classifyDevtoError(
+				created.status,
+				created.errorText,
+			);
+			return classification === "failed"
+				? failWith("failed", "failed", {
+						stage: "draft_create",
+						status: created.status,
+						classification,
+					})
+				: failWith("unknown", "unknown", {
+						stage: "draft_create",
+						status: created.status,
+						classification,
+					});
+		}
+		if (created.kind === "unresolved") {
+			return failWith("unknown", "unknown", {
+				stage: "draft_create",
+				errorText: created.errorText,
+			});
+		}
+		const draftArticle = parseDevtoArticle(created.body);
+		if (!draftArticle) {
+			return failWith("unknown", "unknown", {
+				stage: "draft_create",
+				detail: "draft response missing article id",
+			});
+		}
+		articleId = draftArticle.id;
+		result.draftId = articleId;
+		result.slug = draftArticle.slug || prepared.slug;
+		result.method = "created";
+		result.state = "draft_found";
+		process.stdout.write(`[publish-one] created draft id=${articleId}\n`);
+	}
+
+	const published = await writeDevtoArticle(
+		`${DEVTO_API_ROOT}/articles/${articleId}`,
+		"PUT",
+		apiKey,
+		buildDevtoPublishPayload(),
+		fetchFn,
+	);
+	result.attempts += 1;
+	if (published.kind === "http_error") {
+		const classification = classifyDevtoError(
+			published.status,
+			published.errorText,
+		);
+		return classification === "failed"
+			? failWith("failed", "failed", {
+					stage: "draft_publish",
+					status: published.status,
+					classification,
+					draftId: articleId,
+				})
+			: failWith("unknown", "unknown", {
+					stage: "draft_publish",
+					status: published.status,
+					classification,
+					draftId: articleId,
+				});
+	}
+	if (published.kind === "unresolved") {
+		return failWith("unknown", "unknown", {
+			stage: "draft_publish",
+			draftId: articleId,
+			errorText: published.errorText,
+		});
+	}
+	const publishedArticle = parseDevtoArticle(published.body);
+	result.id = publishedArticle?.id ?? articleId;
+	if (publishedArticle?.slug) result.slug = publishedArticle.slug;
+	if (publishedArticle?.url) result.url = publishedArticle.url;
+
+	const verification = await verifyPublishedArticle(
+		result.slug || prepared.slug,
+		result.canonicalUrl,
+		{
+			username: options.username || process.env.DEVTO_USERNAME,
+			fetchFn,
+			sleepFn,
+		},
+	);
+	if (verification.verified && verification.article) {
+		result.state = "published_verified";
+		result.observedPublished = true;
+		if (verification.article.url) result.url = verification.article.url;
+		if (verification.article.slug) result.slug = verification.article.slug;
+	} else {
+		result.state = "unknown";
+		result.observedPublished = verification.observedPublished ?? undefined;
+		logError(
+			"post-to-dev",
+			"publish-one could not verify the published article",
+			{
+				slug: result.slug,
+				attempts: verification.attempts,
+				lastStatus: verification.lastStatus,
+			},
+		);
+	}
+	return finalize();
+}
+
+export type ParsedPublishOneArgs = {
+	postPath: string;
+	platform: "devto";
+	dryRun: boolean;
+	failInjection: PublishOneFailInjection;
+};
+
+export function parsePublishOneArgs(args: string[]): ParsedPublishOneArgs {
+	let postPath = "";
+	let platform = "";
+	let dryRun = false;
+	let failInjection: PublishOneFailInjection = "none";
+	for (let i = 0; i < args.length; i++) {
+		const arg = args[i];
+		if (arg === "--publish-one") {
+			i += 1;
+			postPath = (args[i] || "").trim();
+			continue;
+		}
+		if (arg === "--platform") {
+			i += 1;
+			platform = (args[i] || "").trim().toLowerCase();
+			continue;
+		}
+		if (arg === "--dry-run") {
+			dryRun = true;
+			continue;
+		}
+		if (arg === "--fail-injection") {
+			i += 1;
+			const value = (args[i] || "").trim();
+			if (
+				value !== "none" &&
+				value !== "pre_post" &&
+				value !== "post_response_loss"
+			) {
+				throw new Error(`Invalid --fail-injection value: ${value}`);
+			}
+			failInjection = value;
+			continue;
+		}
+		throw new Error(`Unknown publish-one argument: ${arg}`);
+	}
+	if (!postPath) {
+		throw new Error("--publish-one requires a post markdown path");
+	}
+	if (platform !== "devto") {
+		throw new Error(
+			`--platform must be devto (got: ${platform || "(missing)"})`,
+		);
+	}
+	return { postPath, platform: "devto", dryRun, failInjection };
+}
+
+async function executePublishOneCli(argv: string[]) {
+	try {
+		const parsed = parsePublishOneArgs(argv);
+		const result = await runPublishOne({
+			postPath: parsed.postPath,
+			platform: parsed.platform,
+			dryRun: parsed.dryRun,
+			failInjection: parsed.failInjection,
+		});
+		if (publishOneExitCode(result) !== 0) {
+			process.exitCode = 1;
+		}
+	} catch (error) {
+		logError("post-to-dev", "publish-one invocation error", { error });
+		process.exitCode = 1;
+	}
+}
+
 if (process.argv[1] && path.basename(process.argv[1]) === "post-to-dev.ts") {
 	dotenv.config({ path: ".env.local" });
-	const targetInput = process.argv[2];
-	const platformsArg = process.argv[3];
-	runDeployment(targetInput, platformsArg).catch((error) => {
-		logError("post-to-dev", "An error occurred", { error });
-		process.exit(1);
-	});
+	if (process.argv.slice(2).includes("--publish-one")) {
+		executePublishOneCli(process.argv.slice(2));
+	} else {
+		const targetInput = process.argv[2];
+		const platformsArg = process.argv[3];
+		runDeployment(targetInput, platformsArg).catch((error) => {
+			logError("post-to-dev", "An error occurred", { error });
+			process.exit(1);
+		});
+	}
 }
