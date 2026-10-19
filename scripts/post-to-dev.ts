@@ -1127,6 +1127,15 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 }
 
 async function runDeployment(targetInput?: string, platformsArg?: string) {
+	if (
+		!/^(1|true|yes|on)$/i.test(
+			String(process.env.PUBLISH_LEGACY_ENABLED || "").trim(),
+		)
+	) {
+		throw new Error(
+			"Legacy publish path is disabled. Use --publish-one for an approved single-post publish.",
+		);
+	}
 	const publicBaseUrl = normalizePublicBaseUrl(
 		process.env.BLOG_PUBLIC_BASE_URL || DEFAULT_PUBLIC_BASE_URL,
 	);
