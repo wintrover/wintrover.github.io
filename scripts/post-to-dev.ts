@@ -80,6 +80,14 @@ const LINKEDIN_POSTS_API_URL = normalizeLinkedInPostsApiUrl(
 	process.env.LINKEDIN_POSTS_API_URL || "https://api.linkedin.com/rest/posts",
 );
 const SUPPORTED_PLATFORMS: Platform[] = ["devto", "linkedin"];
+const DEFAULT_PLATFORMS: Platform[] = ["devto"];
+
+export function isLinkedInAutoPostEnabled() {
+	return /^(1|true|yes|on)$/i.test(
+		String(process.env.LINKEDIN_AUTOPOST_ENABLED || "").trim(),
+	);
+}
+
 export const DEPLOY_POSTS_ROOT_RELATIVE = "src/posts";
 const DEPLOY_POSTS_ROOT = path.resolve(
 	process.cwd(),
@@ -905,16 +913,21 @@ async function discoverAllDeployEligiblePostFiles() {
 	return collectMarkdownFiles(DEPLOY_POSTS_ROOT);
 }
 
-function parsePlatforms(raw?: string): Platform[] {
+export function parsePlatforms(raw?: string): Platform[] {
 	const normalized = String(raw || "")
 		.split(",")
 		.map((s) => s.trim().toLowerCase())
 		.filter(Boolean);
-	const values = normalized.length > 0 ? normalized : SUPPORTED_PLATFORMS;
+	const values = normalized.length > 0 ? normalized : DEFAULT_PLATFORMS;
+	if (values.includes("linkedin") && !isLinkedInAutoPostEnabled()) {
+		throw new Error(
+			"LinkedIn auto-posting is disabled. Set LINKEDIN_AUTOPOST_ENABLED=true only for an explicitly approved manual run.",
+		);
+	}
 	const filtered = values.filter((v): v is Platform =>
 		SUPPORTED_PLATFORMS.includes(v as Platform),
 	);
-	if (filtered.length === 0) return SUPPORTED_PLATFORMS;
+	if (filtered.length === 0) return DEFAULT_PLATFORMS;
 	return Array.from(new Set(filtered));
 }
 
@@ -1033,6 +1046,20 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 				postPath: post.filePath,
 				externalPostId: result.postId,
 				externalPostUrl: result.url || undefined,
+			};
+			await writePlatformStatus(record, false);
+			return record;
+		}
+		if (!isLinkedInAutoPostEnabled()) {
+			const record: DeploymentRecord = {
+				slug: post.slug,
+				postKey: post.postKey,
+				platform,
+				state: "failed",
+				updatedAt,
+				detail:
+					"LinkedIn auto-posting is disabled (LINKEDIN_AUTOPOST_ENABLED != true)",
+				postPath: post.filePath,
 			};
 			await writePlatformStatus(record, false);
 			return record;

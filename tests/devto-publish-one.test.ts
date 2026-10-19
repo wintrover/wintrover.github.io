@@ -10,10 +10,12 @@ import {
 	classifyDevtoError,
 	type DevtoArticle,
 	decideReconcileAction,
+	isLinkedInAutoPostEnabled,
 	listAllDevtoArticles,
 	normalizeCanonicalUrl,
 	type PreparedPost,
 	parseDevtoArticle,
+	parsePlatforms,
 	parsePublishOneArgs,
 	publishOneExitCode,
 	runPublishOne,
@@ -791,5 +793,27 @@ describe("publish-one helpers", () => {
 		expect(summary).toContain("- method: `created`");
 		expect(summary).toContain("- attempts: 2");
 		expect(summary).toContain("actions/runs/123");
+	});
+});
+
+describe("LinkedIn auto-posting guard", () => {
+	afterEach(() => {
+		delete process.env.LINKEDIN_AUTOPOST_ENABLED;
+	});
+
+	test("기본 플랫폼은 devto 하나다", () => {
+		expect(parsePlatforms()).toEqual(["devto"]);
+	});
+
+	test("LINKEDIN_AUTOPOST_ENABLED가 없으면 LinkedIn을 거부한다", () => {
+		delete process.env.LINKEDIN_AUTOPOST_ENABLED;
+		expect(isLinkedInAutoPostEnabled()).toBe(false);
+		expect(() => parsePlatforms("linkedin")).toThrow(/disabled/);
+	});
+
+	test("명시적 true일 때만 LinkedIn을 허용한다", () => {
+		process.env.LINKEDIN_AUTOPOST_ENABLED = "true";
+		expect(isLinkedInAutoPostEnabled()).toBe(true);
+		expect(parsePlatforms("linkedin")).toEqual(["linkedin"]);
 	});
 });
