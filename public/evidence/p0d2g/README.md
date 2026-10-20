@@ -105,12 +105,32 @@ only be checkable by someone with access to the private repository.
 | 13 | The gap was later fixed in generic pipeline code, not in the binding | `fixes/c31bc944f.md`, `fixes/60717df13.md`, `fixes/52abab1bb.md`, `fixes/0b9c79d47.md`, `fixes/5b6754613.md` |
 | 14 | The standalone control target was refused (fail-closed NotFound) at the time, and later became targetable | `run-records/e_control.err`; `fixes/5b6754613.md` |
 | 15 | Attaching the spec pragma directly to the original header was structurally blocked | `orig_pragma/ORIG_PRAGMA_LIMIT.md`, `orig_pragma/variant_orig.patch` |
-| 16 | The experiment record's own expected verdict is `ACCEPTANCE: INCOMPLETE`, and no committed end-to-end `ACCEPTANCE: PASS` log exists | `FORMAL_EXPERIMENT.md` §ACCEPTANCE 상태; this README's scope statement |
+| 16 | The frozen record's expected verdict is `ACCEPTANCE: INCOMPLETE`; a post-fix run on 2026-10-20 observed C1–C5 all OBS and `ACCEPTANCE: PASS` | `FORMAL_EXPERIMENT.md` §ACCEPTANCE 상태; `acceptance-2026-10-20/README.md`, `acceptance-2026-10-20/acceptance.md` |
+| 17 | The post-fix run observed C4 replay agreement (`BUG_FOUND` payload, 13 records) and identical canonical digests in the defect and cold legs | `acceptance-2026-10-20/defect.err:36`, `acceptance-2026-10-20/defect_cold.err:36`, `acceptance-2026-10-20/state_r1_ax_proof_state.json.md`, `acceptance-2026-10-20/state_r2_ax_proof_state.json.md` |
 
-Claim 16 is an absence. It is stated as a fact about the published record,
-not as a proof that no run ever printed a pass line. The record itself says
-the acceptance verdict belongs to `replay_agent.sh`; the harness contains an
-`echo` for the PASS string, but no committed output artifact.
+## Post-fix acceptance (2026-10-20)
+
+The original Phase E run did not observe C4; the frozen record's expected
+verdict is `ACCEPTANCE: INCOMPLETE`. After the P4 and replay-harness fixes,
+a full harness run on Axiom HEAD `7ae9561a9` with a rebuilt `bin/ax` v0.5.9
+observed:
+
+```text
+C1 OBS  C2 OBS  C3 OBS  C4 OBS  C5 OBS
+ACCEPTANCE: PASS
+```
+
+C4's observed line is:
+
+```text
+[INFO] ir_pipeline_runner: [ce-replay] d2StringGateReject — replay agreed;
+BUG_FOUND payload assembled (13 records)
+```
+
+The defect and cold legs produced the same canonical digest
+`3516fcfc…ced6a`. The Axiom repository does not commit the run output; this
+snapshot is the public record. The frozen `FORMAL_EXPERIMENT.md` remains
+unchanged as the contemporaneous record.
 
 ## What this snapshot does not claim
 
@@ -129,6 +149,9 @@ the acceptance verdict belongs to `replay_agent.sh`; the harness contains an
   snapshot alone.** Reproduction requires the Axiom toolchain, which is
   private. The subject side is public and pinned, so the decoder behaviour
   can be reproduced independently.
+- **Not a rewrite of the frozen record.** The PASS run is a later
+  observation; it does not change the fact that the original Phase E run did
+  not observe C4.
 - **Not a claim that the private origin equals this snapshot.** The hashes
   cover the public bytes only.
 
@@ -186,4 +209,14 @@ orig_pragma/ORIG_PRAGMA_LIMIT.md
 orig_pragma/variant_orig.patch
 replay/replay_agent.redacted.sh
 subject/lexer_gate_excerpt.md
+acceptance-2026-10-20/README.md
+acceptance-2026-10-20/acceptance.md
+acceptance-2026-10-20/defect.err
+acceptance-2026-10-20/defect_cold.err
+acceptance-2026-10-20/toolchain.md
+acceptance-2026-10-20/state_r1_ax_proof_state.json.md
+acceptance-2026-10-20/state_r2_ax_proof_state.json.md
+acceptance-2026-10-20/state_r1_ax_prove_trajectory.jsonl
+acceptance-2026-10-20/state_r2_ax_prove_trajectory.jsonl
+acceptance-2026-10-20/vault_r1_manifest.json.md
 ```
