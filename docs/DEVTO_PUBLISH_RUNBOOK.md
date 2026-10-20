@@ -4,9 +4,10 @@ Repeatable, minimal steps to create **one draft** on DEV.to, verify it externall
 
 ## Prerequisites
 
-- `DEVTO_API_KEY` exists only as a `sns-publish` environment secret.
+- `DEVTO_API_KEY` target authority is the `sns-publish` environment secret. Until the owner migrates it, the repository secret is the temporary source.
 - The `Draft One` workflow is the only write path; it is triggered by `repository_dispatch` (`draft-one`).
 - The owner is the required reviewer for the `sns-publish` environment.
+- With the current owner-triggered bootstrap, `current_user_can_approve=true`. After the automation App dispatches, `prevent_self_review` becomes enforceable and the owner still approves.
 - Images are publicly reachable at absolute URLs under `https://wintrover.github.io/assets/images/...`.
 
 ## Checklist (run in order)
@@ -39,11 +40,9 @@ Expected: `event=repository_dispatch`, `actor=<automation-app>`, `headBranch=mai
 4) Approve the environment deployment (owner only)
 ```
 RUN_ID=<run-id>
-gh api repos/wintrover/wintrover.github.io/actions/runs/$RUN_ID/pending_deployments
-gh api -X POST repos/wintrover/wintrover.github.io/actions/runs/$RUN_ID/pending_deployments \
-  --input - <<'JSON'
-{"environment_ids":[<environment-id>],"state":"approved","comment":"owner-approved draft-only dispatch"}
-JSON
+ENV_ID=$(gh api repos/wintrover/wintrover.github.io/actions/runs/$RUN_ID/pending_deployments --jq '.[0].environment.id')
+printf '{"environment_ids":[%s],"state":"approved","comment":"owner-approved draft-only dispatch"}' "$ENV_ID" \
+  | gh api -X POST repos/wintrover/wintrover.github.io/actions/runs/$RUN_ID/pending_deployments --input -
 gh run watch "$RUN_ID" --exit-status
 ```
 Expected: the job starts only after approval.
