@@ -19,6 +19,7 @@ description: 블로그 에이전트의 운영 페르소나, 도구 활용 및 �
 - 결과 불명(`unknown`)은 성공으로 기록하지 않으며 자동 재POST하지 않는다.
 - `state.json`, `DB`/`deploy` 브랜치, Nim `devlog`, `.deploy/` 마커는 **역사 기록**이며 현재 발행 권위가 아니다.
 - LinkedIn 자동 발행은 비활성이다. 재활성화는 별도 제품 결정과 독립 acceptance를 요구한다.
+- **임시 감독 모드 (App 등록 전)**: 에이전트는 아직 오너의 관리자 토큰으로 동작한다. 따라서 무인으로 ruleset·environment·secret·workflow를 변경하거나 `Draft One`/`Unpublish One`을 실행하지 않는다. 모든 병합·발행·승인은 오너가 지켜보는 상태에서만 수행한다. App 등록과 토큰 교체가 끝나면 이 조항을 제거한다.
 
 ## 1. 에이전트 운영 및 도구 사용 규정
 
