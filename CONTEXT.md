@@ -28,6 +28,7 @@
 - 루트 `state.json`의 그래프(Node/Edge) 모델, Nim CLI(`engine/devlog.nim`), `DB`/`deploy` 브랜치, `.deploy/` 상태·`.success` 마커는 과거 운영 체계의 기록이다.
 - 이 기록은 삭제하지 않고 별도 아카이브·퇴역 작업에서 다룬다. 현재 발행 경로는 위 계약만 따른다.
 - LinkedIn 자동 발행은 비활성이며 `LINKEDIN_ACCESS_TOKEN`은 저장소에 존재하지 않는다. 재활성화는 별도 제품 결정과 독립 acceptance를 요구한다.
+- App 등록 전까지 에이전트는 오너의 관리자 토큰으로 동작한다. 이 기간에는 ruleset·environment·secret·workflow 변경과 `Draft One`/`Unpublish One` 실행을 오너 감독 없이 수행하지 않는다. App 토큰으로 교체된 뒤 이 임시 조항을 제거한다.
 
 ## 2) URL 아키텍처 규칙
 
