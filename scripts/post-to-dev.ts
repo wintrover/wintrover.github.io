@@ -1317,6 +1317,7 @@ const DEVTO_LIST_PAGE_SIZE = 1000;
 const DEVTO_LIST_THROTTLE_MS = 350;
 const DEVTO_VERIFY_ATTEMPTS = 6;
 const DEVTO_VERIFY_SLEEP_MS = 10_000;
+const DEVTO_TEMP_SLUG_PATTERN = /-temp-slug-/i;
 const DEFAULT_DEVTO_USERNAME = "wintrover";
 const DEFAULT_PUBLISH_RESULT_PATH = "publish-result.json";
 
@@ -1354,6 +1355,20 @@ function normalizeDevtoTitle(title: string) {
 		.trim()
 		.toLowerCase()
 		.replace(/\s+/g, " ");
+}
+
+export function isDevtoPublished(article: DevtoArticle): boolean {
+	if (
+		typeof article.slug === "string" &&
+		DEVTO_TEMP_SLUG_PATTERN.test(article.slug)
+	) {
+		return false;
+	}
+	if (article.published === true) return true;
+	if (typeof article.published_at === "string" && article.published_at.trim()) {
+		return Number.isFinite(Date.parse(article.published_at));
+	}
+	return false;
 }
 
 export function parseDevtoArticle(value: unknown): DevtoArticle | null {
@@ -1512,6 +1527,44 @@ export async function listAllDevtoArticles(
 	return articles;
 }
 
+export async function fetchLatestDevtoArticles(
+	options: { fetchFn?: FetchLike } = {},
+): Promise<DevtoArticle[]> {
+	const fetchFn = options.fetchFn || fetch;
+	let response: Response;
+	try {
+		response = await fetchFn(
+			`${DEVTO_API_ROOT}/articles/latest?per_page=${DEVTO_LIST_PAGE_SIZE}`,
+			{ headers: { Accept: "application/vnd.forem.api-v1+json" } },
+		);
+	} catch (error) {
+		throw new Error(
+			`DEV.to latest articles request failed: ${asErrorMessage(error)}`,
+		);
+	}
+	if (!response.ok) {
+		const errorText = await response.text().catch(() => "");
+		throw new Error(
+			`DEV.to latest articles request failed (${response.status}): ${errorText}`,
+		);
+	}
+	let raw: unknown;
+	try {
+		raw = await response.json();
+	} catch (error) {
+		throw new Error(
+			`DEV.to latest articles response was not valid JSON: ${asErrorMessage(error)}`,
+		);
+	}
+	const entries = Array.isArray(raw) ? raw : [];
+	const articles: DevtoArticle[] = [];
+	for (const entry of entries) {
+		const article = parseDevtoArticle(entry);
+		if (article) articles.push(article);
+	}
+	return articles;
+}
+
 export type DevtoVerification = {
 	verified: boolean;
 	attempts: number;
@@ -1519,7 +1572,62 @@ export type DevtoVerification = {
 	observedPublished: boolean | null;
 	canonicalMatched: boolean | null;
 	article: DevtoArticle | null;
+	fallbackUsed: boolean;
+	ambiguous: boolean;
 };
+
+type LatestFeedVerification = {
+	verified: boolean;
+	ambiguous: boolean;
+	article: DevtoArticle | null;
+};
+
+const LATEST_FEED_UNVERIFIED: LatestFeedVerification = {
+	verified: false,
+	ambiguous: false,
+	article: null,
+};
+
+async function verifyArticleViaLatestFeed(
+	target: string,
+	articleId: number | undefined,
+	fetchFn: FetchLike,
+): Promise<LatestFeedVerification> {
+	if (!target && articleId === undefined) {
+		return LATEST_FEED_UNVERIFIED;
+	}
+	let articles: DevtoArticle[];
+	try {
+		articles = await fetchLatestDevtoArticles({ fetchFn });
+	} catch {
+		return LATEST_FEED_UNVERIFIED;
+	}
+	const idMatches =
+		articleId === undefined
+			? []
+			: articles.filter((article) => article.id === articleId);
+	const canonicalMatches = target
+		? articles.filter(
+				(article) =>
+					normalizeCanonicalUrl(article.canonical_url || "") === target,
+			)
+		: [];
+	const candidates = canonicalMatches.length > 0 ? canonicalMatches : idMatches;
+	if (candidates.length === 0) {
+		return LATEST_FEED_UNVERIFIED;
+	}
+	if (candidates.length > 1) {
+		return { verified: false, ambiguous: true, article: null };
+	}
+	const candidate = candidates[0];
+	const canonicalMatched = target
+		? normalizeCanonicalUrl(candidate.canonical_url || "") === target
+		: null;
+	if (canonicalMatched === false || !isDevtoPublished(candidate)) {
+		return { verified: false, ambiguous: false, article: candidate };
+	}
+	return { verified: true, ambiguous: false, article: candidate };
+}
 
 export async function verifyPublishedArticle(
 	slug: string,
@@ -1530,6 +1638,7 @@ export async function verifyPublishedArticle(
 		sleepMs?: number;
 		fetchFn?: FetchLike;
 		sleepFn?: SleepLike;
+		articleId?: number;
 	} = {},
 ): Promise<DevtoVerification> {
 	const fetchFn = options.fetchFn || fetch;
@@ -1565,7 +1674,7 @@ export async function verifyPublishedArticle(
 		const article = parseDevtoArticle(raw);
 		if (!article) continue;
 		lastArticle = article;
-		lastObservedPublished = article.published === true;
+		lastObservedPublished = isDevtoPublished(article);
 		lastCanonicalMatched = target
 			? normalizeCanonicalUrl(article.canonical_url || "") === target
 			: null;
@@ -1577,8 +1686,27 @@ export async function verifyPublishedArticle(
 				observedPublished: lastObservedPublished,
 				canonicalMatched: lastCanonicalMatched,
 				article,
+				fallbackUsed: false,
+				ambiguous: false,
 			};
 		}
+	}
+	const fallback = await verifyArticleViaLatestFeed(
+		target,
+		options.articleId,
+		fetchFn,
+	);
+	if (fallback.verified && fallback.article) {
+		return {
+			verified: true,
+			attempts: maxAttempts,
+			lastStatus,
+			observedPublished: true,
+			canonicalMatched: target ? true : null,
+			article: fallback.article,
+			fallbackUsed: true,
+			ambiguous: false,
+		};
 	}
 	return {
 		verified: false,
@@ -1587,6 +1715,8 @@ export async function verifyPublishedArticle(
 		observedPublished: lastObservedPublished,
 		canonicalMatched: lastCanonicalMatched,
 		article: lastArticle,
+		fallbackUsed: false,
+		ambiguous: fallback.ambiguous,
 	};
 }
 
@@ -1931,6 +2061,7 @@ export async function runPublishOne(
 			username: options.username || process.env.DEVTO_USERNAME,
 			fetchFn,
 			sleepFn,
+			articleId: result.id,
 		},
 	);
 	if (verification.verified && verification.article) {
@@ -1938,6 +2069,11 @@ export async function runPublishOne(
 		result.observedPublished = true;
 		if (verification.article.url) result.url = verification.article.url;
 		if (verification.article.slug) result.slug = verification.article.slug;
+		if (verification.fallbackUsed) {
+			process.stdout.write(
+				`[publish-one] verified via latest feed fallback id=${verification.article.id}\n`,
+			);
+		}
 	} else {
 		result.state = "unknown";
 		result.observedPublished = verification.observedPublished ?? undefined;
