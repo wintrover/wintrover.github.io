@@ -84,7 +84,7 @@ Byte-identical in this directory: `toolchain.md`,
   repository. They are not byte copies of a file in the source tree.
 - `subject/lexer_gate_excerpt.md` — authored for this snapshot from the
   public subject at the pinned commit. It is an excerpt, not a copy.
-- `README.md`, `REDACTIONS.md`, `SHA256SUMS`,
+- `README.md`, `REDACTIONS.md`, `TRANSLATIONS.md`, `SHA256SUMS`,
   `acceptance-2026-10-20/README.md` — authored/generated metadata.
 
 ## 5. Byte-identical tier
@@ -92,12 +92,9 @@ Byte-identical in this directory: `toolchain.md`,
 All other published files are byte-identical to their origin paths:
 
 ```
-AGENT_SPEC.md
-FORMAL_EXPERIMENT.md
 PIPELINE_GAP_P4_BOOL_BINDING.md
 discovery/agentA_raw.md
 discovery/agentB_raw.md
-contract/toml_d2_agent_binding_contract.md
 overlay/toml_d2_agent_spec.json.md
 run-records/e_defect.err
 run-records/e_defect.exit
@@ -117,7 +114,13 @@ acceptance-2026-10-20/vault_r1_manifest.json.md
 
 The `run-records/` directory and the `.md`/`.err`/`.jsonl`/`.patch` names are
 chosen because this blog repository's `.gitignore` ignores `logs/`, `*.log`,
-`*.json`, and `*.txt`. The bytes inside the copied files are unchanged.
+`*.json`, and `*.txt`. For the list above, the bytes inside the copied files
+are unchanged.
+
+Translated, not byte-identical: `AGENT_SPEC.md`, `FORMAL_EXPERIMENT.md`,
+`orig_pragma/ORIG_PRAGMA_LIMIT.md`, `replay/replay_agent.redacted.sh`,
+`fixes/0b9c79d47.md`, `acceptance-2026-10-20/acceptance.md`, and
+`contract/toml_d2_agent_binding_contract.md`. See `TRANSLATIONS.md`.
 
 ## 6. Verification
 

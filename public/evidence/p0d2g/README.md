@@ -6,8 +6,9 @@ repository is private, while the claims in the companion blog post must be
 checkable by a reader who has no access to it.
 
 The snapshot is served verbatim from this blog's `public/` directory. It is
-not a re-execution and not a re-analysis. It is a copy of the recorded
-artifacts, plus the redactions listed in `REDACTIONS.md`.
+not a re-execution and not a re-analysis. It is an English-language edition
+of the recorded artifacts, plus the redactions in `REDACTIONS.md` and the
+translations in `TRANSLATIONS.md`.
 
 ## Provenance
 
@@ -21,9 +22,21 @@ artifacts, plus the redactions listed in `REDACTIONS.md`.
 | Subject file | `toml_serialization/lexer.nim` |
 | Subject file SHA-256 | `19d69eed84f74c51fa1784b2e71a4525abc8d2b8aa854c567565d2d603133f4d` |
 
-Most artifacts are byte-for-byte copies of the named source file. Three are
-redacted copies; three kinds are generated. `REDACTIONS.md` records every
-difference, including original and published SHA-256 values.
+Most non-narrative artifacts are byte-for-byte copies of the named source
+file. The narrative records were written in Korean in the private repository;
+their public copies are English translations, not byte-identical copies.
+`TRANSLATIONS.md` records the original and public SHA-256 values for each
+translation. `REDACTIONS.md` records path redactions and generated files.
+
+## Language policy
+
+All public evidence in this directory is in English. The private originals of
+`AGENT_SPEC.md`, `FORMAL_EXPERIMENT.md`, `ORIG_PRAGMA_LIMIT.md`, the
+replay-harness comments, one fix commit message, and the acceptance table
+labels are Korean; their public copies are English translations. The
+discovery reports, run logs, proof states, and manifests were already English.
+`TRANSLATIONS.md` records original/public hashes. Translation fidelity cannot
+be independently checked without access to the private originals.
 
 ## Why the filenames look like this
 
@@ -31,8 +44,8 @@ This blog repository's `.gitignore` ignores `logs/`, `*.log`, `*.json`, and
 `*.txt` (`.gitignore:2,3,38,39`). A published artifact with those names would
 be silently left out of the commit. The snapshot therefore uses
 `run-records/`, `.err`, `.exit`, `.jsonl`, `.json.md`, `.patch`, and `.md`
-names. Only the filenames changed; the bytes inside the copied files are
-unchanged.
+names. For byte-identical copies only the filenames changed; translated files
+are listed in `TRANSLATIONS.md`.
 
 ## Redactions and generated files
 
@@ -45,12 +58,14 @@ unchanged.
 
 Generated, not copied: `fixes/*.md` (git log exports),
 `subject/lexer_gate_excerpt.md` (authored excerpt), and this README,
-`REDACTIONS.md`, `SHA256SUMS`.
+`REDACTIONS.md`, `TRANSLATIONS.md`, `SHA256SUMS`.
 
-No other content was removed or rewritten. `FORMAL_EXPERIMENT.md` is the
-frozen record; it still describes the pre-fix state and its expected verdict
-is `ACCEPTANCE: INCOMPLETE`. The later fixes are recorded separately in
-`fixes/`.
+No other content was removed. The Korean narrative records were translated
+into English; `TRANSLATIONS.md` records every translation and its original
+hash. `FORMAL_EXPERIMENT.md` is the frozen record; the English edition still
+describes the pre-fix state and its expected verdict is `ACCEPTANCE:
+INCOMPLETE`. The later PASS run is recorded separately in
+`acceptance-2026-10-20/`.
 
 Authorship note: the discovery and specification files describe the agents'
 own process. No prompt transcript, invocation log, or per-run timestamp is
@@ -91,7 +106,7 @@ only be checkable by someone with access to the private repository.
 | # | Claim in the companion post | Public artifact |
 |---|---|---|
 | 1 | Two independently authored blind analysis reports each contain 7 genuine candidates; the experiment record describes the runs as zero-hint/zero-context | `discovery/agentA_raw.md`, `discovery/agentB_raw.md`; `FORMAL_EXPERIMENT.md` §Procedure Phase A |
-| 2 | 3 candidates converged across the two reports | `AGENT_SPEC.md` §1 "발견" column (`A3+B3`, `A2+B1`, `A5+B7`) |
+| 2 | 3 candidates converged across the two reports | `AGENT_SPEC.md` §1 "Found by" column (`A3+B3`, `A2+B1`, `A5+B7`) |
 | 3 | Both blind reports missed the BEL/`\x07` anchor; the synthesis pass introduced it and corrected 4 inherited citations | `FORMAL_EXPERIMENT.md` §Classification and §Non-Conclusions; `AGENT_SPEC.md` §11 |
 | 4 | The synthesis pass scored 11 candidates on four criteria and selected candidate 1; the specification says this was authored without compiling or running | `AGENT_SPEC.md` §1–§2, §5 |
 | 5 | The synthesis pass authored proposition S2: `∀ c ∈ D: reject(c) = forbid(c)` | `AGENT_SPEC.md` §4; `contract/toml_d2_agent_binding_contract.md` §1 |
@@ -105,7 +120,7 @@ only be checkable by someone with access to the private repository.
 | 13 | The gap was later fixed in generic pipeline code, not in the binding | `fixes/c31bc944f.md`, `fixes/60717df13.md`, `fixes/52abab1bb.md`, `fixes/0b9c79d47.md`, `fixes/5b6754613.md` |
 | 14 | The standalone control target was refused (fail-closed NotFound) at the time, and later became targetable | `run-records/e_control.err`; `fixes/5b6754613.md` |
 | 15 | Attaching the spec pragma directly to the original header was structurally blocked | `orig_pragma/ORIG_PRAGMA_LIMIT.md`, `orig_pragma/variant_orig.patch` |
-| 16 | The frozen record's expected verdict is `ACCEPTANCE: INCOMPLETE`; a post-fix run on 2026-10-20 observed C1–C5 all OBS and `ACCEPTANCE: PASS` | `FORMAL_EXPERIMENT.md` §ACCEPTANCE 상태; `acceptance-2026-10-20/README.md`, `acceptance-2026-10-20/acceptance.md` |
+| 16 | The frozen record's expected verdict is `ACCEPTANCE: INCOMPLETE`; a post-fix run on 2026-10-20 observed C1–C5 all OBS and `ACCEPTANCE: PASS` | `FORMAL_EXPERIMENT.md` §ACCEPTANCE status; `acceptance-2026-10-20/README.md`, `acceptance-2026-10-20/acceptance.md` |
 | 17 | The post-fix run observed C4 replay agreement (`BUG_FOUND` payload, 13 records) and identical canonical digests in the defect and cold legs | `acceptance-2026-10-20/defect.err:36`, `acceptance-2026-10-20/defect_cold.err:36`, `acceptance-2026-10-20/state_r1_ax_proof_state.json.md`, `acceptance-2026-10-20/state_r2_ax_proof_state.json.md` |
 
 ## Post-fix acceptance (2026-10-20)
@@ -182,6 +197,7 @@ re-validation, and the replay harness are recorded but not redistributable.
 ```
 README.md
 REDACTIONS.md
+TRANSLATIONS.md
 SHA256SUMS
 AGENT_SPEC.md
 FORMAL_EXPERIMENT.md

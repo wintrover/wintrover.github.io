@@ -1,42 +1,42 @@
-# P0-D2-G — AGENT SPEC: 정형 검증 대상 후보 선정 및 명세 패키지 (문자열 내부 제어문자 수용)
+# P0-D2-G — AGENT SPEC: Selection of Formally Verified Candidates and Specification Package (Acceptance of Control Characters Inside Strings)
 
 Experiment: `act2-wp-toml-b1-input-integrity/p0d2g` · Date: 2026-10-17
 
-**출처·방법론**: 본 문서는 SPEC INFERENCE 에이전트의 1차 저작물이다. 입력은 두 독립 블라인드 분석 보고서 `discovery/agentA_raw.md`·`discovery/agentB_raw.md`(verbatim 보존)이며, 후보 풀은 전적으로 이 보고서들에서 취했다. 주체 저장소 `nim-toml-serialization @ 4aa8e2223649fc0837c490a4acfca7b8b1e756f9`(read-only)에 대해 **상속 인용을 전수 대조 검증**했고(§11 정정 기록), **컴파일·실행 없이** 정적 분석만으로 작성했다 — 재생 절차의 컴파일 검증은 후속 단계 소관이다. 문체·커널 구도는 선행 슬라이스 [`../p0d2f/SPEC.md`](../p0d2f/SPEC.md)를 따른다. 특히 p0d2f 개정에서 실증된 **프론트엔드 if-표현식 손실 문제**(p0d2f/SPEC.md Amendment)를 반영해, 본 명세의 전건·후건은 `if` 없이 비교·`and`/`or`/`not`만 사용한다.
+**Source·Methodology**: This document is the 1st artifact of the SPEC INFERENCE agent. Its inputs are two independent blind analysis reports, `discovery/agentA_raw.md`·`discovery/agentB_raw.md` (preserved verbatim), and the candidate pool was taken entirely from those reports. For the subject repository `nim-toml-serialization @ 4aa8e2223649fc0837c490a4acfca7b8b1e756f9` (read-only), the **inherited citations were verified exhaustively against the subject bytes** (correction records in §11), and it was written by static analysis alone, **without compilation or execution** — compile verification of the replay procedure is the responsibility of a later stage. The style and kernel structure follow the prior slice [`../p0d2f/SPEC.md`](../p0d2f/SPEC.md). In particular, reflecting the **frontend if-expression loss issue** demonstrated in the p0d2f amendment (p0d2f/SPEC.md Amendment), the preconditions and postconditions of this specification use only comparisons and `and`/`or`/`not`, without `if`.
 
 ---
 
-## 1. 후보 풀 채점표
+## 1. Candidate pool scoring table
 
-두 보고서에서 추출한 고유 후보 11건(중복 병합, 발견 에이전트 표기). 채점 기준: **C1** 진짜 결함(코드가 저장소 자신의 부합 주장·API 계약을 위반 — 문서만 틀린 doc-stale은 약점), **C2** 형식화 가능성(단일 정수 위의 집합/산술로 결정 속성 기술 가능), **C3** 원본 재생 가능성(pristine 주체 공개 API 호출로 관측), **C4** 차동 대조(같은 명세가 성립하는 형제 입력 존재). ◎ 우수 · ○ 양호 · △ 보통/유보 · ✕ 불충분.
+11 unique candidates extracted from the two reports (duplicates merged, discovering agent notation). Scoring criteria: **C1** a genuine defect (the code violates the repository's own compliance claim or API contract — a doc-stale where only the documentation is wrong is a weakness), **C2** formalizability (the deciding property can be described with sets/arithmetic over a single integer), **C3** reproducibility from the original (observable via calls to the pristine subject's public API), **C4** differential contrast (a sibling input exists for which the same specification holds). ◎ excellent · ○ good · △ fair/reserved · ✕ insufficient.
 
-| # | 후보 | 발견 | C1 | C2 | C3 | C4 | 판정 |
+| # | Candidate | Found by | C1 | C2 | C3 | C4 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1 | **문자열 내부 제어문자 수용** — 렉서 거부 집합 `{8,16,31,127}`(단일행)/`{16,31,127}`(멀티라인) vs README v1.1.0 부합 주장(`lexer.nim:554,588` vs `README.md:65`) | A3+B3 | ● | ◎ | ◎ | ◎ | **선정** |
-| 2 | **writeKey 특수문자 미인용** — `=` 등을 인용하지 않아 "full spec TOML" 주장(`README.md:44`) 위반 출력(`writer.nim:166-180`) | A7 | ● | ○ | △ | ● | **차점** |
-| 3 | **loadFile↔decode tomlCase 배선 불일치** — loadFile 경로가 `init`에 tomlCase 미전달(`decoder.nim:48` vs `:73`) | B4 | ● | △ | ◎ | ◎ | 3위 |
-| 4 | **innerValue `dateDimte` 오타** — TomlDate/TomlTime 접근자 브랜치가 컴파일 불능(`value_ops.nim:32,36`) | A4 | ● | △ | ◎ | ◎ | 4위 |
-| 5 | **enum 빌트인 writer 문자열 출력** — README "ordinal built-in writer" vs `$value` 출력(`writer.nim:482-484`); 코드+테스트가 일치하고 문서만 틀림 | A2+B1 | △ doc-stale | ○ | ◎ | △ | — |
-| 6 | **README fruits 예제가 기본 설정에서 실패** — `fruit2 = 1` 디코드가 기본 플래버에서 raise(`README.md:350-353` vs `reader.nim:134-136,154`); 코드+테스트가 의도적 기본 거부 | B2 | △ doc-stale | ○ | ◎ | ○ | — |
-| 7 | **규격 러너 스킵 50건** vs "pass these test suites" 주장(`spec_test/run_test.sh`, 총 `-skip=` 50개; datetime·hex-escape·control 포함) | A1 (B3 일부) | ○ | ✕ | △ | ✕ | — |
-| 8 | **후행쉼표 테스트 공허** — 테스트 입력이 `:`에서 먼저 실패해 뒤따름 쉼표를 검사하지 않음(`test_decoder.nim:634-636` vs 기본 플래버 v1.1.0 문서화 동작) | A6 | △ | ○ | ◎ | ◎ | — |
-| 9 | **미지 필드 거부의 순서 의존** — `fieldsDone >= totalFields` 조기 break(`reader.nim:345-346`); README가 예외를 명시 약속하지 않아 테스트가 행동을 성문화 | B5 | △ | ○ | ◎ | ◎ | — |
-| 10 | **TomlHourMinute 인코더 출력 축약** — 파싱 관용으로 문서화된 플래그가 기본 플래버 출력에서 `:00`을 생략(`writer.nim:88-89` + `format.nim:36`) | B6 | ○ | △ | ◎ | ○ | — |
-| 11 | **nimble 0.2.18 vs README "Since v0.3.0"** — 메타데이터 드리프트(`toml_serialization.nimble:4` vs `README.md:54-57`; 태그 최대 v0.2.18) | A5+B7 | △ 메타 | ✕ | ✕ | ✕ | — |
+| 1 | **Acceptance of control characters inside strings** — lexer rejection set `{8,16,31,127}` (single-line) / `{16,31,127}` (multiline) vs the README's v1.1.0 compliance claim (`lexer.nim:554,588` vs `README.md:65`) | A3+B3 | ● | ◎ | ◎ | ◎ | **Selected** |
+| 2 | **writeKey does not quote special characters** — it fails to quote `=` etc., producing output that violates the "full spec TOML" claim (`README.md:44`) (`writer.nim:166-180`) | A7 | ● | ○ | △ | ● | **Runner-up** |
+| 3 | **loadFile↔decode tomlCase wiring mismatch** — the loadFile path does not pass tomlCase to `init` (`decoder.nim:48` vs `:73`) | B4 | ● | △ | ◎ | ◎ | 3rd |
+| 4 | **innerValue `dateDimte` typo** — the TomlDate/TomlTime accessor branch cannot compile (`value_ops.nim:32,36`) | A4 | ● | △ | ◎ | ◎ | 4th |
+| 5 | **enum built-in writer string output** — README "ordinal built-in writer" vs the `$value` output (`writer.nim:482-484`); the code and tests agree and only the documentation is wrong | A2+B1 | △ doc-stale | ○ | ◎ | △ | — |
+| 6 | **The README fruits example fails under the default configuration** — decoding `fruit2 = 1` raises under the default flavor (`README.md:350-353` vs `reader.nim:134-136,154`); the code and tests deliberately implement the default rejection | B2 | △ doc-stale | ○ | ◎ | ○ | — |
+| 7 | **50 skips in the spec runner** vs the "pass these test suites" claim (`spec_test/run_test.sh`, `-skip=` 50 in total; including datetime·hex-escape·control) | A1 (B3 in part) | ○ | ✕ | △ | ✕ | — |
+| 8 | **The trailing-comma test is vacuous** — the test input fails earlier at `:`, so the trailing comma is never checked (`test_decoder.nim:634-636` vs the default-flavor v1.1.0 documented behavior) | A6 | △ | ○ | ◎ | ◎ | — |
+| 9 | **Order-dependence of unknown-field rejection** — an early break on `fieldsDone >= totalFields` (`reader.nim:345-346`); since the README does not explicitly promise an exception, the test codifies the behavior | B5 | △ | ○ | ◎ | ◎ | — |
+| 10 | **TomlHourMinute encoder output elision** — the flag documented as a parsing convenience omits `:00` in the default-flavor output (`writer.nim:88-89` + `format.nim:36`) | B6 | ○ | △ | ◎ | ○ | — |
+| 11 | **nimble 0.2.18 vs README "Since v0.3.0"** — metadata drift (`toml_serialization.nimble:4` vs `README.md:54-57`; the latest tag is v0.2.18) | A5+B7 | △ meta | ✕ | ✕ | ✕ | — |
 
-채점표 각 후보의 대표 인용도 주체 바이트와 대조했다(불일치 없음 — 세부 정정은 §11).
+The representative citation of each candidate in the scoring table was also checked against the subject bytes (no discrepancies — detailed corrections in §11).
 
-## 2. 선정 근거
+## 2. Selection rationale
 
-후보 1은 네 기준을 모두 상위권에서 충족하는 유일한 후보다. 결함의 책임이 코드 쪽에 있다: `README.md:65`가 선언하는 TOML v1.1.0 부합 주장에 대해 렉서는 문자열 내부 바이트를 집합 `{8,16,31,127}`/`{16,31,127}`으로만 검사해 v1.0.0·v1.1.0 공통의 문자열 제어문자 금지를 위반하며, 저장소 어디에도 이 축소 집합을 정당화하는 문서가 없다. 결정적 속성이 단일 바이트 값에 대한 집합 멤버십이므로 BitVec 8 친화적 최소 산술 모델로 축소되고, 반례 관측은 pristine 주체에 대한 `Toml.decode` 호출 한 줄로 정의된다(예외 vs 반환+값 보존). 대조 입력(0x08·0x10·0x7F·탭)에서 코드가 명세와 정확히 일치하므로 보편적 수용이 아니라 누락된 집합 멤버에 국한된 결함임이 입증된다. 게다가 같은 파일의 주석 경로가 정확한 전체 집합(`lexer.nim:75`)을 사용하고, 문자열용 픽스처·단위테스트가 전부 `{0x00,0x10,0x1F,0x7F}`만 검사해 기존 스위트가 이 갭을 구조적으로 못 잡으므로 형식 검증의 한계가정 가치가 가장 크다.
+Candidate 1 is the only candidate that satisfies all four criteria in the upper tier. Responsibility for the defect lies on the code side: against the TOML v1.1.0 compliance claim declared by `README.md:65`, the lexer checks bytes inside strings only against the sets `{8,16,31,127}`/`{16,31,127}`, violating the string control-character ban common to v1.0.0·v1.1.0, and nowhere in the repository is there a document justifying this reduced set. Since the deciding property is set membership on a single byte value, it reduces to a minimal arithmetic model friendly to BitVec 8, and the counterexample observation is defined by a single `Toml.decode` call against the pristine subject (exception vs. return with the value preserved). In the contrast inputs (0x08·0x10·0x7F·tab) the code matches the specification exactly, proving that this is not universal acceptance but a defect confined to the missing set members. Moreover, the comment path in the same file uses the exact full set (`lexer.nim:75`), and the string fixtures and unit tests check only `{0x00,0x10,0x1F,0x7F}`, so the existing suite structurally cannot catch this gap; hence its value as an assumption for formal verification is the highest.
 
-**차점**: 후보 2(writeKey 미인용) — C1·C4는 강하나, 반례 재생에 `TomlValueRef` 테이블 AST의 수동 구성이 필요해 C3이 무겁고, 결정 속성이 "키 문자열에 금지 문자가 존재"라는 존재 정량자를 포함해 C2에서 후보 1보다 크다.
+**Runner-up**: Candidate 2 (writeKey does not quote) — C1 and C4 are strong, but reproducing the counterexample requires manually constructing a `TomlValueRef` table AST, which makes C3 heavy, and the deciding property includes the existential quantifier "a forbidden character exists in the key string", so it is larger than candidate 1 in C2.
 
-## 3. P (명제)
+## 3. P (Proposition)
 
-README가 부합을 선언한 TOML 명세(README.md:65)에서 문자열 내부의 원시 바이트 c가 금지 제어문자면 `Toml.decode`는 실패해야 하는데, 주체의 렉서는 c ∈ {8,16,31,127}(단일행) 또는 c ∈ {16,31,127}(멀티라인)일 때만 실패하므로, 예컨대 원시 0x07을 포함한 문서를 예외 없이 수용하고 그 바이트를 디코딩 값에 보존한다.
+Given the TOML specification whose compliance the README declares (README.md:65), if a raw byte c inside a string is a forbidden control character, then `Toml.decode` must fail; however, the subject's lexer fails only when c ∈ {8,16,31,127} (single-line) or c ∈ {16,31,127} (multiline), so, for example, it accepts a document containing the raw byte 0x07 without exception and preserves that byte in the decoded value.
 
-## 4. 형식 명세 S2 (pre/post)
+## 4. Formal specification S2 (pre/post)
 
 ```text
 S2:  ∀ c ∈ D:  reject(c) = forbid(c)
@@ -47,9 +47,9 @@ S2:  ∀ c ∈ D:  reject(c) = forbid(c)
   defect(c)  = forbid(c) ∧ ¬reject(c)
 ```
 
-- 전건 D의 배제 항은 모델 게이트 밖의 구조 경로다: 10(LF)·13(CR)은 단일행 문자열 종단 검사(`lexer.nim:585-586`), 34(`"`)는 구분자, 92(`\`)는 이스케이프 경로로 빠진다. c=0은 `EOF* = '\0'` 별칭(`lexer.nim:72`)으로 인한 우연 거부 경로라 도메인에서 제외한다(§9).
-- `forbid`는 S2가 요구하는 "반드시 거부" 집합이다. 탭(9)은 TOML 문자열 문법상 wschar(%x20/%x09)로 허용되므로 금지 집합에서 제외된다.
-- 파이프라인 프라그마 형태(`if` 없음 — p0d2f 개정 교훈; 커널 함수는 bool 반환):
+- The exclusion terms of the precondition D are structural paths outside the model gate: 10(LF)·13(CR) are the single-line string termination checks (`lexer.nim:585-586`), 34(`"`) is the delimiter, and 92(`\`) falls into the escape path. c=0 is excluded from the domain because it is an incidental rejection path caused by the `EOF* = '\0'` alias (`lexer.nim:72`) (§9).
+- `forbid` is the "must reject" set required by S2. The tab (9) is allowed as a wschar (%x20/%x09) by the TOML string grammar, so it is excluded from the forbidden set.
+- Pipeline pragma form (no `if` — the lesson of the p0d2f amendment; the kernel function returns bool):
 
 ```nim
 {.axiom: [
@@ -57,107 +57,107 @@ S2:  ∀ c ∈ D:  reject(c) = forbid(c)
   post: (result == ((c <= 8) or (c >= 10 and c <= 31) or (c == 127)))].}
 ```
 
-- 단일 구체 입력 평가: `defect(7) = true ∧ ¬false = true`(위반), `defect(8) = true ∧ ¬true = false`(충족), `defect(9) = false`(도메인 내 비금지, 충족).
+- Evaluation on a single concrete input: `defect(7) = true ∧ ¬false = true` (violation), `defect(8) = true ∧ ¬true = false` (satisfied), `defect(9) = false` (not forbidden within the domain, satisfied).
 
-## 5. 모델 명세 (인증 산술 모델)
+## 5. Model specification (certified arithmetic model)
 
-| 커널 | 정의 | 원본 추출 근거 | 기대 판정 |
+| Kernel | Definition | Original extraction basis | Expected verdict |
 |---|---|---|---|
-| `d2StringGateReject` (결함 커널) | `func d2StringGateReject*(c: int): bool = (c == 8) or (c == 16) or (c == 31) or (c == 127)` | `lexer.nim:588` — `scanSingleLineString`(`:565`) 루프의 유일한 바이트 분류 게이트의 기계적 추출. 멀티라인 확장은 `:554`. 원본 `lexer.nim` sha256 @`4aa8e22`: `19d69eed84f74c51fa1784b2e71a4525abc8d2b8aa854c567565d2d603133f4d` (동일 커밋 동일 파일 — `../p0d2f/SPEC.md` 커널 표에서 전승) | **SAT** — 반례 c = 7 (reject(7) = false ≠ forbid(7) = true) |
-| `d2CommentGateReject` (대조 커널) | `func d2CommentGateReject*(c: int): bool = (c <= 8) or (c >= 10 and c <= 31) or (c == 127)` | `lexer.nim:75` — `invalidCommentChar = {'\x00'..'\x08', '\x0A'..'\x1F', '\x7F'}`의 기계적 추출(사용처 `:224`). 저장소 자신이 인접 텍스트 경로(주석)에 채택한 집합으로, S2의 forbid와 **집합으로 동일** | **UNSAT** — 모델이 전건 D 전체에서 forbid와 동치 |
+| `d2StringGateReject` (defect kernel) | `func d2StringGateReject*(c: int): bool = (c == 8) or (c == 16) or (c == 31) or (c == 127)` | `lexer.nim:588` — the mechanical extraction of the only byte-classification gate in the `scanSingleLineString` (`:565`) loop. The multiline extension is at `:554`. Original `lexer.nim` sha256 @`4aa8e22`: `19d69eed84f74c51fa1784b2e71a4525abc8d2b8aa854c567565d2d603133f4d` (same commit, same file — carried over verbatim from the kernel table in `../p0d2f/SPEC.md`) | **SAT** — counterexample c = 7 (reject(7) = false ≠ forbid(7) = true) |
+| `d2CommentGateReject` (contrast kernel) | `func d2CommentGateReject*(c: int): bool = (c <= 8) or (c >= 10 and c <= 31) or (c == 127)` | `lexer.nim:75` — the mechanical extraction of `invalidCommentChar = {'\x00'..'\x08', '\x0A'..'\x1F', '\x7F'}` (usage site `:224`). It is the set the repository itself adopted on the adjacent text path (comments), and it is **identical as a set** to the forbid of S2 | **UNSAT** — the model is equivalent to forbid over the entire precondition D |
 
-- **모델 문장**: solver가 추론하는 대상은 정의역 D 위의 한 정수 변수 c에 대한 두 bool 멤버십 함수다 — 결함 커널은 코드의 실제 게이트, 대조 커널은 저장소 자신의 정합 집합이다. 차동 구도는 p0d2f와 동일하다: 결함 커널만 SAT, 대조 커널은 UNSAT여야 하며, 대조 커널에서 SAT가 나면 주체가 아니라 명세 주입의 결함이다.
-- **대응 근거(1줄)**: 잘 형성된 문서 `k = "a⟨c⟩b"`에서 문자열 내부 문자 c에 대해 `scanSingleLineString` 루프가 수행하는 유일한 제어문자 판정이 `:588`의 집합 검사이고(구분자·CR/LF/EOF는 `:583-586`의 구조 종료로 별도 경로), UTF-8 검사기는 0x00–0x1F 전체를 수용(`private/utf8_validate.nim:17-18`의 테이블 첫 행 전부 0)하므로 decode의 성공/실패가 정확히 `reject(c)`의 부정으로 결정된다.
-- 공개 API 유입 경로: `parseValue`의 `of '\"'` 분기(`lexer.nim:1805-1811`)가 `value = TomlValueRef(kind: TomlKind.String)` 후 `scanString(lex, value.stringVal, StringType.Basic)`을 호출 — `Toml.decode(…, TomlValueRef)`가 곧바로 이 게이트에 도달한다.
+- **Model statement**: what the solver reasons about is two bool membership functions over a single integer variable c on the domain D — the defect kernel is the code's actual gate, and the contrast kernel is the repository's own consistency set. The differential structure is the same as in p0d2f: only the defect kernel may be SAT, while the contrast kernel must be UNSAT; if the contrast kernel turns out SAT, the defect lies not in the subject but in the specification injection.
+- **Correspondence basis (1 line)**: in a well-formed document `k = "a⟨c⟩b"`, the only control-character decision that the `scanSingleLineString` loop performs for the in-string character c is the set check at `:588` (the delimiter·CR/LF/EOF take a separate structural-termination path at `:583-586`), and the UTF-8 validator accepts all of 0x00–0x1F (the entire first row of the table at `private/utf8_validate.nim:17-18` is 0), so the success/failure of decode is determined exactly by the negation of `reject(c)`.
+- Public API ingress path: the `of '\"'` branch of `parseValue` (`lexer.nim:1805-1811`) sets `value = TomlValueRef(kind: TomlKind.String)` and then calls `scanString(lex, value.stringVal, StringType.Basic)` — `Toml.decode(…, TomlValueRef)` reaches this gate directly.
 
-## 6. 반례 입력
+## 6. Counterexample input
 
-| 항목 | 값 |
+| Item | Value |
 |---|---|
-| 입력 문서 | `k = "a\x07b"` — 닫힌 따옴표 사이에 **원시 바이트 0x07(BEL)** 하나(16진: `6B 20 3D 20 22 61 07 62 22`) |
-| 모델 출력 | `reject(7) = false` → decode 수용 예측 |
-| 명세 요구 | `forbid(7) = true` → `TomlError` 발생이어야 함 |
-| defect | `defect(7) = true` — 명세 위반 확정 |
+| Input document | `k = "a\x07b"` — a single **raw byte 0x07(BEL)** between the closing quotes (base 16: `6B 20 3D 20 22 61 07 62 22`) |
+| Model output | `reject(7) = false` → decode acceptance prediction |
+| Specification requirement | `forbid(7) = true` → a `TomlError` must be raised |
+| defect | `defect(7) = true` — confirmed violation of the specification |
 
-보조 반례(같은 결함의 다른 실현, S2 평가와 동일): `k = """a\x08b"""`(멀티라인, `:554`가 8을 누락 — `reject_multi(8) = false`), `k = 'a\x07b'`(리터럴 문자열, 동일 게이트 `:588`).
+Auxiliary counterexamples (other realizations of the same defect, identical to the S2 evaluation): `k = """a\x08b"""` (multiline, `:554` omits 8 — `reject_multi(8) = false`), `k = 'a\x07b'` (literal string, the same gate `:588`).
 
-## 7. 대조 입력
+## 7. Contrast input
 
-| 입력 | forbid | reject(코드) | 판정 |
+| Input | forbid | reject(code) | Verdict |
 |---|---|---|---|
-| `k = "a\x08b"` (원시 0x08) | true | true → raise | **명세 충족** (1차 대조 — 같은 "문자열 내부 제어문자" 가족 내부의 차동) |
-| `k = "a\x10b"` (원시 0x10) | true | true → raise | 명세 충족 |
-| `k = "a\x7Fb"` (원시 0x7F) | true | true → raise | 명세 충족 |
-| `k = "a\tb"` (원시 0x09 탭) | false | false → 수용 | 명세 충족 (비금지 측 — 보편 거부 아님을 배제) |
+| `k = "a\x08b"` (raw 0x08) | true | true → raise | **Specification satisfied** (1st contrast — a differential within the same "control character inside strings" family) |
+| `k = "a\x10b"` (raw 0x10) | true | true → raise | Specification satisfied |
+| `k = "a\x7Fb"` (raw 0x7F) | true | true → raise | Specification satisfied |
+| `k = "a\tb"` (raw 0x09 tab) | false | false → accept | Specification satisfied (non-forbidden side — rules out universal rejection) |
 
-대조군이 성립하므로 SAT는 "렉서가 문자열 검사를 전혀 하지 않는다"가 아니라 "정확히 {1..7, 11, 12, 14..15, 17..30} ∖ (구조 경로)"의 멤버에서만 나오는 **집합 갭 결함**임이 입증된다.
+Since the contrast set holds, SAT arises only from members of exactly {1..7, 11, 12, 14..15, 17..30} ∖ (structural paths), proving that this is a **set-gap defect** and not "the lexer performs no string checking at all".
 
-## 8. 재생 절차 (공개 API — 컴파일 검증은 후속 단계)
+## 8. Replay procedure (public API — compile verification is a later stage)
 
-하니스가 자체 포함해야 하는 타입 선언: **없다** — `Toml`, `TomlValueRef`, `TomlKind`, `TomlError`는 모두 `toml_serialization` 모듈에서 수출된다(`types.nim:106` `TomlValueRef* = ref TomlValue`, `TomlValue.stringVal*` `:120`). 유일한 추가 import는 16진 관측용 `std/strutils`(선택).
+Type declarations the harness must include itself: **none** — `Toml`, `TomlValueRef`, `TomlKind`, and `TomlError` are all exported from the `toml_serialization` module (`types.nim:106` `TomlValueRef* = ref TomlValue`, `TomlValue.stringVal*` `:120`). The only additional import is `std/strutils` for base-16 observation (optional).
 
 ```nim
-# replay.nim — pristine 주체에 --path: 만으로 컴파일 (주체 수정 없음)
+# replay.nim — compile against the pristine subject with only --path: (no modification of the subject)
 import toml_serialization
 
-# 반례: 원시 0x07 — 명세는 raise 요구, 결함 모델은 수용 예측
-let vCx = Toml.decode("k = \"a\x07b\"", TomlValueRef)   # (A) 예외 없이 반환 ← 위반 관측
-doAssert vCx.kind == TomlKind.Table                      # 키 "" → 루트 테이블 반환
+# counterexample: raw 0x07 — the specification demands a raise, the defect model predicts acceptance
+let vCx = Toml.decode("k = \"a\x07b\"", TomlValueRef)   # (A) returns without exception ← violation observation
+doAssert vCx.kind == TomlKind.Table                      # key "" → returns the root table
 doAssert vCx.tableVal["k"].kind == TomlKind.String
-doAssert vCx.tableVal["k"].stringVal == "a\x07b"         # 0x07이 값에 보존됨
+doAssert vCx.tableVal["k"].stringVal == "a\x07b"         # 0x07 is preserved in the value
 
-# 대조: 원시 0x08 — 명세 요구대로 raise
+# contrast: raw 0x08 — raises as the specification requires
 try:
   discard Toml.decode("k = \"a\x08b\"", TomlValueRef)
-  doAssert false            # 도달하면 대조도 실패 → 결함의 판별력 상실
+  doAssert false            # if reached, the contrast also fails → loss of the defect's discriminating power
 except TomlError:
-  discard                   # 기대 동작
+  discard                   # expected behavior
 
-# 보조 반례(멀티라인 갭)·비금지 대조(탭)
-discard Toml.decode("k = \"\"\"a\x08b\"\"\"", TomlValueRef)  # (B) 수용 ← 위반 관측
-discard Toml.decode("k = \"a\tb\"", TomlValueRef)            # (C) 수용 — 정상
+# auxiliary counterexample (multiline gap)·non-forbidden contrast (tab)
+discard Toml.decode("k = \"\"\"a\x08b\"\"\"", TomlValueRef)  # (B) accepted ← violation observation
+discard Toml.decode("k = \"a\tb\"", TomlValueRef)            # (C) accepted — normal
 ```
 
-- **컴파일**: `nim c --skipParentCfg --skipUserCfg --path:<주체 루트> replay.nim` — `--skipParentCfg`는 Axiom3 트리 안에서 실행할 때 상위 `nim.cfg` 무결성 후크가 외부 빌드를 가로채는 것을 피하기 위함이다(주체 자체는 구성 개입이 없다).
-- **비교 관측치**: (A)·(B)는 **exit 0 + 디코딩 값에 제어 바이트 보존**(명세는 `TomlError` 요구 → 불일치 = 결함), (C)·대조 0x08은 **`TomlError` 발생**(명세와 일치). (A)가 raise로 끝나면 반례가 기각되고, 0x08 대조가 raise하지 않으면 차동 구도 자체가 무효다.
-- 본 문서는 이 재생을 실행하지 않았다(범위 교정). 참고(범위 밖, 근거로 미채택): 작성 과정에서 하니스 초안이 우연히 1회 실행되어 (A)의 decode가 예외 없이 반환되는 것이 관측되었으나, 해당 시도는 하니스 형태 단언 결함으로 불완전한 관측이므로 확정 판정은 후속 재생 단계에 맡긴다.
+- **Compilation**: `nim c --skipParentCfg --skipUserCfg --path:<subject root> replay.nim` — `--skipParentCfg` is there to avoid the parent `nim.cfg` integrity hook intercepting external builds when run inside the Axiom3 tree (the subject itself has no configuration interference).
+- **Comparative observation**: (A)·(B) yield **exit 0 + the control byte preserved in the decoded value** (the specification demands a `TomlError` → mismatch = defect), whereas (C)·the 0x08 contrast yield a **`TomlError`** (consistent with the specification). If (A) ends in a raise, the counterexample is rejected; if the 0x08 contrast does not raise, the differential structure itself is invalid.
+- This document did not execute this replay (scope correction). For reference (out of scope, not adopted as evidence): while drafting, the harness draft was accidentally executed 1 time, and it was observed that the decode of (A) returns without exception; however, that attempt was an incomplete observation because of a defect in the harness's shape assertion, so the definitive verdict is left to the later replay stage.
 
-## 9. 가정·범위 한계
+## 9. Assumptions and scope limits
 
-1. **S2가 다루지 않는 것**: 키 이름·주석 경로의 행동, 멀티라인 줄바꿈 규칙(LF/CRLF/bare-CR), 이스케이프 시퀀스 유효성, 다중바이트 UTF-8, 위치별 다중 제어문자 조합. 멀티라인 갭(`:554`)은 보조 반례로만 제시하며 1차 모델은 단일행 `:588`이다.
-2. **forbid의 출처**: README `:65`가 부합을 주장하는 TOML v1.0.0 ABNF(basic/literal 문자열에서 제어문자 배제, wschar=%x20/%x09만 허용)가 결정 근거며 v1.1.0도 이를 유지한다고 본다 — 단, v1.1.0 초·본문 텍스트의 재대조는 본 슬라이스에서 수행하지 않았다. 대신 **v1.0.0-전용 독해만으로도 위반이 성립**하고(0x07은 v1.0.0에서 이미 금지), 저장소 자신이 `:75`의 주석 집합에 동일 집합을 채택한 점이 외부 문서 해석과 독립적인 내부 정합 근거다.
-3. **코드↔모델 대응 중 근거(evidence)만 확보된 부분**: (i) "`:588`이 문자열 내부 문자의 유일한 제어문자 판정"이라는 명제는 루프 구조의 정적 판독 근거이지 형식 증명이 아니다. (ii) UTF-8 테이블 통과는 `utf8_validate.nim:17-18`의 테이블 값 판독이다. (iii) 대조 커널의 UNSAT는 "invalidCommentChar가 forbid와 집합 동일"이라는 구성적 사실이지, 주석 경로 런타임 행동의 검증이 아니다. (iv) c=0(NUL)은 `EOF*='\0'`(`:72`) 별칭 때문에 `:586`에서 **우연히** 거부되는 유일 도메인 외점이라 전건에서 배제했다 — 이 배제 자체도 코드 판독 근거다.
-4. **관측 계약**: 반례/대조의 런타임 관측치는 후속 재생 단계가 확정한다. 본 문서의 기여는 인용이 검증된 명세와 기대 판정(SAT/UNSAT)뿐이다.
+1. **What S2 does not cover**: the behavior of key names and the comment path, multiline line-break rules (LF/CRLF/bare-CR), escape-sequence validity, multibyte UTF-8, and combinations of multiple control characters at different positions. The multiline gap (`:554`) is presented only as an auxiliary counterexample; the 1st model is the single-line `:588`.
+2. **Source of forbid**: the TOML v1.0.0 ABNF whose compliance is claimed by README `:65` (control characters excluded in basic/literal strings, only wschar=%x20/%x09 allowed) is the determining basis, and v1.1.0 is taken to maintain it — however, a re-verification against the v1.1.0 preamble/body text was not performed in this slice. Instead, **the violation already holds under a v1.0.0-only reading** (0x07 was already forbidden in v1.0.0), and the fact that the repository itself adopted the same set in the comment set at `:75` is an internal consistency basis independent of external document interpretation.
+3. **Parts of the code↔model correspondence for which only evidence has been secured**: (i) the claim that "`:588` is the only control-character decision for in-string characters" is a basis from static reading of the loop structure, not a formal proof. (ii) The UTF-8 table pass-through is a reading of the table values at `utf8_validate.nim:17-18`. (iii) The UNSAT of the contrast kernel is the constructive fact that "invalidCommentChar is identical as a set to forbid", not a verification of the runtime behavior of the comment path. (iv) c=0(NUL) is the single point outside the domain that is rejected **incidentally** at `:586` because of the `EOF*='\0'` (`:72`) alias, so it was excluded from the precondition — this exclusion is itself a basis from code reading.
+4. **Observation contract**: the runtime observations of the counterexample/contrast are fixed by the later replay stage. The contribution of this document is limited to a specification with verified citations and the expected verdict (SAT/UNSAT).
 
-## 10. 근거 원장 (양측 인용 원문 — 전 항 주체 바이트 대조 완료)
+## 10. Evidence ledger (verbatim citations from both sides — every item checked against the subject bytes)
 
-**주장 측 (README)**:
-- `README.md:64-66` — `## Spec compliance` / `nim-toml-serialization implements [v1.1.0](https://github.com/toml-lang/toml/releases/tag/1.1.0)` / `TOML spec and pass these test suites:` (`:68-69` iarna·burntsushi 나열)
-- `README.md:43` — `Encode Nim data types into a **subset** of TOML.`(인코더는 subset임을 스스로 인정 — 디코더 부합 주장과의 비교 대조)
+**Claim side (README)**:
+- `README.md:64-66` — `## Spec compliance` / `nim-toml-serialization implements [v1.1.0](https://github.com/toml-lang/toml/releases/tag/1.1.0)` / `TOML spec and pass these test suites:` (`:68-69` listing iarna·burntsushi)
+- `README.md:43` — `Encode Nim data types into a **subset** of TOML.`(the encoder itself admits the subset — a comparative contrast with the decoder compliance claim)
 
-**코드 측 (결함)**:
-- `lexer.nim:588-589` — `    if ord(next) in {8, 16, 31, 127}:` / `      raiseInvalidChar(lex, next)` (단일행, `scanSingleLineString` `:565` 내부)
-- `lexer.nim:554-555` — `    if ord(next) in {16, 31, 127}:` / `      raiseInvalidChar(lex, next)` (멀티라인, `scanMultiLineString` `:468` 내부)
-- `lexer.nim:583-586` — `if next == delimiter: break` / `if next in {CR, LF, EOF}:` / `raiseTomlErr(lex, errUnterminatedString)` (구조 종료 경로 — 전건 배제 근거)
-- `lexer.nim:72` — `  EOF* = '\0'` (NUL 우연 거부 경로)
-- `lexer.nim:1805-1811` — `of '\"':` / `advance(lex)` / `value = TomlValueRef(kind: TomlKind.String)` / `discard scanString(lex, value.stringVal, StringType.Basic)` (공개 API 유입 경로)
-- `private/utf8_validate.nim:17-18` — `const utf8Table = [` / `  0'u8,0,0,…,0, # 00..1f` (0x00–0x1F 전체 수용)
+**Code side (defect)**:
+- `lexer.nim:588-589` — `    if ord(next) in {8, 16, 31, 127}:` / `      raiseInvalidChar(lex, next)` (single-line, inside `scanSingleLineString` `:565`)
+- `lexer.nim:554-555` — `    if ord(next) in {16, 31, 127}:` / `      raiseInvalidChar(lex, next)` (multiline, inside `scanMultiLineString` `:468`)
+- `lexer.nim:583-586` — `if next == delimiter: break` / `if next in {CR, LF, EOF}:` / `raiseTomlErr(lex, errUnterminatedString)` (structural termination path — basis for the exclusion from the precondition)
+- `lexer.nim:72` — `  EOF* = '\0'` (NUL incidental rejection path)
+- `lexer.nim:1805-1811` — `of '\"':` / `advance(lex)` / `value = TomlValueRef(kind: TomlKind.String)` / `discard scanString(lex, value.stringVal, StringType.Basic)` (public API ingress path)
+- `private/utf8_validate.nim:17-18` — `const utf8Table = [` / `  0'u8,0,0,…,0, # 00..1f` (accepts all of 0x00–0x1F)
 
-**코드 측 (저장소 자신의 정합 집합 — 대조 커널·결함성 시증)**:
-- `lexer.nim:75` — `  invalidCommentChar = {'\x00'..'\x08', '\x0A'..'\x1F', '\x7F'}` (S2의 forbid와 집합 동일)
-- `lexer.nim:224` — `        elif next in invalidCommentChar:` (주석 경로 사용처)
-- `writer.nim:131-134` — `proc writeValue*(w: var TomlWriter, s: string)` / `lowEscape = {'\0'..'\31'} - {'\b', '\e', '\f', '\n', '\r', '\t'}` / `highEscape = {'\127'..'\255'}` (인코더는 이 바이트들을 항상 이스케이프 — 디코더가 수용하는 문서는 인코더가 스스로 출력하지 않는 형태)
+**Code side (the repository's own consistency set — contrast kernel and proof of defectiveness)**:
+- `lexer.nim:75` — `  invalidCommentChar = {'\x00'..'\x08', '\x0A'..'\x1F', '\x7F'}` (identical as a set to the forbid of S2)
+- `lexer.nim:224` — `        elif next in invalidCommentChar:` (usage site on the comment path)
+- `writer.nim:131-134` — `proc writeValue*(w: var TomlWriter, s: string)` / `lowEscape = {'\0'..'\31'} - {'\b', '\e', '\f', '\n', '\r', '\t'}` / `highEscape = {'\127'..'\255'}` (the encoder always escapes these bytes — documents the decoder accepts are forms the encoder itself would never emit)
 
-**테스트·픽스처 측 (스위트가 갭을 못 잡는 근거)**:
-- `tests/test_decoder.nim:618-632` — `test "invalid chars in comment":` 블록(`# com\x00ment`, `\x08`, `\x0A`, `\x1F`, `\x7F` — **주석만** 검사)
-- `tests/test_lexer.nim:264-265` — `expect TomlError:` / `testBasicString("hello\b", "hello\b")` (문자열 내용 검사는 0x08뿐 — 거부 집합 안의 멤버)
-- `tests/test_lexer.nim:721-725` — `test "control char not allowed in comments":` / `testComment("# TOML \x01 doc\n[miaw]", '[')` (0x01도 주석에서만)
-- `tests/tomls/iarna/invalid/string-basic-control-{1,2,3,4}.toml` — hexdump: 각각 `a = "null\x00"`, `a = "ctrl-P\x10"`, `a = "ctrl-_\x1F"`, `a = "0x7f\x7F"` — 픽스처의 제어 바이트가 정확히 **{0x00, 0x10, 0x1F, 0x7F} = 거부 집합 멤버뿐** (멀티라인 control-1/2 = 0x00/0x10 동일 구조) → 스위트는 갭 멤버(예: 0x07)를 영구히 검사하지 못함
+**Test and fixture side (basis for the suite being unable to catch the gap)**:
+- `tests/test_decoder.nim:618-632` — `test "invalid chars in comment":` block(`# com\x00ment`, `\x08`, `\x0A`, `\x1F`, `\x7F` — checks **comments only**)
+- `tests/test_lexer.nim:264-265` — `expect TomlError:` / `testBasicString("hello\b", "hello\b")` (the string content check covers only 0x08 — a member inside the rejection set)
+- `tests/test_lexer.nim:721-725` — `test "control char not allowed in comments":` / `testComment("# TOML \x01 doc\n[miaw]", '[')` (0x01 likewise only in comments)
+- `tests/tomls/iarna/invalid/string-basic-control-{1,2,3,4}.toml` — hexdump: respectively `a = "null\x00"`, `a = "ctrl-P\x10"`, `a = "ctrl-_\x1F"`, `a = "0x7f\x7F"` — the control bytes of the fixtures are exactly **{0x00, 0x10, 0x1F, 0x7F} = rejection set members only** (the multiline control-1/2 have the same structure, 0x00/0x10) → the suite can never check gap members (e.g. 0x07)
 
-## 11. 발견 보고서 대비 정정·주해 기록
+## 11. Corrections and adjudication records against the discovery reports
 
-1. **agentA 후보 3 위반 집합 오탈자**: 보고서의 단일행 위반 집합 표기 `{0x01..0x07, 0x0B, 0x0C, 0x0E..0x15, 0x17..0x1E}`에서 **0x16(22)이 누락**되어 있다 — 22 ∉ {8,16,31,127}이므로 위반 멤버가 맞다. 정정: 위반 멤버는 {1..7, 11, 12, 14, 15, **17..30**}이되, 10(LF)·13(CR)은 구조 경로(`:585-586`)라 반례 대상에서 제외.
-2. **agentB 후보 1 README 범위**: `README.md:322-327` → 실제 주장 범위는 `:321-327`("ordinal built-in writer" 문장은 `:323`, "ordinal = TOML integer"는 `:327`). 경미.
-3. **agentA 후보 1 스킵 블록 귀속**: v1.0.0 블록(47-64)과 v1.1.0 블록(73-108)의 개별 스킵 귀속이 두 보고 간 상이하다(예: `invalid/control/bare-cr`는 검증상 `run_test.sh:100`). 채택한 사실은 총계(파일 내 `-skip=` **50개**)와 대표 라인(`:77-81` datetime군, `:98` hex-escape, `:100-102` control군)뿐이다.
-4. **c=0(NUL) 처리**: agentA의 "NUL only raises accidentally" 서술은 `lexer.nim:72` + `:586`로 검증됐고, 이를 모델 정의역 배제 사유로 형식화했다(§4 전건, §9-3).
-5. **그 외**: 채점표·원장에 채택된 모든 인용(`lexer.nim:75/554/588/1805-1811`, `writer.nim:131-134/166-180/225-234/466/482-484/88-89`, `value_ops.nim:29-36/86-87`, `decoder.nim:48/73/77`, `reader.nim:134-136/152-154/324-325/345-346`, `format.nim:28-36`, `test_decoder.nim:303/338-345/592-598/618-632/634-636`, `test_lexer.nim:264-265/721-725`, `test_encoder.nim:196-208`, `test_toml_v110.nim:61-68`, `test_features.nim:276/347-351/398-401`, `test_spec.nim:70-73`, `toml_serialization.nimble:4`, `README.md:39-58/82/187-194/321-336/350-362`, `spec_test/run_test.sh`, 픽스처 hexdump, 태그 v0.2.18, 커밋 62dcb2c·096659b)는 주체 바이트와 일치했다. agentA의 `lexer.nim:714-715`(`scanName`의 `notin {'a'..'z','A'..'Z','0'..'9','_','-'}` → `raiseIllegalChar`)도 확인 — 후보 2의 "자기 렉서가 재파싱 거부" 근거로 유효.
+1. **agentA candidate 3, typo in the violating set**: in the report's single-line violating set notation `{0x01..0x07, 0x0B, 0x0C, 0x0E..0x15, 0x17..0x1E}`, **0x16(22) is missing** — since 22 ∉ {8,16,31,127}, the violating member is correct. Correction: the violating members are {1..7, 11, 12, 14, 15, **17..30**}, but 10(LF)·13(CR) are excluded from the counterexample because they are structural paths (`:585-586`).
+2. **agentB candidate 1, README scope**: `README.md:322-327` → the actual claim range is `:321-327` (the "ordinal built-in writer" sentence is at `:323`, "ordinal = TOML integer" at `:327`). Minor.
+3. **agentA candidate 1, attribution of the skip blocks**: the per-skip attribution of the v1.0.0 block (47-64) and the v1.1.0 block (73-108) differs between the two reports (e.g. `invalid/control/bare-cr` is at `run_test.sh:100` upon verification). The only facts adopted are the total (`-skip=` **50** occurrences in the file) and the representative lines (`:77-81` datetime group, `:98` hex-escape, `:100-102` control group).
+4. **Treatment of c=0(NUL)**: agentA's description "NUL only raises accidentally" was verified with `lexer.nim:72` + `:586`, and this was formalized as the reason for excluding it from the model domain (§4 precondition, §9-3).
+5. **Everything else**: all citations adopted in the scoring table and ledger (`lexer.nim:75/554/588/1805-1811`, `writer.nim:131-134/166-180/225-234/466/482-484/88-89`, `value_ops.nim:29-36/86-87`, `decoder.nim:48/73/77`, `reader.nim:134-136/152-154/324-325/345-346`, `format.nim:28-36`, `test_decoder.nim:303/338-345/592-598/618-632/634-636`, `test_lexer.nim:264-265/721-725`, `test_encoder.nim:196-208`, `test_toml_v110.nim:61-68`, `test_features.nim:276/347-351/398-401`, `test_spec.nim:70-73`, `toml_serialization.nimble:4`, `README.md:39-58/82/187-194/321-336/350-362`, `spec_test/run_test.sh`, fixture hexdump, tag v0.2.18, commits 62dcb2c·096659b) matched the subject bytes. agentA's `lexer.nim:714-715` (`notin {'a'..'z','A'..'Z','0'..'9','_','-'}` in `scanName` → `raiseIllegalChar`) was also confirmed — valid as the basis for candidate 2's "its own lexer rejects re-parsing".
