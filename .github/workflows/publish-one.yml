@@ -1,48 +1,14 @@
 # Draft-only DEV.to path.
-# Reconciles an existing article by canonical URL, creates or adopts a draft,
-# and verifies draft state through the authenticated /me/all re-list.
+# Triggered only by repository_dispatch from the automation identity.
+# The client_payload is untrusted free-form JSON: validate it strictly,
+# pass values via env, and never interpolate raw payload into a shell.
 # It never publishes: an already published article fails with published_exists
 # and requires the unpublish-one workflow first.
-# Legacy status markers (.success/.failed) are intentionally not used here.
 name: Draft One
 
 on:
-  workflow_dispatch:
-    inputs:
-      post_path:
-        description: "Single markdown file under src/posts"
-        required: true
-        default: "src/posts/archright/2026-05-04-6.md"
-        type: string
-      platform:
-        description: "Publish target platform"
-        required: true
-        default: "devto"
-        type: choice
-        options:
-          - devto
-      dry_run:
-        description: "List and decide only, no write to DEV.to"
-        required: true
-        default: "true"
-        type: choice
-        options:
-          - "true"
-          - "false"
-      confirm:
-        description: "Type DRAFT to allow a non-dry-run draft creation"
-        required: true
-        default: ""
-        type: string
-      fail_injection:
-        description: "Failure injection drill (lost-response handling)"
-        required: true
-        default: "none"
-        type: choice
-        options:
-          - none
-          - pre_post
-          - post_response_loss
+  repository_dispatch:
+    types: [draft-one]
 
 permissions:
   contents: read
@@ -80,27 +46,105 @@ jobs:
           PUPPETEER_SKIP_DOWNLOAD: "1"
         run: pnpm install --frozen-lockfile --prod=false
 
-      - name: Require confirm=DRAFT for non-dry-run
+      - name: Validate repository_dispatch payload
+        id: payload
         shell: bash
         env:
-          INPUT_DRY_RUN: ${{ inputs.dry_run }}
-          INPUT_CONFIRM: ${{ inputs.confirm }}
+          CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
         run: |
           set -euo pipefail
-          if [ "$INPUT_DRY_RUN" != "true" ] && [ "$INPUT_CONFIRM" != "DRAFT" ]; then
-            echo "Refusing to write: dry_run=false requires confirm=DRAFT."
-            exit 1
-          fi
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          let payload;
+          try {
+            payload = JSON.parse(process.env.CLIENT_PAYLOAD || "{}");
+          } catch {
+            console.error("client_payload must be valid JSON");
+            process.exit(1);
+          }
+          if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+            console.error("client_payload must be an object");
+            process.exit(1);
+          }
+
+          const allowed = new Set([
+            "post_path",
+            "platform",
+            "dry_run",
+            "confirm",
+            "fail_injection",
+          ]);
+          for (const key of Object.keys(payload)) {
+            if (!allowed.has(key)) {
+              console.error(`unexpected client_payload key: ${key}`);
+              process.exit(1);
+            }
+          }
+
+          const postPath = payload.post_path;
+          if (
+            typeof postPath !== "string" ||
+            !postPath.startsWith("src/posts/") ||
+            postPath.startsWith("src/posts/ko/") ||
+            !postPath.endsWith(".md") ||
+            postPath.includes("..") ||
+            /[\r\n\\]/.test(postPath)
+          ) {
+            console.error("post_path must be a single markdown file under src/posts (not ko)");
+            process.exit(1);
+          }
+
+          if (payload.platform !== "devto") {
+            console.error("platform must be devto");
+            process.exit(1);
+          }
+
+          const rawDryRun = payload.dry_run;
+          const dryRun =
+            rawDryRun === true || rawDryRun === "true"
+              ? "true"
+              : rawDryRun === false || rawDryRun === "false"
+                ? "false"
+                : null;
+          if (dryRun === null) {
+            console.error("dry_run must be true or false");
+            process.exit(1);
+          }
+
+          const confirm = payload.confirm ?? "";
+          if (dryRun !== "true" && confirm !== "DRAFT") {
+            console.error("confirm must be DRAFT for a non-dry-run draft creation");
+            process.exit(1);
+          }
+
+          const failInjection = payload.fail_injection ?? "none";
+          if (
+            !["none", "pre_post", "post_response_loss"].includes(failInjection)
+          ) {
+            console.error("fail_injection must be none, pre_post, or post_response_loss");
+            process.exit(1);
+          }
+
+          const lines = [
+            `post_path=${postPath}`,
+            `platform=devto`,
+            `dry_run=${dryRun}`,
+            `confirm=${confirm}`,
+            `fail_injection=${failInjection}`,
+          ];
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `${lines.join("\n")}\n`);
+          NODE
 
       - name: Create and verify single draft
         shell: bash
         env:
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
           BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/
-          INPUT_POST_PATH: ${{ inputs.post_path }}
-          INPUT_PLATFORM: ${{ inputs.platform }}
-          INPUT_DRY_RUN: ${{ inputs.dry_run }}
-          INPUT_FAIL_INJECTION: ${{ inputs.fail_injection }}
+          INPUT_POST_PATH: ${{ steps.payload.outputs.post_path }}
+          INPUT_PLATFORM: ${{ steps.payload.outputs.platform }}
+          INPUT_DRY_RUN: ${{ steps.payload.outputs.dry_run }}
+          INPUT_FAIL_INJECTION: ${{ steps.payload.outputs.fail_injection }}
         run: |
           set -euo pipefail
           ARGS=(--publish-one "$INPUT_POST_PATH" --platform "$INPUT_PLATFORM")
@@ -113,14 +157,14 @@ jobs:
           pnpm exec tsx scripts/post-to-dev.ts "${ARGS[@]}"
 
       - name: Assert draft-only evidence
-        if: ${{ inputs.dry_run != 'true' }}
+        if: ${{ steps.payload.outputs.dry_run != 'true' }}
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require("node:fs");
           const result = JSON.parse(fs.readFileSync("publish-result.json", "utf8"));
-          const allowedStates = ["draft_verified", "draft_found"];
+          const allowedStates = ["draft_verified", "draft_found", "already_draft"];
           if (!allowedStates.includes(result.state)) {
             console.error(`unexpected state: ${result.state} (allowed: ${allowedStates.join(", ")})`);
             process.exit(1);

@@ -1,0 +1,10 @@
+# The automation identity may open PRs, but it must not merge changes to the
+# control plane without the owner's review.
+/.github/workflows/ @wintrover
+/.github/CODEOWNERS @wintrover
+/scripts/post-to-dev.ts @wintrover
+/scripts/procedure-gate.ts @wintrover
+/tests/devto-publish-one.test.ts @wintrover
+/tests/legacy-publish-isolation.test.ts @wintrover
+/CONTEXT.md @wintrover
+/AGENTS.md @wintrover
