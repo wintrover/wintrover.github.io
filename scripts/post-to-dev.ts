@@ -1276,9 +1276,14 @@ export type PublishOneFailInjection =
 	| "pre_post"
 	| "post_response_loss";
 
+// Draft-only: the run never publishes. `published_verified` and
+// `already_published` are legacy states kept only so persisted results from
+// older runs still map to a non-zero exit code.
 export type PublishOneState =
 	| "published_verified"
 	| "already_published"
+	| "published_exists"
+	| "draft_verified"
 	| "draft_found"
 	| "dry_run"
 	| "ambiguous"
@@ -1302,6 +1307,7 @@ export type PublishOneResult = {
 	id?: number;
 	slug?: string;
 	url?: string;
+	observedDraft?: boolean;
 	observedPublished?: boolean;
 	method: PublishOneMethod;
 	attempts: number;
@@ -1315,10 +1321,6 @@ type SleepLike = (ms: number) => Promise<void>;
 const DEVTO_API_ROOT = "https://dev.to/api";
 const DEVTO_LIST_PAGE_SIZE = 1000;
 const DEVTO_LIST_THROTTLE_MS = 350;
-const DEVTO_VERIFY_ATTEMPTS = 6;
-const DEVTO_VERIFY_SLEEP_MS = 10_000;
-const DEVTO_TEMP_SLUG_PATTERN = /-temp-slug-/i;
-const DEFAULT_DEVTO_USERNAME = "wintrover";
 const DEFAULT_PUBLISH_RESULT_PATH = "publish-result.json";
 
 function devtoSleep(ms: number): Promise<void> {
@@ -1355,20 +1357,6 @@ function normalizeDevtoTitle(title: string) {
 		.trim()
 		.toLowerCase()
 		.replace(/\s+/g, " ");
-}
-
-export function isDevtoPublished(article: DevtoArticle): boolean {
-	if (
-		typeof article.slug === "string" &&
-		DEVTO_TEMP_SLUG_PATTERN.test(article.slug)
-	) {
-		return false;
-	}
-	if (article.published === true) return true;
-	if (typeof article.published_at === "string" && article.published_at.trim()) {
-		return Number.isFinite(Date.parse(article.published_at));
-	}
-	return false;
 }
 
 export function parseDevtoArticle(value: unknown): DevtoArticle | null {
@@ -1467,10 +1455,6 @@ export function buildDevtoDraftPayload(
 	};
 }
 
-export function buildDevtoPublishPayload() {
-	return { article: { published: true } };
-}
-
 export async function listAllDevtoArticles(
 	apiKey: string,
 	options: {
@@ -1527,199 +1511,6 @@ export async function listAllDevtoArticles(
 	return articles;
 }
 
-export async function fetchLatestDevtoArticles(
-	options: { fetchFn?: FetchLike } = {},
-): Promise<DevtoArticle[]> {
-	const fetchFn = options.fetchFn || fetch;
-	let response: Response;
-	try {
-		response = await fetchFn(
-			`${DEVTO_API_ROOT}/articles/latest?per_page=${DEVTO_LIST_PAGE_SIZE}`,
-			{ headers: { Accept: "application/vnd.forem.api-v1+json" } },
-		);
-	} catch (error) {
-		throw new Error(
-			`DEV.to latest articles request failed: ${asErrorMessage(error)}`,
-		);
-	}
-	if (!response.ok) {
-		const errorText = await response.text().catch(() => "");
-		throw new Error(
-			`DEV.to latest articles request failed (${response.status}): ${errorText}`,
-		);
-	}
-	let raw: unknown;
-	try {
-		raw = await response.json();
-	} catch (error) {
-		throw new Error(
-			`DEV.to latest articles response was not valid JSON: ${asErrorMessage(error)}`,
-		);
-	}
-	const entries = Array.isArray(raw) ? raw : [];
-	const articles: DevtoArticle[] = [];
-	for (const entry of entries) {
-		const article = parseDevtoArticle(entry);
-		if (article) articles.push(article);
-	}
-	return articles;
-}
-
-export type DevtoVerification = {
-	verified: boolean;
-	attempts: number;
-	lastStatus: number;
-	observedPublished: boolean | null;
-	canonicalMatched: boolean | null;
-	article: DevtoArticle | null;
-	fallbackUsed: boolean;
-	ambiguous: boolean;
-};
-
-type LatestFeedVerification = {
-	verified: boolean;
-	ambiguous: boolean;
-	article: DevtoArticle | null;
-};
-
-const LATEST_FEED_UNVERIFIED: LatestFeedVerification = {
-	verified: false,
-	ambiguous: false,
-	article: null,
-};
-
-async function verifyArticleViaLatestFeed(
-	target: string,
-	articleId: number | undefined,
-	fetchFn: FetchLike,
-): Promise<LatestFeedVerification> {
-	if (!target && articleId === undefined) {
-		return LATEST_FEED_UNVERIFIED;
-	}
-	let articles: DevtoArticle[];
-	try {
-		articles = await fetchLatestDevtoArticles({ fetchFn });
-	} catch {
-		return LATEST_FEED_UNVERIFIED;
-	}
-	const idMatches =
-		articleId === undefined
-			? []
-			: articles.filter((article) => article.id === articleId);
-	const canonicalMatches = target
-		? articles.filter(
-				(article) =>
-					normalizeCanonicalUrl(article.canonical_url || "") === target,
-			)
-		: [];
-	const candidates = canonicalMatches.length > 0 ? canonicalMatches : idMatches;
-	if (candidates.length === 0) {
-		return LATEST_FEED_UNVERIFIED;
-	}
-	if (candidates.length > 1) {
-		return { verified: false, ambiguous: true, article: null };
-	}
-	const candidate = candidates[0];
-	const canonicalMatched = target
-		? normalizeCanonicalUrl(candidate.canonical_url || "") === target
-		: null;
-	if (canonicalMatched === false || !isDevtoPublished(candidate)) {
-		return { verified: false, ambiguous: false, article: candidate };
-	}
-	return { verified: true, ambiguous: false, article: candidate };
-}
-
-export async function verifyPublishedArticle(
-	slug: string,
-	canonicalUrl: string,
-	options: {
-		username?: string;
-		attempts?: number;
-		sleepMs?: number;
-		fetchFn?: FetchLike;
-		sleepFn?: SleepLike;
-		articleId?: number;
-	} = {},
-): Promise<DevtoVerification> {
-	const fetchFn = options.fetchFn || fetch;
-	const sleepFn = options.sleepFn || devtoSleep;
-	const maxAttempts = options.attempts ?? DEVTO_VERIFY_ATTEMPTS;
-	const sleepMs = options.sleepMs ?? DEVTO_VERIFY_SLEEP_MS;
-	const username = options.username || DEFAULT_DEVTO_USERNAME;
-	const target = normalizeCanonicalUrl(canonicalUrl);
-	let lastStatus = 0;
-	let lastObservedPublished: boolean | null = null;
-	let lastCanonicalMatched: boolean | null = null;
-	let lastArticle: DevtoArticle | null = null;
-	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-		await sleepFn(sleepMs);
-		let response: Response;
-		try {
-			response = await fetchFn(
-				`${DEVTO_API_ROOT}/articles/${encodeURIComponent(username)}/${encodeURIComponent(slug)}`,
-				{ headers: { Accept: "application/vnd.forem.api-v1+json" } },
-			);
-		} catch {
-			lastStatus = 0;
-			continue;
-		}
-		lastStatus = response.status;
-		if (!response.ok) continue;
-		let raw: unknown;
-		try {
-			raw = await response.json();
-		} catch {
-			continue;
-		}
-		const article = parseDevtoArticle(raw);
-		if (!article) continue;
-		lastArticle = article;
-		lastObservedPublished = isDevtoPublished(article);
-		lastCanonicalMatched = target
-			? normalizeCanonicalUrl(article.canonical_url || "") === target
-			: null;
-		if (lastObservedPublished && lastCanonicalMatched !== false) {
-			return {
-				verified: true,
-				attempts: attempt,
-				lastStatus,
-				observedPublished: lastObservedPublished,
-				canonicalMatched: lastCanonicalMatched,
-				article,
-				fallbackUsed: false,
-				ambiguous: false,
-			};
-		}
-	}
-	const fallback = await verifyArticleViaLatestFeed(
-		target,
-		options.articleId,
-		fetchFn,
-	);
-	if (fallback.verified && fallback.article) {
-		return {
-			verified: true,
-			attempts: maxAttempts,
-			lastStatus,
-			observedPublished: true,
-			canonicalMatched: target ? true : null,
-			article: fallback.article,
-			fallbackUsed: true,
-			ambiguous: false,
-		};
-	}
-	return {
-		verified: false,
-		attempts: maxAttempts,
-		lastStatus,
-		observedPublished: lastObservedPublished,
-		canonicalMatched: lastCanonicalMatched,
-		article: lastArticle,
-		fallbackUsed: false,
-		ambiguous: fallback.ambiguous,
-	};
-}
-
 type DevtoWriteOutcome =
 	| { kind: "ok"; body: unknown }
 	| { kind: "http_error"; status: number; errorText: string }
@@ -1727,7 +1518,7 @@ type DevtoWriteOutcome =
 
 async function writeDevtoArticle(
 	url: string,
-	method: "POST" | "PUT",
+	method: "POST",
 	apiKey: string,
 	body: unknown,
 	fetchFn: FetchLike,
@@ -1769,8 +1560,8 @@ export function buildGithubRunUrl(
 
 export function publishOneExitCode(result: PublishOneResult): number {
 	if (
-		result.state === "published_verified" ||
-		result.state === "already_published" ||
+		result.state === "draft_verified" ||
+		result.state === "draft_found" ||
 		result.state === "dry_run"
 	) {
 		return 0;
@@ -1788,6 +1579,8 @@ export function buildPublishOneSummary(result: PublishOneResult): string {
 		`- canonical: ${result.canonicalUrl || "n/a"}`,
 		`- url: ${result.url || "n/a"}`,
 		`- attempts: ${result.attempts}`,
+		`- observed draft: ${result.observedDraft ?? false}`,
+		`- observed published: ${result.observedPublished ?? false}`,
 		`- observed at: ${result.observedAt}`,
 	];
 	if (result.runUrl) lines.push(`- run: ${result.runUrl}`);
@@ -1813,7 +1606,6 @@ export type PublishOneOptions = {
 	apiKey?: string;
 	publicBaseUrl?: string;
 	resultPath?: string;
-	username?: string;
 	fetchFn?: FetchLike;
 	sleepFn?: SleepLike;
 	nowFn?: () => Date;
@@ -1915,13 +1707,15 @@ export async function runPublishOne(
 		});
 	}
 	if (action === "already_published" && selection.kind === "one") {
-		result.state = "already_published";
-		result.method = "already_published";
 		result.id = selection.article.id;
 		result.slug = selection.article.slug || prepared.slug;
 		result.url = selection.article.url;
 		result.observedPublished = true;
-		return finalize();
+		return failWith("published_exists", "already_published", {
+			detail:
+				"article is already published on DEV.to; run the unpublish-one workflow first, then re-run this draft-only flow",
+			id: selection.article.id,
+		});
 	}
 	if (options.dryRun) {
 		result.state = "dry_run";
@@ -2015,78 +1809,55 @@ export async function runPublishOne(
 		process.stdout.write(`[publish-one] created draft id=${articleId}\n`);
 	}
 
-	const published = await writeDevtoArticle(
-		`${DEVTO_API_ROOT}/articles/${articleId}`,
-		"PUT",
-		apiKey,
-		buildDevtoPublishPayload(),
-		fetchFn,
-	);
-	result.attempts += 1;
-	if (published.kind === "http_error") {
-		const classification = classifyDevtoError(
-			published.status,
-			published.errorText,
-		);
-		return classification === "failed"
-			? failWith("failed", "failed", {
-					stage: "draft_publish",
-					status: published.status,
-					classification,
-					draftId: articleId,
-				})
-			: failWith("unknown", "unknown", {
-					stage: "draft_publish",
-					status: published.status,
-					classification,
-					draftId: articleId,
-				});
-	}
-	if (published.kind === "unresolved") {
-		return failWith("unknown", "unknown", {
-			stage: "draft_publish",
-			draftId: articleId,
-			errorText: published.errorText,
-		});
-	}
-	const publishedArticle = parseDevtoArticle(published.body);
-	result.id = publishedArticle?.id ?? articleId;
-	if (publishedArticle?.slug) result.slug = publishedArticle.slug;
-	if (publishedArticle?.url) result.url = publishedArticle.url;
-
-	const verification = await verifyPublishedArticle(
-		result.slug || prepared.slug,
-		result.canonicalUrl,
-		{
-			username: options.username || process.env.DEVTO_USERNAME,
-			fetchFn,
-			sleepFn,
-			articleId: result.id,
-		},
-	);
-	if (verification.verified && verification.article) {
-		result.state = "published_verified";
-		result.observedPublished = true;
-		if (verification.article.url) result.url = verification.article.url;
-		if (verification.article.slug) result.slug = verification.article.slug;
-		if (verification.fallbackUsed) {
-			process.stdout.write(
-				`[publish-one] verified via latest feed fallback id=${verification.article.id}\n`,
-			);
-		}
-	} else {
-		result.state = "unknown";
-		result.observedPublished = verification.observedPublished ?? undefined;
+	let relisted: DevtoArticle[];
+	try {
+		relisted = await listAllDevtoArticles(apiKey, { fetchFn, sleepFn });
+	} catch (error) {
 		logError(
 			"post-to-dev",
-			"publish-one could not verify the published article",
-			{
-				slug: result.slug,
-				attempts: verification.attempts,
-				lastStatus: verification.lastStatus,
-			},
+			"publish-one could not re-list articles to verify the draft",
+			{ error },
 		);
+		return failWith("unknown", "unknown", {
+			stage: "draft_verify",
+			draftId: articleId,
+		});
 	}
+	const verifiedDraft = relisted.find((article) => article.id === articleId);
+	if (!verifiedDraft) {
+		return failWith("unknown", "unknown", {
+			stage: "draft_verify",
+			detail: "draft not found in the authenticated /me/all re-list",
+			draftId: articleId,
+		});
+	}
+	if (verifiedDraft.published !== false) {
+		return failWith("unknown", "unknown", {
+			stage: "draft_verify",
+			detail: "re-listed article is not an unpublished draft",
+			draftId: articleId,
+			observedPublished: verifiedDraft.published ?? null,
+		});
+	}
+	if (
+		normalizeCanonicalUrl(verifiedDraft.canonical_url || "") !==
+		result.canonicalUrl
+	) {
+		return failWith("unknown", "unknown", {
+			stage: "draft_verify",
+			detail: "re-listed draft canonical URL does not match",
+			draftId: articleId,
+		});
+	}
+	result.id = articleId;
+	if (verifiedDraft.slug) result.slug = verifiedDraft.slug;
+	if (verifiedDraft.url) result.url = verifiedDraft.url;
+	result.state = "draft_verified";
+	result.observedDraft = true;
+	result.observedPublished = false;
+	process.stdout.write(
+		`[publish-one] draft verified in /me/all id=${articleId}\n`,
+	);
 	return finalize();
 }
 

@@ -4,14 +4,11 @@ import path from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
 	buildDevtoDraftPayload,
-	buildDevtoPublishPayload,
 	buildGithubRunUrl,
 	buildPublishOneSummary,
 	classifyDevtoError,
 	type DevtoArticle,
 	decideReconcileAction,
-	fetchLatestDevtoArticles,
-	isDevtoPublished,
 	isLinkedInAutoPostEnabled,
 	listAllDevtoArticles,
 	normalizeCanonicalUrl,
@@ -22,7 +19,6 @@ import {
 	publishOneExitCode,
 	runPublishOne,
 	selectExistingDevtoArticle,
-	verifyPublishedArticle,
 } from "../scripts/post-to-dev";
 
 type FakeRequest = { url: string; init?: RequestInit };
@@ -116,64 +112,70 @@ function withTempDir(): { dir: string; dispose: () => void } {
 	};
 }
 
+// Stateful DEV.to fake: `/me/all` serves the mutable article store, so a
+// created draft shows up in later re-lists just like the real API.
 function articleApiRoutes(options: {
 	existing?: DevtoArticle[];
 	createdDraftId?: number;
-	published?: boolean;
-	verifyStatus?: number;
-	latestFeed?: unknown;
-	latestStatus?: number;
+	relistDraft?: "draft" | "missing" | "published" | "wrong-canonical";
 }) {
 	const slug = "publish-one-test";
-	const verifyBody = {
-		id: options.createdDraftId ?? 7,
-		slug,
-		url: `https://dev.to/wintrover/${slug}`,
-		published: options.published ?? true,
-		canonical_url: CANONICAL,
-	};
+	const articles = [...(options.existing ?? [])];
 	return makeFetch([
 		{
 			match: (url) => url.includes("/api/articles/me/all"),
 			respond: (url) => {
 				const page = Number(new URL(url).searchParams.get("page") || "1");
-				return fakeResponse(page === 1 ? (options.existing ?? []) : []);
+				return fakeResponse(page === 1 ? articles : []);
 			},
 		},
 		{
 			match: (url, init) =>
 				url.endsWith("/api/articles") && (init?.method ?? "GET") === "POST",
-			respond: () =>
-				fakeResponse({
-					id: options.createdDraftId ?? 501,
+			respond: () => {
+				const draftId = options.createdDraftId ?? 501;
+				const relist = options.relistDraft ?? "draft";
+				if (relist === "draft") {
+					articles.push(
+						article({
+							id: draftId,
+							slug,
+							url: `https://dev.to/wintrover/${slug}`,
+							published: false,
+							canonical_url: CANONICAL,
+						}),
+					);
+				}
+				if (relist === "published") {
+					articles.push(
+						article({
+							id: draftId,
+							slug,
+							url: `https://dev.to/wintrover/${slug}`,
+							published: true,
+							canonical_url: CANONICAL,
+						}),
+					);
+				}
+				if (relist === "wrong-canonical") {
+					articles.push(
+						article({
+							id: draftId,
+							slug,
+							url: `https://dev.to/wintrover/${slug}`,
+							published: false,
+							canonical_url: "https://example.com/wrong/",
+						}),
+					);
+				}
+				return fakeResponse({
+					id: draftId,
 					slug,
 					url: `https://dev.to/wintrover/${slug}`,
 					published: false,
 					canonical_url: CANONICAL,
-				}),
-		},
-		{
-			match: (url, init) =>
-				url.includes("/api/articles/") && (init?.method ?? "") === "PUT",
-			respond: (url) =>
-				fakeResponse({
-					id: Number(url.split("/api/articles/")[1]) || 501,
-					slug,
-					url: `https://dev.to/wintrover/${slug}`,
-					published: options.published ?? true,
-					canonical_url: CANONICAL,
-				}),
-		},
-		{
-			match: (url) =>
-				url.includes(`/api/articles/wintrover/${slug}`) &&
-				!url.includes("/me/"),
-			respond: () => fakeResponse(verifyBody, options.verifyStatus ?? 200),
-		},
-		{
-			match: (url) => url.includes("/api/articles/latest"),
-			respond: () =>
-				fakeResponse(options.latestFeed ?? [], options.latestStatus ?? 200),
+				});
+			},
 		},
 	]);
 }
@@ -422,12 +424,6 @@ describe("payload builders", () => {
 		expect(payload.article.tags).toEqual(["testing"]);
 		expect(payload.article.cover_image).toBeUndefined();
 	});
-
-	test("publish payload는 published:true만 담는다", () => {
-		const payload = buildDevtoPublishPayload();
-		expect(payload).toEqual({ article: { published: true } });
-		expect(Object.keys(payload.article)).toEqual(["published"]);
-	});
 });
 
 describe("parseDevtoArticle", () => {
@@ -496,368 +492,6 @@ describe("listAllDevtoArticles", () => {
 	});
 });
 
-describe("isDevtoPublished", () => {
-	test("published:true면 발행으로 판정한다", () => {
-		expect(isDevtoPublished(article({ id: 1, published: true }))).toBe(true);
-	});
-
-	test("published 필드가 없어도 유효한 published_at이 있으면 발행으로 판정한다", () => {
-		const publicArticle = article({ id: 2 });
-		delete (publicArticle as { published?: boolean }).published;
-		publicArticle.published_at = "2026-06-01T00:00:00Z";
-		expect(publicArticle.published).toBeUndefined();
-		expect(isDevtoPublished(publicArticle)).toBe(true);
-	});
-
-	test("published_at이 비어 있거나 유효하지 않으면 미발행으로 판정한다", () => {
-		expect(isDevtoPublished(article({ id: 3, published_at: "" }))).toBe(false);
-		expect(isDevtoPublished(article({ id: 4, published_at: "   " }))).toBe(
-			false,
-		);
-		expect(
-			isDevtoPublished(article({ id: 5, published_at: "not-a-timestamp" })),
-		).toBe(false);
-	});
-
-	test("temp-slug 게시물은 published:true여도 미발행으로 판정한다", () => {
-		expect(
-			isDevtoPublished(
-				article({
-					id: 6,
-					published: true,
-					published_at: "2026-06-01T00:00:00Z",
-					slug: "abc123-temp-slug-987654",
-				}),
-			),
-		).toBe(false);
-	});
-
-	test("published도 published_at도 없으면 미발행으로 판정한다", () => {
-		expect(isDevtoPublished(article({ id: 7 }))).toBe(false);
-	});
-});
-
-describe("fetchLatestDevtoArticles", () => {
-	test("latest 피드를 1회 호출로 파싱하고 invalid 항목은 걸러낸다", async () => {
-		const { fetchFn, calls } = makeFetch([
-			{
-				match: (url) => url.includes("/api/articles/latest"),
-				respond: () =>
-					fakeResponse([
-						{
-							id: 1,
-							published_at: "2026-06-01T00:00:00Z",
-							canonical_url: CANONICAL,
-						},
-						{ id: "bad" },
-					]),
-			},
-		]);
-		const articles = await fetchLatestDevtoArticles({ fetchFn });
-		expect(articles).toEqual([
-			{
-				id: 1,
-				published_at: "2026-06-01T00:00:00Z",
-				canonical_url: CANONICAL,
-			},
-		]);
-		expect(calls).toHaveLength(1);
-		expect(calls[0].url).toBe(
-			"https://dev.to/api/articles/latest?per_page=1000",
-		);
-	});
-
-	test("배열이 아니면 빈 배열을 반환한다", async () => {
-		const { fetchFn } = makeFetch([
-			{
-				match: (url) => url.includes("/api/articles/latest"),
-				respond: () => fakeResponse({ error: "nope" }),
-			},
-		]);
-		expect(await fetchLatestDevtoArticles({ fetchFn })).toEqual([]);
-	});
-
-	test("HTTP 오류와 네트워크 오류, JSON 파싱 오류는 예외로 처리한다", async () => {
-		const httpError = makeFetch([
-			{
-				match: (url) => url.includes("/api/articles/latest"),
-				respond: () => fakeResponse({ error: "boom" }, 503),
-			},
-		]);
-		await expect(
-			fetchLatestDevtoArticles({ fetchFn: httpError.fetchFn }),
-		).rejects.toThrow("(503)");
-
-		const throwing = async () => {
-			throw new Error("econnreset");
-		};
-		await expect(
-			fetchLatestDevtoArticles({ fetchFn: throwing }),
-		).rejects.toThrow("latest articles request failed");
-
-		const badJson = makeFetch([
-			{
-				match: (url) => url.includes("/api/articles/latest"),
-				respond: () =>
-					({
-						ok: true,
-						status: 200,
-						json: async () => {
-							throw new Error("bad json");
-						},
-					}) as unknown as Response,
-			},
-		]);
-		await expect(
-			fetchLatestDevtoArticles({ fetchFn: badJson.fetchFn }),
-		).rejects.toThrow("not valid JSON");
-	});
-});
-
-describe("verifyPublishedArticle", () => {
-	const PUBLISHED_AT = "2026-06-01T00:00:00Z";
-
-	function verifyRoutes(options: {
-		showStatus?: number;
-		showBody?: unknown;
-		latestStatus?: number;
-		latestBody?: unknown;
-		latestThrow?: boolean;
-	}) {
-		return makeFetch([
-			{
-				match: (url) => url.includes("/api/articles/latest"),
-				respond: () => {
-					if (options.latestThrow) throw new Error("latest network down");
-					return fakeResponse(
-						options.latestBody ?? [],
-						options.latestStatus ?? 200,
-					);
-				},
-			},
-			{
-				match: (url) => url.includes("/api/articles/wintrover/"),
-				respond: () =>
-					fakeResponse(
-						options.showBody ?? { error: "not found" },
-						options.showStatus ?? 404,
-					),
-			},
-		]);
-	}
-
-	test("공개 응답에 published 필드가 없어도 published_at으로 검증에 성공한다", async () => {
-		const { fetchFn, calls } = verifyRoutes({
-			showStatus: 200,
-			showBody: {
-				id: 501,
-				slug: "publish-one-test",
-				published_at: PUBLISHED_AT,
-				canonical_url: CANONICAL,
-			},
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 3, fetchFn, sleepFn: async () => {} },
-		);
-		expect(verification.verified).toBe(true);
-		expect(verification.attempts).toBe(1);
-		expect(verification.observedPublished).toBe(true);
-		expect(verification.canonicalMatched).toBe(true);
-		expect(verification.fallbackUsed).toBe(false);
-		expect(verification.ambiguous).toBe(false);
-		expect(verification.article?.id).toBe(501);
-		expect(calls).toHaveLength(1);
-	});
-
-	test("canonical이 다르면 published_at이 있어도 검증에 실패한다", async () => {
-		const { fetchFn } = verifyRoutes({
-			showStatus: 200,
-			showBody: {
-				id: 501,
-				slug: "publish-one-test",
-				published_at: PUBLISHED_AT,
-				canonical_url: "https://example.com/other/",
-			},
-			latestBody: [
-				{
-					id: 501,
-					published_at: PUBLISHED_AT,
-					canonical_url: "https://example.com/other/",
-				},
-			],
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 2, fetchFn, sleepFn: async () => {}, articleId: 501 },
-		);
-		expect(verification.verified).toBe(false);
-		expect(verification.canonicalMatched).toBe(false);
-		expect(verification.fallbackUsed).toBe(false);
-		expect(verification.ambiguous).toBe(false);
-	});
-
-	test("temp-slug 게시물은 재시도와 폴백 끝에도 발행으로 검증하지 않는다", async () => {
-		const { fetchFn, calls } = verifyRoutes({
-			showStatus: 200,
-			showBody: {
-				id: 501,
-				slug: "abc-temp-slug-123",
-				published: true,
-				canonical_url: CANONICAL,
-			},
-			latestBody: [
-				{
-					id: 501,
-					slug: "abc-temp-slug-123",
-					published_at: PUBLISHED_AT,
-					canonical_url: CANONICAL,
-				},
-			],
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 2, fetchFn, sleepFn: async () => {}, articleId: 501 },
-		);
-		expect(verification.verified).toBe(false);
-		expect(verification.observedPublished).toBe(false);
-		expect(verification.ambiguous).toBe(false);
-		expect(
-			calls.filter((call) => call.url.includes("/api/articles/wintrover/")),
-		).toHaveLength(2);
-		expect(
-			calls.filter((call) => call.url.includes("/api/articles/latest")),
-		).toHaveLength(1);
-	});
-
-	test("show 404면 latest 피드 폴백으로 1회 검증한다", async () => {
-		const { fetchFn, calls } = verifyRoutes({
-			showStatus: 404,
-			latestBody: [
-				{
-					id: 501,
-					slug: "publish-one-test",
-					published_at: PUBLISHED_AT,
-					canonical_url: CANONICAL,
-					url: "https://dev.to/wintrover/publish-one-test",
-				},
-			],
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 2, fetchFn, sleepFn: async () => {}, articleId: 501 },
-		);
-		expect(verification.verified).toBe(true);
-		expect(verification.fallbackUsed).toBe(true);
-		expect(verification.observedPublished).toBe(true);
-		expect(verification.canonicalMatched).toBe(true);
-		expect(verification.article?.id).toBe(501);
-		expect(verification.ambiguous).toBe(false);
-		expect(
-			calls.filter((call) => call.url.includes("/api/articles/latest")),
-		).toHaveLength(1);
-	});
-
-	test("latest 피드에 같은 canonical 후보가 복수면 ambiguous로 실패한다", async () => {
-		const { fetchFn } = verifyRoutes({
-			showStatus: 404,
-			latestBody: [
-				{ id: 1, published_at: PUBLISHED_AT, canonical_url: CANONICAL },
-				{ id: 2, published_at: PUBLISHED_AT, canonical_url: CANONICAL },
-			],
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 1, fetchFn, sleepFn: async () => {} },
-		);
-		expect(verification.verified).toBe(false);
-		expect(verification.ambiguous).toBe(true);
-		expect(verification.fallbackUsed).toBe(false);
-	});
-
-	test("latest 피드 네트워크 실패는 예외를 전파하지 않고 미검증으로 유지한다", async () => {
-		const { fetchFn } = verifyRoutes({
-			showStatus: 404,
-			latestThrow: true,
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 1, fetchFn, sleepFn: async () => {}, articleId: 501 },
-		);
-		expect(verification.verified).toBe(false);
-		expect(verification.ambiguous).toBe(false);
-	});
-
-	test("latest 피드의 draft(published:false)는 false positive가 없다", async () => {
-		const { fetchFn } = verifyRoutes({
-			showStatus: 404,
-			latestBody: [{ id: 501, published: false, canonical_url: CANONICAL }],
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 1, fetchFn, sleepFn: async () => {}, articleId: 501 },
-		);
-		expect(verification.verified).toBe(false);
-		expect(verification.observedPublished).toBeNull();
-		expect(verification.ambiguous).toBe(false);
-	});
-
-	test("latest 피드가 5xx면 검증 실패를 유지한다", async () => {
-		const { fetchFn } = verifyRoutes({
-			showStatus: 404,
-			latestStatus: 500,
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 1, fetchFn, sleepFn: async () => {} },
-		);
-		expect(verification.verified).toBe(false);
-		expect(verification.fallbackUsed).toBe(false);
-	});
-
-	test("canonical과 id가 모두 없으면 폴백 호출 없이 실패한다", async () => {
-		const { fetchFn, calls } = verifyRoutes({ showStatus: 404 });
-		const verification = await verifyPublishedArticle("publish-one-test", "", {
-			attempts: 1,
-			fetchFn,
-			sleepFn: async () => {},
-		});
-		expect(verification.verified).toBe(false);
-		expect(
-			calls.filter((call) => call.url.includes("/api/articles/latest")),
-		).toHaveLength(0);
-	});
-
-	test("latest 피드에서 id만 매칭되고 canonical이 다르면 검증하지 않는다", async () => {
-		const { fetchFn } = verifyRoutes({
-			showStatus: 404,
-			latestBody: [
-				{
-					id: 501,
-					published_at: PUBLISHED_AT,
-					canonical_url: "https://example.com/other/",
-				},
-			],
-		});
-		const verification = await verifyPublishedArticle(
-			"publish-one-test",
-			CANONICAL,
-			{ attempts: 1, fetchFn, sleepFn: async () => {}, articleId: 501 },
-		);
-		expect(verification.verified).toBe(false);
-		expect(verification.canonicalMatched).toBeNull();
-		expect(verification.ambiguous).toBe(false);
-	});
-});
-
 describe("parsePublishOneArgs", () => {
 	test("정상 인자를 파싱한다", () => {
 		expect(
@@ -918,96 +552,120 @@ describe("parsePublishOneArgs", () => {
 	});
 });
 
-describe("runPublishOne (fake API)", () => {
-	test("기존 게시물이 published:true면 already_published로 종료하고 쓰기 요청이 없다", async () => {
+describe("runPublishOne (draft-only, fake API)", () => {
+	test("기존 게시물이 published:true면 published_exists로 실패하고 unpublish-one이 필요하다", async () => {
 		const { fetchFn, calls } = articleApiRoutes({
-			existing: [article({ id: 7, published: true, canonical_url: CANONICAL })],
+			existing: [
+				article({
+					id: 7,
+					published: true,
+					slug: "already-public",
+					canonical_url: CANONICAL,
+				}),
+			],
 		});
-		const { result } = await runInTmp(fetchFn);
-		expect(result.state).toBe("already_published");
+		const { result, persisted } = await runInTmp(fetchFn);
+		expect(result.state).toBe("published_exists");
 		expect(result.method).toBe("already_published");
 		expect(result.id).toBe(7);
 		expect(result.observedPublished).toBe(true);
+		expect(result.observedDraft).toBeUndefined();
 		expect(result.attempts).toBe(0);
-		expect(publishOneExitCode(result)).toBe(0);
-		expect(calls).toHaveLength(2);
+		expect(publishOneExitCode(result)).toBe(1);
+		expect(calls.filter((call) => call.init?.method)).toHaveLength(0);
+		expect(persisted.state).toBe("published_exists");
 	});
 
-	test("canonical 매칭 draft는 PUT으로 입양(adopt)하고 검증까지 완료한다", async () => {
-		const { fetchFn, calls } = articleApiRoutes({
-			existing: [
-				article({ id: 42, published: false, canonical_url: CANONICAL }),
-			],
-			createdDraftId: 42,
-		});
-		const { result, persisted } = await runInTmp(fetchFn);
-		expect(result.state).toBe("published_verified");
-		expect(result.method).toBe("adopted_draft");
-		expect(result.draftId).toBe(42);
-		expect(result.id).toBe(42);
-		expect(result.attempts).toBe(1);
-		expect(result.observedPublished).toBe(true);
-		expect(publishOneExitCode(result)).toBe(0);
-		expect(calls.filter((call) => call.init?.method === "POST")).toHaveLength(
-			0,
-		);
-		expect(persisted.state).toBe("published_verified");
-		expect(persisted.platform).toBe("devto");
-	});
-
-	test("없으면 draft를 생성하고 PUT으로 발행 후 공개 GET으로 검증한다", async () => {
+	test("없으면 draft를 생성하고 /me/all 재조회로 published:false를 검증한다", async () => {
 		const { fetchFn, calls } = articleApiRoutes({ createdDraftId: 501 });
-		const { result } = await runInTmp(fetchFn);
-		expect(result.state).toBe("published_verified");
+		const { result, persisted } = await runInTmp(fetchFn);
+		expect(result.state).toBe("draft_verified");
 		expect(result.method).toBe("created");
 		expect(result.draftId).toBe(501);
 		expect(result.id).toBe(501);
 		expect(result.slug).toBe("publish-one-test");
-		expect(result.attempts).toBe(2);
+		expect(result.attempts).toBe(1);
+		expect(result.observedDraft).toBe(true);
+		expect(result.observedPublished).toBe(false);
+		expect(publishOneExitCode(result)).toBe(0);
 		const methods = calls.map((call) => call.init?.method ?? "GET");
-		expect(methods).toEqual(["GET", "POST", "PUT", "GET"]);
+		expect(methods).toEqual(["GET", "POST", "GET", "GET"]);
+		expect(calls.filter((call) => call.init?.method === "PUT")).toHaveLength(0);
+		expect(persisted.state).toBe("draft_verified");
+		expect(persisted.observedDraft).toBe(true);
+		expect(persisted.observedPublished).toBe(false);
 	});
 
-	test("공개 show가 404여도 latest 피드 폴백으로 published_verified가 된다", async () => {
+	test("canonical 매칭 draft는 쓰기 없이 입양하고 재조회로 검증한다", async () => {
 		const { fetchFn, calls } = articleApiRoutes({
-			createdDraftId: 501,
-			verifyStatus: 404,
-			latestFeed: [
-				{
-					id: 501,
-					slug: "publish-one-test",
-					published_at: "2026-06-01T00:00:00Z",
+			existing: [
+				article({
+					id: 42,
+					published: false,
+					slug: "existing-draft-slug",
 					canonical_url: CANONICAL,
-					url: "https://dev.to/wintrover/publish-one-test",
-				},
+				}),
 			],
 		});
-		const { result } = await runInTmp(fetchFn);
-		expect(result.state).toBe("published_verified");
-		expect(result.method).toBe("created");
-		expect(result.id).toBe(501);
-		expect(result.observedPublished).toBe(true);
+		const { result, persisted } = await runInTmp(fetchFn);
+		expect(result.state).toBe("draft_verified");
+		expect(result.method).toBe("adopted_draft");
+		expect(result.draftId).toBe(42);
+		expect(result.id).toBe(42);
+		expect(result.attempts).toBe(0);
+		expect(result.observedDraft).toBe(true);
+		expect(result.observedPublished).toBe(false);
 		expect(publishOneExitCode(result)).toBe(0);
-		expect(
-			calls.filter((call) => call.url.includes("/api/articles/latest")),
-		).toHaveLength(1);
+		expect(calls.filter((call) => call.init?.method)).toHaveLength(0);
+		expect(persisted.state).toBe("draft_verified");
 	});
 
-	test("검증이 실패하면 unknown으로 종료하고 6회까지 재시도한다", async () => {
-		const { fetchFn, calls } = articleApiRoutes({
+	test("재조회에서 draft가 아니면(published !== false) unknown으로 실패한다", async () => {
+		const { fetchFn } = articleApiRoutes({
 			createdDraftId: 501,
-			published: false,
+			relistDraft: "published",
 		});
 		const { result } = await runInTmp(fetchFn);
 		expect(result.state).toBe("unknown");
-		expect(result.observedPublished).toBe(false);
+		expect(result.observedDraft).toBeUndefined();
 		expect(publishOneExitCode(result)).toBe(1);
-		const verifyCalls = calls.filter(
-			(call) =>
-				call.url.includes("/api/articles/wintrover/publish-one-test") &&
-				!call.init?.method,
-		);
-		expect(verifyCalls).toHaveLength(6);
+	});
+
+	test("재조회에서 draft를 못 찾으면 unknown으로 실패한다", async () => {
+		const { fetchFn } = articleApiRoutes({
+			createdDraftId: 501,
+			relistDraft: "missing",
+		});
+		const { result } = await runInTmp(fetchFn);
+		expect(result.state).toBe("unknown");
+		expect(result.observedDraft).toBeUndefined();
+		expect(publishOneExitCode(result)).toBe(1);
+	});
+
+	test("재조회한 draft의 canonical이 다르면 unknown으로 실패한다", async () => {
+		const { fetchFn } = articleApiRoutes({
+			createdDraftId: 501,
+			relistDraft: "wrong-canonical",
+		});
+		const { result } = await runInTmp(fetchFn);
+		expect(result.state).toBe("unknown");
+		expect(result.observedDraft).toBeUndefined();
+		expect(publishOneExitCode(result)).toBe(1);
+	});
+
+	test("재조회 요청이 실패하면 unknown으로 종료한다", async () => {
+		const routes = articleApiRoutes({ createdDraftId: 501 });
+		let listCalls = 0;
+		const fetchFn = async (url: string, init?: RequestInit) => {
+			if (url.includes("/api/articles/me/all")) {
+				listCalls += 1;
+				if (listCalls >= 3) return fakeResponse({ error: "boom" }, 500);
+			}
+			return routes.fetchFn(url, init);
+		};
+		const { result } = await runInTmp(fetchFn);
+		expect(result.state).toBe("unknown");
+		expect(publishOneExitCode(result)).toBe(1);
 	});
 
 	test("생성 POST가 5xx면 unknown이고 재시도 없이 종료한다", async () => {
@@ -1035,19 +693,32 @@ describe("runPublishOne (fake API)", () => {
 		expect(publishOneExitCode(result)).toBe(1);
 	});
 
-	test("post_response_loss 주입은 응답을 버리고 unknown으로 종료하며 PUT이 없다", async () => {
-		const { fetchFn, calls } = articleApiRoutes({ createdDraftId: 501 });
-		const { result } = await runInTmp(fetchFn, {
+	test("post_response_loss 주입은 unknown으로 끝나고, 다음 실행은 draft를 입양해 중복 생성하지 않는다", async () => {
+		const routes = articleApiRoutes({ createdDraftId: 501 });
+		const first = await runInTmp(routes.fetchFn, {
 			failInjection: "post_response_loss",
 		});
-		expect(result.state).toBe("unknown");
-		expect(result.method).toBe("unknown");
-		expect(result.attempts).toBe(1);
-		expect(publishOneExitCode(result)).toBe(1);
-		expect(calls.filter((call) => call.init?.method === "PUT")).toHaveLength(0);
-		expect(calls.filter((call) => call.init?.method === "POST")).toHaveLength(
-			1,
-		);
+		expect(first.result.state).toBe("unknown");
+		expect(first.result.method).toBe("unknown");
+		expect(first.result.attempts).toBe(1);
+		expect(publishOneExitCode(first.result)).toBe(1);
+		expect(
+			routes.calls.filter((call) => call.init?.method === "POST"),
+		).toHaveLength(1);
+		expect(
+			routes.calls.filter((call) => call.init?.method === "PUT"),
+		).toHaveLength(0);
+
+		const second = await runInTmp(routes.fetchFn);
+		expect(second.result.state).toBe("draft_verified");
+		expect(second.result.method).toBe("adopted_draft");
+		expect(second.result.draftId).toBe(501);
+		expect(second.result.observedDraft).toBe(true);
+		expect(second.result.observedPublished).toBe(false);
+		expect(publishOneExitCode(second.result)).toBe(0);
+		expect(
+			routes.calls.filter((call) => call.init?.method === "POST"),
+		).toHaveLength(1);
 	});
 
 	test("pre_post 주입은 목록 조회 후 쓰기 없이 failed로 종료한다", async () => {
@@ -1055,7 +726,6 @@ describe("runPublishOne (fake API)", () => {
 			existing: [
 				article({ id: 42, published: false, canonical_url: CANONICAL }),
 			],
-			createdDraftId: 42,
 		});
 		const { result } = await runInTmp(fetchFn, {
 			failInjection: "pre_post",
@@ -1064,6 +734,7 @@ describe("runPublishOne (fake API)", () => {
 		expect(result.attempts).toBe(0);
 		expect(publishOneExitCode(result)).toBe(1);
 		expect(calls).toHaveLength(2);
+		expect(calls.filter((call) => call.init?.method)).toHaveLength(0);
 	});
 
 	test("복수 매칭은 ambiguous로 종료하고 쓰기가 없다", async () => {
@@ -1090,11 +761,11 @@ describe("runPublishOne (fake API)", () => {
 			existing: [
 				article({ id: 42, published: false, canonical_url: CANONICAL }),
 			],
-			createdDraftId: 42,
 		});
 		const { result } = await runInTmp(fetchFn, { dryRun: true });
 		expect(result.state).toBe("dry_run");
 		expect(result.method).toBe("none");
+		expect(result.observedDraft).toBeUndefined();
 		expect(publishOneExitCode(result)).toBe(0);
 		expect(calls.filter((call) => call.init?.method)).toHaveLength(0);
 	});
@@ -1163,7 +834,7 @@ describe("publish-one helpers", () => {
 		).toBe("https://github.com/wintrover/wintrover.github.io/actions/runs/123");
 	});
 
-	test("publishOneExitCode 매핑을 적용한다", () => {
+	test("publishOneExitCode는 draft/dry-run 성공만 0으로 매핑한다", () => {
 		const base = {
 			platform: "devto" as const,
 			postPath: "p.md",
@@ -1172,36 +843,43 @@ describe("publish-one helpers", () => {
 			attempts: 0,
 			observedAt: "2026-06-01T00:00:00.000Z",
 		};
-		expect(publishOneExitCode({ ...base, state: "published_verified" })).toBe(
-			0,
-		);
-		expect(publishOneExitCode({ ...base, state: "already_published" })).toBe(0);
+		expect(publishOneExitCode({ ...base, state: "draft_verified" })).toBe(0);
+		expect(publishOneExitCode({ ...base, state: "draft_found" })).toBe(0);
 		expect(publishOneExitCode({ ...base, state: "dry_run" })).toBe(0);
+		expect(publishOneExitCode({ ...base, state: "published_exists" })).toBe(1);
+		expect(publishOneExitCode({ ...base, state: "published_verified" })).toBe(
+			1,
+		);
+		expect(publishOneExitCode({ ...base, state: "already_published" })).toBe(1);
 		expect(publishOneExitCode({ ...base, state: "failed" })).toBe(1);
 		expect(publishOneExitCode({ ...base, state: "unknown" })).toBe(1);
 		expect(publishOneExitCode({ ...base, state: "ambiguous" })).toBe(1);
 	});
 
-	test("buildPublishOneSummary는 상태와 링크를 요약한다", () => {
+	test("buildPublishOneSummary는 draft 상태와 관찰 플래그를 요약한다", () => {
 		const summary = buildPublishOneSummary({
 			platform: "devto",
 			postPath: "src/posts/archright/2026-05-04-6.md",
 			canonicalUrl: CANONICAL,
-			state: "published_verified",
+			state: "draft_verified",
 			method: "created",
 			id: 501,
+			draftId: 501,
 			slug: "publish-one-test",
 			url: "https://dev.to/wintrover/publish-one-test",
-			observedPublished: true,
-			attempts: 2,
+			observedDraft: true,
+			observedPublished: false,
+			attempts: 1,
 			observedAt: "2026-06-01T00:00:00.000Z",
 			runUrl:
 				"https://github.com/wintrover/wintrover.github.io/actions/runs/123",
 		});
 		expect(summary).toContain("## Publish One Result");
-		expect(summary).toContain("- state: `published_verified`");
+		expect(summary).toContain("- state: `draft_verified`");
 		expect(summary).toContain("- method: `created`");
-		expect(summary).toContain("- attempts: 2");
+		expect(summary).toContain("- attempts: 1");
+		expect(summary).toContain("- observed draft: true");
+		expect(summary).toContain("- observed published: false");
 		expect(summary).toContain("actions/runs/123");
 	});
 });

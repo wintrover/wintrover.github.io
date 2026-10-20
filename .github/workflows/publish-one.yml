@@ -1,8 +1,10 @@
-# Draft-first, externally verified single-post publish path.
-# Reconciles an existing DEV.to article by canonical URL, publishes a draft,
-# and only reports success after a public GET confirms publication.
+# Draft-only single-post DEV.to path.
+# Reconciles an existing article by canonical URL, creates or adopts a draft,
+# and verifies draft state through the authenticated /me/all re-list.
+# It never publishes: an already published article fails with published_exists
+# and requires the unpublish-one workflow first.
 # Legacy status markers (.success/.failed) are intentionally not used here.
-name: Publish One
+name: Draft One
 
 on:
   workflow_dispatch:
@@ -28,7 +30,7 @@ on:
           - "true"
           - "false"
       confirm:
-        description: "Type PUBLISH to allow a non-dry-run publish"
+        description: "Type DRAFT to allow a non-dry-run draft creation"
         required: true
         default: ""
         type: string
@@ -78,19 +80,19 @@ jobs:
           PUPPETEER_SKIP_DOWNLOAD: "1"
         run: pnpm install --frozen-lockfile --prod=false
 
-      - name: Require confirm=PUBLISH for non-dry-run
+      - name: Require confirm=DRAFT for non-dry-run
         shell: bash
         env:
           INPUT_DRY_RUN: ${{ inputs.dry_run }}
           INPUT_CONFIRM: ${{ inputs.confirm }}
         run: |
           set -euo pipefail
-          if [ "$INPUT_DRY_RUN" != "true" ] && [ "$INPUT_CONFIRM" != "PUBLISH" ]; then
-            echo "Refusing to publish: dry_run=false requires confirm=PUBLISH."
+          if [ "$INPUT_DRY_RUN" != "true" ] && [ "$INPUT_CONFIRM" != "DRAFT" ]; then
+            echo "Refusing to write: dry_run=false requires confirm=DRAFT."
             exit 1
           fi
 
-      - name: Publish single post
+      - name: Create and verify single draft
         shell: bash
         env:
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
@@ -109,6 +111,26 @@ jobs:
             ARGS+=(--fail-injection "$INPUT_FAIL_INJECTION")
           fi
           pnpm exec tsx scripts/post-to-dev.ts "${ARGS[@]}"
+
+      - name: Assert draft-only evidence
+        if: ${{ inputs.dry_run != 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require("node:fs");
+          const result = JSON.parse(fs.readFileSync("publish-result.json", "utf8"));
+          const allowedStates = ["draft_verified", "draft_found"];
+          if (!allowedStates.includes(result.state)) {
+            console.error(`unexpected state: ${result.state} (allowed: ${allowedStates.join(", ")})`);
+            process.exit(1);
+          }
+          if (result.observedDraft !== true || result.observedPublished === true) {
+            console.error("draft-only evidence invalid", result);
+            process.exit(1);
+          }
+          console.log(`draft id=${result.id} slug=${result.slug}`);
+          NODE
 
       - name: Upload publish result
         if: always()
