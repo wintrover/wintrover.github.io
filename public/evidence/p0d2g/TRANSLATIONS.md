@@ -1,8 +1,8 @@
 # Translation ledger — p0d2g public snapshot
 
-The public evidence bundle is English-only. Six artifacts were written in
-Korean in the private Axiom repository (or generated from a Korean harness)
-and are published here as English translations.
+The public evidence bundle is English-only. Seven entries below contain
+Korean in whole or in part (private records or a Korean harness); their
+public copies are English translations.
 
 A translation is **not** a byte-identical copy. The hash below proves which
 public bytes are being served; it does not prove fidelity to the private
