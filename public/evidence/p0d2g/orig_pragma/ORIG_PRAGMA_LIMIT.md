@@ -1,48 +1,48 @@
-# P0-D2-G — ORIG_PRAGMA_LIMIT: 원본 함수 직접 명세 부착의 한계 관측
+# P0-D2-G — ORIG_PRAGMA_LIMIT: Observation of the Limits of Directly Attaching a Spec to the Original Function
 
 Experiment: `act2-wp-toml-b1-input-integrity/p0d2g` · Date: 2026-10-17
-바이너리: `bin/ax` v0.3.7 (사본 `/tmp/p0d2g_d_ax`) · 주체: `nim-toml-serialization @ 4aa8e2223649fc0837c490a4acfca7b8b1e756f9`
+Binary: `bin/ax` v0.3.7 (copy `/tmp/p0d2g_d_ax`) · Subject: `nim-toml-serialization @ 4aa8e2223649fc0837c490a4acfca7b8b1e756f9`
 
-**목적**: 채택된 에이전트 추론 명세 S2(`AGENT_SPEC.md` §4)를 **원본 주체 함수 헤더에 직접** 부착해 실행하고, 어느 단계가·왜 이 연결을 거부하는지 관측한다. 이 문서는 관측 전용 기록이다 — 수정·해법 없음. 원본 소스 클론(`<SUBJECT_CLONE>`)은 건드리지 않았고, 모든 변형은 `env_orig/subject` 클론에서 수행했다.
+**Purpose**: attach the adopted agent reasoning spec S2 (`AGENT_SPEC.md` §4) **directly to the header of the original subject function**, execute it, and observe which stage refuses this connection and why. This document is an observation-only record — no fix, no solution. The original source clone (`<SUBJECT_CLONE>`) was not touched, and all variants were performed in the `env_orig/subject` clone.
 
 ---
 
-## 1. 대상 원본 프로시저 (게이트 소속, 실측)
+## 1. Target original procedures (gate membership, as measured)
 
-두 게이트는 서로 다른 프로시저 안에 있으며 **시그니처는 동일 형태**다 (`toml_serialization/lexer.nim`, pristine sha256 `19d69eed84f74c51fa1784b2e71a4525abc8d2b8aa854c567565d2d603133f4d` — 스펙 §5 기재값과 일치):
+The two gates are in different procedures, and the **signatures are of the same shape** (`toml_serialization/lexer.nim`, pristine sha256 `19d69eed84f74c51fa1784b2e71a4525abc8d2b8aa854c567565d2d603133f4d` — matching the value recorded in spec §5):
 
-| 게이트 | 프로시저 | 선언(원본 라인) |
+| gate | procedure | declaration (original line) |
 |---|---|---|
-| `:554` (멀티라인, `{16, 31, 127}`) | `scanMultiLineString` | 468 |
-| `:588` (단일행, `{8, 16, 31, 127}`) | `scanSingleLineString` | 565 |
+| `:554` (multiline, `{16, 31, 127}`) | `scanMultiLineString` | 468 |
+| `:588` (single-line, `{8, 16, 31, 127}`) | `scanSingleLineString` | 565 |
 
 ```nim
 proc scanMultiLineString[T](lex: var TomlLexer, res: var T, kind: static[StringType]) {.raises: [IOError, TomlError].} =
 proc scanSingleLineString[T](lex: var TomlLexer, res: var T, kind: static[StringType]) {.raises: [IOError, TomlError].} =
 ```
 
-- 제네릭 `[T]` (string 또는 TomlVoid로 한정하는 `{.fatal.}` 가드 포함), `static` 매개변수, 반환 없음(`proc`), 부수효과 `raises: [IOError, TomlError]`.
-- **시그니처 바인딩 불일치(잠재 병목)**: S2 프라그마의 `c`와 `result`는 이 시그니처의 어떤 이름과도 대응하지 않는다. 실제 문자는 루프 내부 지역변수 `next`(char)이고 결과는 예외 발생 여부다. 이 불일치는 관측 설계의 일부로서 남겨 두었다(§4).
+- Generic `[T]` (including a `{.fatal.}` guard restricting it to string or TomlVoid), a `static` parameter, no return value (`proc`), side effects `raises: [IOError, TomlError]`.
+- **Signature binding mismatch (a potential bottleneck)**: the `c` and `result` of the S2 pragma correspond to no name in this signature. The actual character is the loop-local variable `next` (char), and the result is whether an exception was raised. This mismatch was left in place as part of the observation design (§4).
 
-## 2. 변형 패치 (variant_orig.patch, 1531 바이트)
+## 2. Variant patch (variant_orig.patch, 1531 bytes)
 
-- `git clone` 원본 클론 → `env_orig/subject`, 핀 체크아웃, `rev-parse` 검증(`4aa8e2223649fc0837c490a4acfca7b8b1e756f9`).
-- 유일한 변경: 두 프로시저 헤더의 기존 프라그마 블록 앞에 스펙 프라그마 삽입(파일당 2줄, 그 외 무변경):
+- `git clone` the original clone → `env_orig/subject`, checkout the pinned revision, verify with `rev-parse` (`4aa8e2223649fc0837c490a4acfca7b8b1e756f9`).
+- The only change: insertion of the spec pragma in front of the existing pragma block of the two procedure headers (2 lines per file, no other changes):
 
 ```diff
 -proc scanSingleLineString[T](lex: var TomlLexer, res: var T, kind: static[StringType]) {.raises: [IOError, TomlError].} =
 +proc scanSingleLineString[T](lex: var TomlLexer, res: var T, kind: static[StringType]) {.axiom: [pre: (c >= 1 and c <= 255 and c != 10 and c != 13 and c != 34 and c != 92), post: (result == ((c <= 8) or (c >= 10 and c <= 31) or (c == 127)))], raises: [IOError, TomlError].} =
 ```
 
-(`scanMultiLineString` 동일 형태. 재생 단계 도달이 없어 컴파일 적합성은 검증 대상이 아니었다 — materializer가 raw AST에서 프라그마를 읽는다는 파이프라인 설계에 따름.)
+(`scanMultiLineString` of the same shape. Since the replay stage was never reached, compile fitness was not a verification target — following the pipeline design in which the materializer reads the pragma from the raw AST.)
 
-## 3. 실행 관측치 (verbatim)
+## 3. Execution observations (verbatim)
 
-### 3.1 본 실행 — 프라그마 부착 원본 대상 `scanSingleLineString`
+### 3.1 This run — original target with the pragma attached `scanSingleLineString`
 
-`AXIOM_STATE_DIR=state_orig AXIOM_PROVE_VAULT_DIR=vault_orig ax prove --project env_orig/subject --target 'toml_serialization/lexer.nim::scanSingleLineString'` → **exit 2** (0.7초, 솔버 미도달).
+`AXIOM_STATE_DIR=state_orig AXIOM_PROVE_VAULT_DIR=vault_orig ax prove --project env_orig/subject --target 'toml_serialization/lexer.nim::scanSingleLineString'` → **exit 2** (0.7 seconds, solver not reached).
 
-`runs/orig_pragma.err` 전문(타겟 프로시저 언급 라인 포함 — `unsupported decl kind`/`lossy`/`binding` 라인은 **없음**, 도달하지 않았음):
+The full text of `runs/orig_pragma.err` (including the line mentioning the target procedure — there are **no** `unsupported decl kind`/`lossy`/`binding` lines; they were not reached):
 
 ```
 [INFO] axiom_engine: analyzing topology...
@@ -52,9 +52,9 @@ proc scanSingleLineString[T](lex: var TomlLexer, res: var T, kind: static[String
 [ERROR] action_interpreter_cli: [ERROR] --target toml_serialization/lexer.nim::scanSingleLineString resolved to no frontier nodes (NotFound or Ambiguous). Canonical targets require exactly one match; 0 matches = NotFound, >1 = Ambiguous. Refuse to run an implicit full-frontier verification on a canonical target.
 ```
 
-(`runs/orig_pragma.out`은 빈 파일.)
+(`runs/orig_pragma.out` is an empty file.)
 
-**결정적 정밀 관측** — 대상은 인덱스에는 존재한다. 본 실행이 남긴 `state_orig/.axiom/cache/topology_merkle.json`의 기록:
+**Deterministic precise observation** — the target does exist in the index. The record left by this run in `state_orig/.axiom/cache/topology_merkle.json`:
 
 ```json
 {"modulePath": "toml_serialization/lexer.nim", "functionName": "scanSingleLineString",
@@ -64,82 +64,82 @@ proc scanSingleLineString[T](lex: var TomlLexer, res: var T, kind: static[String
   "raiseTomlErr", "ord", "raiseInvalidChar", "valid", "clear", "scanEscapeChar", "push", "add"]}
 ```
 
-(`scanMultiLineString`도 동일 — declarationLine 468, `hasAxiomImpl: false`, rawCallTargets에 `"post:"` 포함.)
+(`scanMultiLineString` is the same — declarationLine 468, `hasAxiomImpl: false`, with `"post:"` included in rawCallTargets.)
 
-이것이 말해 주는 것:
-1. **프라그마는 raw AST까지는 읽혔다** — 페이로드의 `post:` 토큰이 `rawCallTargets`로 새어 나온 것은 CST가 프라그마 식을 파싱했고, 파이프라인이 그것에 부여한 의미가 "호출 후보" 수준이라는 증거다. 프라그마는 의무(obligation)로 변환되지 않았다.
-2. **`hasAxiomImpl: false`** — 구현 플래그는 `axiomImpl`이라는 **다른 프라그마 이름**에서만 셋된다(`src/core/topology/topology_engine.nim:309`, `hasPragmaNamedP(fnNode, "axiomImpl")`). IR 전환 진입점 역시 `{.axiom, axiomImpl.}` 쌍을 전제한다(`src/core/trusted/ast_to_ir.nim:1502`). 즉 파이프라인의 AST 마커 어휘와 스펙 프라그마 어휘(`axiom: [pre/post]`)는 역할이 분리되어 있다.
+What this tells us:
+1. **The pragma was read at least as far as the raw AST** — the fact that the `post:` token of the payload leaked into `rawCallTargets` is evidence that the CST parsed the pragma expression and that the meaning the pipeline assigned to it is at the level of a "call candidate". The pragma was not converted into an obligation.
+2. **`hasAxiomImpl: false`** — the implementation flag is set only from a **different pragma name**, `axiomImpl` (`src/core/topology/topology_engine.nim:309`, `hasPragmaNamedP(fnNode, "axiomImpl")`). The IR transition entry point likewise presupposes a `{.axiom, axiomImpl.}` pair (`src/core/trusted/ast_to_ir.nim:1502`). In other words, the pipeline's AST marker vocabulary and the spec pragma vocabulary (`axiom: [pre/post]`) have separated roles.
 
-### 3.2 대조 실행 — 프라그마 없는 leaf 원본 `stringDelimiter` (같은 파일)
+### 3.2 Control run — leaf original without a pragma `stringDelimiter` (same file)
 
-`--target 'toml_serialization/lexer.nim::stringDelimiter'` → **exit 2**. `runs/orig_pragma_ctrldelim.err`의 결정 라인:
+`--target 'toml_serialization/lexer.nim::stringDelimiter'` → **exit 2**. The decisive line of `runs/orig_pragma_ctrldelim.err`:
 
 ```
 [INFO] axiom_engine: external candidate excluded: stringDelimiter eligibility=elNoObligation rejection=ogr.no-applicable obligations=0 nonTrivial=0 source=toml_serialization/lexer.nim
 [ERROR] action_interpreter_cli: [ERROR] --target toml_serialization/lexer.nim::stringDelimiter resolved to no frontier nodes (NotFound or Ambiguous). ...
 ```
 
-의존성 0짜리 원본 함수는 **사전-자격(pre-eligibility) 프론티어에는 진입**하지만, 의무가 없어(`ogr.no-applicable`, obligations=0) 자격 게이트에서 탈락한다.
+An original function with 0 dependencies **does enter the pre-eligibility frontier**, but since it has no obligation (`ogr.no-applicable`, obligations=0) it is dropped at the qualification gate.
 
-### 3.3 if-갭 재검증 프로브 (`/tmp/d2if_probe`, 단일 파일 주체)
+### 3.3 if-gap re-verification probe (`/tmp/d2if_probe`, single-file subject)
 
-`probe.nim` = `func p*(c: int): int {.axiom: [pre: (c >= 0), post: (result == (if c < 1: 0 else: 1))].} = 0`, `--target 'probe.nim::p'` → **exit 2**. `runs/if_probe.err` 결정 라인:
+`probe.nim` = `func p*(c: int): int {.axiom: [pre: (c >= 0), post: (result == (if c < 1: 0 else: 1))].} = 0`, `--target 'probe.nim::p'` → **exit 2**. The decisive line of `runs/if_probe.err`:
 
 ```
 [INFO] axiom_engine: external candidate unsupported decl kind: p in probe.nim reason=axiom spec expression has no IR translation (translator marked loss); the explicit spec cannot be ingested for this symbol
 [ERROR] action_interpreter_cli: [ERROR] --target probe.nim::p resolved to no frontier nodes (NotFound or Ambiguous). ...
 ```
 
-**판정: if-표현식 스펙은 v0.3.7에서도 여전히 lossy 거부다.** 원인 코드 확인: spec 적하 경로 `ingestExplicitSpec`이 lossy를 보면 `moUnsupportedDeclKind` + 상기 reason으로 fail-closed한다(`src/infrastructure/external_ir_materializer.nim:449-453`). p0d2f에서 기록된 Canon 프론트엔드 if-손실(`toCanonKind`에 nkElifExpr/nkElseExpr 부재)은 **현행 바이너리에도 그대로 유효**하다.
+**Verdict: an if-expression spec is still rejected as lossy in v0.3.7 as well.** Cause confirmed in the code: the spec ingestion path `ingestExplicitSpec`, when it sees lossy, fails closed with `moUnsupportedDeclKind` + the reason above (`src/infrastructure/external_ir_materializer.nim:449-453`). The Canon frontend if-loss recorded in p0d2f (the absence of nkElifExpr/nkElseExpr in `toCanonKind`) **remains valid for the current binary as well**.
 
-### 3.4 양성 대조 — 같은 리그, if 없는 스펙
+### 3.4 Positive control — same rig, spec without an if
 
-`/tmp/d2if_probe_ctl`: `post: (result == (c - c))`로만 바꾼 동일 구성 → **exit 0**. `runs/if_probe_ctl.err`:
+`/tmp/d2if_probe_ctl`: the same configuration with only `post: (result == (c - c))` substituted → **exit 0**. `runs/if_probe_ctl.err`:
 
 ```
 [INFO] axiom_engine: --target filter: 1 node(s) match 'probe.nim::p'
 [INFO] ir_pipeline_runner: [classify] p → vtSmtNative (simple bitvec/bool operations)
 [INFO] ir_pipeline_runner: type-level candidate 'p' but no LSP — routed to standard SMT pipeline
-[WARN] loop_driver: [LEAN ERROR] p: canonicalLeanKernelCheck: exit code 1: ... (Lean 변수 미사용 경고)
+[WARN] loop_driver: [LEAN ERROR] p: canonicalLeanKernelCheck: exit code 1: ... (Lean variable unused warning)
 [INFO] loop_driver:   [1/1] probe.nim::p — orchestrationNotVerifiable
 ```
 
-if만 없으면 같은 리그의 스펙이 materializer→분류→SMT→Lean 커널 검사까지 전진한다(최종 상태는 `certZ3Candidate`/`orchestrationNotVerifiable` — 승격 조건 미충족이지만, 이는 솔버 단계의 결과이지 자격 거부가 아니다). 즉 3.3의 거부는 리그 문제가 아니라 if-표현식 자체에 대한 것이다.
+If only the if is removed, the spec of the same rig advances through materializer→classification→SMT→Lean kernel check (the final status is `certZ3Candidate`/`orchestrationNotVerifiable` — the promotion condition is not met, but that is the result of the solver stage, not a qualification rejection). In other words, the rejection in 3.3 is not a rig problem but one about the if-expression itself.
 
-## 4. 분류 — 무엇이 원본 직접 연결을 막는가
+## 4. Classification — what blocks the direct connection to the original
 
-관측 증거가 가리키는 차단은 **한 단계가 아니라 세 겹의 직렬 게이트**다. 본 실행은 첫 게이트에서, 대조는 둘째 게이트에서 각각 막혔고, 셋째 게이트의 내용은 코드 정독 + 3.3 프로브로 확정했다.
+The blocking indicated by the observed evidence is **not one stage but three serial gates**. This run was blocked at the first gate and the control at the second, and the content of the third gate was established by reading the code + the 3.3 probe.
 
-| # | 게이트 | 위치 | 원본 함수에게 내리는 판정 | 증거 |
+| # | gate | location | verdict handed down to the original function | evidence |
 |---|---|---|---|---|
-| 1 | **프론티어 편입(의존성 폐쇄)** | `src/core/topology/verified_frontier.nim:40` `computeVerifiedFrontier` — 모든 `dependencyIds`가 검증 완료 집합에 있어야 편입 | `scanSingleLineString`/`scanMultiLineString`는 `stringDelimiter`·`UTF8Validator`·`raiseTomlErr`·`scanEscapeChar`·`raiseInvalidChar` 등 의존이 있고 빈 볼트에서 그 의존은 영원히 "검증됨"이 될 수 없음 → **프론티어 미편입 → NotFound 거부** | 3.1 (`not found in frontier`), merkle 캐시의 rawCallTargets |
-| 2 | **자격 게이트(의무 존재)** | `src/cli/axiom_engine.nim:2842` `isEligible` → `classifyExternalCandidate`(:2149) → census 분류 | 의존 없는 leaf 원본은 편입하지만 의무 0건(`ogr.no-applicable`)으로 탈락. 의무의 공급원은 (a) Axiom 커널 레지스트리, (b) 오버레이가 선언한 주체 (`overlayDeclaresSubject` 등)뿐 — **주체 함수 헤더의 스펙 프라그마는 의무 공급원이 아니다** | 3.2 (`ogr.no-applicable obligations=0`) |
-| 3 | **스펙 적하(손실 없는 번역)** | `src/infrastructure/external_ir_materializer.nim:449` — pre/post를 Canon→IR 번역, lossy면 fail-closed | (도달 시) `c`/`result`가 시그니처에 없는 바인딩 불일치와 if-표현식 손실이 여기서 걸린다. if-손실은 재확인됨(3.3). 참고로 `pre`의 비교 연쇄는 if 없는 형태라 3.3의 `pre: (c >= 0)`는 lossy가 아니었다 — 손실 판정은 post의 if에서 났다 | 3.3/3.4, materializer 소스 |
+| 1 | **Frontier inclusion (dependency closure)** | `src/core/topology/verified_frontier.nim:40` `computeVerifiedFrontier` — all `dependencyIds` must be in the verified set for inclusion | `scanSingleLineString`/`scanMultiLineString` have dependencies such as `stringDelimiter`·`UTF8Validator`·`raiseTomlErr`·`scanEscapeChar`·`raiseInvalidChar`, and in an empty vault those dependencies can never become "verified" → **not included in the frontier → NotFound rejection** | 3.1 (`not found in frontier`), the rawCallTargets in the merkle cache |
+| 2 | **Qualification gate (existence of obligations)** | `src/cli/axiom_engine.nim:2842` `isEligible` → `classifyExternalCandidate`(:2149) → census classification | a dependency-free leaf original is included, but is dropped with 0 obligations (`ogr.no-applicable`). The only sources of obligations are (a) the Axiom kernel registry and (b) the subject declared by the overlay (`overlayDeclaresSubject` etc.) — **the spec pragma in a subject function header is not a source of obligations** | 3.2 (`ogr.no-applicable obligations=0`) |
+| 3 | **Spec ingestion (lossless translation)** | `src/infrastructure/external_ir_materializer.nim:449` — translates pre/post from Canon→IR, and fails closed if lossy | (if reached) the binding mismatch of `c`/`result` absent from the signature and the if-expression loss are caught here. The if-loss was re-confirmed (3.3). As a note, the comparison chain in `pre` is of a form without if, so 3.3's `pre: (c >= 0)` was not lossy — the loss verdict came from the if in post | 3.3/3.4, the materializer source |
 
-또 하나의 어휘 불일치가 게이트 2의 상류에 있다: 파이프라인이 주체 AST에서 구현 인지 플래그를 세우는 프라그마 이름은 `axiomImpl`이고(`topology_engine.nim:309`), 스펙 프라그마(`axiom: [pre/post]`)의 페이로드는 의무가 아니라 호출 후보 토큰(`"post:"`)으로만 관측된다(3.1). **스펙 프라그마를 원본 헤더에 붙이는 것만으로는 어느 게이트에도 '의무'로 등록되지 않는다.**
+There is yet another vocabulary mismatch upstream of gate 2: the pragma name by which the pipeline sets the "is an implementation" flag from the subject AST is `axiomImpl` (`topology_engine.nim:309`), and the payload of the spec pragma (`axiom: [pre/post]`) is observed only as a call-candidate token (`"post:"`), not as an obligation (3.1). **Merely attaching the spec pragma to the original header does not register it as an 'obligation' at any gate.**
 
-시그니처 바인딩 불일치(`c`/`result` 부재)에 관하면: 이것이 실재하는 잠재 병목임은 분명하지만(명세 변수가 원본 시그니처에 없고, 실제 검사 대상은 루프 지역변수 `next: char`, 판정 결과는 예외 발생), **본 관측에서는 도달조차 하지 못했다** — 게이트 1이 먼저 막았다. 즉 "직접 부착"은 바인딩 문제를 진단받기 전에 구조적으로 차단된다.
+As for the signature binding mismatch (the absence of `c`/`result`): it is clearly a real potential bottleneck (the spec variables are not in the original signature, the actual check target is the loop-local variable `next: char`, and the verdict result is the occurrence of an exception), but **it was not even reached in this observation** — gate 1 blocked it first. In other words, "direct attachment" is structurally blocked before the binding problem can be diagnosed.
 
-## 5. 시사점 — 베스포크 오버레이 경로의 존재 이유
+## 5. Implication — the reason the bespoke overlay path exists
 
-p0d2f가 채택한 경로 — 주체 트리 **루트에 새 커널 모듈을 추가**(`d2kernels.nim`, "this file is the ONLY delta from the baseline tree")하고 그 `func`에 스펙 프라그마를 붙이며, 컴파일용 `template axiom*(val: untyped = "") {.pragma.}` shim을 곁들이고, 오버레이가 그 심볼을 주체로 선언하는 구성 — 은 우회가 아니라 **위 세 게이트를 각각 통과하는 유일한 구성**이었다는 것이 본 관측으로 정립된다:
+The path adopted by p0d2f — **adding a new kernel module at the root of the subject tree** (`d2kernels.nim`, "this file is the ONLY delta from the baseline tree"), attaching the spec pragma to its `func`, adding a compile-time `template axiom*(val: untyped = "") {.pragma.}` shim alongside it, and having the overlay declare that symbol as the subject — is not a bypass; this observation establishes that it was the **only configuration that passes each of the three gates above**:
 
-1. 커널 `func`는 의존 0(리프) → 게이트 1 통과(3.2가 보여 주듯 리프는 편입한다).
-2. 오버레이 선언 → 게이트 2의 의무 공급원 확보(`p0d2f/env2/subject_variant/d2kernels.nim`의 구성 + `axiom_engine.nim:2854-2880`의 오버레이 분기).
-3. if 없는 비교/div 스펙 → 게이트 3 통과(p0d2f SPEC.md 개정 + 본 문서 3.4).
+1. The kernel `func` has 0 dependencies (a leaf) → passes gate 1 (as 3.2 shows, leaves are included).
+2. Overlay declaration → secures the obligation source for gate 2 (the configuration in `p0d2f/env2/subject_variant/d2kernels.nim` + the overlay branch in `axiom_engine.nim:2854-2880`).
+3. A comparison/div spec without an if → passes gate 3 (the p0d2f SPEC.md revision + 3.4 of this document).
 
-반대로 원본 함수에 스펙을 직접 붙이는 길은 게이트 1(비-리프)·게이트 2(비-오버레이)에서 막히며, 막힌 지점조차 "명세-원본 바인딩" 진단이 아니라 **프론티어/자격 구조의 fail-closed 거부**로 표출된다. 원본 코드와 형식 명세 사이의 이 연결 단절이 바로 베스포크 오버레이(추출 커널) 경로가 존재하는 구조적 이유다.
+Conversely, the path of directly attaching the spec to the original function is blocked at gate 1 (non-leaf) and gate 2 (non-overlay), and even the point of blockage is expressed not as a "spec-original binding" diagnosis but as a **fail-closed rejection of the frontier/qualification structure**. This disconnection between the original code and the formal spec is precisely the structural reason the bespoke overlay (extracted kernel) path exists.
 
-## 6. 산출물·범위
+## 6. Artifacts·scope
 
-| 산출물 | 경로 |
+| artifact | path |
 |---|---|
-| 변형 클론(핀 고정) | `p0d2g/env_orig/subject/` (@4aa8e22, lexer.nim 2행 수정) |
-| 패치 | `p0d2g/variant_orig.patch` (1531 B) |
-| 본 실행 로그 | `p0d2g/runs/orig_pragma.{out,err,exit}` (exit 2) |
-| leaf 대조 로그 | `p0d2g/runs/orig_pragma_ctrldelim.{out,err,exit}` (exit 2) |
-| if-프로브 로그 | `p0d2g/runs/if_probe.{out,err,exit}` (exit 2) |
-| 양성 대조 로그 | `p0d2g/runs/if_probe_ctl.{out,err,exit}` (exit 0) |
-| 상태/볼트 | `p0d2g/state_orig/`, `p0d2g/vault_orig/`, `p0d2g/state_probe/`, `p0d2g/vault_probe/` |
+| variant clone (pinned) | `p0d2g/env_orig/subject/` (@4aa8e22, 2 lines of lexer.nim modified) |
+| patch | `p0d2g/variant_orig.patch` (1531 B) |
+| log of this run | `p0d2g/runs/orig_pragma.{out,err,exit}` (exit 2) |
+| leaf control log | `p0d2g/runs/orig_pragma_ctrldelim.{out,err,exit}` (exit 2) |
+| if-probe log | `p0d2g/runs/if_probe.{out,err,exit}` (exit 2) |
+| positive control log | `p0d2g/runs/if_probe_ctl.{out,err,exit}` (exit 0) |
+| state/vault | `p0d2g/state_orig/`, `p0d2g/vault_orig/`, `p0d2g/state_probe/`, `p0d2g/vault_probe/` |
 
-범위 준수: 원본 클론 미변경, `src/`·p0d2f·`AGENT_SPEC.md`·discovery 무변경, `make build` 미실행, 커밋 없음. 재생(솔버/반례) 단계에는 도달하지 않았다 — 게이트 1이 그 상류에서 실행을 거부했기 때문이며, 이 자체가 본 슬라이스의 관측 결과다.
+Scope compliance: the original clone is unmodified, `src/`·p0d2f·`AGENT_SPEC.md`·discovery are unmodified, `make build` was not run, no commits. The replay (solver/counterexample) stage was not reached — because gate 1 refused the execution upstream of it, and this by itself is the observation result of this slice.
