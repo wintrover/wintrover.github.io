@@ -1279,6 +1279,8 @@ export type PublishOneFailInjection =
 export type PublishOneState =
 	| "published_verified"
 	| "already_published"
+	| "published_exists"
+	| "draft_verified"
 	| "draft_found"
 	| "dry_run"
 	| "ambiguous"
@@ -1303,6 +1305,7 @@ export type PublishOneResult = {
 	slug?: string;
 	url?: string;
 	observedPublished?: boolean;
+	observedDraft?: boolean;
 	method: PublishOneMethod;
 	attempts: number;
 	observedAt: string;
@@ -1771,6 +1774,7 @@ export function publishOneExitCode(result: PublishOneResult): number {
 	if (
 		result.state === "published_verified" ||
 		result.state === "already_published" ||
+		result.state === "draft_verified" ||
 		result.state === "dry_run"
 	) {
 		return 0;
@@ -1788,6 +1792,7 @@ export function buildPublishOneSummary(result: PublishOneResult): string {
 		`- canonical: ${result.canonicalUrl || "n/a"}`,
 		`- url: ${result.url || "n/a"}`,
 		`- attempts: ${result.attempts}`,
+		`- observed draft: ${result.observedDraft ?? false}`,
 		`- observed at: ${result.observedAt}`,
 	];
 	if (result.runUrl) lines.push(`- run: ${result.runUrl}`);
@@ -1809,6 +1814,7 @@ export type PublishOneOptions = {
 	postPath: string;
 	platform: "devto";
 	dryRun: boolean;
+	draftOnly?: boolean;
 	failInjection: PublishOneFailInjection;
 	apiKey?: string;
 	publicBaseUrl?: string;
@@ -1825,6 +1831,7 @@ export async function runPublishOne(
 	const fetchFn = options.fetchFn || fetch;
 	const sleepFn = options.sleepFn || devtoSleep;
 	const nowFn = options.nowFn || (() => new Date());
+	const draftOnly = options.draftOnly ?? true;
 	const publicBaseUrl = normalizePublicBaseUrl(
 		options.publicBaseUrl ||
 			process.env.BLOG_PUBLIC_BASE_URL ||
@@ -1915,12 +1922,19 @@ export async function runPublishOne(
 		});
 	}
 	if (action === "already_published" && selection.kind === "one") {
-		result.state = "already_published";
+		result.state = draftOnly ? "published_exists" : "already_published";
 		result.method = "already_published";
 		result.id = selection.article.id;
 		result.slug = selection.article.slug || prepared.slug;
 		result.url = selection.article.url;
 		result.observedPublished = true;
+		if (draftOnly) {
+			logError(
+				"post-to-dev",
+				"publish-one found an already published article; draft-only requires unpublish-one first",
+				{ id: selection.article.id, slug: selection.article.slug },
+			);
+		}
 		return finalize();
 	}
 	if (options.dryRun) {
@@ -2013,6 +2027,53 @@ export async function runPublishOne(
 		result.method = "created";
 		result.state = "draft_found";
 		process.stdout.write(`[publish-one] created draft id=${articleId}\n`);
+	}
+
+	if (draftOnly) {
+		let verifiedDraft: DevtoArticle | null = null;
+		try {
+			const latestArticles = await listAllDevtoArticles(apiKey, {
+				fetchFn,
+				sleepFn,
+			});
+			verifiedDraft =
+				latestArticles.find((article) => article.id === articleId) ?? null;
+		} catch (error) {
+			return failWith("unknown", "unknown", {
+				stage: "draft_verify",
+				error: asErrorMessage(error),
+			});
+		}
+		if (!verifiedDraft) {
+			return failWith("unknown", "unknown", {
+				stage: "draft_verify",
+				detail: "draft not found after create/adopt",
+				draftId: articleId,
+			});
+		}
+		if (verifiedDraft.published !== false) {
+			return failWith("published_exists", "already_published", {
+				stage: "draft_verify",
+				draftId: articleId,
+			});
+		}
+		const canonicalMatched =
+			normalizeCanonicalUrl(verifiedDraft.canonical_url || "") ===
+			result.canonicalUrl;
+		if (!canonicalMatched) {
+			return failWith("unknown", "unknown", {
+				stage: "draft_verify",
+				detail: "canonical mismatch",
+				draftId: articleId,
+			});
+		}
+		result.id = articleId;
+		result.slug = verifiedDraft.slug || result.slug;
+		result.url = verifiedDraft.url;
+		result.state = "draft_verified";
+		result.observedDraft = true;
+		result.observedPublished = false;
+		return finalize();
 	}
 
 	const published = await writeDevtoArticle(

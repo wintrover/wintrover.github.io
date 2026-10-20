@@ -125,6 +125,7 @@ function articleApiRoutes(options: {
 	latestStatus?: number;
 }) {
 	const slug = "publish-one-test";
+	const articles = [...(options.existing ?? [])];
 	const verifyBody = {
 		id: options.createdDraftId ?? 7,
 		slug,
@@ -137,20 +138,23 @@ function articleApiRoutes(options: {
 			match: (url) => url.includes("/api/articles/me/all"),
 			respond: (url) => {
 				const page = Number(new URL(url).searchParams.get("page") || "1");
-				return fakeResponse(page === 1 ? (options.existing ?? []) : []);
+				return fakeResponse(page === 1 ? articles : []);
 			},
 		},
 		{
 			match: (url, init) =>
 				url.endsWith("/api/articles") && (init?.method ?? "GET") === "POST",
-			respond: () =>
-				fakeResponse({
+			respond: () => {
+				const draft = article({
 					id: options.createdDraftId ?? 501,
 					slug,
 					url: `https://dev.to/wintrover/${slug}`,
 					published: false,
 					canonical_url: CANONICAL,
-				}),
+				});
+				articles.push(draft);
+				return fakeResponse(draft);
+			},
 		},
 		{
 			match: (url, init) =>
@@ -190,6 +194,7 @@ async function runInTmp(
 			postPath,
 			platform: "devto",
 			dryRun: false,
+			draftOnly: false,
 			failInjection: "none",
 			apiKey: "test-key",
 			publicBaseUrl: "https://wintrover.github.io/",
@@ -1151,6 +1156,57 @@ describe("runPublishOne (fake API)", () => {
 	});
 });
 
+describe("draft-only runPublishOne", () => {
+	test("새 초안을 만들고 /me/all의 published:false로 검증한다", async () => {
+		const { fetchFn, calls } = articleApiRoutes({ createdDraftId: 501 });
+		const { result } = await runInTmp(fetchFn, { draftOnly: true });
+		expect(result.state).toBe("draft_verified");
+		expect(result.observedDraft).toBe(true);
+		expect(result.observedPublished).toBe(false);
+		expect(result.id).toBe(501);
+		expect(calls.filter((call) => call.init?.method === "PUT")).toHaveLength(0);
+	});
+
+	test("기존 초안을 채택하고 쓰기 없이 검증한다", async () => {
+		const draft = article({
+			id: 42,
+			published: false,
+			canonical_url: CANONICAL,
+		});
+		const { fetchFn, calls } = articleApiRoutes({ existing: [draft] });
+		const { result } = await runInTmp(fetchFn, { draftOnly: true });
+		expect(result.state).toBe("draft_verified");
+		expect(result.id).toBe(42);
+		expect(calls.filter((call) => call.init?.method)).toHaveLength(0);
+	});
+
+	test("이미 공개된 글은 published_exists로 실패한다", async () => {
+		const published = article({
+			id: 7,
+			published: true,
+			canonical_url: CANONICAL,
+		});
+		const { fetchFn, calls } = articleApiRoutes({ existing: [published] });
+		const { result } = await runInTmp(fetchFn, { draftOnly: true });
+		expect(result.state).toBe("published_exists");
+		expect(publishOneExitCode(result)).toBe(1);
+		expect(calls.filter((call) => call.init?.method)).toHaveLength(0);
+	});
+
+	test("응답 유실 주입은 unknown으로 끝나고 재POST하지 않는다", async () => {
+		const { fetchFn, calls } = articleApiRoutes({ existing: [] });
+		const { result } = await runInTmp(fetchFn, {
+			draftOnly: true,
+			failInjection: "post_response_loss",
+		});
+		expect(result.state).toBe("unknown");
+		expect(publishOneExitCode(result)).toBe(1);
+		expect(calls.filter((call) => call.init?.method === "POST")).toHaveLength(
+			1,
+		);
+	});
+});
+
 describe("publish-one helpers", () => {
 	test("buildGithubRunUrl은 환경 변수가 모일 때만 URL을 만든다", () => {
 		expect(buildGithubRunUrl({})).toBeUndefined();
@@ -1176,6 +1232,8 @@ describe("publish-one helpers", () => {
 			0,
 		);
 		expect(publishOneExitCode({ ...base, state: "already_published" })).toBe(0);
+		expect(publishOneExitCode({ ...base, state: "draft_verified" })).toBe(0);
+		expect(publishOneExitCode({ ...base, state: "published_exists" })).toBe(1);
 		expect(publishOneExitCode({ ...base, state: "dry_run" })).toBe(0);
 		expect(publishOneExitCode({ ...base, state: "failed" })).toBe(1);
 		expect(publishOneExitCode({ ...base, state: "unknown" })).toBe(1);
