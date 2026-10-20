@@ -1428,7 +1428,7 @@ export function decideReconcileAction(
 ): DevtoReconcileAction {
 	if (selection.kind === "none") return "create_draft";
 	if (selection.kind === "one") {
-		return isDevtoPublished(selection.article)
+		return selection.article.published === true
 			? "already_published"
 			: "adopt_draft";
 	}

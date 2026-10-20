@@ -373,6 +373,19 @@ describe("decideReconcileAction", () => {
 			}),
 		).toBe("ambiguous");
 	});
+
+	test("인증 목록의 draft 재판정은 published 플래그만 본다(published_at이 있어도 draft로 입양한다)", () => {
+		expect(
+			decideReconcileAction({
+				kind: "one",
+				article: article({
+					id: 3,
+					published: false,
+					published_at: "2026-06-01T00:00:00Z",
+				}),
+			}),
+		).toBe("adopt_draft");
+	});
 });
 
 describe("classifyDevtoError", () => {
