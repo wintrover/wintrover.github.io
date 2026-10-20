@@ -17,11 +17,11 @@
 - 콘텐츠 원천은 `main`이다. 사이트 배포는 `pages-deploy.yml`이 `main`에서 수행한다.
 - 병합 권위는 GitHub ruleset + `validate` 필수 검사 + 오너 PR 승인이다. 검증을 우회하는 직접 push는 금지한다.
 - 외부 발행은 `Draft One`(`repository_dispatch: draft-one`)만 사용하며, `sns-publish` 환경의 오너 승인 후 실행한다.
-- DEV.to 결과물은 **초안(`published:false`)만** 허용한다. 공개 전환은 기존 글을 `Unpublish One`으로 초안화한 뒤에만 가능하다.
+- 신규 DEV.to 결과물은 **초안(`published:false`)만** 허용한다. 공개 전환은 이 저장소의 자동화 범위가 아니며, 이미 공개된 글을 초안으로 되돌릴 때는 `Unpublish One`을 사용한다.
 - 발행 완료 판정은 DEV.to `GET /api/articles/me/all`에서 동일 `id`와 `published:false`를 관측하는 것이다. 로컬 로그·마커의 success는 증거가 아니다.
 - 재실행은 canonical URL/title로 기존 초안을 찾아 `already_draft`/`draft_found`로 종료하며 새 POST를 만들지 않는다.
 - 결과 불명(`unknown`)은 성공으로 기록하지 않으며 자동 재POST하지 않는다.
-- `DEVTO_API_KEY`는 `sns-publish` 환경 secret으로만 제공한다. 저장소 수준 secret은 두지 않는다.
+- `DEVTO_API_KEY`의 목표 권위는 `sns-publish` 환경 secret이다. 오너가 값을 입력하고 저장소 수준 secret을 삭제하기 전까지는 저장소 secret이 임시로 사용된다.
 
 ### 역사 기록 (현재 발행 권위 아님)
 
