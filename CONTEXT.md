@@ -10,43 +10,24 @@
 - 이 프로젝트는 커밋 히스토리와 대화 로그에서 개발자의 사고방식을 추출해 블로그 포스팅으로 전환하는 Devlog 프로젝트다.
 - 결과물은 단순 작업 기록이 아니라 문제 정의, 의사결정, 시행착오, 개선 근거를 재구성한 학습 가능한 개발 기록이어야 한다.
 
-## 1-1) Devlog/Axiom 엔진 아키텍처 규칙
+## 1-1) 운영 계약과 발행 권위
 
-- 배포 상태의 진실 원천은 UI가 아니라 루트 `state.json`이며, 구조는 그래프(Node/Edge) 모델을 따른다.
-- Node는 최소한 `id`, `path`, `kind`, `status`, `timestamps`, `integrity`를 포함해 포스트와 사고 조각의 상태를 기술해야 한다.
-- Edge는 최소한 `from`, `to`, `relation`, `status`를 포함해 `parent_thought_id`, `derived_from` 같은 사고 연결을 표현해야 한다.
-- 무결성 검증은 단순 `published` 플래그가 아니라 의존성(`requires`)의 충족 여부를 계산하는 방식이어야 한다.
-- 배포/동기화/그래프 생성 비즈니스 로직은 Nim CLI(`devlog`) 내부에 캡슐화하고, GitHub Actions나 향후 `/admin`은 CLI 호출만 수행해야 한다.
-- GitHub Actions는 임시 GUI로 사용하며 `workflow_dispatch` 입력과 `GITHUB_STEP_SUMMARY` 출력을 제공해야 한다.
-- Nim CLI 실행으로 `state.json`이 변경되면 워크플로는 변경분을 `main`에 자동 커밋/푸시하고 커밋 메시지에 `[skip ci]`를 포함해야 한다.
-- publish 워크플로는 `X_API_KEY`, `LINKEDIN_ACCESS_TOKEN`, `DEVTO_API_KEY`를 Secrets에서 주입해 Nim 엔진에 전달해야 한다.
-- 초기 publish 구현은 외부 API 호출 대신 플랫폼별 Mock 성공 응답을 기록하고 `state.json` 채널 상태를 갱신해야 한다.
-- 이미 `published` 상태인 노드의 publish 재호출은 API/Mock 호출 없이 `already_published`를 반환하는 멱등성 규칙을 지켜야 한다.
-- [REQ-DEPLOY-01] SNS 배포 워크플로는 Git 파일시스템 상태머신을 사용해야 하며 `.deploy/lock` Soft Lock으로 중복 실행을 방지해야 한다.
-- [REQ-DEPLOY-02] `main` 브랜치는 포스팅 작성과 코드 개발의 기본 브랜치로 사용하고 SNS 배포 트리거 대상으로 사용하지 않는다.
-- [REQ-DEPLOY-03] `deploy` 브랜치는 실제 SNS 배포가 일어나는 프로덕션 브랜치로 사용해야 한다.
-- [REQ-DEPLOY-04] 배포 상태는 소스코드가 없는 독립 `DB` 브랜치(이하 DB 브랜치)에서만 관리해야 한다.
-- [REQ-DEPLOY-05] 포스트별 플랫폼 상태는 `.deploy/[post-key]/[platform].status`를 SSOT로 기록하고 `.success`/`.failed` 마커로 재시도 여부를 결정해야 한다.
-- [REQ-DEPLOY-06] 플랫폼 상태 파일(`.status`)에는 외부 플랫폼 식별자(`postId`, `url`)를 저장해 중복 발행 방지 정확도를 유지해야 한다.
-- [REQ-DEPLOY-07] 상태머신 규칙은 `.success`가 있으면 Skip, `.failed` 또는 상태 파일 부재면 재배포 시도를 수행해야 한다.
-- LinkedIn 배포는 `rest/posts`를 사용하고 Posts API 페이로드(`author`, `commentary`, `visibility`)를 적용해야 하며 Author는 `v2/me`로 확인한 person URN을 우선 주입하되 프로필 조회 권한 이슈가 발생하면 `LINKEDIN_PERSON_URN`(기본값 `urn:li:person:binfyrHJAK`) fallback으로 배포를 지속해야 한다.
-- LinkedIn `commentary`는 소개 문단과 링크 문단을 `\n\n`으로 분리해야 하며 링크는 별도 단락으로 출력해야 한다.
+### 현재 유효한 계약
 
-- LinkedIn 소개 문단은 배포 대상 포스트의 `excerpt`/`description`을 sanitize한 값을 사용하고, 소개 문단을 확보하지 못하면 영어 기본 소개문을 사용해야 한다.
-- SNS 배포 워크플로는 `workflow_dispatch` 입력 `linkedin_dry_run=true`일 때 LinkedIn 발행 API 호출을 생략하고 canonical URL·commentary·payload 미리보기만 출력해야 한다.
-- DEV.to 및 LinkedIn 본문의 이미지 링크는 `https://wintrover.github.io/` 기반 절대 경로로 치환해야 한다.
-- 모든 플랫폼 시도 결과는 `GITHUB_STEP_SUMMARY` 마크다운 표와 `DB` 브랜치의 `STATUS.md`에 동시 반영해야 하며, 상태 스냅샷은 `DB` 브랜치에서만 단일 커밋으로 영속화해야 한다.
-- SNS 배포 워크플로는 `deploy`와 `DB` 브랜치를 이중 체크아웃하고, 배포 후 `database` 저장소에서 `git pull --rebase` 기반 최대 3회 재시도 후 원자적으로 푸시해야 한다.
-- [REQ-DEPLOY-08] `main` 브랜치에는 `.deploy/` 상태 데이터를 커밋하거나 푸시하면 안 된다.
-- [REQ-DEPLOY-09] SNS 배포 스캔 대상은 현재 워킹 디렉토리의 `src/posts/` 아래에 실제로 존재하는 물리적 `.md` 파일로만 제한해야 하며, 이 경로 밖의 입력·Git 이력·캐시 인덱스 결과를 배포 후보로 허용하면 안 된다.
-- [REQ-DEPLOY-10] SNS 배포 실행 시 `GITHUB_STEP_SUMMARY`에는 스캔 기준 루트와 배포 후보 물리 파일 목록 스냅샷을 함께 기록해 실행 시점 입력 집합을 추적 가능해야 한다.
-- [REQ-DEPLOY-11] SNS 배포 실행 시 터미널 로그에도 스캔 기준 루트와 배포 후보 물리 파일 목록 스냅샷을 동일하게 출력해 워크플로 로그 검색으로 입력 집합을 재구성 가능해야 한다.
-- [REQ-DEPLOY-12] SNS 배포 스크립트 입력 계약은 디렉터리 target을 즉시 거부하고 `src/posts/` 내부(단, `src/posts/ko/` 제외)의 단일 `.md` 파일만 허용해야 한다.
-- [REQ-DEPLOY-13] SNS 배포 워크플로는 preflight 단계에서 후보 파일 수를 계산해 `MAX_PUBLISH_PER_RUN`(기본값 1) 초과 시 하드 실패해야 하며, `scanned-root`/`candidate` 요약 출력과 환경 승인 이후에만 publish를 실행해야 한다.
-- [REQ-DEPLOY-14] SNS 배포 워크플로는 preflight 또는 publish 실패 시 `notify-on-failure` 단계에서 Slack/Email 알림을 시도해야 한다.
-- [REQ-DEPLOY-15] 대량 재처리는 일반 SNS 배포 워크플로에서 금지하고, 수동 승인과 배치 제한을 가진 `sns-bulk-backfill` 전용 워크플로에서만 허용해야 한다.
-- [REQ-DEPLOY-16] `src/posts/ko/` 로케일 서브트리의 물리 `.md` 파일은 배포 후보에서 제외해야 한다.
-- [REQ-DEPLOY-17] 배포 후보 선정 시 `post_key`는 파일명(`basename`)만 사용하며 전체 경로를 포함하지 않아야 한다. `scripts/post-to-dev.ts`의 `toPostKey()` 함수는 반드시 `basename`만 반환해야 하며, 이를 위반할 경우 `[REQ-DEPLOY-17]` 메시지와 함께 에러를 발생시켜야 한다. (`tests/sns-deploy-state-machine.test.ts`에서 단위 테스트로 검증됨)
+- 콘텐츠 원천은 `main`이다. 사이트 배포는 `pages-deploy.yml`이 `main`에서 수행한다.
+- 병합 권위는 GitHub ruleset + `validate` 필수 검사 + 오너 PR 승인이다. 검증을 우회하는 직접 push는 금지한다.
+- 외부 발행은 `Draft One`(`repository_dispatch: draft-one`)만 사용하며, `sns-publish` 환경의 오너 승인 후 실행한다.
+- DEV.to 결과물은 **초안(`published:false`)만** 허용한다. 공개 전환은 기존 글을 `Unpublish One`으로 초안화한 뒤에만 가능하다.
+- 발행 완료 판정은 DEV.to `GET /api/articles/me/all`에서 동일 `id`와 `published:false`를 관측하는 것이다. 로컬 로그·마커의 success는 증거가 아니다.
+- 재실행은 canonical URL/title로 기존 초안을 찾아 `already_draft`/`draft_found`로 종료하며 새 POST를 만들지 않는다.
+- 결과 불명(`unknown`)은 성공으로 기록하지 않으며 자동 재POST하지 않는다.
+- `DEVTO_API_KEY`는 `sns-publish` 환경 secret으로만 제공한다. 저장소 수준 secret은 두지 않는다.
+
+### 역사 기록 (현재 발행 권위 아님)
+
+- 루트 `state.json`의 그래프(Node/Edge) 모델, Nim CLI(`engine/devlog.nim`), `DB`/`deploy` 브랜치, `.deploy/` 상태·`.success` 마커는 과거 운영 체계의 기록이다.
+- 이 기록은 삭제하지 않고 별도 아카이브·퇴역 작업에서 다룬다. 현재 발행 경로는 위 계약만 따른다.
+- LinkedIn 자동 발행은 비활성이며 `LINKEDIN_ACCESS_TOKEN`은 저장소에 존재하지 않는다. 재활성화는 별도 제품 결정과 독립 acceptance를 요구한다.
 
 ## 2) URL 아키텍처 규칙
 

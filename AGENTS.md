@@ -8,6 +8,17 @@ description: 블로그 에이전트의 운영 페르소나, 도구 활용 및 �
 이 파일은 AI 에이전트가 이 프로젝트(`wintrover-blog`)에서 효과적으로 작업할 수 있도록 가이드라인과 컨텍스트를 제공합니다.
 블로그 오너의 공식 정체성은 **사고 궤적 아키텍트 (Thought Trajectory Architect)**이며, 핵심 역량은 단순 구현이 아니라 **복잡한 문제를 해결하기 위한 논리적 궤적을 설계하고 이를 AI와 협업해 물리적 코드로 이식하는 것**이다.
 
+## 0. 현재 운영 계약 (요약)
+
+- 콘텐츠 원천은 `main`이며, 사이트 배포는 `pages-deploy.yml`이 `main`에서 수행한다.
+- 병합 권위는 GitHub ruleset + `validate` 필수 검사 + 오너 PR 승인이다. 검증을 우회하는 직접 push는 금지한다.
+- 외부 발행은 `Draft One`(`repository_dispatch: draft-one`)만 사용하며, `sns-publish` 환경의 오너 승인 후 실행한다.
+- DEV.to 결과물은 **초안(`published:false`)만** 허용한다. 공개 전환은 기존 글을 `Unpublish One`으로 초안화한 뒤에만 가능하다.
+- 발행 완료 판정은 DEV.to `GET /api/articles/me/all`에서 동일 `id`와 `published:false`를 관측하는 것이다. 로컬 로그·마커의 success는 증거가 아니다.
+- 결과 불명(`unknown`)은 성공으로 기록하지 않으며 자동 재POST하지 않는다.
+- `state.json`, `DB`/`deploy` 브랜치, Nim `devlog`, `.deploy/` 마커는 **역사 기록**이며 현재 발행 권위가 아니다.
+- LinkedIn 자동 발행은 비활성이다. 재활성화는 별도 제품 결정과 독립 acceptance를 요구한다.
+
 ## 1. 에이전트 운영 및 도구 사용 규정
 
 ### 핵심 가동 지침

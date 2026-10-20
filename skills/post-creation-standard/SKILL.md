@@ -18,8 +18,9 @@ description: 블로그 포스트의 일관된 품질과 구조를 유지하기 �
 - **프로젝트 명칭 정책**: **포스팅 내용에서 프로젝트명은 일관되게 지칭한다.**
   - `Axiom Enterprise` 폴더명을 그대로 사용하지 말고, `Axiom`으로만 지칭
   - 예: "Axiom Enterprise was built" → "Axiom was built"
-- **Procedure Gate 예외**: 콘텐츠(`src/posts/`) 파일은 아키텍처의 '실록(History)' 또는 '홍보(Publicity)' 영역에 속하므로 `src/core`에 적용되는 Procedure Gate의 엄격한 증거 의무에서 제외된다. 포스트 작성은 `--no-verify`로 커밋할 수 있다.
-- **deploy 브랜치 검증 의무**: `deploy` 브랜치에 푸시한 후 **반드시** `gh run list`와 `gh run view`로 GitHub Actions 실행 결과를 검증해야 한다.
+- **콘텐츠 변경 경로**: 콘텐츠(`src/posts/`)는 `main`에 PR로 병합한다. `deploy` 브랜치에 푸시하거나 `--no-verify`로 검증을 우회하지 않는다.
+- **병합 검증 의무**: PR 생성 후 `validate` 필수 검사 결과를 `gh run list`/`gh run view`로 확인하고, 오너 승인 없이 병합하지 않는다.
+- **외부 발행**: 포스트 병합 후 DEV.to 초안이 필요하면 `devto-publishing` 스킬의 `Draft One` 절차를 따른다. 공개 발행은 이 스킬의 범위가 아니다.
 - **GitHub Actions 확인**: `gh` 명령어만 사용한다. (예: `gh run list`, `gh run view`)
 - **Git 명령어 페이저 비활성화**: 모든 git 명령어는 반드시 `git --no-pager <subcommand>` 형식으로 실행한다.
 - **공식 문서 탐색**: Context7은 MCP가 아닌 CLI(`ctx7` 또는 `npx ctx7`)만 사용한다.

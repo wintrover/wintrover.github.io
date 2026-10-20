@@ -1126,7 +1126,10 @@ async function attemptPublish(post: PreparedPost, platform: Platform) {
 	}
 }
 
-async function runDeployment(targetInput?: string, platformsArg?: string) {
+export async function runDeployment(
+	targetInput?: string,
+	platformsArg?: string,
+) {
 	if (
 		!/^(1|true|yes|on)$/i.test(
 			String(process.env.PUBLISH_LEGACY_ENABLED || "").trim(),
