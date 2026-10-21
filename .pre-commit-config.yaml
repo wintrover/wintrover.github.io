@@ -2,6 +2,9 @@ repos:
 -   repo: builtin
     hooks:
     -   id: trailing-whitespace
+        # A unified diff spells an empty context line as a single space, so
+        # trimming it corrupts the recorded patch. Keep this artifact verbatim.
+        exclude: ^public/evidence/p0d2g/orig_pragma/variant_orig\.patch$
         priority: 0
     -   id: end-of-file-fixer
         priority: 0
