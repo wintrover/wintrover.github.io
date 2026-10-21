@@ -40,7 +40,6 @@ coverage/
 *.ps1
 !scripts/dump_source/dump_sources.ps1
 !package.json
-!package-lock.json
 !tsconfig.json
 !biome.json
 !stryker.config.json
