@@ -13,7 +13,7 @@ const AGENT_DOCS = [
 
 const CODEOWNER_PATHS = [
 	"/AGENTS.md",
-	"/CONTEXT.md",
+	"/docs/spec/",
 	"/docs/agents/",
 	"/.pre-commit-config.yaml",
 	"/package.json",

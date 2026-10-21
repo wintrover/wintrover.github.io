@@ -1,23 +1,29 @@
 # Agent Task Process
 
-> AGENTS.md §0.3(증거 문화 불변식)에서 추출한 절차 문서다. **규칙의 원천은 `AGENTS.md`와 `CONTEXT.md`**이며, 이 문서는 "어떻게 실행하는가"만 담는다.
+> AGENTS.md §0.3(증거 문화 불변식)에서 추출한 절차 문서다. **규칙의 원천은 `AGENTS.md`와 `docs/spec/`**이며, 이 문서는 "어떻게 실행하는가"만 담는다.
 
 ## 작업 시작 전 전수조사 (MUST)
 
-- **작업 시작 시 반드시 `CONTEXT.md`, BDD Gherkin(.feature), 테스트 코드를 전수조사한다.** 사용자의 지시를 받으면 구현에 앞서 이 세 가지 요소를 최우선으로 분석하여 현재 상태와 규칙을 완벽히 파악해야 한다.
-- **UI 모션 관련 작업은 `CONTEXT.md`의 `[UI Motion Rule]`을 최우선으로 확인한다.** Svelte 컴포넌트 재사용으로 진입 모션이 소실되는 회귀를 절대 허용하지 않는다.
+- **작업 시작 시 반드시 `docs/spec/`, BDD Gherkin(.feature), 테스트 코드를 전수조사한다.** 사용자의 지시를 받으면 구현에 앞서 이 세 가지 요소를 최우선으로 분석하여 현재 상태와 규칙을 완벽히 파악해야 한다.
+- **UI 모션 관련 작업은 `docs/spec/ui-design.md`의 `[UI Motion Rule]`을 최우선으로 확인한다.** Svelte 컴포넌트 재사용으로 진입 모션이 소실되는 회귀를 절대 허용하지 않는다.
 - `skills/` 디렉토리를 탐색한다. 현재 작업과 연관된 `SKILL.md`가 있다면 즉시 로드하고, 그 스킬이 가리키는 절차 문서를 따른다. (`skills/`는 **발견 포인터**이고 절차 SSOT가 아니다.)
 
 ## 기능 변경 5단계 (MUST)
 
-1. **Context**: 전역 규칙에 영향이 있는 요구사항을 `CONTEXT.md`에 먼저 반영한다.
+1. **Context**: 전역 규칙에 영향이 있는 요구사항을 관련 `docs/spec/` 문서에 먼저 반영한다.
 2. **BDD**: 기능 변경을 `.feature`의 Given-When-Then 시나리오로 먼저 정의한다.
 3. **TDD**: 정의된 시나리오에 따라 **실패하는** 테스트를 먼저 작성한다.
 4. **Implementation**: 테스트를 통과하기 위한 **최소한의 코드 변경**만 반영한다.
-5. **Verification**: 테스트 통과와 빌드 결과가 `CONTEXT.md`와 일치하는지 확인한다.
+5. **Verification**: 테스트 통과와 빌드 결과가 `docs/spec/`와 일치하는지 확인한다.
 
+- 모든 작업은 위 순서를 **반드시(MUST)** 준수하며, 선행 단계 완료 전 다음 단계로 진행하거나 코드 구현을 시작하는 것을 엄격히 금지한다.
 - 절차가 하나라도 누락되거나 순서가 뒤바뀌면 즉시 작업을 중단하고 절차를 복구한다.
 - **아키텍트의 사고 궤적 보존 규칙**: 모든 변경 사항은 BDD와 TDD를 통해 의사결정의 논리적 증명을 완료하기 전까지 완료로 간주하지 않는다.
+
+## 게이트·스크립트 불변 규칙 (MUST)
+
+- MCP 프록시(`scripts/context7-toolname-proxy.ts`)는 다운스트림 입력 프레이밍으로 Content-Length와 NDJSON을 모두 수용하고, 감지된 프레이밍과 동일한 형식으로 응답해야 한다.
+- 레포지토리 루트의 런타임/설정 스크립트는 `.js/.mjs/.cjs` 대신 TypeScript 또는 JSON 기반으로 유지한다.
 
 ## 부작용 가설 (검증 단계)
 
@@ -42,14 +48,14 @@
 - 포스트 상세 라우트(`/post/:slug/`)에서도 히어로/헤더 진입 모션이 동일 톤으로 재생되어야 하며, 직접 진입과 라우트 전환 모두에서 DOM 재생성으로 이를 보장한다.
 - BDD Gherkin의 UI Then 절은 눈에 보이는 결과뿐 아니라 DOM 생명주기(생성/파괴) 상태를 명시해야 한다.
 - "화면 데이터만 정상"인 상태를 모션 정상으로 간주하지 않으며, 모션 회귀 방지의 완료 기준은 DOM 교체 증명까지 포함한다.
-- **정본**: `CONTEXT.md` §4 `[UI Motion Rule]`.
+- **정본**: `docs/spec/ui-design.md`의 `[UI Motion Rule]`.
 
 ## 포스트 작성 표준
 
-- **이중 언어 정책**: 모든 포스트는 영어(English)와 한국어(Korean) 두 언어로 작성한다. 파일명은 동일한 `YYYY-MM-DD-N.md`를 쓴다.
+- **이중 언어 정책**: 모든 포스트는 영어(English)와 한국어(Korean) 두 언어로 작성한다. 파일명은 동일한 `YYYY-MM-DD-N.md`를 쓴다. (정본은 `docs/spec/post-creation.md`다)
   - 영어: `src/posts/project/` · `src/posts/company/` · `src/posts/archright/`
   - 한국어: `src/posts/ko/project/` · `src/posts/ko/company/` · `src/posts/ko/archright/`
-- **카테고리**: `categories.json`의 선언을 따른다 (`Project` · `Company Work` · `Archright`). 정본은 `CONTEXT.md` §2·§7이다.
+- **카테고리**: `categories.json`의 선언을 따른다 (`Project` · `Company Work` · `Archright`). 정본은 `docs/spec/post-creation.md`다.
 - **프론트매터 필수 필드**:
   - `layout: post`
   - `title`: 명확하고 호기심을 유발하는 제목
@@ -76,8 +82,8 @@
 ## 시각화 자료(Mermaid) 처리
 
 - **마크다운 직접 사용 금지**: 본문에 ` ```mermaid ` 블록을 그대로 두지 않는다.
-- **이미지 생성**: `scripts/generate-blog-images.ts` 파일에 Mermaid 소스를 등록한다.
-- **명령어 실행**: `bun scripts/generate-blog-images.ts`를 실행하여 `public/images/`에 PNG를 생성한다. (tsx보다 bun이 실행 속도가 빠름)
+- **이미지 생성**: Mermaid 소스는 `scripts/image-tools.ts`의 파이프라인에 등록한다. (정본 진입점: `pnpm run images:generate:ci` → `scripts/image-tools.ts`)
+- **명령어 실행**: `pnpm run images:generate:ci`를 실행하여 `public/images/`에 PNG를 생성한다. 이 명령은 CI(`pages-deploy.yml`)가 사용하는 동일 경로다.
 - **참조 방식**: 마크다운에서는 `../assets/images/파일명.png` 경로를 사용하여 이미지를 삽입한다.
 
 ## 외부 플랫폼(DEV.to) 발행
@@ -109,5 +115,5 @@
 ## 관련
 
 - [AGENTS.md §0.3](../../AGENTS.md) — 증거 문화 불변식(압축 버전)
-- [CONTEXT.md §6](../../CONTEXT.md) — 작업 절차 표준(MUST/차단 규칙)
+- [docs/spec/](../../spec/) — 도메인 계약 정본(URL·빌드·UI·포스트 작성)
 - [docs/agents/quality-gates.md](quality-gates.md) — 집행 체인

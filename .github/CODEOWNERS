@@ -6,7 +6,7 @@
 /scripts/procedure-gate.ts @wintrover
 /tests/devto-publish-one.test.ts @wintrover
 /tests/legacy-publish-isolation.test.ts @wintrover
-/CONTEXT.md @wintrover
+/docs/spec/ @wintrover
 /AGENTS.md @wintrover
 /docs/agents/ @wintrover
 /.pre-commit-config.yaml @wintrover

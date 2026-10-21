@@ -23,6 +23,8 @@ const IMPLEMENTATION_PREFIXES = [
 
 const TEST_FILE_REGEX = /^tests\/.+\.test\.[cm]?[jt]sx?$/;
 const FEATURE_FILE_REGEX = /^tests\/features\/.+\.feature$/;
+const SPEC_FILE_REGEX = /^docs\/spec\/.+\.md$/;
+const SPEC_DIR = "docs/spec";
 const REF_PATTERN = /@ref\s+(REQ-[A-Z]+-\d+)/g;
 
 function normalizeFiles(files: string[]) {
@@ -30,15 +32,20 @@ function normalizeFiles(files: string[]) {
 }
 
 const POSTS_PATHS = ["src/posts/", "src/posts/ko/"];
+const SPEC_PATHS = ["docs/spec/"];
 
 function isContentFile(filePath: string) {
 	return POSTS_PATHS.some((p) => filePath.startsWith(p));
 }
 
+function isSpecFile(filePath: string) {
+	return SPEC_PATHS.some((p) => filePath.startsWith(p));
+}
+
 function matchesImplementationFile(filePath: string) {
-	if (filePath === "CONTEXT.md") return false;
 	if (filePath.startsWith("tests/")) return false;
 	if (isContentFile(filePath)) return false;
+	if (isSpecFile(filePath)) return false;
 	return IMPLEMENTATION_PREFIXES.some((prefix) => filePath.startsWith(prefix));
 }
 
@@ -56,22 +63,27 @@ function extractRefsFromFile(filePath: string): string[] {
 	}
 }
 
-function extractRefsFromContext(): Set<string> {
+function extractRefsFromSpecs(): Set<string> {
+	const refs: Set<string> = new Set();
 	try {
-		const content = fs.readFileSync("CONTEXT.md", "utf-8");
-		const refs: Set<string> = new Set();
-		let match: RegExpExecArray | null;
-		while ((match = REF_PATTERN.exec(content)) !== null) {
-			refs.add(match[1]);
+		if (!fs.existsSync(SPEC_DIR)) return refs;
+		const files = fs
+			.readdirSync(SPEC_DIR)
+			.filter((f) => f.endsWith(".md"))
+			.sort();
+		for (const file of files) {
+			const content = fs.readFileSync(path.join(SPEC_DIR, file), "utf-8");
+			let match: RegExpExecArray | null;
+			while ((match = REF_PATTERN.exec(content)) !== null) {
+				refs.add(match[1]);
+			}
+			const bracketPattern = /\[REQ-[A-Z]+-\d+\]/g;
+			while ((match = bracketPattern.exec(content)) !== null) {
+				refs.add(match[0].slice(1, -1));
+			}
 		}
-		const bracketPattern = /\[REQ-[A-Z]+-\d+\]/g;
-		while ((match = bracketPattern.exec(content)) !== null) {
-			refs.add(match[0].slice(1, -1));
-		}
-		return refs;
-	} catch {
-		return new Set();
-	}
+	} catch {}
+	return refs;
 }
 
 function extractRefsFromFeatures(): Set<string> {
@@ -94,9 +106,9 @@ function extractRefsFromFeatures(): Set<string> {
 }
 
 function validateRefs(changedFiles: string[]): RefValidationResult {
-	const allRefsInContext = extractRefsFromContext();
+	const allRefsInSpecs = extractRefsFromSpecs();
 	const allRefsInFeatures = extractRefsFromFeatures();
-	const combinedRefs = new Set([...allRefsInContext, ...allRefsInFeatures]);
+	const combinedRefs = new Set([...allRefsInSpecs, ...allRefsInFeatures]);
 	const unresolvedRefs: string[] = [];
 	for (const file of changedFiles) {
 		if (!matchesImplementationFile(file)) continue;
@@ -138,10 +150,10 @@ export function evaluateProcedureGate(changedFiles: string[]): GateResult {
 		};
 	}
 	const missing: string[] = [];
-	const hasContext = normalized.includes("CONTEXT.md");
+	const hasSpec = normalized.some((file) => SPEC_FILE_REGEX.test(file));
 	const hasFeature = normalized.some((file) => FEATURE_FILE_REGEX.test(file));
 	const hasTest = normalized.some((file) => TEST_FILE_REGEX.test(file));
-	if (!hasContext) missing.push("CONTEXT.md");
+	if (!hasSpec) missing.push("docs/spec/*.md");
 	if (!hasFeature) missing.push("tests/features/*.feature");
 	if (!hasTest) missing.push("tests/**/*.test.ts");
 	if (missing.length > 0) {
