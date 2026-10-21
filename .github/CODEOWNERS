@@ -4,6 +4,7 @@
 /.github/CODEOWNERS @wintrover
 /scripts/post-to-dev.ts @wintrover
 /scripts/procedure-gate.ts @wintrover
+/scripts/app-token.ts @wintrover
 /tests/devto-publish-one.test.ts @wintrover
 /tests/legacy-publish-isolation.test.ts @wintrover
 /docs/spec/ @wintrover

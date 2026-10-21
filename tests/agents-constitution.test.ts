@@ -20,6 +20,7 @@ const CODEOWNER_PATHS = [
 	"/vite.config.ts",
 	"/pnpm-lock.yaml",
 	"/tests/agents-constitution.test.ts",
+	"/scripts/app-token.ts",
 	"/skills/",
 ];
 
@@ -61,6 +62,7 @@ describe("에이전트 헌법 분할 계약", () => {
 			"skills are discovery pointers and not a second source of truth",
 			"codeowners declares the control plane paths",
 			"retired procedure gate workflow is absent",
+			"automation app is not a bypass actor",
 		]);
 	});
 

@@ -21,6 +21,23 @@
 - 코드베이스에서 `any` 타입 사용을 엄격히 금지한다. 불가피한 경우 `unknown`을 사용하고 적절한 Type Guard를 구현한다.
 - **실태 주석**: 현재 `biome.json`의 `suspicious.noExplicitAny`는 `off`다. 즉 lint가 `any`를 기계적으로 잡아주지 않는다. 위 금인은 **자동 게이트가 아니라 규율**이며, `any`가 필요해질 때는 `unknown` + Type Guard가 기본값이다.
 
+## 자격 증명
+
+- 자동화 작업은 `GH_TOKEN`으로 수행한다. 토큰은 `pnpm exec tsx scripts/app-token.ts`가 **표준출력 한 줄**로 내며 유효 기간은 1시간이다. 401을 만나면 토큰을 다시 민팅한다.
+- **fail-closed 셸 스니펫**:
+
+  ```sh
+  set -eu
+  T="$(pnpm exec tsx scripts/app-token.ts)" || exit 1
+  test -n "$T" || exit 1
+  export GH_TOKEN="$T"
+  ```
+
+- **개인키는 저장소 밖에 있다.** 기본 위치는 `~/.config/wintrover-automation/`(`WINTROVER_APP_CONFIG` 환경 변수로 변경 가능)이며, `app.pem`(권한 `0600`)과 `config.json`(`appId` · `installationId`)을 담는다. 저장소 안에는 절대 두지 않는다.
+- **키 소지 ≠ 토큰 보유.** 키는 서버 측에서 폐기될 때까지 토큰을 계속 민팅한다. 키 파일이 유출되면 설치 토큰이 무한 재생성되므로 키 파일 자체를 보호한다.
+- **`GH_TOKEN` 없이 git 쓰기 명령을 실행하지 않는다.** `gh`의 credential helper가 저장된 오너 PAT을 조용히 대신 쓰기 때문에, "토큰 미설정"이 "오너 권한으로 실행"이 된다. 쓰기 명령 전에 `GH_TOKEN` 설정 여부를 확인한다.
+- **오너 승인은 브라우저에서 수행한다.** `GH_TOKEN`이 설정된 상태의 `gh` 리뷰는 App 신원으로 기록되므로 승인 행위를 대신하지 않는다. 승인·병합 승인 화면은 오너의 브라우저 세션에서 처리한다.
+
 ## 표준 언어 및 환경
 
 - **최종 산출물/사용자 응대**: 한국어를 표준으로 한다.

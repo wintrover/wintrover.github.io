@@ -22,6 +22,8 @@ ruleset id `25404151`, `enforcement: active`, 대상 ref은 `refs/heads/main`이
 
 - **PR 병합 방법**: `squash`만 허용 (`allowed_merge_methods: ["squash"]`)
 - **코드 소유자 리뷰**: `require_code_owner_review: true`
+- **필수 승인 리뷰 수**: `required_approving_review_count: 1` — 오너 1인의 승인이 필요하고, PR 작성자인 자동화 App은 자기 PR을 승인할 수 없다.
+- **우회 주체(`bypass_actors`)**: 오너(User, `pull_request` 모드) **전용**이다. 자동화 App `wintrover-automation`은 의도적으로 등록되지 않았다 — 이 App은 ruleset 변경·워크플로 파일 push·규칙 우회 병합을 수행할 수 없다.
 - **필수 상태 검사**: context `validate` (integration id `15368`), `strict_required_status_checks_policy: true`
 - **금지 규칙**: `deletion`(브랜치 삭제 금지) · `non_fast_forward`(force push 금지)
 - **기타**: `require_extra_approval_for_unattributed_changes: true`, `dismiss_stale_reviews_on_push: false`, `required_review_thread_resolution: false`
@@ -54,7 +56,7 @@ ruleset id `25404151`, `enforcement: active`, 대상 ref은 `refs/heads/main`이
 
 - **헌법·계약**: `/AGENTS.md` · `/docs/spec/` · `/docs/agents/`
 - **실행 경로**: `/.github/workflows/` · `/.github/CODEOWNERS` · `/.pre-commit-config.yaml` · `/package.json` · `/vite.config.ts` · `/pnpm-lock.yaml`
-- **발행·게이트 스크립트**: `/scripts/post-to-dev.ts` · `/scripts/procedure-gate.ts`
+- **발행·게이트 스크립트**: `/scripts/post-to-dev.ts` · `/scripts/procedure-gate.ts` · `/scripts/app-token.ts`
 - **테스트·스킬**: `/tests/devto-publish-one.test.ts` · `/tests/legacy-publish-isolation.test.ts` · `/tests/agents-constitution.test.ts` · `/skills/`
 
 ## 5. 절차 게이트 은퇴 기록 (2026-10-19)
@@ -69,6 +71,10 @@ ruleset id `25404151`, `enforcement: active`, 대상 ref은 `refs/heads/main`이
 - 모든 새로운 포스트나 코드 변경 사항은 최종적으로 `prek` 품질 게이트를 통과해야 한다.
 - 완료의 정의는 기계 검증이다: 명령 → 관측 → pass/fail이 없으면 완료를 주장할 수 없다.
 - 필수 검사(`validate`)와 오너 PR 승인이 모두 통과해야 병합된다.
+
+## 7. 잔류 위험 (기록)
+
+- **Pages 배포는 `main` push로 독립적으로 트리거된다.** `pages-deploy.yml`은 ruleset과 무관하게 `main`에 도달한 커밋을 배포하므로, ruleset은 **유일한 병합 게이트**다. 오너가 규칙 우회로 검증에 실패한(red) 커밋을 `main`에 올리면 그 커밋은 그대로 배포된다. 기록된 잔류 위험이며 본 슬라이스에서 해결하지 않는다.
 
 ## 관련
 

@@ -45,3 +45,9 @@ Feature: Agent constitution split
     When the workflow directory is inspected
     Then .github/workflows/procedure-gate.yml must not exist
     And the evidence triple requirement must survive as a declared procedure policy
+
+  Scenario: automation app is not a bypass actor
+    Given an automation app identity with contents and pull requests permissions
+    When it attempts a ruleset change, a workflow-file push, or a bypass merge
+    Then the platform rejects each attempt
+    And merging requires the owner's approval
