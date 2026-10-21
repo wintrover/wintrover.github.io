@@ -8,3 +8,10 @@
 /tests/legacy-publish-isolation.test.ts @wintrover
 /CONTEXT.md @wintrover
 /AGENTS.md @wintrover
+/docs/agents/ @wintrover
+/.pre-commit-config.yaml @wintrover
+/package.json @wintrover
+/vite.config.ts @wintrover
+/pnpm-lock.yaml @wintrover
+/tests/agents-constitution.test.ts @wintrover
+/skills/ @wintrover

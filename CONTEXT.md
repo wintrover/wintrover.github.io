@@ -1,4 +1,6 @@
-# wintrover-blog Context (SSoT 헌법)
+# wintrover-blog Context (SSoT 계약·증거)
+
+> 이 문서는 이 프로젝트의 계약·증거 문서(운영 계약·도메인 규칙·참조 정본)다. 에이전트 행동 헌법은 `AGENTS.md`에 있다.
 
 이 문서는 이 프로젝트의 진실의 단일 원천(SSoT)이다.
 모든 작업은 이 문서를 최우선으로 참조하며, 충돌 시 이 문서의 규칙을 기준으로 판단한다.
@@ -135,11 +137,19 @@
 - **3단계 (TDD)**: 정의된 시나리오에 따라 실패하는 테스트 코드를 먼저 작성한다.
 - **4단계 (Implementation)**: 테스트를 통과하기 위한 **최소한의 코드 변경**만 반영한다.
 - **5단계 (Verification)**: 최종 검증 시 테스트 통과 및 `scripts/build-github.ts` 실행 결과가 이 문서와 일치하는지 확인한다.
-- 구현 파일 변경은 `CONTEXT.md`, `tests/features/*.feature`, `tests/**/*.test.ts` 변경 증거가 함께 있어야 하며, 해당 검증은 `scripts/procedure-gate.ts`와 CI 워크플로로 자동 차단한다.
-- CI 절차 게이트의 변경 파일 계산은 기본적으로 three-dot diff를 사용하되, 히스토리 재작성으로 merge base가 없을 때 two-dot diff로 폴백해 차단 규칙을 계속 적용한다.
+- 구현 파일 변경은 `CONTEXT.md`, `tests/features/*.feature`, `tests/**/*.test.ts` 변경 증거가 함께 있어야 한다. 이 증거 삼중항 요구는 자동 차단이 아니라 **선언된 절차 정책**으로 유지된다(§6 현재 집행 표면).
+- 절차 게이트 스크립트의 변경 파일 계산은 기본적으로 three-dot diff를 사용하되, 히스토리 재작성으로 merge base가 없을 때 two-dot diff로 폴백해 차단 규칙을 계속 적용한다.
 - MCP 프록시(`scripts/context7-toolname-proxy.ts`)는 다운스트림 입력 프레이밍으로 Content-Length와 NDJSON을 모두 수용하고, 감지된 프레이밍과 동일한 형식으로 응답해야 한다.
 - 레포지토리 루트의 런타임/설정 스크립트는 `.js/.mjs/.cjs` 대신 TypeScript 또는 JSON 기반으로 유지한다.
 - 이 절차 중 하나라도 누락되거나 순서가 뒤바뀔 경우, 에이전트는 즉시 작업을 중단하고 절차를 복구해야 한다.
+
+### 현재 집행 표면 (2026-10-19 기준)
+
+- **CI 필수 검사** = `validate` 워크플로(`.github/workflows/validate.yml`)의 Biome → typecheck → vitest run → build 4단계. GitHub ruleset의 required check다.
+- **로컬 집행** = `prek` 10훅 체인(`.pre-commit-config.yaml`). Biome·타입체크·Knip·DepCruise·포스트 로컬라이제이션 동기화·vitest 커버리지를 포함한다.
+- **절차 게이트(증거 삼중항의 CI·훅 집행)는 2026-10-19에 은퇴**했다. `.github/workflows/procedure-gate.yml`과 procedure-gate 프리커밋 훅은 존재하지 않는다.
+- 증거 삼중항(`CONTEXT.md` + `tests/features/*.feature` + `tests/**/*.test.ts`) 요구는 위 자동 집행에서 분리되어 **선언된 절차 정책**으로 유지된다. 검증은 `pnpm run gate:procedure:staged` 수동 실행으로만 확인한다.
+- 집행 체인의 실태와 은퇴 기록은 `docs/agents/quality-gates.md`에 있다.
 
 ## 7) 포스트 작성 표준 (2026-04-02 추가)
 
