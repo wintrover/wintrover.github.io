@@ -40,4 +40,3 @@ identity). Upstream defects observed by the honest adapter are recorded in
 docs/spec/counterexample_replay_adapter.md §4 (unknown-constant BMC script;
 partial-param obligation model) — adapter stays authority-0, fail-closed
 demotion preserved.
-
