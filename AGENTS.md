@@ -31,7 +31,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 
 ### §0.3 증거 문화 불변식
 
-- 모든 기능·코드 변경은 **증거 삼중항** — `CONTEXT.md` 반영 + `tests/features/*.feature` 시나리오 + `tests/**/*.test.ts` 실패→통과 테스트 — 으로 논리적 증명을 완료하기 전까지 완료로 간주하지 않는다.
+- 모든 기능·코드 변경은 **증거 삼중항** — `docs/spec/*.md` 반영 + `tests/features/*.feature` 시나리오 + `tests/**/*.test.ts` 실패→통과 테스트 — 으로 논리적 증명을 완료하기 전까지 완료로 간주하지 않는다.
 - 절차가 누락되거나 순서가 뒤바뀌면 에이전트는 즉시 작업을 중단하고 절차를 복구한다. 절차의 상세는 `docs/agents/task-process.md`에 있다.
 - "버그가 없다"는 단정은 금지된다. 검증 단계에서 프레임워크 특성 기반 부작용 가설을 최소 3가지(애니메이션 소실 · 상태 유지/오염 · 메모리 누수 관점 포함) 수립·검증해야 한다.
 - 완료의 정의는 **기계 검증**이다. 명령 → 관측 → pass/fail 없이 완료를 주장할 수 없다.
@@ -47,7 +47,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 - 결과 불명(`unknown`)은 성공으로 기록하지 않으며 자동 재POST하지 않는다.
 - `state.json`, `DB`/`deploy` 브랜치, Nim `devlog`, `.deploy/` 마커는 **역사 기록**이며 현재 발행 권위가 아니다.
 - LinkedIn 자동 발행은 비활성이다. 재활성화는 별도 제품 결정과 독립 acceptance를 요구한다.
-- 정본 규칙의 상세는 `CONTEXT.md`에 있다.
+- 정본 규칙의 상세는 `docs/spec/`에 있다.
 
 ---
 
@@ -82,8 +82,8 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 - **SSOT 원칙**: 규칙은 한 곳에 산다. 중복 의미 상태를 만들지 않고, 정본이 존재하면 다른 곳은 이를 가리키기만 한다.
 - **그래프 모델은 역사다**: `state.json`의 Node/Edge 그래프, Nim CLI(`engine/devlog.nim`), `DB`/`deploy` 브랜치, `.deploy/` 상태·마커는 과거 운영 체계의 기록이다. 삭제하지 않으며 별도 아카이브·퇴역 작업에서 다룬다. 현재 발행 경로는 §0.4의 계약만 따른다.
 - **단일 리스트 소스**: 포스트 리스트 마크업·스타일은 단일 컴포넌트를 SSOT로 삼고, 경로별 페이지는 분류·SEO·구성만 담당한다.
-- **모션은 DOM 교체로 증명한다**: 라우트 전환 시 진입 모션 소실은 데이터가 아니라 DOM 생명주기 문제이며, `[UI Motion Rule]`의 정본은 `CONTEXT.md` §4다.
-- 도메인 규칙(URL 아키텍처 · 빌드/Mermaid 파이프라인 · UI/디자인 · 포스트 작성 표준)의 정본은 `CONTEXT.md`에 있다.
+- **모션은 DOM 교체로 증명한다**: 라우트 전환 시 진입 모션 소실은 데이터가 아니라 DOM 생명주기 문제이며, `[UI Motion Rule]`의 정본은 `docs/spec/ui-design.md`다.
+- 도메인 규칙(URL 아키텍처 · 빌드/Mermaid 파이프라인 · UI/디자인 · 포스트 작성 표준)의 정본은 `docs/spec/`에 있다.
 
 ---
 
@@ -101,7 +101,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 |---|---|
 | `AGENTS.md` | 에이전트 행동 헌법 (Fact · Invariant · Authority · Acceptance/Failure) |
 | `docs/agents/` | 절차 · 도구 · 체크리스트 (`operations.md` · `task-process.md` · `quality-gates.md`) |
-| `CONTEXT.md` | 운영 계약 · 도메인 규칙 · 참조 정본 (SSoT 계약·증거 문서) |
+| `docs/spec/` | 도메인 계약 정본 (URL·빌드·UI·포스트 작성) |
 | `skills/` | 발견 포인터 (절차 SSOT가 아니며, 위 문서를 가리킨다) |
 | `.pre-commit-config.yaml` · `.github/workflows/validate.yml` | 집행 (실행 경로) |
 | `state.json` · `DB`/`deploy` 브랜치 · `.deploy/` | 역사 기록 (현재 권위 아님) |

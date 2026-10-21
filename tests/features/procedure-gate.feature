@@ -7,7 +7,7 @@ Feature: AGENTS 절차 게이트 강제
   Scenario: implementation change requires context bdd and test evidence
     Given a change includes implementation files
     When staged or CI diff is evaluated
-    Then CONTEXT.md must be included in changed files
+    Then at least one docs/spec/*.md file must be included in changed files
     And at least one tests/features/*.feature file must be included
     And at least one tests/**/*.test.ts file must be included
 
@@ -43,7 +43,7 @@ Feature: AGENTS 절차 게이트 강제
   Scenario: content files skip procedure gate evidence requirement
     Given a change includes only files under src/posts/ or src/posts/ko/
     When gate evaluates changed files
-    Then gate result must pass without requiring CONTEXT.md
+    Then gate result must pass without requiring docs/spec/*.md
     And gate result must pass without requiring .feature files
     And gate result must pass without requiring .test.ts files
 

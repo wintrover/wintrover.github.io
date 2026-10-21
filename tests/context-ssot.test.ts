@@ -8,9 +8,13 @@ function read(rel: string) {
 	return fs.readFileSync(path.join(root, rel), "utf-8");
 }
 
-describe("SSoT context 규칙 전수 검증", () => {
+describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 	const feature = read("tests/features/context-architecture.feature");
-	const context = read("CONTEXT.md");
+	const agents = read("AGENTS.md");
+	const urlSpec = read("docs/spec/url-architecture.md");
+	const buildSpec = read("docs/spec/build-pipeline.md");
+	const uiSpec = read("docs/spec/ui-design.md");
+	const postSpec = read("docs/spec/post-creation.md");
 	const buildScript = read("scripts/build-github.ts");
 	const pagesWorkflow = read(".github/workflows/pages-deploy.yml");
 	const imageTools = read("scripts/image-tools.ts");
@@ -22,26 +26,29 @@ describe("SSoT context 규칙 전수 검증", () => {
 	const postFeed = read("src/components/PostFeed.svelte");
 	const postDetail = read("src/components/PostDetail.svelte");
 
-	test("Given CONTEXT When 검토 Then 필수 헌법 규칙이 빠짐없이 존재한다", () => {
-		expect(context).toContain("진실의 단일 원천");
-		expect(context).toContain("기본 언어는 영어");
-		expect(context).toContain("/ko/");
-		expect(context).toContain("/en/");
-		expect(context).toContain("브랜드 메타데이터");
-		expect(context).toContain("build-github.ts");
-		expect(context).toContain("image-tools.ts");
-		expect(context).toContain("세로 정렬");
-		expect(context).toContain("일정한 카드 크기");
-		expect(context).toContain("동일한 포스트 리스트 UI 컴포넌트");
-		expect(context).toContain("Geist 다크 테마");
-		expect(context).toContain("zinc 기반 중성 팔레트");
-		expect(context).toContain("시각 밀도");
-		expect(context).toContain("수직 리듬 스케일 토큰");
+	test("Given 도메인 계약 When 검토 Then 필수 헌법 규칙이 빠짐없이 존재한다", () => {
+		expect(agents).toContain("SSOT 원칙");
+		expect(agents).toContain("규칙은 한 곳에 산다");
+		expect(urlSpec).toContain("기본 언어는 영어");
+		expect(urlSpec).toContain("/ko/");
+		expect(urlSpec).toContain("/en/");
+		expect(buildSpec).toContain("브랜드 메타데이터");
+		expect(buildSpec).toContain("build-github.ts");
+		expect(buildSpec).toContain("image-tools.ts");
+		expect(uiSpec).toContain("세로 정렬");
+		expect(uiSpec).toContain("일정한 카드 크기");
+		expect(uiSpec).toContain("동일한 포스트 리스트 UI 컴포넌트");
+		expect(uiSpec).toContain("Geist 다크 테마");
+		expect(uiSpec).toContain("zinc 기반 중성 팔레트");
+		expect(uiSpec).toContain("시각 밀도");
+		expect(uiSpec).toContain("수직 리듬 스케일 토큰");
+		expect(postSpec).toContain("exclusiveTags");
+		expect(postSpec).toContain("YYYY-MM-DD-N.md");
 	});
 
 	test("Given feature 파일 When 파싱 Then 시나리오 카탈로그가 SSoT와 일치한다", () => {
 		const expected = [
-			"CONTEXT 문서가 핵심 헌법 규칙을 포함한다",
+			"도메인 계약 문서가 핵심 헌법 규칙을 포함한다",
 			"URL architecture uses root for English and /ko for Korean",
 			"Locale detection must not treat /en as locale path",
 			"Canonical SEO path must follow locale prefix policy",
@@ -194,7 +201,7 @@ describe("SSoT context 규칙 전수 검증", () => {
 
 	test("Given GEO 정책 When robots와 메타 검증 Then AI 검색 제어 지시어를 유지한다", () => {
 		const indexTemplate = read("index.html");
-		expect(context).toContain(
+		expect(buildSpec).toContain(
 			"max-image-preview:large,max-snippet:-1,max-video-preview:-1",
 		);
 		expect(indexTemplate).toContain(
