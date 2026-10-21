@@ -56,7 +56,8 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 ### §1.1 병합 권위
 
 - 병합 권위는 **GitHub ruleset + `validate` 필수 검사 + 오너 PR 승인**이다. 검증을 우회하는 직접 push는 금지된다.
-- **모든 PR은 필수 `validate` 검사를 통과하고 1건의 승인 리뷰를 충족해야 병합할 수 있다. 이 저장소의 유일 협업자는 오너이며 PR 작성자는 자기 PR을 승인할 수 없으므로(플랫폼 규칙), `main` 착지는 오너의 명시적 규칙 우회(bypass, 감사 기록됨)로만 이루어진다. 우회 병합은 정상 병합과 동일하게 취급하지 않는다.**
+- **모든 PR은 필수 `validate` 검사를 통과하고 1건의 승인 리뷰를 충족해야 병합할 수 있다. 정상 경로는 자동화 App(`wintrover-automation`)이 작성한 PR이 `validate`를 통과하고 오너(다른 신원)가 승인한 뒤 squash 병합되는 것이다. 규칙 우회(bypass)는 오너만 사용할 수 있는 예외 경로이며 감사 기록된다. 우회 병합은 정상 병합과 동일하게 취급하지 않는다.**
+- 자동화 신원은 최소 권한 GitHub App `wintrover-automation`이며 권한은 `contents:write` · `pull_requests:write` · `checks:read` · `actions:read`로 한정된다. `administration` · `workflows` · `organization` 권한은 없다. 이 App은 ruleset 변경·워크플로 파일 push·규칙 우회 병합을 수행할 수 없다.
 - `CODEOWNERS`가 지정하는 통제 경로(집행 경로 `package.json`·`vite.config.ts`·워크플로 포함)의 변경은 리뷰 요청의 우선 대상이다.
 - 필수 검사(`validate`)의 구성과 로컬 집행 체인은 `docs/agents/quality-gates.md`에 있다.
 
@@ -69,11 +70,11 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 
 - 자격 증명은 네이티브 클라이언트로만 취급한다. 코드·로그·문서에 비밀 값을 남기지 않는다.
 
-### §1.4 임시 감독 모드 (App 등록 전)
+### §1.4 감독 모드 (App 등록 후 · PAT 폐기 대기)
 
-- 에이전트는 아직 오너의 관리자 토큰으로 동작한다. 따라서 무인으로 ruleset·environment·secret·workflow를 변경하거나 `Draft One`/`Unpublish One`을 실행하지 않는다.
-- 모든 병합·발행·승인은 오너가 지켜보는 상태에서만 수행한다.
-- App 등록과 토큰 교체가 끝나면 이 조항을 제거한다.
+- 자동화 App `wintrover-automation`은 등록·설정 완료 상태이고, 에이전트는 App 권한으로 동작한다. 오너의 관리자 PAT은 아직 서버 측에서 폐기되지 않았다.
+- 남은 오너 행위는 **서버 측 PAT 폐기(1회)** 뿐이다. 폐기가 확인되면 이 조항을 제거한다.
+- 폐기 전까지 에이전트는 무인으로 ruleset·environment·secret·workflow를 변경하거나 `Draft One`/`Unpublish One`을 실행하지 않는다. 모든 병합·발행·승인은 오너가 지켜보는 상태에서만 수행한다.
 
 ---
 
@@ -83,7 +84,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 - **그래프 모델은 역사다**: `state.json`의 Node/Edge 그래프, Nim CLI(`engine/devlog.nim`), `DB`/`deploy` 브랜치, `.deploy/` 상태·마커는 과거 운영 체계의 기록이다. 삭제하지 않으며 별도 아카이브·퇴역 작업에서 다룬다. 현재 발행 경로는 §0.4의 계약만 따른다.
 - **단일 리스트 소스**: 포스트 리스트 마크업·스타일은 단일 컴포넌트를 SSOT로 삼고, 경로별 페이지는 분류·SEO·구성만 담당한다.
 - **모션은 DOM 교체로 증명한다**: 라우트 전환 시 진입 모션 소실은 데이터가 아니라 DOM 생명주기 문제이며, `[UI Motion Rule]`의 정본은 `docs/spec/ui-design.md`다.
-- 도메인 규칙(URL 아키텍처 · 빌드/Mermaid 파이프라인 · UI/디자인 · 포스트 작성 표준)의 정본은 `docs/spec/`에 있다.
+- 도메인 규칙(URL 아키텍처 · 빌드/Mermaid 파이프라인 · UI/디자인 · 포스트 작성 표준 · 자동화 신원)의 정본은 `docs/spec/`에 있다.
 
 ---
 
@@ -101,7 +102,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 |---|---|
 | `AGENTS.md` | 에이전트 행동 헌법 (Fact · Invariant · Authority · Acceptance/Failure) |
 | `docs/agents/` | 절차 · 도구 · 체크리스트 (`operations.md` · `task-process.md` · `quality-gates.md`) |
-| `docs/spec/` | 도메인 계약 정본 (URL·빌드·UI·포스트 작성) |
+| `docs/spec/` | 도메인 계약 정본 (URL·빌드·UI·포스트 작성·자동화 신원) |
 | `skills/` | 발견 포인터 (절차 SSOT가 아니며, 위 문서를 가리킨다) |
 | `.pre-commit-config.yaml` · `.github/workflows/validate.yml` | 집행 (실행 경로) |
 | `state.json` · `DB`/`deploy` 브랜치 · `.deploy/` | 역사 기록 (현재 권위 아님) |
