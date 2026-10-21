@@ -56,7 +56,8 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 ### §1.1 병합 권위
 
 - 병합 권위는 **GitHub ruleset + `validate` 필수 검사 + 오너 PR 승인**이다. 검증을 우회하는 직접 push는 금지된다.
-- **모든 PR은 필수 `validate` 검사를 통과해야 한다. `CODEOWNERS`가 지정한 통제 경로의 변경에는 코드 소유자 리뷰가 추가로 필요하다. 소유자의 규칙 우회(bypass)는 별도 권한이며 정상 병합과 동일하게 취급하지 않는다.**
+- **모든 PR은 필수 `validate` 검사를 통과하고 1건의 승인 리뷰를 충족해야 병합할 수 있다. 이 저장소의 유일 협업자는 오너이며 PR 작성자는 자기 PR을 승인할 수 없으므로(플랫폼 규칙), `main` 착지는 오너의 명시적 규칙 우회(bypass, 감사 기록됨)로만 이루어진다. 우회 병합은 정상 병합과 동일하게 취급하지 않는다.**
+- `CODEOWNERS`가 지정하는 통제 경로(집행 경로 `package.json`·`vite.config.ts`·워크플로 포함)의 변경은 리뷰 요청의 우선 대상이다.
 - 필수 검사(`validate`)의 구성과 로컬 집행 체인은 `docs/agents/quality-gates.md`에 있다.
 
 ### §1.2 발행 권위

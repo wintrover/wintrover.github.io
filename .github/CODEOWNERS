@@ -14,4 +14,5 @@
 /vite.config.ts @wintrover
 /pnpm-lock.yaml @wintrover
 /tests/agents-constitution.test.ts @wintrover
+/tests/features/agents-constitution.feature @wintrover
 /skills/ @wintrover
