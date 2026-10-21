@@ -3,10 +3,10 @@ Feature: Context SSoT architecture and UI invariants
   I want architecture and layout rules to be executable
   So that core constraints are preserved over time
 
-  Rule: CONTEXT 문서는 프로젝트의 단일 규칙 원천이어야 한다
+  Rule: 도메인 계약 문서(docs/spec/)는 프로젝트의 단일 규칙 원천이어야 한다
 
-  Scenario: CONTEXT 문서가 핵심 헌법 규칙을 포함한다
-    Given project governance is driven by CONTEXT.md
+  Scenario: 도메인 계약 문서가 핵심 헌법 규칙을 포함한다
+    Given project governance is driven by the docs/spec domain contracts
     When maintainers review architecture constraints
     Then the document must define SSoT policy
     And it must define URL architecture and locale constraints

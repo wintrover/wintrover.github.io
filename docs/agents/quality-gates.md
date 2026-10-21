@@ -52,7 +52,7 @@ ruleset id `25404151`, `enforcement: active`, 대상 ref은 `refs/heads/main`이
 
 `.github/CODEOWNERS`가 선언한다. 모든 항목은 `@wintrover`다.
 
-- **헌법·계약**: `/AGENTS.md` · `/CONTEXT.md` · `/docs/agents/`
+- **헌법·계약**: `/AGENTS.md` · `/docs/spec/` · `/docs/agents/`
 - **실행 경로**: `/.github/workflows/` · `/.github/CODEOWNERS` · `/.pre-commit-config.yaml` · `/package.json` · `/vite.config.ts` · `/pnpm-lock.yaml`
 - **발행·게이트 스크립트**: `/scripts/post-to-dev.ts` · `/scripts/procedure-gate.ts`
 - **테스트·스킬**: `/tests/devto-publish-one.test.ts` · `/tests/legacy-publish-isolation.test.ts` · `/tests/agents-constitution.test.ts` · `/skills/`
@@ -62,7 +62,7 @@ ruleset id `25404151`, `enforcement: active`, 대상 ref은 `refs/heads/main`이
 - **은퇴된 것**: `.github/workflows/procedure-gate.yml`(PR·push 트리거) 과 pre-commit의 procedure-gate 훅. 이제 존재하지 않는다 — 파일 부재는 계약 테스트(`tests/agents-constitution.test.ts`)가 고정한다.
 - **남아 있는 것**: 게이트 로직 스크립트 `scripts/procedure-gate.ts` 와 그 순수 로직 테스트 `tests/procedure-gate.test.ts`. 변경 파일 계산은 three-dot diff를 기본으로 하고, 히스토리 재작성으로 merge base가 없을 때 two-dot diff로 폴백한다.
 - **실행 경로**: 자동 집행 경로는 없다. 검증은 로컬 수동 실행(`pnpm run gate:procedure:staged`, `pnpm run gate:procedure:ci`)으로만 가능하다.
-- **정책의 생존**: 증거 삼중항(`CONTEXT.md` + `tests/features/*.feature` + `tests/**/*.test.ts`) 요구는 자동 차단에서 분리되어 **선언된 절차 정책**으로 유지된다. 정본은 `CONTEXT.md` §6 "현재 집행 표면"이다.
+- **정책의 생존**: 증거 삼중항(`docs/spec/*.md` + `tests/features/*.feature` + `tests/**/*.test.ts`) 요구는 자동 차단에서 분리되어 **선언된 절차 정책**으로 유지된다. 현재 집행 표면의 정본은 이 문서 §1·§3·§5다.
 
 ## 6. 작업 완료 판정
 
@@ -73,5 +73,5 @@ ruleset id `25404151`, `enforcement: active`, 대상 ref은 `refs/heads/main`이
 ## 관련
 
 - [AGENTS.md §1.1](../../AGENTS.md) — 병합 권위(압축 버전)
-- [CONTEXT.md §6](../../CONTEXT.md) — 작업 절차 표준·현재 집행 표면
+- [docs/spec/](../../spec/) — 도메인 계약 정본(URL·빌드·UI·포스트 작성)
 - [docs/agents/operations.md](operations.md) — 도구·환경 운영
