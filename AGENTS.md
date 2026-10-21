@@ -107,3 +107,16 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 | `state.json` · `DB`/`deploy` 브랜치 · `.deploy/` | 역사 기록 (현재 권위 아님) |
 
 **규칙**: 측정·역사적 결론·생성 데이터를 이 문서에 배치하지 않는다. 정본 계산이 존재할 때 이 문서는 그 현재 값을 중복하지 않는다.
+
+---
+
+## 5. 주요 설정 및 명령어 (Quick Recap)
+
+- 의존성 설치: `pnpm install`
+- 로컬 개발: `bun run dev`
+- 테스트: `bun test` 또는 `bun x vitest`
+- 품질 게이트: `bun x prek run --all-files`
+- 빌드: `pnpm build`
+- 스크립트 실행: `bun run <script_path>`
+- 라이브러리 해석: `ctx7 library <name> "<질문>"` 또는 `npx ctx7 library <name> "<질문>"`
+- 문서 조회: `ctx7 docs </org/project> "<질문>"` 또는 `npx ctx7 docs </org/project> "<질문>"`
