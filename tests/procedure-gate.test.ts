@@ -47,7 +47,7 @@ describe("절차 게이트 강제 검증", () => {
 		expect(scenarios).toEqual([
 			"implementation change requires context bdd and test evidence",
 			"documentation-only change should not be blocked",
-			"CI gate must run on pull_request and push",
+			"retired CI procedure gate workflow must be absent",
 			"rewritten history in CI must still produce changed file list",
 			"context7 proxy must preserve downstream framing compatibility",
 			"runtime scripts must avoid js extension leftovers",
@@ -115,11 +115,10 @@ describe("절차 게이트 강제 검증", () => {
 		fs.unlinkSync(tempFile);
 	});
 
-	test("Given workflow 파일 When 검사 Then 절차 게이트가 PR과 push에서 실행된다", () => {
-		const workflow = read(".github/workflows/procedure-gate.yml");
-		expect(workflow).toContain("pull_request:");
-		expect(workflow).toContain("push:");
-		expect(workflow).toContain("pnpm run gate:procedure:ci");
+	test("Given workflow 파일 When 검사 Then 절차 게이트 워크플로는 존재하지 않는다", () => {
+		expect(
+			fs.existsSync(path.join(root, ".github/workflows/procedure-gate.yml")),
+		).toBe(false);
 	});
 
 	test("Given CI 병합베이스 없음 When diff 실패 Then 절차 게이트가 two-dot으로 폴백한다", () => {

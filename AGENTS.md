@@ -1,90 +1,109 @@
 ---
 name: blog-agent-operational-guide
-description: 블로그 에이전트의 운영 페르소나, 도구 활용 및 작업 프로세스 가이드. 기술적 표준은 skills/ 디렉토리를 참조한다.
+description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority·Acceptance). 절차·도구·체크리스트의 SSOT는 docs/agents/에 있다.
 ---
 
-# AGENTS.md
+# AGENTS.md — 에이전트 행동 헌법
 
-이 파일은 AI 에이전트가 이 프로젝트(`wintrover-blog`)에서 효과적으로 작업할 수 있도록 가이드라인과 컨텍스트를 제공합니다.
+> **이 파일이 정의하는 것**: AGENTS.md는 **무엇이 참인가 · 무엇이 허용되는가 · 누가 권한을 가지는가 · 무엇이 완료인가**를 규정한 헌법이다. "어떻게 실행하는가"를 가르치는 문서가 아니다.
+> **잔류 기준**: 이 파일에 남는 문장은 **Fact · Invariant · Authority · Acceptance/Failure**뿐이다. Procedure · Tool · Checklist · Rationale · Example은 이 파일에 존재하지 않으며, 그 전문은 `docs/agents/`가 담는다.
+> **단방향 구조**: AGENTS.md가 정의하고 `docs/agents/`가 이를 참조한다 — 역방향 참조는 허용되지 않는다.
+> **측정·역사·생성 데이터**: 정본 계산이 존재할 때 이 문서는 그 값을 중복하지 않으며, 위치는 §4 SSOT 표를 따른다.
+
 블로그 오너의 공식 정체성은 **사고 궤적 아키텍트 (Thought Trajectory Architect)**이며, 핵심 역량은 단순 구현이 아니라 **복잡한 문제를 해결하기 위한 논리적 궤적을 설계하고 이를 AI와 협업해 물리적 코드로 이식하는 것**이다.
 
-## 0. 현재 운영 계약 (요약)
+---
+
+## §0. 헌법 (CONSTITUTION)
+
+### §0.1 정체성
+
+- 이 프로젝트는 커밋 히스토리와 대화 로그에서 개발자의 사고방식을 추출해 블로그 포스팅으로 전환하는 Devlog 프로젝트다.
+- 결과물은 단순 작업 기록이 아니라 **문제 정의 · 의사결정 · 시행착오 · 개선 근거**를 재구성한 학습 가능한 개발 기록이어야 한다.
+- 아키텍트의 사고 궤적은 BDD와 TDD를 통한 논리적 증명으로만 보존된다. **증거 없는 관점은 완료가 아니다.**
+
+### §0.2 언어 정책
+
+- 최종 산출물과 사용자 응대는 **한국어**를 표준으로 한다.
+- 공개 포스트는 **영어(English)와 한국어(Korean) 두 언어**로 작성하며, 파일명과 slug는 두 버전이 일치한다.
+- 기본 URL은 영어가 루트(`/`), 한국어가 `/ko/`를 쓴다. `/en/` 경로는 아키텍처에서 제거되어 있다.
+- 커밋 메시지는 **영어**로 작성한다.
+
+### §0.3 증거 문화 불변식
+
+- 모든 기능·코드 변경은 **증거 삼중항** — `CONTEXT.md` 반영 + `tests/features/*.feature` 시나리오 + `tests/**/*.test.ts` 실패→통과 테스트 — 으로 논리적 증명을 완료하기 전까지 완료로 간주하지 않는다.
+- 절차가 누락되거나 순서가 뒤바뀌면 에이전트는 즉시 작업을 중단하고 절차를 복구한다. 절차의 상세는 `docs/agents/task-process.md`에 있다.
+- "버그가 없다"는 단정은 금지된다. 검증 단계에서 프레임워크 특성 기반 부작용 가설을 최소 3가지(애니메이션 소실 · 상태 유지/오염 · 메모리 누수 관점 포함) 수립·검증해야 한다.
+- 완료의 정의는 **기계 검증**이다. 명령 → 관측 → pass/fail 없이 완료를 주장할 수 없다.
+- 데이터 변경만으로 모션 정상으로 간주하지 않는다. UI 모션 회귀 방지의 완료 기준은 **DOM 교체 증명(`not.toBe`)까지** 포함한다.
+
+### §0.4 발행 계약 (Facts)
 
 - 콘텐츠 원천은 `main`이며, 사이트 배포는 `pages-deploy.yml`이 `main`에서 수행한다.
-- 병합 권위는 GitHub ruleset + `validate` 필수 검사 + 오너 PR 승인이다. 검증을 우회하는 직접 push는 금지한다.
-- 외부 발행은 `Draft One`(`repository_dispatch: draft-one`)만 사용하며, `sns-publish` 환경의 오너 승인 후 실행한다.
+- 외부 발행은 `Draft One`(`repository_dispatch: draft-one`)만 사용한다.
 - 신규 DEV.to 결과물은 **초안(`published:false`)만** 허용한다. 공개 전환은 이 저장소의 자동화 범위가 아니며, 이미 공개된 글을 초안으로 되돌릴 때는 `Unpublish One`을 사용한다.
 - 발행 완료 판정은 DEV.to `GET /api/articles/me/all`에서 동일 `id`와 `published:false`를 관측하는 것이다. 로컬 로그·마커의 success는 증거가 아니다.
 - `DEVTO_API_KEY`의 목표 권위는 `sns-publish` 환경 secret이다. 오너 이전 전까지는 저장소 secret이 임시로 사용된다.
 - 결과 불명(`unknown`)은 성공으로 기록하지 않으며 자동 재POST하지 않는다.
 - `state.json`, `DB`/`deploy` 브랜치, Nim `devlog`, `.deploy/` 마커는 **역사 기록**이며 현재 발행 권위가 아니다.
 - LinkedIn 자동 발행은 비활성이다. 재활성화는 별도 제품 결정과 독립 acceptance를 요구한다.
-- **임시 감독 모드 (App 등록 전)**: 에이전트는 아직 오너의 관리자 토큰으로 동작한다. 따라서 무인으로 ruleset·environment·secret·workflow를 변경하거나 `Draft One`/`Unpublish One`을 실행하지 않는다. 모든 병합·발행·승인은 오너가 지켜보는 상태에서만 수행한다. App 등록과 토큰 교체가 끝나면 이 조항을 제거한다.
+- 정본 규칙의 상세는 `CONTEXT.md`에 있다.
 
-## 1. 에이전트 운영 및 도구 사용 규정
+---
 
-### 핵심 가동 지침
+## §1. 권한 (AUTHORITY)
 
-- **작업 시작 시 반드시 `CONTEXT.md`, BDD Gherkin(.feature), 테스트 코드를 전수조사한다.** 사용자의 지시를 받으면 구현에 앞서 이 세 가지 요소를 최우선으로 분석하여 현재 상태와 규칙을 완벽히 파악해야 한다.
-- **UI 모션 관련 작업은 `CONTEXT.md`의 `[UI Motion Rule]`을 최우선으로 확인한다.** Svelte 컴포넌트 재사용으로 진입 모션이 소실되는 회귀를 절대 허용하지 않는다.
-- **`skills/` 디렉토리를 탐색한다.** 현재 수행하려는 작업과 연관된 `SKILL.md`가 있다면 이를 즉시 로드하고 해당 체크리스트를 작업의 SSOT(Single Source of Truth)로 삼는다.
-- 모든 기술적 의사결정 및 검증 절차는 개별 Skill 정의에 위임한다.
-- **기능/코드 변경 작업은 아래 순서를 반드시(MUST) 선행하며, 완료 전 구현을 시작하면 안 된다.** `CONTEXT.md` 영향 여부 확인 및 필요 시 반영 → BDD 시나리오(.feature) 작성 → TDD 실패 테스트 작성 → 최소 구현 순서로 진행한다. 이 절차를 생략하면 작업을 중단하고 절차부터 복구한다.
-- **아키텍트의 사고 궤적 보존 규칙**: 모든 변경 사항은 BDD와 TDD를 통해 의사결정의 논리적 증명을 완료하기 전까지 완료로 간주하지 않는다.
-- **검증 단계에서 "버그가 없다"고 단정하기 전에 프레임워크 특성 기반 부작용 가설을 최소 3가지 수립·검증한다.** 특히 애니메이션 소실, 상태 유지/오염, 메모리 누수 관점을 필수로 포함한다.
-- **포스팅 작성 시**: 항상 `post-creation-standard` 스킬을 최우선으로 준수하며, **모든 포스팅은 반드시 영어(English)로 작성한다.**
-- **기존 포스트 부분 수정 기본 규칙**: 동일한 부분은 토씨·문장부호·줄바꿈을 유지하고, 특히 줄 끝 `\`를 제거·이동·정규화하지 않는다.
-- **가독성 구조 기본 규칙**: 문단 구분선(`<hr ... />`)과 제목 계층(`##`, `###`)은 기존 위치와 표기를 유지하며, 섹션 번호 표기(`1)`, `1.`)도 원문 형식을 따른다.
-- **흐름 블록 가독성 규칙**: `요구사항 입력` 같은 흐름 블록은 빈 줄과 줄 끝 `\`를 포함한 단계형 레이아웃을 유지하고, 화살표(`→`) 연결 구문은 원문 배치(단일행/다중행)를 보존한다.
-- **정형 검증 절차 표기 규칙**: 검증 절차를 설명하는 단락은 번호 목록(`1.`~`N.`)을 기본 형식으로 유지하고, 예시 문장은 조건문/결과문 종결부의 쉼표·마침표·역슬래시를 원문대로 보존한다.
-- **로깅 정책**: 앱 코드에서는 `src/lib/log.ts`의 `logError`/`logWarn`를 우선 사용한다.
-- **타입 안정성**: 코드베이스에서 `any` 타입 사용을 엄격히 금지한다. 불가피한 경우 `unknown`을 사용하고 적절한 Type Guard를 구현한다.
+### §1.1 병합 권위
 
-### 도구 사용 강제
+- 병합 권위는 **GitHub ruleset + `validate` 필수 검사 + 오너 PR 승인**이다. 검증을 우회하는 직접 push는 금지된다.
+- **모든 PR은 필수 `validate` 검사를 통과하고 1건의 승인 리뷰를 충족해야 병합할 수 있다. 이 저장소의 유일 협업자는 오너이며 PR 작성자는 자기 PR을 승인할 수 없으므로(플랫폼 규칙), `main` 착지는 오너의 명시적 규칙 우회(bypass, 감사 기록됨)로만 이루어진다. 우회 병합은 정상 병합과 동일하게 취급하지 않는다.**
+- `CODEOWNERS`가 지정하는 통제 경로(집행 경로 `package.json`·`vite.config.ts`·워크플로 포함)의 변경은 리뷰 요청의 우선 대상이다.
+- 필수 검사(`validate`)의 구성과 로컬 집행 체인은 `docs/agents/quality-gates.md`에 있다.
 
-- **코드 탐색**: `code-index` MCP만 사용한다. (`mcp_code-index_*`)
-- **공식 문서 탐색**: `Context7` CLI만 사용한다. (`ctx7` / `npx ctx7`)
-- **사고 과정(구조적 문제해결)**: `Sequential Thinking` MCP만 사용한다. (`mcp_Sequential_Thinking_sequentialthinking`)
-- **브라우저 로그/네트워크 확인**: `Chrome DevTools` MCP만 사용한다. (`mcp_Chrome_DevTools_MCP_*`)
-- **GitHub Actions 확인**: `gh` 명령어만 사용한다. (예: `gh run list`, `gh run view`)
-- **Git 명령어 페이저 비활성화**: 모든 git 명령어는 반드시 `git --no-pager <subcommand>` 형식으로 실행한다.
+### §1.2 발행 권위
 
-### 표준 언어 및 환경
+- 발행 실행은 `sns-publish` 환경의 오너 승인을 통과해야 한다. **에이전트는 승인자가 될 수 없다.**
+- 재실행은 canonical URL/title로 기존 초안을 찾아 `already_draft`/`draft_found`로 종료한다. 새 POST를 만들지 않는다.
 
-- **최종 산출물/사용자 응대**: 한국어를 표준으로 한다.
-- **개발 환경**: Windows PowerShell 환경에 최적화된 명령어를 사용한다.
-- **패키지 및 실행 환경**:
-  - 의존성 설치 및 관리가 중요한 작업(패키지 추가/삭제, CI 환경 등)은 반드시 `pnpm`을 사용한다.
-  - 실행 속도가 중요한 작업(로컬 개발 서버 실행, 테스트 수행, 간단한 스크립트 실행)은 `bun`을 우선적으로 사용하여 생산성을 높인다.
-- **테스트 설계**:
-  - 신규/수정 테스트는 `fast-check` 기반 Property-Based Testing(PBT)을 기본으로 한다.
-  - 사용자 시나리오/버그 재현은 Given-When-Then 형태의 BDD 스타일 테스트를 우선하며, UI 모션 시나리오는 **DOM 재렌더링/재생성 단위**까지 명시한다.
-  - UI 모션 회귀 테스트는 데이터 변경 검증만으로 종료하지 않고, **DOM 참조 비교(`not.toBe`)**로 실제 컴포넌트 교체를 기계적으로 증명한다.
-  - 테스트 커버리지는 회귀(regression) 방지의 최소 기준이며, 프로젝트의 커버리지 임계치를 지속적으로 만족해야 한다.
+### §1.3 비밀 권위
 
-## 2. 작업 프로세스 및 스킬 매핑
+- 자격 증명은 네이티브 클라이언트로만 취급한다. 코드·로그·문서에 비밀 값을 남기지 않는다.
 
-에이전트는 다음 작업 단계별로 명시된 기술 스킬을 적용해야 한다.
+### §1.4 임시 감독 모드 (App 등록 전)
 
-- **포스트 작성 및 수정**: `skills/post-creation-standard`
-- **시각화 자료(Mermaid) 처리**: `skills/mermaid-conversion`
-- **외부 플랫폼(DEV.to) 배포**: `skills/devto-publishing`
-- **품질 검증 및 테스트**: `skills/quality-assurance`
+- 에이전트는 아직 오너의 관리자 토큰으로 동작한다. 따라서 무인으로 ruleset·environment·secret·workflow를 변경하거나 `Draft One`/`Unpublish One`을 실행하지 않는다.
+- 모든 병합·발행·승인은 오너가 지켜보는 상태에서만 수행한다.
+- App 등록과 토큰 교체가 끝나면 이 조항을 제거한다.
 
-## 3. 주요 설정 및 명령어 (Quick Recap)
+---
 
-- **의존성 설치**: `pnpm install`
-- **로컬 개발**: `bun run dev` (속도 최적화)
-- **테스트**: `bun test` 또는 `bun x vitest` (속도 최적화)
-- **품질 게이트 (prek)**: `bun x prek run --all-files` (Biome, 타입체크, Knip, DepCruise 병렬 검증)
-- **빌드**: `pnpm build`
-- **스크립트 실행**: `bun run <script_path>`
-- **Context7 CLI 사용 절차**:
-  - 라이브러리 해석: `ctx7 library <name> "<질문>"` 또는 `npx ctx7 library <name> "<질문>"`
-  - 문서 조회: `ctx7 docs </org/project> "<질문>"` 또는 `npx ctx7 docs </org/project> "<질문>"`
-  - 설치 확인: `ctx7 --version` (글로벌 설치 시)
+## §2. 아키텍처 원칙 (ARCHITECTURE)
 
-## 4. 예외 및 품질 게이트
+- **SSOT 원칙**: 규칙은 한 곳에 산다. 중복 의미 상태를 만들지 않고, 정본이 존재하면 다른 곳은 이를 가리키기만 한다.
+- **그래프 모델은 역사다**: `state.json`의 Node/Edge 그래프, Nim CLI(`engine/devlog.nim`), `DB`/`deploy` 브랜치, `.deploy/` 상태·마커는 과거 운영 체계의 기록이다. 삭제하지 않으며 별도 아카이브·퇴역 작업에서 다룬다. 현재 발행 경로는 §0.4의 계약만 따른다.
+- **단일 리스트 소스**: 포스트 리스트 마크업·스타일은 단일 컴포넌트를 SSOT로 삼고, 경로별 페이지는 분류·SEO·구성만 담당한다.
+- **모션은 DOM 교체로 증명한다**: 라우트 전환 시 진입 모션 소실은 데이터가 아니라 DOM 생명주기 문제이며, `[UI Motion Rule]`의 정본은 `CONTEXT.md` §4다.
+- 도메인 규칙(URL 아키텍처 · 빌드/Mermaid 파이프라인 · UI/디자인 · 포스트 작성 표준)의 정본은 `CONTEXT.md`에 있다.
 
-- 모든 새로운 포스트나 코드 변경 사항은 최종적으로 `skills/quality-assurance` 내의 `prek` 품질 게이트를 통과해야 한다.
-  - 특히, **테스트 커버리지가 100% 미만인 경우 `prek`를 통과할 수 없으며 커밋이 차단된다.**
+---
+
+## §3. 환경 (ENVIRONMENT)
+
+- 이 저장소는 Svelte 5 · TypeScript · Vite로 구성되고, Node 20 · pnpm 9를 기준으로 고정된다.
+- 의존성 설치·관리는 `pnpm`, 로컬 실행·테스트 등 속도가 중요한 작업은 `bun`을 우선한다.
+- 툴체인·도구 강제·명령어·로깅·타입 안정성의 상세는 `docs/agents/operations.md`에 있다.
+
+---
+
+## §4. SSOT 위치
+
+| 계층 | 내용 |
+|---|---|
+| `AGENTS.md` | 에이전트 행동 헌법 (Fact · Invariant · Authority · Acceptance/Failure) |
+| `docs/agents/` | 절차 · 도구 · 체크리스트 (`operations.md` · `task-process.md` · `quality-gates.md`) |
+| `CONTEXT.md` | 운영 계약 · 도메인 규칙 · 참조 정본 (SSoT 계약·증거 문서) |
+| `skills/` | 발견 포인터 (절차 SSOT가 아니며, 위 문서를 가리킨다) |
+| `.pre-commit-config.yaml` · `.github/workflows/validate.yml` | 집행 (실행 경로) |
+| `state.json` · `DB`/`deploy` 브랜치 · `.deploy/` | 역사 기록 (현재 권위 아님) |
+
+**규칙**: 측정·역사적 결론·생성 데이터를 이 문서에 배치하지 않는다. 정본 계산이 존재할 때 이 문서는 그 현재 값을 중복하지 않는다.

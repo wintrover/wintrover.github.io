@@ -16,10 +16,11 @@ Feature: AGENTS 절차 게이트 강제
     When gate evaluates changed files
     Then gate result must pass without requiring implementation evidence
 
-  Scenario: CI gate must run on pull_request and push
-    Given GitHub workflow is configured for procedure gate
+  Scenario: retired CI procedure gate workflow must be absent
+    Given the procedure gate lost its CI and hook enforcement on 2026-10-19
     When maintainers open PR or push to main
-    Then workflow must execute gate script and fail on violation
+    Then no procedure gate workflow file must exist under .github/workflows/
+    And the evidence triple requirement must survive as a declared procedure policy
 
   Scenario: rewritten history in CI must still produce changed file list
     Given branch history can be force-rewritten without a merge base
