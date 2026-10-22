@@ -35,14 +35,6 @@ _site/
 
 # Coverage
 coverage/
-!scripts/dump_source/dump_sources.ps1
-!package.json
-!tsconfig.json
-!biome.json
-!stryker.config.json
-!knip.json
-!src/lib/categories.json
-!src/lib/resume/**/*.json
 
 # Stryker
 .stryker-tmp/
@@ -52,6 +44,3 @@ stryker_output.txt
 # Scripts
 *.cjs
 !*.config.cjs
-!.dependency-cruiser.json
-
-!resume/**/*.json

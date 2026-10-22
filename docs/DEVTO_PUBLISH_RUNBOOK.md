@@ -10,6 +10,12 @@ Repeatable, minimal steps to create **one draft** on DEV.to, verify it externall
 - With the current owner-triggered bootstrap, `current_user_can_approve=true`. After the automation App dispatches, `prevent_self_review` becomes enforceable and the owner still approves.
 - Images are publicly reachable at absolute URLs under `https://wintrover.github.io/assets/images/...`.
 
+> **전환 상태 (2026-10-22)**
+>
+> - 자동화 App `wintrover-automation`(App ID 5415157, Contents: read & write — `repository_dispatch` 가능)이 등록·설치되어 dispatcher 경로를 대체할 수 있다.
+> - 오너 관리자 PAT는 서버 폐기 대기 중이다. 폐기 이후 dispatch 경로는 App 설치 토큰(`pnpm exec tsx scripts/app-token.ts`)으로 전환한다.
+> - `sns-publish` 환경의 오너 승인 게이트는 전환 여부와 무관하게 불변이다.
+
 ## Checklist (run in order)
 
 1) Validate `main`
