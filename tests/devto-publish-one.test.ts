@@ -1,8 +1,10 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import fc from "fast-check";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
+	absolutizeLinksInMarkdown,
 	buildDevtoDraftPayload,
 	buildDevtoPublishPayload,
 	buildGithubRunUrl,
@@ -101,6 +103,8 @@ function writeTempPost(dir: string): string {
 			"---",
 			"",
 			"# Hello publish one",
+			"",
+			"[Evidence](/evidence/p0d2g/README.md)",
 			"",
 		].join("\n"),
 		"utf-8",
@@ -923,6 +927,99 @@ describe("parsePublishOneArgs", () => {
 	});
 });
 
+describe("absolutizeLinksInMarkdown", () => {
+	test("루트 상대 링크는 공개 기본 URL로 절대화한다", () => {
+		expect(
+			absolutizeLinksInMarkdown(
+				"[Evidence](/evidence/p0d2g/README.md)",
+				"https://wintrover.github.io/",
+			),
+		).toBe("[Evidence](https://wintrover.github.io/evidence/p0d2g/README.md)");
+	});
+
+	test("제목(title)을 가진 링크도 대상만 절대화한다", () => {
+		expect(
+			absolutizeLinksInMarkdown(
+				'[Evidence](/evidence/p0d2g/README.md "Snapshot")',
+				"https://wintrover.github.io/",
+			),
+		).toBe(
+			'[Evidence](https://wintrover.github.io/evidence/p0d2g/README.md "Snapshot")',
+		);
+	});
+
+	test("앵커·절대 URL·프로토콜 상대·문서 상대·빈 링크는 그대로 둔다", () => {
+		const markdown = [
+			"[Anchor](#section)",
+			"[Absolute](https://example.com/x)",
+			"[Mail](mailto:someone@example.com)",
+			"[ProtocolRelative](//example.com/x)",
+			"[DocRelative](./local.md)",
+			"[ParentRelative](../up/local.md)",
+			"[Bare](local.md)",
+			"[Empty]()",
+		].join("\n");
+		expect(
+			absolutizeLinksInMarkdown(markdown, "https://wintrover.github.io/"),
+		).toBe(markdown);
+	});
+
+	test("이미지 문법은 링크 변환 대상에서 제외한다", () => {
+		const markdown = "![alt](/images/a.png)";
+		expect(
+			absolutizeLinksInMarkdown(markdown, "https://wintrover.github.io/"),
+		).toBe(markdown);
+	});
+
+	test("PBT: 루트 상대 경로는 항상 절대 URL이 되고 루트 상대 링크가 남지 않는다", () => {
+		const segment = fc.constantFrom("a", "b", "evidence", "p0d2g", "post");
+		const file = fc
+			.string({
+				unit: fc.constantFrom(
+					..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+				),
+				minLength: 1,
+				maxLength: 24,
+			})
+			.map((s) => `${s}.md`);
+		fc.assert(
+			fc.property(
+				fc.array(segment, { minLength: 1, maxLength: 5 }),
+				file,
+				(segments, f) => {
+					const sitePath = `/${segments.join("/")}/${f}`;
+					const out = absolutizeLinksInMarkdown(
+						`[Evidence](${sitePath})`,
+						"https://wintrover.github.io/",
+					);
+					expect(out).toBe(
+						`[Evidence](https://wintrover.github.io${sitePath})`,
+					);
+					expect(/\]\(\s*\/(?!\/)/.test(out)).toBe(false);
+				},
+			),
+		);
+	});
+
+	test("PBT: 루트 상태가 아닌 대상은 어떤 입력이든 그대로 둔다", () => {
+		const target = fc
+			.string({
+				unit: fc.constantFrom(..."abcxyz0123456789-._~:/#".split("")),
+				minLength: 1,
+				maxLength: 24,
+			})
+			.filter((s) => !s.startsWith("/") || s.startsWith("//"));
+		fc.assert(
+			fc.property(target, (t) => {
+				const markdown = `[Link](${t})`;
+				expect(
+					absolutizeLinksInMarkdown(markdown, "https://wintrover.github.io/"),
+				).toBe(markdown);
+			}),
+		);
+	});
+});
+
 describe("runPublishOne (fake API)", () => {
 	test("기존 게시물이 published:true면 already_published로 종료하고 쓰기 요청이 없다", async () => {
 		const { fetchFn, calls } = articleApiRoutes({
@@ -938,7 +1035,7 @@ describe("runPublishOne (fake API)", () => {
 		expect(calls).toHaveLength(2);
 	});
 
-	test("canonical 매칭 draft는 PUT으로 입양(adopt)하고 검증까지 완료한다", async () => {
+	test("canonical 매칭 draft는 본문을 PUT 재동기화한 뒤 발행까지 완료한다", async () => {
 		const { fetchFn, calls } = articleApiRoutes({
 			existing: [
 				article({ id: 42, published: false, canonical_url: CANONICAL }),
@@ -950,12 +1047,23 @@ describe("runPublishOne (fake API)", () => {
 		expect(result.method).toBe("adopted_draft");
 		expect(result.draftId).toBe(42);
 		expect(result.id).toBe(42);
-		expect(result.attempts).toBe(1);
+		expect(result.attempts).toBe(2);
 		expect(result.observedPublished).toBe(true);
 		expect(publishOneExitCode(result)).toBe(0);
 		expect(calls.filter((call) => call.init?.method === "POST")).toHaveLength(
 			0,
 		);
+		const puts = calls.filter((call) => call.init?.method === "PUT");
+		expect(puts).toHaveLength(2);
+		expect(puts[0].url).toContain("/api/articles/42");
+		const refreshPayload = JSON.parse(String(puts[0].init?.body)) as {
+			article: { published: boolean; body_markdown: string };
+		};
+		expect(refreshPayload.article.published).toBe(false);
+		expect(refreshPayload.article.body_markdown).toContain(
+			"https://wintrover.github.io/evidence/p0d2g/README.md",
+		);
+		expect(refreshPayload.article.body_markdown).not.toContain("](/evidence");
 		expect(persisted.state).toBe("published_verified");
 		expect(persisted.platform).toBe("devto");
 	});
@@ -1167,7 +1275,7 @@ describe("draft-only runPublishOne", () => {
 		expect(calls.filter((call) => call.init?.method === "PUT")).toHaveLength(0);
 	});
 
-	test("기존 초안을 채택하고 쓰기 없이 검증한다", async () => {
+	test("기존 초안은 PUT으로 본문을 재동기화하고 published:false로 검증한다", async () => {
 		const draft = article({
 			id: 42,
 			published: false,
@@ -1176,8 +1284,77 @@ describe("draft-only runPublishOne", () => {
 		const { fetchFn, calls } = articleApiRoutes({ existing: [draft] });
 		const { result } = await runInTmp(fetchFn, { draftOnly: true });
 		expect(result.state).toBe("draft_verified");
+		expect(result.observedDraft).toBe(true);
+		expect(result.observedPublished).toBe(false);
 		expect(result.id).toBe(42);
-		expect(calls.filter((call) => call.init?.method)).toHaveLength(0);
+		expect(calls.filter((call) => call.init?.method === "POST")).toHaveLength(
+			0,
+		);
+		const puts = calls.filter((call) => call.init?.method === "PUT");
+		expect(puts).toHaveLength(1);
+		expect(puts[0].url).toContain("/api/articles/42");
+		const payload = JSON.parse(String(puts[0].init?.body)) as {
+			article: { published: boolean; body_markdown: string };
+		};
+		expect(payload.article.published).toBe(false);
+		expect(payload.article.body_markdown).toContain(
+			"[Evidence](https://wintrover.github.io/evidence/p0d2g/README.md)",
+		);
+		expect(payload.article.body_markdown).not.toContain("](/evidence");
+	});
+
+	test("생성 POST 본문의 루트 상대 링크도 절대 URL로 변환된다", async () => {
+		const { fetchFn, calls } = articleApiRoutes({ createdDraftId: 501 });
+		const { result } = await runInTmp(fetchFn, { draftOnly: true });
+		expect(result.state).toBe("draft_verified");
+		const posts = calls.filter((call) => call.init?.method === "POST");
+		expect(posts).toHaveLength(1);
+		const payload = JSON.parse(String(posts[0].init?.body)) as {
+			article: { body_markdown: string };
+		};
+		expect(payload.article.body_markdown).toContain(
+			"[Evidence](https://wintrover.github.io/evidence/p0d2g/README.md)",
+		);
+		expect(payload.article.body_markdown).not.toContain("](/evidence");
+	});
+
+	test("재동기화 PUT이 5xx면 unknown으로 종료하고 재쓰기가 없다", async () => {
+		const draft = article({
+			id: 42,
+			published: false,
+			canonical_url: CANONICAL,
+		});
+		const routes = articleApiRoutes({ existing: [draft] });
+		let putCalls = 0;
+		const fetchFn = async (url: string, init?: RequestInit) => {
+			if (url.includes("/api/articles/42") && init?.method === "PUT") {
+				putCalls += 1;
+				return fakeResponse({ error: "boom" }, 503);
+			}
+			return routes.fetchFn(url, init);
+		};
+		const { result } = await runInTmp(fetchFn, { draftOnly: true });
+		expect(result.state).toBe("unknown");
+		expect(publishOneExitCode(result)).toBe(1);
+		expect(putCalls).toBe(1);
+	});
+
+	test("재동기화 PUT이 4xx면 failed로 종료한다", async () => {
+		const draft = article({
+			id: 42,
+			published: false,
+			canonical_url: CANONICAL,
+		});
+		const routes = articleApiRoutes({ existing: [draft] });
+		const fetchFn = async (url: string, init?: RequestInit) => {
+			if (url.includes("/api/articles/42") && init?.method === "PUT") {
+				return fakeResponse({ error: "no" }, 422);
+			}
+			return routes.fetchFn(url, init);
+		};
+		const { result } = await runInTmp(fetchFn, { draftOnly: true });
+		expect(result.state).toBe("failed");
+		expect(publishOneExitCode(result)).toBe(1);
 	});
 
 	test("이미 공개된 글은 published_exists로 실패한다", async () => {

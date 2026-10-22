@@ -73,7 +73,7 @@ Expected: `404` (a draft has no public article endpoint).
 Authenticated check: use `Unpublish One` with `article_id=<id>`; expected `action=already_draft`, `published:false`.
 
 6) Re-run without local state
-Delete any local artifact and dispatch the same post again. Expected: the same `id` is found, `state=already_draft`, and no new POST is made.
+Delete any local artifact and dispatch the same post again. Expected: the same `id` is found, the draft body is refreshed from the current post via PUT (`published:false` kept), the run ends in `draft_verified`, and no new POST is made.
 
 7) Failure injection
 ```
@@ -84,6 +84,7 @@ Expected: the workflow fails with `unknown`; no automatic re-POST follows. Recon
 ## Notes & Pitfalls
 
 - `published:true` is never produced by `Draft One`. If an article is already public, the run fails with `published_exists` and requires `Unpublish One` first.
+- Root-relative markdown links in the post body (e.g. `/evidence/...`) are absolutized against the public base URL before the draft is created or refreshed; anchors, absolute URLs, protocol-relative URLs, and document-relative links pass through unchanged.
 - `client_payload` is untrusted free-form JSON. The workflow validates an allowlist and never interpolates payload into a shell.
 - Do not use `.js` paths or `node scripts/post-to-dev.js`; the runtime entrypoint is `scripts/post-to-dev.ts` via `pnpm exec tsx`.
 - Do not treat a green job or a local marker as proof. Only the DEV.to API observation counts.

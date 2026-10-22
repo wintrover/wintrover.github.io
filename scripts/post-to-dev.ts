@@ -271,6 +271,32 @@ export async function absolutizeImagesInMarkdown(
 	return out;
 }
 
+export function absolutizeLinksInMarkdown(
+	markdown: string,
+	publicBaseUrl: string,
+): string {
+	const linkRegex = /(?<!!)\[([^\]]*)\]\((\s*<?([^)\s]+)>?)([^)]*)\)/g;
+	return markdown.replace(
+		linkRegex,
+		(
+			fullMatch,
+			alt: string,
+			_urlPart: string,
+			urlOnly: string,
+			rest: string,
+		) => {
+			const target = String(urlOnly || "").trim();
+			if (!target || target.startsWith("#") || target.startsWith("//")) {
+				return fullMatch;
+			}
+			if (!target.startsWith("/")) return fullMatch;
+			const abs = absolutizeSrc(target, publicBaseUrl);
+			if (typeof abs !== "string" || !abs) return fullMatch;
+			return `[${alt}](${abs}${rest})`;
+		},
+	);
+}
+
 function clampTitle(title: string) {
 	if (!title) return "";
 	return title.length <= 128 ? title : `${title.slice(0, 125)}...`;
@@ -439,10 +465,14 @@ async function preparePost(filePath: string, publicBaseUrl: string) {
 		filenameBase,
 	);
 	const firstImageRef = { url: null as string | null };
-	const bodyMarkdown = await absolutizeImagesInMarkdown(
+	const imageAbsolutized = await absolutizeImagesInMarkdown(
 		processedContent,
 		publicBaseUrl,
 		firstImageRef,
+	);
+	const bodyMarkdown = absolutizeLinksInMarkdown(
+		imageAbsolutized,
+		publicBaseUrl,
 	);
 	const titleRaw =
 		String(typedFrontmatter.title || "").trim() ||
@@ -1956,6 +1986,43 @@ export async function runPublishOne(
 		result.state = "draft_found";
 		process.stdout.write(
 			`[publish-one] adopting existing draft id=${articleId}\n`,
+		);
+		const refreshed = await writeDevtoArticle(
+			`${DEVTO_API_ROOT}/articles/${articleId}`,
+			"PUT",
+			apiKey,
+			buildDevtoDraftPayload(prepared, result.canonicalUrl),
+			fetchFn,
+		);
+		result.attempts += 1;
+		if (refreshed.kind === "http_error") {
+			const classification = classifyDevtoError(
+				refreshed.status,
+				refreshed.errorText,
+			);
+			return classification === "failed"
+				? failWith("failed", "failed", {
+						stage: "draft_refresh",
+						status: refreshed.status,
+						classification,
+						draftId: articleId,
+					})
+				: failWith("unknown", "unknown", {
+						stage: "draft_refresh",
+						status: refreshed.status,
+						classification,
+						draftId: articleId,
+					});
+		}
+		if (refreshed.kind === "unresolved") {
+			return failWith("unknown", "unknown", {
+				stage: "draft_refresh",
+				errorText: refreshed.errorText,
+				draftId: articleId,
+			});
+		}
+		process.stdout.write(
+			`[publish-one] refreshed draft id=${articleId} from the current post body\n`,
 		);
 	} else {
 		if (options.failInjection === "post_response_loss") {
