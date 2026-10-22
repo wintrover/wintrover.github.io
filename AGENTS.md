@@ -79,7 +79,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 - **그래프 모델은 역사다**: `state.json`의 Node/Edge 그래프, Nim CLI(`engine/devlog.nim`), `DB`/`deploy` 브랜치, `.deploy/` 상태·마커는 과거 운영 체계의 기록이다. 삭제하지 않으며 별도 아카이브·퇴역 작업에서 다룬다. 현재 발행 경로는 §0.4의 계약만 따른다.
 - **단일 리스트 소스**: 포스트 리스트 마크업·스타일은 단일 컴포넌트를 SSOT로 삼고, 경로별 페이지는 분류·SEO·구성만 담당한다.
 - **모션은 DOM 교체로 증명한다**: 라우트 전환 시 진입 모션 소실은 데이터가 아니라 DOM 생명주기 문제이며, `[UI Motion Rule]`의 정본은 `docs/spec/ui-design.md`다.
-- 도메인 규칙(URL 아키텍처 · 빌드/Mermaid 파이프라인 · UI/디자인 · 포스트 작성 표준 · 자동화 신원)의 정본은 `docs/spec/`에 있다.
+- 도메인 규칙(URL 아키텍처 · 빌드/Mermaid 파이프라인 · UI/디자인 · 포스트 작성 표준 · 자동화 신원 · 외부 발행)의 정본은 `docs/spec/`에 있다.
 
 ---
 
@@ -97,7 +97,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 |---|---|
 | `AGENTS.md` | 에이전트 행동 헌법 (Fact · Invariant · Authority · Acceptance/Failure) |
 | `docs/agents/` | 절차 · 도구 · 체크리스트 (`operations.md` · `task-process.md` · `quality-gates.md`) |
-| `docs/spec/` | 도메인 계약 정본 (URL·빌드·UI·포스트 작성·자동화 신원) |
+| `docs/spec/` | 도메인 계약 정본 (URL·빌드·UI·포스트 작성·자동화 신원·외부 발행) |
 | `skills/` | 발견 포인터 (절차 SSOT가 아니며, 위 문서를 가리킨다) |
 | `.pre-commit-config.yaml` · `.github/workflows/validate.yml` | 집행 (실행 경로) |
 | `state.json` · `DB`/`deploy` 브랜치 · `.deploy/` | 역사 기록 (현재 권위 아님) |

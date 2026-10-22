@@ -88,6 +88,7 @@
 
 ## 외부 플랫폼(DEV.to) 발행
 
+- **정본**: 발행 본문 변환(상대 링크 절대화)과 재실행 시 초안 재동기화(adopt 후 PUT 갱신) 계약의 정본은 [docs/spec/external-publishing.md](../spec/external-publishing.md)다.
 - **초안 전용**: `Draft One`은 `published:false` 초안만 만든다. 공개 전환은 이 저장소의 자동화 범위가 아니다. 이미 공개된 글을 초안으로 되돌릴 때는 `Unpublish One`을 사용한다.
 - **단일 실행 경로**: 발행은 `.github/workflows/publish-one.yml`의 `repository_dispatch: draft-one`으로만 요청한다. 로컬에서 `scripts/post-to-dev.ts`를 직접 실행하지 않는다. `--publish-one` 외의 레거시 경로는 `PUBLISH_LEGACY_ENABLED` 없이는 거부된다.
 - **승인 경계**: 실제 실행은 `sns-publish` 환경의 오너 승인을 통과해야 한다. 에이전트는 승인자가 될 수 없다.
