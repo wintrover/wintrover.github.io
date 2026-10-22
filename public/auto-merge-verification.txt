@@ -1,0 +1,4 @@
+auto-merge-verification-marker-2026-10-22-k4m9xq
+
+This file proves that a review-free pull request can reach the live site
+through validate-gated auto-merge. See docs/agents/quality-gates.md.

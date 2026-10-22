@@ -70,7 +70,7 @@
 ### 콘텐츠 변경 경로와 병합 검증
 
 - **콘텐츠 변경 경로**: 콘텐츠(`src/posts/`)는 `main`에 PR로 병합한다. `deploy` 브랜치에 푸시하거나 `--no-verify`로 검증을 우회하지 않는다.
-- **병합 검증 의무**: PR 생성 후 `validate` 필수 검사 결과를 `gh run list`/`gh run view`로 확인하고, 오너 승인 없이 병합하지 않는다.
+- **병합 검증 의무**: PR 생성 후 `validate` 필수 검사 결과를 `gh run list`/`gh run view`로 확인한다. 통과하면 auto-merge가 병합을 수행한다(승인 리뷰 없음).
 
 ### 기존 포스트 부분 수정 규칙
 
@@ -91,7 +91,7 @@
 - **초안 전용**: `Draft One`은 `published:false` 초안만 만든다. 공개 전환은 이 저장소의 자동화 범위가 아니다. 이미 공개된 글을 초안으로 되돌릴 때는 `Unpublish One`을 사용한다.
 - **단일 실행 경로**: 발행은 `.github/workflows/publish-one.yml`의 `repository_dispatch: draft-one`으로만 요청한다. 로컬에서 `scripts/post-to-dev.ts`를 직접 실행하지 않는다. `--publish-one` 외의 레거시 경로는 `PUBLISH_LEGACY_ENABLED` 없이는 거부된다.
 - **승인 경계**: 실제 실행은 `sns-publish` 환경의 오너 승인을 통과해야 한다. 에이전트는 승인자가 될 수 없다.
-- **감독 모드 (App 등록 후 · PAT 폐기 대기)**: 자동화 App `wintrover-automation`은 등록·설정 완료 상태이나 오너의 관리자 PAT은 아직 서버 측에서 폐기되지 않았다. 남은 최종 오너 행위는 PAT 폐기이며, 폐기 확인 뒤 이 임시 조항을 제거한다. 폐기 전까지 dispatch와 승인은 오너가 지켜보는 상태에서만 수행한다.
+- **자동화 신원 (App 설치 토큰)**: 자동화는 GitHub App `wintrover-automation`의 설치 토큰(`pnpm exec tsx scripts/app-token.ts` 발급)으로만 동작한다. 관리자 권한이 없고 ruleset 우회(bypass) 주체로 등록되지 않으며 워크플로 파일을 수정할 수 없다. `Draft One` dispatch와 `sns-publish` 환경 승인은 오너가 브라우저에서 수행한다.
 - **사전 검증**: 발행 전 `pnpm run typecheck`, `pnpm run test`, `pnpm run build:github`가 통과해야 한다.
 - **외부 관측이 유일한 증거**: 성공 판정은 `GET https://dev.to/api/articles/me/all`에서 동일 `id`가 `published:false`로 보이는 것이다. 워크플로 로그의 success나 로컬 마커는 증거가 아니다.
 - **재실행**: 동일 포스트를 다시 요청하면 기존 초안을 찾아 `already_draft`/`draft_found`로 종료해야 하며 새 POST를 만들면 안 된다.
