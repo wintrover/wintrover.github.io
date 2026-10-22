@@ -70,7 +70,7 @@
 ### 콘텐츠 변경 경로와 병합 검증
 
 - **콘텐츠 변경 경로**: 콘텐츠(`src/posts/`)는 `main`에 PR로 병합한다. `deploy` 브랜치에 푸시하거나 `--no-verify`로 검증을 우회하지 않는다.
-- **병합 검증 의무**: PR 생성 후 `validate` 필수 검사 결과를 `gh run list`/`gh run view`로 확인하고, 오너 승인 없이 병합하지 않는다.
+- **병합 검증 의무**: PR 생성 후 `validate` 필수 검사 결과를 `gh run list`/`gh run view`로 확인한다. 통과하면 auto-merge가 병합을 수행한다(승인 리뷰 없음).
 
 ### 기존 포스트 부분 수정 규칙
 

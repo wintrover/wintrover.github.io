@@ -1,5 +1,6 @@
-# The automation identity may open PRs, but it must not merge changes to the
-# control plane without the owner's review.
+# CODEOWNERS declares review-request targets only; merging requires no
+# approvals (validate-gated auto-merge). Control-plane protection is enforced
+# by platform permissions (administration / workflows), not by this file.
 /.github/workflows/ @wintrover
 /.github/CODEOWNERS @wintrover
 /scripts/post-to-dev.ts @wintrover

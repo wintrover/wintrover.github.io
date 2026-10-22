@@ -9,7 +9,7 @@
 - 권한은 `contents:write` · `pull_requests:write` · `checks:read` · `actions:read` 네 가지로 한정된다.
 - `administration` · `workflows` · `organization` 권한은 부여되지 않는다. 이 App은 ruleset 변경, 워크플로 파일 push, 저장소 설정 변경을 수행할 수 없다.
 - App은 ruleset의 우회 주체(`bypass_actors`)로 등록되지 않는다. 우회 주체는 오너(User, `pull_request` 모드) 전용이다.
-- App 신원으로 작성한 PR의 저자 자체는 승인이 필요하지 않다. 승인 신원은 오너(다른 신원)여야 한다.
+- 병합은 인간 승인을 요구하지 않는다. App이 연 PR도 `validate` 통과 후 auto-merge로 병합된다.
 
 ## 설치 토큰 발급 계약
 
@@ -27,12 +27,13 @@
 
 ## 병합 경로
 
-- 정상 경로: App이 PR을 작성 → `validate` 필수 검사 통과 → 오너(다른 신원)의 승인 리뷰 1건 → squash 병합.
+- 정상 경로: App이 PR을 작성 → `validate` 필수 검사 통과 → auto-merge가 승인 없이 squash 병합.
 - 예외 경로: 오너의 명시적 규칙 우회(bypass). 감사 기록 대상이며 정상 병합과 동일하게 취급하지 않는다.
 
 ## 잔류 위험
 
 - Pages 배포는 `main` push로 독립적으로 트리거된다. ruleset은 유일한 병합 게이트이므로, 오너의 규칙 우회 병합은 검증에 실패한 커밋도 그대로 배포한다. 기록된 잔류 위험이며 본 슬라이스에서 해결하지 않는다.
+- 무리뷰 전환으로 검증 명령 정의·테스트·스크립트 변경이 인간 리뷰 없이 main에 도달할 수 있다. 수용된 한계다.
 
 ## 관련
 
