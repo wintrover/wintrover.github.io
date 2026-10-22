@@ -35,7 +35,7 @@ Feature: Agent constitution split
 
   Scenario: codeowners declares the control plane paths
     Given the control plane of this repository spans docs, gates and toolchain files
-    When GitHub computes required reviewers for a pull request
+    When GitHub computes review requests for a pull request
     Then CODEOWNERS must cover AGENTS.md, docs/spec/ and docs/agents/
     And CODEOWNERS must cover the execution paths .pre-commit-config.yaml, package.json, vite.config.ts and pnpm-lock.yaml
     And CODEOWNERS must cover the constitution contract test and the skills directory
@@ -50,4 +50,4 @@ Feature: Agent constitution split
     Given an automation app identity with contents and pull requests permissions
     When it attempts a ruleset change, a workflow-file push, or a bypass merge
     Then the platform rejects each attempt
-    And merging requires the owner's approval
+    And merging requires only the passing validate check with auto-merge
