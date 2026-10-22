@@ -20,14 +20,11 @@
 
 ruleset id `25404151`, `enforcement: active`, 대상 ref은 `refs/heads/main`이다.
 
-- **PR 병합 방법**: `squash`만 허용 (`allowed_merge_methods: ["squash"]`)
-- **코드 소유자 리뷰**: `require_code_owner_review: false` — CODEOWNERS는 리뷰 요청 대상 경로 선언으로만 남는다(병합 게이트 아님).
-- **필수 승인 리뷰 수**: `required_approving_review_count: 0` — 인간 승인은 병합 요건이 아니다. `require_extra_approval_for_unattributed_changes`는 승인 0건에서 효력이 없다.
+- **적용 규칙 (2026-10-22 실측)**: `deletion`(브랜치 삭제 금지) · `non_fast_forward`(force push 금지) · `required_status_checks`(context `validate`, integration id `15368`, `strict_required_status_checks_policy: true`) — 총 3개.
+- **`pull_request` 규칙 제거 (2026-10-22 무리뷰 전환)**: "Require a pull request before merging" 규칙을 전체 제거했다. 인간 승인·코드 소유자 리뷰는 병합 요건이 아니며, PR 필수 자체도 ruleset이 더 이상 강제하지 않는다. main 직접 push는 `required_status_checks`가 ref 갱신에 `validate` 통과를 요구하므로 검증 우회는 여전히 차단된다.
+- **병합 방법**: ruleset 수준 제한이 없다. 자동화 경로는 `gh pr merge --auto --squash`로 squash를 관례로 사용한다.
 - **저장소 설정 `allow_auto_merge: true`**: 병합 요건이 충족되면 GitHub가 PR을 자동 병합한다. PR별 auto-merge는 write 권한 보유자(App 포함)가 설정한다.
 - **우회 주체(`bypass_actors`)**: 오너(User, `pull_request` 모드) **전용**이다. 자동화 App `wintrover-automation`은 의도적으로 등록되지 않았다 — 이 App은 ruleset 변경·워크플로 파일 push·규칙 우회 병합을 수행할 수 없다.
-- **필수 상태 검사**: context `validate` (integration id `15368`), `strict_required_status_checks_policy: true`
-- **금지 규칙**: `deletion`(브랜치 삭제 금지) · `non_fast_forward`(force push 금지)
-- **기타**: `require_extra_approval_for_unattributed_changes: true`, `dismiss_stale_reviews_on_push: false`, `required_review_thread_resolution: false`
 - `CODEOWNERS`는 리뷰 요청 대상 경로를 선언한다(§4). 병합 게이트가 아니다.
 
 ## 3. 로컬 집행: `prek` 10훅 체인
@@ -77,6 +74,7 @@ ruleset id `25404151`, `enforcement: active`, 대상 ref은 `refs/heads/main`이
 
 - **Pages 배포는 `main` push로 독립적으로 트리거된다.** `pages-deploy.yml`은 ruleset과 무관하게 `main`에 도달한 커밋을 배포하므로, ruleset은 **유일한 병합 게이트**다. 오너가 규칙 우회로 검증에 실패한(red) 커밋을 `main`에 올리면 그 커밋은 그대로 배포된다. 기록된 잔류 위험이며 본 슬라이스에서 해결하지 않는다.
 - **무리뷰 수용 한계**: 검증 명령 정의(`package.json`)·의존성 잠금(`pnpm-lock.yaml`)·테스트 코드·빌드 설정·발행 스크립트·CODEOWNERS 선언은 PR 작성자가 변경할 수 있다. 필수 CI가 통과해도 검증 체인과 발행 로직의 의미 보존까지는 보증되지 않는다. 오너 전용 경계는 플랫폼 권한 영역(ruleset·저장소 설정·워크플로 파일·secrets·environments)이다.
+- **PR 필수 규칙 제거의 잔류 위험**: main 직접 push가 ruleset 수준에서 차단되지 않는다. 남은 방어선은 `required_status_checks`(strict)가 ref 갱신에 `validate` 통과를 요구하는 것뿐이며, 병합 방법 제한(squash 전용)도 사라졌다 — squash는 자동화 경로의 관례로만 유지된다.
 
 ## 관련
 
