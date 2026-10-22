@@ -70,12 +70,6 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 
 - 자격 증명은 네이티브 클라이언트로만 취급한다. 코드·로그·문서에 비밀 값을 남기지 않는다.
 
-### §1.4 감독 모드 (App 등록 후 · PAT 폐기 대기)
-
-- 자동화 App `wintrover-automation`은 등록·설정 완료 상태이고, 에이전트는 App 권한으로 동작한다. 오너의 관리자 PAT은 아직 서버 측에서 폐기되지 않았다.
-- 남은 오너 행위는 **서버 측 PAT 폐기(1회)** 뿐이다. 폐기가 확인되면 이 조항을 제거한다.
-- 폐기 전까지 에이전트는 무인으로 ruleset·environment·secret·workflow를 변경하거나 `Draft One`/`Unpublish One`을 실행하지 않는다. 모든 병합·발행·승인은 오너가 지켜보는 상태에서만 수행한다.
-
 ---
 
 ## §2. 아키텍처 원칙 (ARCHITECTURE)
