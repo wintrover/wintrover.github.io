@@ -45,8 +45,8 @@
 
 ## 콘텐츠 변경 경로와 게이트 예외
 
-- **Procedure Gate 예외**: 콘텐츠(`src/posts/`) 파일은 아키텍처의 '실록(History)' 또는 '홍보(Publicity)' 영역에 속하므로 `src/core`에 적용되는 Procedure Gate의 엄격한 증거 의무(`docs/spec/*.md`, `tests/features/*.feature`, `tests/**/*.test.ts`)에서 제외된다. `[REQ-PROCEDURE-GATE-07]` 단, `docs/spec/`와의 정합성 검토는 유지한다. **CI 스킵 금지**: Procedure Gate 예외는 로컬 git hooks(`--no-verify`)에만 적용되며, GitHub Actions CI(`[skip ci]`)는 스킵하면 안 된다. 블로그 배포를 위해 `Pages Build & Deploy` 워크플로우가 반드시 실행되어야 한다.
-- **deploy 브랜치 검증 의무**: `deploy` 브랜치에 푸시한 후에는 반드시 `gh` 명령어로 GitHub Actions 실행 결과를 검증해야 한다.
+- **Procedure Gate 예외**: 콘텐츠(`src/posts/`) 파일은 아키텍처의 '실록(History)' 또는 '홍보(Publicity)' 영역에 속하므로 `src/`·`scripts/`·`engine/`·`.github/workflows/` 구현 경로에 적용되는 Procedure Gate의 엄격한 증거 의무(`docs/spec/*.md`, `tests/features/*.feature`, `tests/**/*.test.ts`)에서 제외된다. `[REQ-PROCEDURE-GATE-07]` 단, `docs/spec/`와의 정합성 검토는 유지한다. **CI 스킵 금지**: Procedure Gate 예외는 로컬 git hooks(`--no-verify`)에만 적용되며, GitHub Actions CI(`[skip ci]`)는 스킵하면 안 된다. 블로그 배포를 위해 `Pages Build & Deploy` 워크플로우가 반드시 실행되어야 한다.
+- **배포·외부 발행 경로**: 콘텐츠 원천은 `main`이며, 사이트 배포는 `pages-deploy.yml`(`Pages Build & Deploy`)이 `main` push에서 수행한다. `deploy` 브랜치는 역사 기록으로 현재 발행 권위가 아니므로 푸시하지 않는다. 외부 발행은 `Draft One`(`repository_dispatch: draft-one`)만 사용한다.
 
 ## 기록: 2026-04-02 포스트 변경 이력
 

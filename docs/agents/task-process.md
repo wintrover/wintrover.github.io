@@ -97,8 +97,8 @@
 - **외부 관측이 유일한 증거**: 성공 판정은 `GET https://dev.to/api/articles/me/all`에서 동일 `id`가 `published:false`로 보이는 것이다. 워크플로 로그의 success나 로컬 마커는 증거가 아니다.
 - **재실행**: 동일 포스트를 다시 요청하면 기존 초안을 찾아 `already_draft`/`draft_found`로 종료해야 하며 새 POST를 만들면 안 된다.
 - **불명 상태**: `unknown`은 성공이 아니다. 자동 재POST하지 말고 `/me/all`을 다시 조회해 동일 canonical/title의 글을 찾은 뒤 판정한다.
-- **이미지 주소**: 본문 이미지는 공개 절대 URL(`https://wintrover.github.io/assets/images/...`)이어야 한다. `/blog` 접두사는 사용하지 않는다.
-- **비밀 정보**: `DEVTO_API_KEY`의 목표 권위는 `sns-publish` 환경 secret이다. 오너 이전 전까지는 저장소 secret이 임시로 사용되며, 코드·로그에 값을 남기지 않는다.
+- **이미지 주소**: 본문 이미지는 공개 절대 URL(`https://wintrover.github.io/images/...`)이어야 한다. `/blog` 접두사는 사용하지 않는다.
+- **비밀 정보**: `DEVTO_API_KEY`는 `sns-publish` 환경 secret에만 존재한다. 코드·로그에 값을 남기지 않는다.
 - **단계별 실행 절차**: [docs/DEVTO_PUBLISH_RUNBOOK.md](../DEVTO_PUBLISH_RUNBOOK.md)
 
 ## 스킬 매핑 (skills/는 발견 포인터)
