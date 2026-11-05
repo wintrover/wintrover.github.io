@@ -43,7 +43,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 - 외부 발행은 `Draft One`(`repository_dispatch: draft-one`)만 사용한다.
 - 신규 DEV.to 결과물은 **초안(`published:false`)만** 허용한다. 공개 전환은 이 저장소의 자동화 범위가 아니며, 이미 공개된 글을 초안으로 되돌릴 때는 `Unpublish One`을 사용한다.
 - 발행 완료 판정은 DEV.to `GET /api/articles/me/all`에서 동일 `id`와 `published:false`를 관측하는 것이다. 로컬 로그·마커의 success는 증거가 아니다.
-- `DEVTO_API_KEY`의 목표 권위는 `sns-publish` 환경 secret이다. 오너 이전 전까지는 저장소 secret이 임시로 사용된다.
+- `DEVTO_API_KEY`의 권위는 `sns-publish` 환경 secret이다.
 - 결과 불명(`unknown`)은 성공으로 기록하지 않으며 자동 재POST하지 않는다.
 - `state.json`, `DB`/`deploy` 브랜치, Nim `devlog`, `.deploy/` 마커는 **역사 기록**이며 현재 발행 권위가 아니다.
 - LinkedIn 자동 발행은 비활성이다. 재활성화는 별도 제품 결정과 독립 acceptance를 요구한다.
@@ -56,7 +56,7 @@ description: 블로그 에이전트의 행동 헌법(Fact·Invariant·Authority�
 ### §1.1 병합 권위
 
 - 병합 권위는 **GitHub ruleset + `validate` 필수 검사**다. 검증을 우회하는 직접 push는 금지된다.
-- **병합은 인간 승인을 요구하지 않는다.** 모든 PR은 필수 `validate` 검사를 통과하면 GitHub auto-merge가 승인 리뷰 0건으로 squash 병합한다. 정상 경로는 자동화 App(`wintrover-automation`)이 작성한 PR이 `validate`를 통과하고 사람 개입 없이 auto-merge로 병합되는 것이다. 규칙 우회(bypass)는 오너만 사용할 수 있는 예외 경로이며 감사 기록된다. 우회 병합은 정상 병합과 동일하게 취급하지 않는다.**
+- **병합은 인간 승인을 요구하지 않는다.** 모든 PR은 필수 `validate` 검사를 통과하면 GitHub auto-merge가 승인 리뷰 0건으로 병합한다. 정상 경로는 자동화 App(`wintrover-automation`)이 작성한 PR이 `validate`를 통과하고 사람 개입 없이 auto-merge로 squash 병합되는 것이다. squash는 ruleset·플랫폼이 강제하는 병합 방법 제한이 아니라 자동화 경로의 관례다. 규칙 우회(bypass)는 오너만 사용할 수 있는 예외 경로이며 감사 기록된다. 우회 병합은 정상 병합과 동일하게 취급하지 않는다.**
 - 필수 CI가 통과해도 검증 체인과 발행 로직의 의미가 원래와 동일하다는 것까지는 보증하지 않는다. 검증 명령 정의·의존성 잠금·테스트 코드가 PR로 변경될 수 있으며, 이 한계는 무리뷰 전환의 수용 조건이다.
 - 자동화 신원은 최소 권한 GitHub App `wintrover-automation`이며 권한은 `contents:write` · `pull_requests:write` · `checks:read` · `actions:read`로 한정된다. `administration` · `workflows` · `organization` 권한은 없다. 이 App은 ruleset 변경·워크플로 파일 push·규칙 우회 병합을 수행할 수 없다.
 - `CODEOWNERS`가 지정하는 통제 경로는 리뷰 **요청** 대상일 뿐 병합 게이트가 아니다. 실제 통제는 플랫폼 권한이 집행한다: ruleset·저장소 설정(`administration`), 워크플로 파일(`workflows` 권한 — App 토큰의 워크플로 파일 push는 GitHub가 거부한다, 실측 2026-10-22), secrets·environments. 그 외 모든 파일(`package.json`·`tests/`·스크립트·빌드 설정 포함)은 PR 작성자가 변경할 수 있다.

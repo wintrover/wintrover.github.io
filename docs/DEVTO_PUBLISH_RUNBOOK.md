@@ -4,15 +4,15 @@ Repeatable, minimal steps to create **one draft** on DEV.to, verify it externall
 
 ## Prerequisites
 
-- `DEVTO_API_KEY` target authority is the `sns-publish` environment secret. Until the owner migrates it, the repository secret is the temporary source.
+- `DEVTO_API_KEY` exists only in the `sns-publish` environment secret; no repository-level secret holds it.
 - The `Draft One` workflow is the only write path; it is triggered by `repository_dispatch` (`draft-one`).
 - The owner is the required reviewer for the `sns-publish` environment.
-- With the current owner-triggered bootstrap, `current_user_can_approve=true`. After the automation App dispatches, `prevent_self_review` becomes enforceable and the owner still approves.
-- Images are publicly reachable at absolute URLs under `https://wintrover.github.io/assets/images/...`.
+- `prevent_self_review` is not enabled on the `sns-publish` environment (measured 2026-11-05): the user who triggered the run is not blocked from approving it.
+- Images are publicly reachable at absolute URLs under `https://wintrover.github.io/images/...`.
 
 > **전환 상태 (2026-10-22)**
 >
-> - 자동화 App `wintrover-automation`(App ID 5415157, Contents: read & write — `repository_dispatch` 가능)은 **유일한 자동화 경로**다. 오너의 관리자 PAT는 서버 측에서 폐기되었다.
+> - 자동화 App `wintrover-automation`(App ID 5415157, 권한은 [docs/spec/automation-identity.md](spec/automation-identity.md)의 정본을 따름 — `repository_dispatch` 가능)은 **유일한 자동화 경로**다. 오너의 관리자 PAT는 서버 측에서 폐기되었다.
 > - dispatch와 API 호출은 `scripts/app-token.ts`가 발급한 App 설치 토큰을 사용한다(`pnpm exec tsx scripts/app-token.ts`). 이 App은 관리자 권한이 없고 ruleset 우회(bypass) 주체로 등록되지 않으며 워크플로 파일을 수정할 수 없다.
 > - `sns-publish` 환경의 오너 승인 게이트는 전환 여부와 무관하게 불변이다. 오너는 브라우저에서 승인한다.
 
