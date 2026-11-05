@@ -45,6 +45,7 @@ describe("PostDetail Component", () => {
 
 	afterEach(() => {
 		vi.clearAllMocks();
+		vi.unstubAllEnvs();
 	});
 
 	test("포스트 내용을 올바르게 렌더링해야 함", async () => {
@@ -441,5 +442,37 @@ describe("PostDetail Component", () => {
 			}),
 			{ numRuns: 25 },
 		);
+	});
+
+	test("영어 로케일에서 미존재 slug는 기존 영어 not-found 문구를 유지해야 함", async () => {
+		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(null);
+
+		render(PostDetail, { params: { slug: "missing-slug" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("Post not found")).toBeInTheDocument();
+		});
+		expect(
+			screen.getByText(
+				"The post you're looking for doesn't exist or has been moved.",
+			),
+		).toBeInTheDocument();
+		expect(screen.getByText("Go back to home")).toBeInTheDocument();
+	});
+
+	test("한국어 로케일에서 미존재 slug는 한국어 not-found 문구를 표시해야 함", async () => {
+		vi.stubEnv("VITE_LOCALE", "ko");
+		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(null);
+
+		render(PostDetail, { params: { slug: "missing-slug" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("포스트를 찾을 수 없습니다")).toBeInTheDocument();
+		});
+		expect(
+			screen.getByText("찾으시는 포스트가 없거나 이동되었습니다."),
+		).toBeInTheDocument();
+		expect(screen.getByText("홈으로 돌아가기")).toBeInTheDocument();
+		expect(document.title).toBe("포스트를 찾을 수 없습니다");
 	});
 });
