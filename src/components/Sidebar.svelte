@@ -161,7 +161,7 @@ void isActive;
 
 <div class="sidebar-module motion-reveal">
   <h4>About</h4>
-  <p>A Thought Trajectory Architect turning hidden decision paths behind AI products into explicit, sharable architecture.</p>
+  <p>An Integrity Proof Engineer turning claims about AI-generated software into explicit, machine-reproducible evidence.</p>
   <br>
   <p>Check my <a href={resumeUrl} on:click={goResume}>resume</a></p>
 </div>

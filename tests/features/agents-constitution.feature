@@ -1,5 +1,5 @@
 Feature: Agent constitution split
-  As a Thought Trajectory Architect
+  As an Integrity Proof Engineer
   I want AGENTS.md to carry only constitutional statements
   So that procedures live in one place and drift is mechanically prevented
 

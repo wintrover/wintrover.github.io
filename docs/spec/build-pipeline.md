@@ -11,6 +11,9 @@
   - `dist/resume/index.html`
   - `dist/ko/resume/index.html`
 - 블로그 브랜드 메타데이터(타이틀/설명/OG)는 런타임 설정과 빌드 파이프라인에서 **하나의 공유 소스**로부터 파생되어야 한다.
+- 오너 직함(브랜드 정체성)의 공식 선언은 헌법(`AGENTS.md` §0.1)을 따르며, 사이트 브랜드 표면(`brandProfile`·resume locales·`public/404.html` 타이틀·빌드 폴백 문자열)이 그 직함을 동일하게 반영해야 한다.
+- 직함 재발급 시 이전 직함의 full-string이 소스와 빌드 산출물(HTML·JS 번들)에 잔존해서는 안 된다.
+- `Thought Trajectory System` / `사고 궤적 시스템`은 제품 기능명이므로 직함 재발급의 삭제 대상에서 제외한다.
 - GA4 측정 ID와 GSC 사이트 검증 토큰은 하드코딩하지 않고 `VITE_GA_MEASUREMENT_ID`, `VITE_GOOGLE_SITE_VERIFICATION` 환경 변수로 주입해야 한다.
 - GitHub Actions 주입 경로는 `secrets`를 우선 사용하고, 필요 시 `vars`를 fallback으로 허용해야 한다.
 - GA4 추적 초기화는 앱 부팅 시점(`src/main.ts`)에서 단일 진입점으로 시작해야 하며, 해시 라우트 변경(`hashchange`)과 히스토리 이동(`popstate`)에서 페이지뷰를 갱신해야 한다.

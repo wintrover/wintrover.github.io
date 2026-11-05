@@ -22,20 +22,20 @@ type SupportedLocale = "ko" | "en";
 
 const brandProfile = {
 	role: {
-		ko: "사고 궤적 아키텍트",
-		en: "Thought Trajectory Architect",
+		ko: "무결성 증명 엔지니어",
+		en: "Integrity Proof Engineer",
 	},
 	blogTitle: {
-		ko: "Axiom - 사고 궤적 아키텍트",
-		en: "Axiom - Thought Trajectory Architect",
+		ko: "Axiom - 무결성 증명 엔지니어",
+		en: "Axiom - Integrity Proof Engineer",
 	},
 	blogDescription: {
-		ko: "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그.",
-		en: "A Thought Trajectory Architect's blog on designing decision trajectories behind AI products.",
+		ko: "AI 생성 소프트웨어의 명시적 사양과 주장을 검증하고, 그 결과를 기계적으로 재현 가능한 증거로 남기는 무결성 증명 엔지니어의 블로그.",
+		en: "An Integrity Proof Engineer's blog on verifying the explicit specifications and claims of AI-generated software as machine-reproducible evidence.",
 	},
 	buildDescription: {
-		ko: "결과물 뒤에 숨겨진 의사결정의 궤적을 설계하는 사고 궤적 아키텍트의 블로그와 이력서.",
-		en: "Blog and resume of a Thought Trajectory Architect who designs decision trajectories behind AI products.",
+		ko: "AI 생성 소프트웨어의 명시적 사양과 주장을 검증하고, 그 결과를 기계적으로 재현 가능한 증거로 남기는 무결성 증명 엔지니어의 블로그와 이력서.",
+		en: "Blog and resume of an Integrity Proof Engineer who verifies the explicit specifications and claims of AI-generated software and records the results as machine-reproducible evidence.",
 	},
 	ogImageAlt: {
 		ko: "Axiom 프로필 이미지",
