@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 import {
 	blogDefaultSeo,
@@ -99,11 +101,29 @@ describe("brand metadata ssot", () => {
 		const ko = getBlogBuildMeta("ko");
 
 		expect(en.ogTitle).toBe(blogDefaultSeo.title);
-		expect(en.metaDescription).toContain("Thought Trajectory Architect");
+		expect(en.metaDescription).toContain("Integrity Proof Engineer");
 		expect(en.ogImageAlt).toBe("Axiom profile image");
 
-		expect(ko.ogTitle).toContain("사고 궤적 아키텍트");
+		expect(ko.ogTitle).toContain("무결성 증명 엔지니어");
 		expect(ko.metaDescription).toContain("블로그와 이력서");
 		expect(ko.ogImageAlt).toBe("Axiom 프로필 이미지");
+	});
+
+	test("public/404.html 타이틀은 재발급된 직함을 반영해야 함", () => {
+		const content = fs.readFileSync(
+			path.join(process.cwd(), "public", "404.html"),
+			"utf-8",
+		);
+		expect(content).toContain("Integrity Proof Engineer");
+		expect(content).not.toContain("Thought Trajectory Architect");
+	});
+
+	test("build-github.ts 폴백 문자열은 재발급된 직함을 반영해야 함", () => {
+		const content = fs.readFileSync(
+			path.join(process.cwd(), "scripts", "build-github.ts"),
+			"utf-8",
+		);
+		expect(content).toContain("Integrity Proof Engineer");
+		expect(content).not.toContain("Thought Trajectory Architect");
 	});
 });

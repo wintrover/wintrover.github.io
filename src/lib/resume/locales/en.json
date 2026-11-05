@@ -1,12 +1,12 @@
 {
 	"site_title": "Suhyok Yun",
-	"site_subtitle": "Thought Trajectory Architect",
+	"site_subtitle": "Integrity Proof Engineer",
 	"meta": {
 		"title": "resume",
-		"description": "Thought Trajectory Architect shaping AI products by making decision trajectories explicit and executable.",
-		"keywords": "Thought Trajectory Architect, Decision Trajectory, AI, Machine Learning, Computer Vision, LLM, NLP, Suhyok Yun",
+		"description": "Integrity Proof Engineer verifying the explicit specifications and claims of AI-generated software as machine-reproducible evidence.",
+		"keywords": "Integrity Proof Engineer, Machine-Verifiable Evidence, AI, Machine Learning, Computer Vision, LLM, NLP, Suhyok Yun",
 		"og_title": "resume",
-		"og_description": "Thought Trajectory Architect shaping AI products by making decision trajectories explicit and executable.",
+		"og_description": "Integrity Proof Engineer verifying the explicit specifications and claims of AI-generated software as machine-reproducible evidence.",
 		"og_type": "website"
 	},
 	"contact_email_label": "Email",
@@ -28,7 +28,7 @@
 	"lang_switcher_en": "English",
 	"lang_switcher_ko": "한국어",
 	"about_title": "About Me",
-	"about_content": "I am a Thought Trajectory Architect who values the decision trajectory behind every outcome as much as the shipped product itself.<br/>With a background in Electrical and Electronic Engineering, I design logical paths for complex problems and collaborate with AI to translate those paths into working software.<br/>Through the Intel developer program and the projects below, I built LLM and computer vision systems, optimized performance, and deployed services to real users.<br/>I focus on fast experimentation, explicit reasoning, and customer-centered decisions that remain auditable after launch.<br/>",
+	"about_content": "I am an Integrity Proof Engineer who verifies the explicit specifications and claims of AI-generated software and records the results as machine-reproducible evidence.<br/>With a background in Electrical and Electronic Engineering, I design verification infrastructure and collaborate with AI to translate it into working software.<br/>Through the Intel developer program and the projects below, I built LLM and computer vision systems, optimized performance, and deployed services to real users.<br/>I focus on fast experimentation, explicit reasoning, and customer-centered decisions that remain auditable after launch.<br/>",
 	"section_title_projects": "Projects",
 	"section_title_experience": "Experience",
 	"section_title_education": "Education",

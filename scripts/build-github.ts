@@ -165,7 +165,7 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 	const title = String(json?.meta?.title ?? "resume");
 	const description = String(
 		json?.meta?.description ??
-			"Axiom, a Thought Trajectory Architect platform shaping AI products by making decision trajectories explicit and executable.",
+			"Axiom, the site of an Integrity Proof Engineer who verifies the claims of AI-generated software as machine-reproducible evidence.",
 	);
 	const canonical = `${siteOrigin}${localePrefix}/resume/`;
 	const redirect = `${localePrefix}/#/resume`;
