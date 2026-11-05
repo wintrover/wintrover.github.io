@@ -1,7 +1,11 @@
 <script lang="ts">
 import { onMount, tick } from "svelte";
 import { push } from "svelte-spa-router";
-import { buildPostDetailSeo, defaultOgImage } from "../lib/config";
+import {
+	buildPostDetailSeo,
+	defaultOgImage,
+	getNotFoundCopy,
+} from "../lib/config";
 import { detectLocaleFromRuntime } from "../lib/locale";
 import { logError } from "../lib/log";
 import { loadPostBySlug, type Post } from "../lib/postLoader";
@@ -86,6 +90,8 @@ async function loadPostData(slug: string) {
 $: resolvedLocale = detectLocaleFromRuntime(
 	browser ? window.location.pathname : "/",
 );
+
+$: notFoundCopy = getNotFoundCopy({ scope: "post", resolvedLocale });
 
 $: {
 	const slug = normalizeRouteSlug(params?.slug);
@@ -255,10 +261,10 @@ void goBack;
 		</article>
 	{:else if !loading}
 		<div class="error-container">
-			<h2>Post not found</h2>
-			<p>The post you're looking for doesn't exist or has been moved.</p>
+			<h2>{notFoundCopy.title}</h2>
+			<p>{notFoundCopy.description}</p>
 			<button class="back-button" on:click={goBack}>
-				Go back to home
+				{notFoundCopy.homeLink}
 			</button>
 		</div>
 	{:else}

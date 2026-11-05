@@ -43,6 +43,33 @@ const brandProfile = {
 	},
 } as const;
 
+const notFoundProfile = {
+	page: {
+		title: {
+			ko: "페이지를 찾을 수 없습니다",
+			en: "Page not found",
+		},
+		description: {
+			ko: "찾으시는 페이지가 없거나 이동되었습니다.",
+			en: "The page you're looking for doesn't exist or has been moved.",
+		},
+	},
+	post: {
+		title: {
+			ko: "포스트를 찾을 수 없습니다",
+			en: "Post not found",
+		},
+		description: {
+			ko: "찾으시는 포스트가 없거나 이동되었습니다.",
+			en: "The post you're looking for doesn't exist or has been moved.",
+		},
+	},
+	homeLink: {
+		ko: "홈으로 돌아가기",
+		en: "Go back to home",
+	},
+} as const;
+
 export function getBaseUrl() {
 	const withTrailingSlash = (s: string) => (s.endsWith("/") ? s : `${s}/`);
 	const globals = globalThis as WintrGlobal;
@@ -89,6 +116,22 @@ export function getBlogBuildMeta(locale: SupportedLocale) {
 		ogDescription: brandProfile.buildDescription[locale],
 		ogImageAlt: brandProfile.ogImageAlt[locale],
 	};
+}
+
+export function getNotFoundCopy(args: {
+	scope: "page" | "post";
+	resolvedLocale: SupportedLocale;
+}) {
+	const { scope, resolvedLocale } = args;
+	return {
+		title: notFoundProfile[scope].title[resolvedLocale],
+		description: notFoundProfile[scope].description[resolvedLocale],
+		homeLink: notFoundProfile.homeLink[resolvedLocale],
+	};
+}
+
+export function buildNotFoundSeoUrl(resolvedLocale: SupportedLocale) {
+	return `${getRuntimeOrigin()}${localePrefix(resolvedLocale)}/`;
 }
 
 export function buildBlogListSeoUrl(args: {
@@ -141,10 +184,10 @@ export function buildPostDetailSeo(args: {
 	}
 
 	if (!loading) {
+		const copy = getNotFoundCopy({ scope: "post", resolvedLocale });
 		return {
-			seoTitle: "Post not found",
-			seoDescription:
-				"The post you're looking for doesn't exist or has been moved.",
+			seoTitle: copy.title,
+			seoDescription: copy.description,
 			canonicalUrl: localeRoot,
 			structuredData: "",
 		};

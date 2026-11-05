@@ -69,6 +69,7 @@ import App from "../src/App.svelte";
 describe("App.svelte", () => {
 	beforeEach(() => {
 		document.body.className = "";
+		window.location.hash = "";
 		vi.mocked(posts).set([]);
 		vi.clearAllMocks();
 		MockResizeObserver.reset();
@@ -112,6 +113,7 @@ describe("App.svelte", () => {
 
 	afterEach(() => {
 		cleanup();
+		vi.unstubAllEnvs();
 		vi.unstubAllGlobals();
 	});
 
@@ -395,5 +397,36 @@ describe("App.svelte", () => {
 			},
 			{ timeout: 2000 },
 		);
+	});
+
+	test("존재하지 않는 해시 라우트는 NotFound 뷰를 렌더링해야 함", async () => {
+		window.location.hash = "#/no-such-route";
+		render(App);
+
+		await waitFor(() => {
+			expect(screen.getByText("Page not found")).toBeInTheDocument();
+		});
+		expect(
+			screen.getByText(
+				"The page you're looking for doesn't exist or has been moved.",
+			),
+		).toBeInTheDocument();
+		expect(screen.getByText("Go back to home")).toBeInTheDocument();
+		expect(document.title).toBe("Page not found");
+	});
+
+	test("한국어 로케일에서 존재하지 않는 해시 라우트는 한국어 NotFound 문구를 렌더링해야 함", async () => {
+		vi.stubEnv("VITE_LOCALE", "ko");
+		window.location.hash = "#/no-such-route-ko";
+		render(App);
+
+		await waitFor(() => {
+			expect(screen.getByText("페이지를 찾을 수 없습니다")).toBeInTheDocument();
+		});
+		expect(
+			screen.getByText("찾으시는 페이지가 없거나 이동되었습니다."),
+		).toBeInTheDocument();
+		expect(screen.getByText("홈으로 돌아가기")).toBeInTheDocument();
+		expect(document.title).toBe("페이지를 찾을 수 없습니다");
 	});
 });

@@ -4,8 +4,10 @@ import { describe, expect, test } from "vitest";
 import {
 	blogDefaultSeo,
 	buildBlogListSeoUrl,
+	buildNotFoundSeoUrl,
 	buildPostDetailSeo,
 	getBlogBuildMeta,
+	getNotFoundCopy,
 } from "../src/lib/config";
 import type { Post } from "../src/lib/postLoader";
 
@@ -36,18 +38,30 @@ describe("buildPostDetailSeo", () => {
 		expect(seo.structuredData).toContain('"@type":"BlogPosting"');
 	});
 
-	test("post가 없고 로딩이 끝나면 not found SEO를 반환해야 함", () => {
-		const seo = buildPostDetailSeo({
+	test("post가 없고 로딩이 끝나면 로케일별 not found SEO를 반환해야 함", () => {
+		const en = buildPostDetailSeo({
+			post: null,
+			loading: false,
+			slug: "missing",
+			resolvedLocale: "en",
+		});
+
+		expect(en.seoTitle).toBe("Post not found");
+		expect(en.seoDescription).toBe(
+			"The post you're looking for doesn't exist or has been moved.",
+		);
+
+		const ko = buildPostDetailSeo({
 			post: null,
 			loading: false,
 			slug: "missing",
 			resolvedLocale: "ko",
 		});
 
-		expect(seo.seoTitle).toBe("Post not found");
-		expect(seo.seoDescription).toContain("doesn't exist");
-		expect(seo.canonicalUrl).toContain("/ko/");
-		expect(seo.structuredData).toBe("");
+		expect(ko.seoTitle).toBe("포스트를 찾을 수 없습니다");
+		expect(ko.seoDescription).toBe("찾으시는 포스트가 없거나 이동되었습니다.");
+		expect(ko.canonicalUrl).toContain("/ko/");
+		expect(ko.structuredData).toBe("");
 	});
 
 	test("post가 없고 로딩 중이면 loading SEO를 반환해야 함", () => {
@@ -92,6 +106,42 @@ describe("buildBlogListSeoUrl", () => {
 			resolvedLocale: "ko",
 		});
 		expect(url).toContain("/ko/");
+	});
+});
+
+describe("notFound copy ssot", () => {
+	test("일반 NotFound 문구는 ko/en 쌍으로 공급되어야 함", () => {
+		const en = getNotFoundCopy({ scope: "page", resolvedLocale: "en" });
+		expect(en.title).toBe("Page not found");
+		expect(en.description).toBe(
+			"The page you're looking for doesn't exist or has been moved.",
+		);
+		expect(en.homeLink).toBe("Go back to home");
+
+		const ko = getNotFoundCopy({ scope: "page", resolvedLocale: "ko" });
+		expect(ko.title).toBe("페이지를 찾을 수 없습니다");
+		expect(ko.description).toBe("찾으시는 페이지가 없거나 이동되었습니다.");
+		expect(ko.homeLink).toBe("홈으로 돌아가기");
+	});
+
+	test("게시글 not-found 문구는 ko/en 쌍으로 공급되어야 함", () => {
+		const en = getNotFoundCopy({ scope: "post", resolvedLocale: "en" });
+		expect(en.title).toBe("Post not found");
+		expect(en.description).toBe(
+			"The post you're looking for doesn't exist or has been moved.",
+		);
+		expect(en.homeLink).toBe("Go back to home");
+
+		const ko = getNotFoundCopy({ scope: "post", resolvedLocale: "ko" });
+		expect(ko.title).toBe("포스트를 찾을 수 없습니다");
+		expect(ko.description).toBe("찾으시는 포스트가 없거나 이동되었습니다.");
+		expect(ko.homeLink).toBe("홈으로 돌아가기");
+	});
+
+	test("not-found canonical URL은 로케일 루트 정책을 따라야 함", () => {
+		expect(buildNotFoundSeoUrl("en")).toContain("/");
+		expect(buildNotFoundSeoUrl("en")).not.toContain("/en/");
+		expect(buildNotFoundSeoUrl("ko")).toContain("/ko/");
 	});
 });
 

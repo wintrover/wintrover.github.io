@@ -3,6 +3,7 @@ import { onDestroy, onMount } from "svelte";
 import Router from "svelte-spa-router";
 import BlogList from "./components/BlogList.svelte";
 import Footer from "./components/Footer.svelte";
+import NotFound from "./components/NotFound.svelte";
 import PostDetail from "./components/PostDetail.svelte";
 import ResumePage from "./components/ResumePage.svelte";
 import Sidebar from "./components/Sidebar.svelte";
@@ -24,6 +25,7 @@ const routes = {
 	"/resume": ResumePage,
 	"/resume/": ResumePage,
 	"/resume/*": ResumePage,
+	"*": NotFound,
 };
 
 $: {

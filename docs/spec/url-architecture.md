@@ -10,6 +10,12 @@
 - `/en/` 경로는 아키텍처에서 제거하며, 신규 링크/리다이렉트/사이트맵/캐노니컬에서 사용하지 않는다.
 - 영어 콘텐츠의 표준 URL은 루트 기반(`/post/:slug/`, `/resume/`)으로 유지한다.
 
+## Not-Found 라우트 계약
+
+- 해시 라우트 맵의 마지막 키는 catch-all `'*'`(NotFound 뷰)이며, 존재하지 않는 해시 라우트는 빈 화면(null 렌더) 대신 NotFound 뷰를 렌더링한다.
+- Not-Found 문구는 런타임 로케일(en/ko)과 일치하며, 일반 NotFound(`Page not found`/`페이지를 찾을 수 없습니다`)와 게시글 not-found(`Post not found`/`포스트를 찾을 수 없습니다`) 문구를 구분해 `config.ts`의 ko/en 쌍 SSOT에서 공급한다.
+- 첫 진입 miss의 서버 404(`public/404.html` 언어 셤)는 불변이며, SPA not-found 뷰는 문서 URL을 실제 콘텐츠와 공유하므로 robots noindex 같은 색인 주장을 하지 않는다(문서 색인 방어는 서버 404의 기존 `noindex,nofollow`가 담당).
+
 ## slug 정규화와 조회 호환
 
 - 배포 스크립트의 canonical URL slug 생성은 앱 라우터의 `slugify` 규칙과 동일해야 하며, 아포스트로피가 포함된 제목도 동일 slug로 정규화해야 한다.
