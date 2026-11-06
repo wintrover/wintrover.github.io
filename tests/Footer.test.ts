@@ -10,7 +10,6 @@ vi.mock("../src/lib/config", () => ({
 		social: {
 			email: "test@example.com",
 			github: "testuser",
-			instagram: "testinst",
 			linkedin: "testlink",
 		},
 	},
@@ -35,11 +34,7 @@ describe("Footer Component", () => {
 		const githubLink = screen.getByTitle("GitHub");
 		expect(githubLink).toHaveAttribute("href", "https://github.com/testuser");
 
-		const instagramLink = screen.getByTitle("Instagram");
-		expect(instagramLink).toHaveAttribute(
-			"href",
-			"https://instagram.com/testinst",
-		);
+		expect(screen.queryByTitle("Instagram")).not.toBeInTheDocument();
 
 		const linkedinLink = screen.getByTitle("LinkedIn");
 		expect(linkedinLink).toHaveAttribute(
@@ -59,7 +54,6 @@ describe("Footer Component", () => {
 		vi.mocked(siteConfig).social = {
 			email: "",
 			github: "",
-			instagram: "",
 			linkedin: "",
 		};
 
@@ -77,12 +71,11 @@ describe("Footer Component", () => {
 				fc.record({
 					email: fc.oneof(fc.constant(""), fc.emailAddress()),
 					github: fc.oneof(fc.constant(""), safeUser(1, 12)),
-					instagram: fc.oneof(fc.constant(""), safeUser(1, 12)),
 					linkedin: fc.oneof(fc.constant(""), safeUser(1, 12)),
 				}),
-				({ email, github, instagram, linkedin }) => {
+				({ email, github, linkedin }) => {
 					document.body.innerHTML = "";
-					vi.mocked(siteConfig).social = { email, github, instagram, linkedin };
+					vi.mocked(siteConfig).social = { email, github, linkedin };
 
 					const { unmount } = render(Footer);
 
@@ -104,15 +97,6 @@ describe("Footer Component", () => {
 						expect(screen.queryByTitle("GitHub")).not.toBeInTheDocument();
 					}
 
-					if (instagram) {
-						expect(screen.getByTitle("Instagram")).toHaveAttribute(
-							"href",
-							`https://instagram.com/${instagram}`,
-						);
-					} else {
-						expect(screen.queryByTitle("Instagram")).not.toBeInTheDocument();
-					}
-
 					if (linkedin) {
 						expect(screen.getByTitle("LinkedIn")).toHaveAttribute(
 							"href",
@@ -121,6 +105,8 @@ describe("Footer Component", () => {
 					} else {
 						expect(screen.queryByTitle("LinkedIn")).not.toBeInTheDocument();
 					}
+
+					expect(screen.queryByTitle("Instagram")).not.toBeInTheDocument();
 
 					unmount();
 				},

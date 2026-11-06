@@ -216,7 +216,6 @@ export const siteConfig = {
 	social: {
 		email: "wintrover@gmail.com",
 		github: "wintrover",
-		instagram: "wintrover",
 		linkedin: "suhyok-yun-1934b713a",
 	},
 };
