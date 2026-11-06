@@ -20,5 +20,5 @@ Feature: Resume content integrity
 
   Scenario: resume project entry names the real Axiom project
     Given resume project entries are defined in korean and english locales
-    When the devlog project entry is resolved
+    When the axiom project entry is resolved
     Then title must be "Axiom" and the description must present the integrity proof engine for AI-generated software logic

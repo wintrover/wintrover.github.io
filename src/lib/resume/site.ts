@@ -45,7 +45,7 @@ type Project = {
 export const content = {
 	projects: [
 		{
-			id: "devlog",
+			id: "axiom",
 			links: [
 				{
 					type: "github",
