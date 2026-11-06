@@ -17,3 +17,8 @@ Feature: Resume content integrity
     Given resume social links are defined in site config
     When github link is rendered
     Then github URL must use https://github.com/wintrover format
+
+  Scenario: resume project entry names the real Axiom project
+    Given resume project entries are defined in korean and english locales
+    When the devlog project entry is resolved
+    Then title must be "Axiom" and the description must present the integrity proof engine for AI-generated software logic

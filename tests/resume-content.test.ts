@@ -19,6 +19,7 @@ describe("이력서 콘텐츠 검증", () => {
 			"resume social linkedin uses canonical profile URL",
 			"resume meta title uses unified short label",
 			"resume wintrover social github link uses personal profile",
+			"resume project entry names the real Axiom project",
 		]);
 	});
 
@@ -45,5 +46,20 @@ describe("이력서 콘텐츠 검증", () => {
 	test("Given resume 사이트 설정 When 소셜 링크 확인 Then github 주소는 wintrover 개인 프로필을 사용한다", () => {
 		const site = read("src/lib/resume/site.ts");
 		expect(site).toContain('url: "https://github.com/wintrover"');
+	});
+
+	test("Given 이력서 프로젝트 항목 When 확인 Then Axiom 무결성 증명 엔진 실체를 기술한다", () => {
+		const en = JSON.parse(read("src/lib/resume/locales/en.json"));
+		const ko = JSON.parse(read("src/lib/resume/locales/ko.json"));
+		expect(en.projects.devlog.title).toBe("Axiom");
+		expect(ko.projects.devlog.title).toBe("Axiom");
+		expect(en.projects.devlog.quote).toContain("integrity proof engine");
+		expect(ko.projects.devlog.quote).toContain("무결성 증명 엔진");
+		for (const term of ["Z3", "Lean 4"]) {
+			expect(en.projects.devlog.description).toContain(term);
+			expect(ko.projects.devlog.description).toContain(term);
+		}
+		expect(JSON.stringify(en.projects.devlog)).not.toContain("ReasoningTrace");
+		expect(JSON.stringify(ko.projects.devlog)).not.toContain("ReasoningTrace");
 	});
 });
