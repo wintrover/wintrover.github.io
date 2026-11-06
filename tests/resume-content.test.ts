@@ -51,15 +51,17 @@ describe("이력서 콘텐츠 검증", () => {
 	test("Given 이력서 프로젝트 항목 When 확인 Then Axiom 무결성 증명 엔진 실체를 기술한다", () => {
 		const en = JSON.parse(read("src/lib/resume/locales/en.json"));
 		const ko = JSON.parse(read("src/lib/resume/locales/ko.json"));
-		expect(en.projects.devlog.title).toBe("Axiom");
-		expect(ko.projects.devlog.title).toBe("Axiom");
-		expect(en.projects.devlog.quote).toContain("integrity proof engine");
-		expect(ko.projects.devlog.quote).toContain("무결성 증명 엔진");
+		expect(en.projects.axiom.title).toBe("Axiom");
+		expect(ko.projects.axiom.title).toBe("Axiom");
+		expect(en.projects.axiom.quote).toContain("integrity proof engine");
+		expect(ko.projects.axiom.quote).toContain("무결성 증명 엔진");
 		for (const term of ["Z3", "Lean 4"]) {
-			expect(en.projects.devlog.description).toContain(term);
-			expect(ko.projects.devlog.description).toContain(term);
+			expect(en.projects.axiom.description).toContain(term);
+			expect(ko.projects.axiom.description).toContain(term);
 		}
-		expect(JSON.stringify(en.projects.devlog)).not.toContain("ReasoningTrace");
-		expect(JSON.stringify(ko.projects.devlog)).not.toContain("ReasoningTrace");
+		expect(JSON.stringify(en.projects)).not.toContain("ReasoningTrace");
+		expect(JSON.stringify(ko.projects)).not.toContain("ReasoningTrace");
+		expect("devlog" in en.projects).toBe(false);
+		expect("devlog" in ko.projects).toBe(false);
 	});
 });

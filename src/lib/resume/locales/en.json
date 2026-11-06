@@ -33,7 +33,7 @@
 	"section_title_experience": "Experience",
 	"section_title_education": "Education",
 	"projects": {
-		"devlog": {
+		"axiom": {
 			"title": "Axiom",
 			"quote": "An integrity proof engine that verifies AI-generated software logic and produces deterministic verdicts, counterexamples, and locally replayable evidence artifacts.",
 			"description": "- Verified propositions in the supported kernel scope and produced counterexamples with Z3 SMT bounded model checking (BMC) and a CEGAR loop<br/>- Reconfirmed verification results through a dual-assurance path combining Z3 SMT with Lean 4 replay<br/>- Normalized the hypothesis-attempt-evidence flow into tamper-evident certificates via the Reasoning Ledger, verifiable against a local trust journal<br/>- Enforced the integrity of the verification pipeline itself with a CLI-first surface (ax prove, ax report, ax cert verify) and gate-based static analysis"
