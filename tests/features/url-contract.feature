@@ -53,3 +53,4 @@ Feature: Public URL contract is the append-only alias authority
     When the sitemap and alias documents are generated
     Then the sitemap must contain only canonical URLs
     And the /kr/ document must canonicalize to /ko/ with a zero-second refresh
+    And every alias document must declare robots noindex,follow
