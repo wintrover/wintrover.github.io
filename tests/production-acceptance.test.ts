@@ -3,32 +3,49 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { collectPostEntries } from "../scripts/build-github";
 import {
+	categoryHashTarget,
+	categoryTagHashTarget,
 	compareUrlMultisets,
 	decodeXmlText,
 	EXPECTED_SITEMAP_LOC_COUNT,
+	evaluateCategorySeo,
+	evaluateInitialNotFoundResponse,
+	evaluateKrAliasDocument,
 	evaluatePostSeo,
+	evaluateSpaNotFoundDocument,
 	expectedSitemapLocs,
 	extractCanonicalHrefs,
 	extractHtmlLang,
+	extractMetaRefreshContents,
 	extractMetaRefreshTargets,
 	extractReplaceTargets,
+	extractRobotsContents,
 	extractSitemapLocs,
 	FORBIDDEN_KO_PATHS,
+	findAliasEntries,
 	findLegacyAliasLocs,
 	isKoTreeUrl,
 	isKrUrl,
 	isSameOriginUrl,
+	isZeroSecondRefreshContent,
 	normalizeLocation,
 	PRODUCTION_ORIGIN,
 	parseCliArgs,
+	parseUrlContract,
+	pickCategoryTagSample,
 	postCanonicalUrl,
 	postHashFragment,
 	postHashTarget,
 	postLandingPath,
 	REQUIRED_ROOT_PATHS,
 	resolveSitemapExpectation,
+	resolveSitemapPlan,
+	robotsAllowsIndexing,
+	robotsBlocksIndexing,
+	slugifyUrlSegment,
 	UNKNOWN_PATH,
 } from "../scripts/verify-production.mjs";
+import { slugify } from "../src/lib/utils";
 
 const root = process.cwd();
 
@@ -52,11 +69,14 @@ function featureScenarios(feature: string) {
 describe("production acceptance feature contract", () => {
 	const feature = read("tests/features/production-acceptance.feature");
 
-	test("Given feature 파일 When 시나리오 카탈로그 Then 3개 시나리오가 유지된다", () => {
+	test("Given feature 파일 When 시나리오 카탈로그 Then 6개 시나리오가 유지된다", () => {
 		expect(featureScenarios(feature)).toEqual([
 			"Production HTTP contract holds for landings, aliases, sitemap, and forbidden paths",
 			"Korean posts are observed through real browser requests",
-			"SPA head SEO is an opt-in flag until the head fix deploys",
+			"SPA head SEO is an opt-in flag",
+			"Sitemap expectation follows url-contract.json when present",
+			"Legacy /kr and unknown paths are judged stage by stage",
+			"SPA head SEO covers category and tag routes",
 		]);
 	});
 
@@ -64,7 +84,7 @@ describe("production acceptance feature contract", () => {
 		const blocks = feature
 			.split(/\r?\n(?=\s*Scenario:)/)
 			.filter((block) => block.includes("Scenario:"));
-		expect(blocks).toHaveLength(3);
+		expect(blocks).toHaveLength(6);
 		for (const block of blocks) {
 			expect(block).toContain("Given ");
 			expect(block).toContain("When ");
@@ -364,5 +384,264 @@ describe("독립성 규칙", () => {
 		expect(pkg.scripts["verify:production"]).toBe(
 			"node scripts/verify-production.mjs",
 		);
+	});
+});
+
+describe("url-contract 기대 집합", () => {
+	test("Given canonical 배열 When 파싱 Then host를 제거한 root-relative 집합이 된다", () => {
+		expect(
+			parseUrlContract([
+				"https://wintrover.github.io/",
+				"/ko/",
+				{ url: "https://wintrover.github.io/post/a/" },
+				{ loc: "/resume/" },
+			]),
+		).toEqual({
+			canonical: ["/", "/ko/", "/post/a/", "/resume/"],
+			aliases: [],
+		});
+	});
+
+	test("Given canonical+aliases 객체 When 파싱 Then alias가 경로로 정규화된다", () => {
+		expect(
+			parseUrlContract({
+				canonical: ["/", "/ko/"],
+				aliases: [
+					{ from: "/post/old/", to: "/post/new/" },
+					"legacy-slug",
+					{ from: "https://wintrover.github.io/kr/" },
+				],
+			}),
+		).toEqual({
+			canonical: ["/", "/ko/"],
+			aliases: [
+				{ from: "/post/old/", to: "/post/new/" },
+				{ from: "/post/legacy-slug/", to: null },
+				{ from: "/kr/", to: null },
+			],
+		});
+	});
+
+	test("Given 잘못된 contract When 파싱 Then fail-closed로 throw한다", () => {
+		expect(() => parseUrlContract({})).toThrow(
+			"canonical URL array is missing",
+		);
+		expect(() => parseUrlContract({ canonical: [42] })).toThrow(
+			"invalid canonical entry",
+		);
+		expect(() =>
+			parseUrlContract({ canonical: ["/"], aliases: "nope" }),
+		).toThrow("aliases must be an array");
+		expect(() => parseUrlContract("{")).toThrow();
+	});
+
+	test("Given contract/dist/source When 기대 집합 해석 Then 우선순위가 고정된다", () => {
+		expect(
+			resolveSitemapPlan({
+				contractLocs: ["/c"],
+				localLocs: ["/d"],
+				sourceLocs: ["/s"],
+			}),
+		).toEqual({ locs: ["/c"], source: "url-contract" });
+		expect(
+			resolveSitemapPlan({
+				contractLocs: null,
+				localLocs: ["/d"],
+				sourceLocs: ["/s"],
+			}),
+		).toEqual({ locs: ["/d"], source: "dist" });
+		expect(
+			resolveSitemapPlan({
+				contractLocs: null,
+				localLocs: null,
+				sourceLocs: ["/s"],
+			}),
+		).toEqual({ locs: ["/s"], source: "source" });
+	});
+
+	test("Given alias 경로 When sitemap 항목 필터 Then 슬래시 변형까지 잡는다", () => {
+		expect(
+			findAliasEntries(
+				["/", "/post/old/", "/post/old", "/post/new/"],
+				["/post/old/"],
+			),
+		).toEqual(["/post/old", "/post/old/"]);
+		expect(findAliasEntries(["/"], [])).toEqual([]);
+	});
+});
+
+describe("/kr 별칭 문서 판정", () => {
+	const html = [
+		'<html lang="ko"><head>',
+		'<link rel="canonical" href="https://wintrover.github.io/ko/"/>',
+		'<meta http-equiv="refresh" content="0; url=/ko/"/>',
+		'<meta name="robots" content="noindex,follow"/>',
+		"</head></html>",
+	].join("");
+
+	test("Given 계약을 만족하는 /kr/ HTML When 판정 Then 문제가 없다", () => {
+		expect(evaluateKrAliasDocument({ status: 200, html })).toEqual([]);
+		expect(extractMetaRefreshContents(html)).toEqual(["0; url=/ko/"]);
+		expect(isZeroSecondRefreshContent("0; url=/ko/")).toBe(true);
+		expect(isZeroSecondRefreshContent("1; url=/ko/")).toBe(false);
+		expect(extractRobotsContents(html)).toEqual(["noindex,follow"]);
+		expect(robotsBlocksIndexing(["noindex,follow"])).toBe(true);
+		expect(robotsBlocksIndexing(["noindex nofollow"])).toBe(true);
+		expect(robotsAllowsIndexing(["index,follow"])).toBe(true);
+	});
+
+	test("Given refresh가 다르거나 robots가 없으면 When 판정 Then 실패한다", () => {
+		const shifted = html.replace("0; url=/ko/", "1; url=/ko/");
+		expect(
+			evaluateKrAliasDocument({ status: 200, html: shifted }).join("; "),
+		).toContain("refresh=");
+		const noRobots = html.replace(
+			'<meta name="robots" content="noindex,follow"/>',
+			"",
+		);
+		expect(
+			evaluateKrAliasDocument({ status: 200, html: noRobots }).join("; "),
+		).toContain("robots=[] expected noindex directive");
+		expect(evaluateKrAliasDocument({ status: 301, html }).join("; ")).toContain(
+			"status=301 expected=200",
+		);
+	});
+});
+
+describe("404 3단계 판정", () => {
+	const initialHtml =
+		'<html><head><meta name="robots" content="noindex,nofollow"/></head></html>';
+
+	test("Given 404 응답 HTML When 1단계 판정 Then noindex,nofollow와 canonical/Location 부재를 요구한다", () => {
+		expect(
+			evaluateInitialNotFoundResponse({
+				status: 404,
+				html: initialHtml,
+				location: null,
+			}),
+		).toEqual([]);
+		const problems = evaluateInitialNotFoundResponse({
+			status: 200,
+			html: '<link rel="canonical" href="https://wintrover.github.io/"/>',
+			location: "/somewhere/",
+		});
+		expect(problems).toEqual([
+			"status=200 expected=404",
+			"robots=[] expected noindex,nofollow",
+			'canonical=["https://wintrover.github.io/"] expected none',
+			'location="/somewhere/" expected none',
+		]);
+	});
+
+	test("Given SPA NotFound DOM When 3단계 판정 Then 로케일 루트 canonical과 index robots를 요구한다", () => {
+		expect(
+			evaluateSpaNotFoundDocument({
+				locale: "ko",
+				canonicals: [`${PRODUCTION_ORIGIN}/ko/`],
+				documentTitle: "페이지를 찾을 수 없습니다",
+				robots: ["index,follow,max-image-preview:large"],
+				jsonLdCount: 0,
+			}),
+		).toEqual([]);
+		const problems = evaluateSpaNotFoundDocument({
+			locale: "en",
+			canonicals: [`${PRODUCTION_ORIGIN}/`, `${PRODUCTION_ORIGIN}/`],
+			documentTitle: "Axiom",
+			robots: ["noindex,nofollow"],
+			jsonLdCount: 1,
+		});
+		expect(problems).toContain("canonical count=2 (expected 1)");
+		expect(problems).toContain(
+			'document.title="Axiom" expected="Page not found"',
+		);
+		expect(problems).toContain(
+			'robots=["noindex,nofollow"] expected index,follow without noindex',
+		);
+		expect(problems).toContain("json-ld count=1 expected=0");
+		expect(
+			evaluateSpaNotFoundDocument({
+				locale: "en",
+				canonicals: [`${PRODUCTION_ORIGIN}/`],
+				documentTitle: "Page not found",
+				robots: [],
+				jsonLdCount: 0,
+			}),
+		).toEqual(["robots=[] expected index,follow"]);
+	});
+});
+
+describe("category/tag 표본과 SPA head 판정", () => {
+	test("Given frontmatter 항목 When 표본 파생 Then slug 순서로 결정된다", () => {
+		expect(
+			pickCategoryTagSample([
+				{ slug: "z", category: "Tutorial", tags: [] },
+				{
+					slug: "a",
+					category: "Company Work",
+					tags: ["SMBholdings", "CVFactory"],
+				},
+				{ slug: "b", category: "Archright", tags: ["Axiom"] },
+			]),
+		).toEqual({
+			category: "Company Work",
+			categorySlug: "company-work",
+			tag: "CVFactory",
+			tagSlug: "cvfactory",
+		});
+		expect(
+			pickCategoryTagSample([{ slug: "a", category: "Tutorial", tags: [] }]),
+		).toBeNull();
+		expect(pickCategoryTagSample([])).toBeNull();
+	});
+
+	test("Given category/tag 값 When slug 변환 Then 앱 slugify와 동일하다", () => {
+		for (const value of [
+			"Company Work",
+			"Archright",
+			"CVFactory",
+			"Axiom",
+			"Quality-Gate",
+			"정형 검증",
+		]) {
+			expect(slugifyUrlSegment(value)).toBe(slugify(value));
+		}
+		expect(categoryHashTarget("ko", "company-work")).toBe(
+			"/ko/#/category/company-work",
+		);
+		expect(categoryTagHashTarget("en", "company-work", "cvfactory")).toBe(
+			"/#/category/company-work/tag/cvfactory",
+		);
+	});
+
+	test("Given category 경로 DOM When SEO 판정 Then 로케일 루트 canonical과 라벨 title을 요구한다", () => {
+		expect(
+			evaluateCategorySeo({
+				locale: "ko",
+				canonicals: [`${PRODUCTION_ORIGIN}/ko/`],
+				documentTitle: "Company Work",
+				expectedTitle: "Company Work",
+			}),
+		).toEqual([]);
+		const problems = evaluateCategorySeo({
+			locale: "en",
+			canonicals: [`${PRODUCTION_ORIGIN}/#/category/company-work`],
+			documentTitle: "",
+			expectedTitle: "Company Work",
+		});
+		expect(problems).toContain(
+			"canonical contains hash: https://wintrover.github.io/#/category/company-work",
+		);
+		expect(problems).toContain(
+			'canonical="https://wintrover.github.io/#/category/company-work" expected="https://wintrover.github.io/"',
+		);
+		expect(problems).toContain("document.title is empty");
+		expect(
+			evaluateCategorySeo({
+				locale: "ko",
+				canonicals: [`${PRODUCTION_ORIGIN}/ko/`, `${PRODUCTION_ORIGIN}/ko/`],
+				documentTitle: "Company Work #cvfactory",
+				expectedTitle: "Company Work #cvfactory",
+			}),
+		).toEqual(["canonical count=2 (expected 1)"]);
 	});
 });
