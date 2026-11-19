@@ -335,4 +335,64 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(mainEntry).not.toContain("canonical.href");
 		expect(indexTemplate).toContain('rel="canonical"');
 	});
+
+	test("Given 공개 계약 When 보장 경계 문서 검증 Then 보장·비보장·UNKNOWN 구획이 존재한다", () => {
+		const urlContractSpec = read("docs/spec/url-contract.md");
+		const guarantees = read("docs/spec/public-contract-guarantees.md");
+		expect(urlContractSpec).toContain("public-contract-guarantees.md");
+		for (const section of [
+			"## 보장 (Guaranteed)",
+			"## 보장하지 않음 (Not guaranteed)",
+			"## UNKNOWN 결정 등록부",
+			"## 권위 체인 (Authority chain)",
+			"## 참조 (References)",
+		]) {
+			expect(guarantees).toContain(section);
+		}
+		for (const id of [
+			"UNKNOWN-A",
+			"UNKNOWN-B",
+			"UNKNOWN-D",
+			"UNKNOWN-E",
+			"UNKNOWN-ADV",
+		]) {
+			expect(guarantees).toContain(id);
+		}
+		for (const field of [
+			"코드로 결정할 수 없는 이유",
+			"오너",
+			"결정 트리거",
+			"다음 행동",
+		]) {
+			expect(guarantees.split(field).length - 1).toBeGreaterThanOrEqual(5);
+		}
+		expect(guarantees).toContain("registry");
+		expect(guarantees).toContain("sitemap");
+		expect(guarantees).toContain("append-only");
+		expect(guarantees).toContain("noindex,follow");
+		expect(guarantees).toContain("수동 witness");
+	});
+
+	test("Given 공개 계약 When 비보장 주장 검증 Then 과잉 주장이 없다", () => {
+		const guarantees = read("docs/spec/public-contract-guarantees.md");
+		const guaranteedSection = guarantees.slice(
+			guarantees.indexOf("## 보장 (Guaranteed)"),
+			guarantees.indexOf("## 보장하지 않음 (Not guaranteed)"),
+		);
+		const notGuaranteedSection = guarantees.slice(
+			guarantees.indexOf("## 보장하지 않음 (Not guaranteed)"),
+			guarantees.indexOf("## UNKNOWN 결정 등록부"),
+		);
+		expect(guaranteedSection).not.toContain("301");
+		expect(guaranteedSection).not.toContain("308");
+		expect(guaranteedSection).not.toContain("불변");
+		expect(guaranteedSection).not.toContain("Rekor");
+		expect(notGuaranteedSection).toContain("ruleset bypass");
+		expect(notGuaranteedSection).toContain("SHA256SUMS");
+		expect(notGuaranteedSection).toContain("301");
+		expect(guarantees).toContain(
+			"CI(`validate`)·pre-commit(`prek`)에 연결되지 않는다",
+		);
+		expect(guarantees).toContain("감사 항목");
+	});
 });

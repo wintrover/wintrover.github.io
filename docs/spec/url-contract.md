@@ -84,12 +84,9 @@
 
 ## 보장 범위
 
-- 이 계약은 **정상적인 변경 PR에서의 회귀**를 막는다: canonical 삭제, alias retarget, alias→canonical 전환, locale 변경, sitemap 노출.
-- 다음은 보장 범위 밖이다.
-  - 악의적 쓰기: 한 PR에서 registry·검증 스크립트·테스트를 함께 수정하면 게이트 의미가 바뀔 수 있다.
-  - ruleset bypass 또는 `validate`를 거치지 않는 main 직접 push.
-  - 계약 도입 이전에 이미 사라진 URL의 복원.
-  - 검증 명령 정의(`package.json`)·의존성 잠금·워크플로 파일의 작성자 변경.
+- 보장되는 것과 보장되지 않는 것, 아직 결정되지 않은 항목의 정본은 [public-contract-guarantees.md](public-contract-guarantees.md)다.
+- 요약: 정상적인 변경 PR에서 append-only 게이트와 빌드 검증은 canonical 삭제·alias retarget·alias→canonical 전환·locale 변경·sitemap 노출을 막는다.
+- 다음은 이 문서가 보장하지 않는다: 악의적 쓰기(한 PR에서 registry·검증 스크립트·테스트 동시 수정), ruleset bypass 또는 `validate`를 거치지 않는 main 직접 push, 계약 도입 이전에 이미 사라진 URL의 복원, HTTP 301/308 의미. 경계의 상세와 UNKNOWN 결정 등록부는 링크한 문서가 소유한다.
 - 이 한계는 AGENTS.md §1.1의 무리뷰 수용 조건과 같은 성격이며, 플랫폼 권한 영역(ruleset·workflows·secrets)이 최종 경계다.
 
 ## 관련
