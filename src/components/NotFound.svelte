@@ -1,7 +1,9 @@
 <script lang="ts">
+import { onMount } from "svelte";
 import { push } from "svelte-spa-router";
-import { buildNotFoundSeoUrl, getNotFoundCopy } from "../lib/config";
+import { getNotFoundCopy } from "../lib/config";
 import { detectLocaleFromRuntime } from "../lib/locale";
+import { applyNotFoundSeo } from "../lib/seo";
 
 const browser =
 	typeof window !== "undefined" && typeof document !== "undefined";
@@ -12,18 +14,15 @@ $: resolvedLocale = detectLocaleFromRuntime(
 	browser ? window.location.pathname : "/",
 );
 $: notFoundCopy = getNotFoundCopy({ scope: "page", resolvedLocale });
-$: canonicalUrl = buildNotFoundSeoUrl(resolvedLocale);
+
+onMount(() => {
+	applyNotFoundSeo(resolvedLocale);
+});
 
 function goBack() {
 	push("/");
 }
 </script>
-
-<svelte:head>
-	<title>{notFoundCopy.title}</title>
-	<meta name="description" content={notFoundCopy.description} />
-	<link rel="canonical" href={canonicalUrl} />
-</svelte:head>
 
 <div class="error-container" data-testid="not-found">
   <h2>{notFoundCopy.title}</h2>

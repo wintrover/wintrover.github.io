@@ -3,12 +3,12 @@ import { push } from "svelte-spa-router";
 import {
 	blogDefaultSeo,
 	buildBlogListSeoUrl,
-	defaultOgImage,
 	getRuntimeOrigin,
 } from "../lib/config";
 import { detectLocaleFromRuntime } from "../lib/locale";
 import type { Post } from "../lib/postLoader";
 import { filterPostsByRoute, toPostArray } from "../lib/postQuery";
+import { applyBlogListSeo } from "../lib/seo";
 import { selectedCategory } from "../stores/category";
 import { posts as postsStore } from "../stores/posts";
 import PostFeed from "./PostFeed.svelte";
@@ -56,28 +56,19 @@ $: {
 		currentHref: browser ? window.location.href : null,
 		resolvedLocale,
 	});
+	if (browser) {
+		applyBlogListSeo({
+			title: seoTitle,
+			description: seoDescription,
+			canonical: seoUrl,
+			resolvedLocale,
+		});
+	}
 }
 
 void filteredPosts;
 void selectPost;
 </script>
-
-<svelte:head>
-	<title>{seoTitle}</title>
-	<meta name="description" content={seoDescription} />
-	<meta
-		name="robots"
-		content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
-	/>
-	<meta property="og:title" content={seoTitle} />
-	<meta property="og:description" content={seoDescription} />
-	<meta property="og:type" content="website" />
-	<meta property="og:url" content={seoUrl} />
-	<meta property="og:image" content={defaultOgImage} />
-	<meta property="og:image:alt" content={seoTitle} />
-	<meta property="og:site_name" content="Axiom" />
-	<link rel="canonical" href={seoUrl} />
-</svelte:head>
 
 <div class="blog-page">
 	{#key routeMotionKey}
