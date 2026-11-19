@@ -1,6 +1,6 @@
 # 프로덕션 승인 계약
 
-> 이 문서는 배포된 `https://wintrover.github.io`의 승인 표면(HTTP·브라우저·선택적 SPA head SEO)에 대한 정본이다. 실행 절차는 [docs/agents/production-acceptance.md](../agents/production-acceptance.md)에 있다.
+> 이 문서는 배포된 `https://wintrover.github.io`의 승인 표면(HTTP·브라우저·SPA head SEO)에 대한 정본이다. 실행 절차는 [docs/agents/production-acceptance.md](../agents/production-acceptance.md)에 있다.
 
 ## 목적
 
@@ -25,6 +25,8 @@
   - `/ko/`는 200이다. 두 번째 이동이 HTTP 301이면 실패한다.
 - `/ko`는 301로 `/ko/`에 수렴한다.
 - KO 트리의 `/ko/evidence/`·`/ko/404.html`·`/ko/.nojekyll`·`/ko/auto-merge-verification.txt`·`/ko/sitemap.xml`·`/ko/robots.txt`는 404다.
+- `/en/`과 `/en/resume/`는 404다. `/en` 접두사는 실제 배포 경로가 아니며 404 셸에서만 처리된다.
+- `url-contract.json`의 alias 중 URL이 `/post/<slug>/` 형태인 각 항목은 KO 트리로 누출되지 않아야 한다. 즉 `/ko/post/<slug>/`는 404다. 이 검사는 registry alias에서만 파생하며, 같은 slug가 `collectPostEntries(root, "ko")`의 정본 KO 포스트로 존재하면 그 200은 정당하므로 검사에서 제외한다. registry에 없는 URL 계열을 만들지 않는다.
 - 루트 대응 자산 `/evidence/p0d2g/README.md`·`/404.html`·`/.nojekyll`·`/auto-merge-verification.txt`·`/images/profile.png`·`/kr/`는 200이다.
 
 ## sitemap 집합 계약
@@ -40,33 +42,42 @@
 
 1. **최초 HTTP 응답**: 미지의 경로는 404이고, `Location` 헤더가 없고, canonical 링크가 없고, robots는 `noindex,nofollow`다. 이 판정은 브라우저 최종 DOM과 합치지 않는다.
 2. **JS 리다이렉트**: 브라우저는 같은 origin의 hash URL(`#/...`)에 착지하고, 그 새 문서 응답은 200이다. 최종 navigation response가 200임을 관측한다.
-3. **SPA NotFound DOM**: `document.title`은 로케일 NotFound 문구(`Page not found` / `페이지를 찾을 수 없습니다`), canonical은 정확히 1개이며 로케일 루트(`https://wintrover.github.io/` 또는 `.../ko/`)다. robots에 `noindex`가 없어야 하고(index,follow), SPA JSON-LD는 0개다. 이 판정은 1·2단계와 별도의 검사(`browser:unknown:dom`)다.
+3. **SPA NotFound DOM**: `document.title`은 로케일 NotFound 문구(`Page not found` / `페이지를 찾을 수 없습니다`), canonical은 정확히 1개이며 로케일 루트(`https://wintrover.github.io/` 또는 `.../ko/`)다. robots에 `noindex`가 없어야 하고(index,follow), SPA JSON-LD는 0개다. 이 판정은 1·2단계와 별도의 검사다.
+   - KO: ko-KR 브라우저로 무접두사 미지의 경로를 방문해 `/ko/#/...` 착지를 관측한다(`browser:unknown`, `browser:unknown:dom`).
+   - EN: `/en/<unknown>` 경로로 404 셸의 EN 분기를 결정적으로 얻는다(`browser:en-unknown`, `browser:en-unknown:dom`). `navigator.language`에 의존하지 않으며, `/en/` 자체는 SPA 홈으로 착지하므로 NotFound 경로로 쓰지 않는다.
+   - 두 로케일 모두 최종 문서 200, 같은 origin hash 착지, `html lang` 일치, 로케일 루트 canonical 1개, 로케일 NotFound title, index robots, JSON-LD 0을 요구한다.
 
 ## 브라우저 계약
 
 - 모든 KO 포스트 랜딩은 최종 hash `#/post/<slug>`, `html lang=ko`, 한국어 h1을 만족한다.
+- 모든 EN 포스트 랜딩은 최종 hash `#/post/<slug>`, `html lang=en`, `document.title` = EN 포스트 제목, canonical 정확히 1개 = `https://wintrover.github.io/post/<slug>/`(hash 없음)를 만족한다. 이 head 판정은 기본 실행에 포함되며 `--skip-spa-seo`에서만 생략된다.
 - 같은 origin의 `/ko/` 응답 중 status 400 이상은 0개이고, 같은 origin의 실패 요청은 0개다. 교차 origin 임베드(giscus, 외부 CDN, 팝업 목적지)는 사이트 자산 계약의 범위가 아니다.
-- `.markdown-content img` 중 `naturalWidth`가 0인 이미지는 0개다.
+- `.markdown-content img` 중 `naturalWidth`가 0인 이미지는 0개다. 이 판정은 KO·EN 포스트 모두에 적용한다.
 - `/ko/`와 `/ko/resume/`는 `lang=ko`로 렌더링되고 같은 origin의 비정상 요청이 없다.
+- `/`는 `lang=en`으로 렌더링되고 같은 origin의 실패 요청이 없다.
+- `/resume/`는 `lang=en`이며 Axiom 카드 href가 정확히 `https://github.com/Archright/Axiom`이고, 클릭으로 생성된 팝업의 최종 URL은 해당 저장소 URL로 시작한다.
 - `/ko/resume/`의 Axiom 카드 href는 정확히 `https://github.com/Archright/Axiom`이며, 클릭으로 생성된 팝업의 최종 URL은 해당 저장소 URL로 시작한다.
 - `/kr`은 브라우저에서 `/ko/`로 착지한다.
 
-## SPA head SEO 플래그
+## SPA head SEO 기본 모드
 
-- `--include-spa-seo`는 기본 비활성이다. SPA head 단일 소유자 수정(#52)이 배포되어 현재 프로덕션은 이 검사를 통과하지만, 기본 실행에서 skip한다.
-- 플래그를 켜면 각 KO 포스트 페이지에서 canonical이 정확히 1개이며 포스트 URL과 같고, `document.title`이 포스트 제목과 같아야 한다.
-- 404 3단계(SPA NotFound DOM)는 플래그와 무관하게 기본 실행에서 `browser:unknown:dom`으로 판정한다.
-- 플래그를 켜면 소스 frontmatter에서 실제 존재하는 category 하나와 tag 하나를 파생해 다음 hash 경로의 최종 DOM을 판정한다.
+- SPA head SEO 검사는 기본 실행에 포함된다. 대상은 모든 KO 포스트의 `spa-seo:<slug>`, 모든 EN 포스트의 `browser:en-post:<slug>` 내 canonical/title 판정, 그리고 category/tag 4개 경로(`spa-seo:category:<locale>`, `spa-seo:category-tag:<locale>`)다.
+- `--skip-spa-seo`가 유일한 opt-out이다. 포스트 head와 category/tag head 검사를 생략하고 `SKIP spa-seo ...` 한 줄을 출력하며, 이 검사는 `checks`에 포함되지 않는다. 404 3단계와 EN 포스트의 자산/언어/hash 판정은 그대로 실행한다.
+- `--include-spa-seo`는 하위 호환 no-op으로 수용한다. 기존 명령이 종료 코드 2로 실패하지 않도록 하며, `NOTE ...` 한 줄만 출력한다. `--skip-spa-seo`와 동시에 주면 사용법 오류(종료 코드 2)다.
+- 포스트 head: canonical이 정확히 1개이며 포스트 URL과 같고, `document.title`이 포스트 제목과 같아야 한다.
+- category/tag: 소스 frontmatter에서 실제 존재하는 category 하나와 tag 하나를 파생해 다음 hash 경로의 최종 DOM을 판정한다.
   - `/ko/#/category/<categorySlug>`, `/ko/#/category/<categorySlug>/tag/<tagSlug>`
   - `/#/category/<categorySlug>`, `/#/category/<categorySlug>/tag/<tagSlug>`
   - canonical은 정확히 1개이고 값은 로케일 루트다. `#`을 포함하면 실패한다. hashless 경로(`/ko/category/<categorySlug>/`)는 배포에서 404이므로 canonical로 기대하지 않는다.
   - `document.title`은 비어 있지 않고 카테고리 라벨을 포함해야 한다. category 경로는 라벨과 정확히 같고, tag 경로는 `<라벨> #<tagSlug>` 형식이다.
-- 기본 실행은 오늘의 프로덕션에 대해 통과해야 한다. SPA head 수정(#52)은 배포되었으므로 플래그를 기본값으로 승격하는 별도 변경을 수행할 수 있다.
+  - 표본이 없으면 해당 검사는 FAIL한다. 표본을 만들기 위해 존재하지 않는 category/tag를 발명하지 않는다.
+- 이 모드의 기대값은 배포된 프로덕션의 관측값이 아니라 계약이다. 프로덕션이 실패하면 계약을 낮추지 않고 원인을 진단한다.
 
 ## 판정과 출력
 
-- 검사마다 `ok`/`FAIL` 한 줄을 출력하고, 선택 검사는 `SKIP`으로 표시한다.
+- 검사마다 `ok`/`FAIL` 한 줄을 출력하고, `--skip-spa-seo`에서 생략한 SPA head 검사는 `SKIP`으로 표시한다.
 - 마지막 줄은 `RESULT checks=N fail=M`이며, 실패가 하나라도 있으면 종료 코드는 0이 아니다.
+- 검사 수는 실행 모드와 registry/소스에서 파생된 항목 수에 따라 달라진다. 도구와 테스트는 총계를 하드코딩하지 않으며, 계약은 개별 check id와 기대값이다.
 - 이 계약은 수동 post-deploy gate다. CI·pre-commit에 연결하지 않는다.
 
 ## 관련

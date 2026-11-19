@@ -8,6 +8,8 @@ import {
 	categoryTagHashTarget,
 	compareUrlMultisets,
 	decodeXmlText,
+	deriveKoLocaleBoundaryPaths,
+	EN_UNKNOWN_PATH,
 	EXPECTED_SITEMAP_LOC_COUNT,
 	evaluateCategorySeo,
 	evaluateInitialNotFoundResponse,
@@ -22,7 +24,7 @@ import {
 	extractReplaceTargets,
 	extractRobotsContents,
 	extractSitemapLocs,
-	FORBIDDEN_KO_PATHS,
+	FORBIDDEN_LOCALE_PATHS,
 	findAliasEntries,
 	findLegacyAliasLocs,
 	isKoTreeUrl,
@@ -41,6 +43,7 @@ import {
 	REQUIRED_ROOT_PATHS,
 	resolveSitemapExpectation,
 	resolveSitemapPlan,
+	resolveSpaSeoMode,
 	robotsAllowsIndexing,
 	robotsBlocksIndexing,
 	slugifyUrlSegment,
@@ -89,15 +92,17 @@ describe("production acceptance repository wiring", () => {
 describe("production acceptance feature contract", () => {
 	const feature = read("tests/features/production-acceptance.feature");
 
-	test("Given feature 파일 When 시나리오 카탈로그 Then 7개 시나리오가 유지된다", () => {
+	test("Given feature 파일 When 시나리오 카탈로그 Then 확장된 시나리오가 유지된다", () => {
 		expect(featureScenarios(feature)).toEqual([
 			"Production HTTP contract holds for landings, aliases, sitemap, and forbidden paths",
 			"Korean posts are observed through real browser requests",
-			"SPA head SEO is an opt-in flag",
+			"SPA head SEO is the default with a skip opt-out",
 			"Sitemap expectation follows url-contract.json when present",
 			"Registry kinds separate canonical and alias expectations",
 			"Legacy /kr and unknown paths are judged stage by stage",
 			"SPA head SEO covers category and tag routes",
+			"English browser parity covers posts, home, resume, and the SPA 404 shell",
+			"Locale-boundary negatives reject alias leakage into the Korean tree",
 		]);
 	});
 
@@ -105,7 +110,7 @@ describe("production acceptance feature contract", () => {
 		const blocks = feature
 			.split(/\r?\n(?=\s*Scenario:)/)
 			.filter((block) => block.includes("Scenario:"));
-		expect(blocks).toHaveLength(7);
+		expect(blocks).toHaveLength(featureScenarios(feature).length);
 		for (const block of blocks) {
 			expect(block).toContain("Given ");
 			expect(block).toContain("When ");
@@ -289,14 +294,16 @@ describe("브라우저 요청 귀속", () => {
 		expect(normalizeLocation(null)).toBe("");
 	});
 
-	test("Given 금지/필수 경로 목록 When 계약 확인 Then KO 경계와 루트 자산이 고정된다", () => {
-		expect(FORBIDDEN_KO_PATHS).toEqual([
+	test("Given 금지/필수 경로 목록 When 계약 확인 Then 로케일 경계와 루트 자산이 고정된다", () => {
+		expect(FORBIDDEN_LOCALE_PATHS).toEqual([
 			"/ko/evidence/",
 			"/ko/404.html",
 			"/ko/.nojekyll",
 			"/ko/auto-merge-verification.txt",
 			"/ko/sitemap.xml",
 			"/ko/robots.txt",
+			"/en/",
+			"/en/resume/",
 		]);
 		expect(REQUIRED_ROOT_PATHS).toEqual([
 			"/evidence/p0d2g/README.md",
@@ -307,26 +314,87 @@ describe("브라우저 요청 귀속", () => {
 			"/kr/",
 		]);
 		expect(UNKNOWN_PATH).toBe("/definitely-not-a-real-path-xyz/");
+		expect(EN_UNKNOWN_PATH).toBe("/en/definitely-not-a-real-path-xyz/");
+	});
+});
+
+describe("로케일 경계 negative", () => {
+	test("Given alias registry When KO 경계 파생 Then /post/<slug>/ alias만 404 대상이 된다", () => {
+		const aliases = [
+			{ from: "/post/legacy-en/", to: "/post/current-en/" },
+			{ from: "/post/ko-kept/", to: "/post/ko-current/" },
+			{ from: "/kr/", to: "/ko/" },
+			{ from: "/post/legacy-en/", to: "/post/other-en/" },
+			{ from: "/post/nested/extra/", to: "/post/current-en/" },
+		];
+		expect(deriveKoLocaleBoundaryPaths(aliases, ["ko-kept"])).toEqual([
+			"/ko/post/legacy-en/",
+		]);
+		expect(deriveKoLocaleBoundaryPaths([], ["ko-kept"])).toEqual([]);
+	});
+
+	test("Given KO 포스트가 아닌 alias slug When 경계 확인 Then 중복 없이 정렬된다", () => {
+		expect(
+			deriveKoLocaleBoundaryPaths(
+				[
+					{ from: "/post/z-legacy/", to: "/post/z-current/" },
+					{ from: "/post/a-legacy/", to: "/post/a-current/" },
+					{ from: "/post/z-legacy/", to: "/post/z-other/" },
+				],
+				[],
+			),
+		).toEqual(["/ko/post/a-legacy/", "/ko/post/z-legacy/"]);
 	});
 });
 
 describe("CLI 플래그", () => {
-	test("Given 인자 없음 When 파싱 Then spa SEO는 기본 비활성이다", () => {
-		expect(parseCliArgs([])).toEqual({ includeSpaSeo: false, unknown: [] });
+	test("Given 인자 없음 When 파싱 Then SPA head SEO는 기본 활성이다", () => {
+		expect(parseCliArgs([])).toEqual({
+			skipSpaSeo: false,
+			includeSpaSeo: false,
+			unknown: [],
+		});
+		expect(resolveSpaSeoMode(parseCliArgs([]))).toBe("enabled");
 	});
 
-	test("Given --include-spa-seo When 파싱 Then spa SEO만 활성화된다", () => {
-		expect(parseCliArgs(["--include-spa-seo"])).toEqual({
+	test("Given --skip-spa-seo When 파싱 Then SPA head SEO만 비활성화된다", () => {
+		const parsed = parseCliArgs(["--skip-spa-seo"]);
+		expect(parsed).toEqual({
+			skipSpaSeo: true,
+			includeSpaSeo: false,
+			unknown: [],
+		});
+		expect(resolveSpaSeoMode(parsed)).toBe("skipped");
+	});
+
+	test("Given --include-spa-seo When 파싱 Then 하위 호환 no-op으로 수용된다", () => {
+		const parsed = parseCliArgs(["--include-spa-seo"]);
+		expect(parsed).toEqual({
+			skipSpaSeo: false,
 			includeSpaSeo: true,
 			unknown: [],
 		});
+		expect(resolveSpaSeoMode(parsed)).toBe("enabled");
+	});
+
+	test("Given skip과 include를 함께 When 모드 결정 Then fail-closed로 throw한다", () => {
+		expect(() =>
+			resolveSpaSeoMode({ skipSpaSeo: true, includeSpaSeo: true }),
+		).toThrow("mutually exclusive");
 	});
 
 	test("Given 알 수 없는 인자 When 파싱 Then 보고 대상으로 수집된다", () => {
 		expect(parseCliArgs(["--bogus", "--include-spa-seo"])).toEqual({
+			skipSpaSeo: false,
 			includeSpaSeo: true,
 			unknown: ["--bogus"],
 		});
+	});
+
+	test("Given 검증 스크립트 When 사용법 확인 Then skip 플래그를 안내한다", () => {
+		const script = read("scripts/verify-production.mjs");
+		expect(script).toContain("--skip-spa-seo");
+		expect(script).toContain("[--skip-spa-seo]");
 	});
 });
 
