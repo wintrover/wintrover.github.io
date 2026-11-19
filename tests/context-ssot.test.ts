@@ -190,6 +190,22 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(buildScript).toContain("process.exit(1)");
 	});
 
+	test("Given public assets When locale 산출물 검증 Then 영어 전용 문서는 public에 두지 않는다", () => {
+		expect(fs.existsSync(path.join(root, "public", "post"))).toBe(false);
+		expect(fs.existsSync(path.join(root, "public", "kr"))).toBe(false);
+		expect(buildScript).toContain("buildLegacyPostAliases(dist)");
+		expect(buildScript).toContain("LEGACY_POST_ALIASES[0].from");
+		const aliasFn = buildScript.slice(
+			buildScript.indexOf("export function buildLegacyPostAliases"),
+			buildScript.indexOf("function verifyBuildOutput"),
+		);
+		expect(aliasFn).toContain(
+			'path.join(dist, "post", alias.from, "index.html")',
+		);
+		expect(aliasFn).toContain('path.join(dist, "ko", "post", alias.from)');
+		expect(aliasFn).not.toContain('writeFile(path.join(dist, "ko"');
+	});
+
 	test("Given build-github.ts When legacy alias 검증 Then /kr을 locale로 승격하지 않는다", () => {
 		const sitemapFn = buildScript.slice(
 			buildScript.indexOf("function buildSitemap"),

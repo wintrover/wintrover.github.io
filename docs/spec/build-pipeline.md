@@ -22,6 +22,9 @@
 - `index.html`은 `%VITE_GOOGLE_SITE_VERIFICATION%` 값을 사용하는 `google-site-verification` 메타 태그를 유지해야 한다.
 - 영어는 루트에 배치하므로 `dist/en/index.html` 생성에 의존하지 않는다.
 - 레거시 `/kr` 별칭은 두 `buildBlog` 호출이 `dist`를 재생성한 뒤, `verifyBuildOutput` 이전에 `buildLegacyLocaleAlias`가 생성해야 한다. `public/`에 두지 않는다(ko 빌드의 `copyPublicDir`가 `dist/ko/kr/`로 복사해 계약 밖 URL을 만든다).
+- 포스트 랜딩 페이지와 레거시 포스트 slug 별칭은 `build-github.ts`가 생성해야 하며 `public/`에 두지 않는다. Vite는 `publicDir`(`public/`)를 각 locale outDir에 그대로 복사하므로 `public/`의 영어 전용 문서는 `dist/ko/`에도 나타난다.
+- `/ko` 트리에는 한국어 slug만 포함되어야 한다. 영어 전용 레거시 포스트 별칭은 `dist/post/<옛 slug>/index.html`에만 생성하고 `dist/ko/post/<옛 slug>/`를 만들지 않는다.
+- `public/post`와 `public/kr`는 금지된다. 두 경로는 locale별 복사로 계약 밖 URL(`dist/ko/post/<영어 slug>/`, `dist/ko/kr/`)을 생성한다.
 - Sitemap과 canonical 생성 시 영어는 루트 prefix(`""`), 한국어는 `/ko` prefix를 사용한다.
 - 검색/AI 노출 제어 메타는 `index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1` 정책을 기본으로 유지해야 한다.
 - 브라우저 탭 제목(`<title>`)은 페이지 의미 중심으로 유지하고 브랜드 suffix(`- Axiom`)를 덧붙이지 않는다.

@@ -34,7 +34,6 @@ type ProjectLink = {
 	type: ProjectLinkType;
 	url: string;
 	iconClass: string;
-	titleKey: string;
 };
 
 type Project = {
@@ -51,7 +50,6 @@ export const content = {
 					type: "github",
 					url: "https://github.com/Archright/Axiom",
 					iconClass: "fab fa-github",
-					titleKey: "project_link.github",
 				},
 			],
 		},
@@ -66,7 +64,6 @@ export const content = {
 					type: "github",
 					url: "https://github.com/wintrover/DataEngineering_Airflow_ETL.git",
 					iconClass: "fab fa-github",
-					titleKey: "project_link.github",
 				},
 			],
 		},
