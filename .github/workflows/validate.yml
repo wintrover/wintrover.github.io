@@ -52,3 +52,15 @@ jobs:
 
       - name: Build
         run: pnpm run build:github
+
+      - name: Fetch PR base
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+        run: git fetch --no-tags --depth=1 origin "$BASE_SHA"
+
+      - name: URL contract append-only
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+        run: pnpm exec tsx scripts/verify-url-contract-append-only.ts --base "$BASE_SHA"

@@ -186,7 +186,12 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(buildScript).toContain(
 			'path.join(distPath, "ko", "resume", "index.html")',
 		);
-		expect(buildScript).toContain('path.join(distPath, "kr", "index.html")');
+		expect(buildScript).toContain(
+			'...contract.urls\n\t\t\t.filter((entry) => entry.kind === "alias")',
+		);
+		expect(buildScript).toContain(
+			'path.join(distPath, ...aliasPathSegments(entry.url), "index.html")',
+		);
 		expect(buildScript).not.toContain(
 			'path.join(distPath, "en", "index.html")',
 		);
@@ -195,9 +200,12 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 
 	test("Given build-github.ts When slug·랜딩·sitemap 계약 검증 Then fail-closed 검증기를 호출한다", () => {
 		expect(buildScript).toContain("resolvePostSlug");
-		expect(buildScript).toContain("validateLegacyPostAliases(root)");
+		expect(buildScript).toContain("validateUrlContractAliases(root, contract)");
 		expect(buildScript).toContain("verifyPostLandingPages(dist, root)");
-		expect(buildScript).toContain("verifySitemapContract(dist, root)");
+		expect(buildScript).toContain(
+			"verifySitemapContract(dist, root, contract)",
+		);
+		expect(buildScript).not.toContain("LEGACY_POST_ALIASES");
 		expect(urlSpec).toContain("fileName");
 		expect(urlSpec).toContain("영구 보존");
 		expect(buildSpec).toContain("정적 랜딩");
@@ -207,16 +215,17 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 	test("Given public assets When locale 산출물 검증 Then 영어 전용 문서는 public에 두지 않는다", () => {
 		expect(fs.existsSync(path.join(root, "public", "post"))).toBe(false);
 		expect(fs.existsSync(path.join(root, "public", "kr"))).toBe(false);
-		expect(buildScript).toContain("buildLegacyPostAliases(dist)");
-		expect(buildScript).toContain("LEGACY_POST_ALIASES.map");
+		expect(buildScript).toContain("buildAliasPages(dist, root, contract)");
+		expect(buildScript).toContain("verifyAliasOutputs(dist, root, contract)");
+		expect(buildScript).not.toContain("LEGACY_POST_ALIASES");
 		const aliasFn = buildScript.slice(
-			buildScript.indexOf("export function buildLegacyPostAliases"),
+			buildScript.indexOf("export function buildAliasPages"),
 			buildScript.indexOf("function verifyBuildOutput"),
 		);
-		expect(aliasFn).toContain(
-			'path.join(dist, "post", alias.from, "index.html")',
-		);
-		expect(aliasFn).toContain('path.join(dist, "ko", "post", alias.from)');
+		expect(aliasFn).toContain("resolveAlias(contract, alias.url)");
+		expect(aliasFn).toContain("renderLegacyPostAliasHtml");
+		expect(aliasFn).toContain("renderLegacyLocaleAliasHtml");
+		expect(aliasFn).toContain('path.join(dist, "ko", "post", origin.slug)');
 		expect(aliasFn).not.toContain('writeFile(path.join(dist, "ko"');
 	});
 
@@ -224,7 +233,7 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(buildScript).toContain("deriveKoPublicAssets");
 		expect(buildScript).toContain("copyKoPublicAssets");
 		expect(buildScript).toContain("findLocaleBoundaryViolations");
-		expect(buildScript).toContain("verifyLocaleBoundary(dist, root)");
+		expect(buildScript).toContain("verifyLocaleBoundary(dist, root, contract)");
 		expect(buildScript).toContain("COPY_PUBLIC_DIR");
 		expect(buildSpec).toContain("deriveKoPublicAssets");
 		expect(buildSpec).toContain("locale 출력 경계");
@@ -295,5 +304,18 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(imageTools).toContain("export async function runGenerateImagesCi");
 		expect(imageTools).toContain('logError("generate-images-ci"');
 		expect(imageTools).toContain("process.exit(1)");
+	});
+
+	test("Given URL contract When 스펙 검증 Then append-only 권위와 보장 범위가 명시된다", () => {
+		const urlContractSpec = read("docs/spec/url-contract.md");
+		expect(urlContractSpec).toContain("url-contract.json");
+		expect(urlContractSpec).toContain("append-only");
+		expect(urlContractSpec).toContain("bootstrap");
+		expect(urlContractSpec).toContain("보장 범위");
+		expect(urlContractSpec).toContain("ruleset bypass");
+		expect(urlContractSpec).toContain("sitemap");
+		expect(urlContractSpec).toContain("퍼지");
+		expect(buildSpec).toContain("url-contract.json");
+		expect(urlSpec).toContain("url-contract.json");
 	});
 });

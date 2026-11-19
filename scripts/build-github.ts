@@ -8,10 +8,22 @@ import {
 } from "../src/lib/config";
 import { logError } from "../src/lib/log";
 import { renderMarkdownBody } from "../src/lib/markdown";
-import { parseFrontMatter, slugify } from "../src/lib/utils";
+import { parseFrontMatter } from "../src/lib/utils";
+import { collectPostEntries, walkMarkdownFiles } from "./post-entries";
+import {
+	deriveCanonicalUrls,
+	parsePostAliasUrl,
+	parseUrlContract,
+	resolveAlias,
+	URL_CONTRACT_FILE,
+	type UrlContract,
+	type UrlLocale,
+	validateUrlContract,
+} from "./public-urls";
+
+export { collectPostEntries, resolvePostSlug } from "./post-entries";
 
 type Env = Record<string, string | undefined>;
-type FrontmatterData = Record<string, unknown>;
 type ResumeMeta = {
 	title?: string;
 	description?: string;
@@ -25,23 +37,10 @@ type ResumeLocaleJson = {
 const robotsMetaContent =
 	"index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
 
-type LegacyPostAlias = {
-	from: string;
-	to: string;
-};
-
 type LegacyPostAliasTarget = {
 	title: string;
 	description: string;
 };
-
-// English-tree-only: Vite copies public/ into every locale outDir, so this alias must never live in public/.
-export const LEGACY_POST_ALIASES: LegacyPostAlias[] = [
-	{
-		from: "the-agent-wrote-the-theorem-a-formal-disproof-a-pipeline-gap-and-a-refusal-to-cheat",
-		to: "the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat",
-	},
-];
 
 function run(cmd: string, args: string[], env: Env = {}) {
 	execFileSync(cmd, args, {
@@ -88,106 +87,6 @@ function xmlEscape(value: string) {
 		.replaceAll(">", "&gt;")
 		.replaceAll('"', "&quot;")
 		.replaceAll("'", "&apos;");
-}
-
-function walkMarkdownFiles(rootDir: string) {
-	const results: string[] = [];
-	const stack: string[] = [rootDir];
-	while (stack.length > 0) {
-		const current = stack.pop();
-		if (!current) continue;
-		const entries = fs.readdirSync(current, { withFileTypes: true });
-		for (const entry of entries) {
-			const full = path.join(current, entry.name);
-			if (entry.isDirectory()) {
-				stack.push(full);
-				continue;
-			}
-			if (entry.isFile() && entry.name.toLowerCase().endsWith(".md")) {
-				results.push(full);
-			}
-		}
-	}
-	return results;
-}
-
-function toLastMod(value: unknown) {
-	if (typeof value !== "string") return null;
-	const d = new Date(value);
-	if (Number.isNaN(d.getTime())) return null;
-	return d.toISOString().slice(0, 10);
-}
-
-export function resolvePostSlug(title: string, fileName: string): string {
-	return slugify(title) || slugify(fileName);
-}
-
-export function collectPostEntries(root: string, locale: "ko" | "en") {
-	const postsRoot = path.join(root, "src", "posts");
-	const koRoot = path.join(postsRoot, "ko");
-	const files =
-		locale === "ko"
-			? fs.existsSync(koRoot)
-				? walkMarkdownFiles(koRoot)
-				: []
-			: fs.existsSync(postsRoot)
-				? walkMarkdownFiles(postsRoot).filter((p) => {
-						const rel = path.relative(postsRoot, p).replaceAll("\\", "/");
-						return !rel.toLowerCase().startsWith("ko/");
-					})
-				: [];
-
-	const entries: {
-		slug: string;
-		lastmod: string | null;
-		title: string;
-		description: string;
-		date: string | null;
-	}[] = [];
-	const seen = new Map<string, string>();
-	for (const filePath of files) {
-		const fileName = path.basename(filePath, ".md");
-		const raw = fs.readFileSync(filePath, "utf8");
-		const { data } = parseFrontMatter(raw);
-		const frontmatter = data as FrontmatterData;
-		const title =
-			typeof frontmatter.title === "string" ? frontmatter.title : "";
-		const slug = resolvePostSlug(title, fileName);
-		const relativePath = path.relative(root, filePath).replaceAll("\\", "/");
-		if (!slug) {
-			logError("build-github", `Post slug cannot be derived: ${relativePath}`, {
-				error: new Error(`empty post slug: ${relativePath}`),
-			});
-			process.exit(1);
-		}
-		const duplicatePath = seen.get(slug);
-		if (duplicatePath) {
-			logError(
-				"build-github",
-				`Duplicate post slug "${slug}" in ${locale} locale: ${duplicatePath} and ${relativePath}`,
-				{ error: new Error(`duplicate post slug: ${slug}`) },
-			);
-			process.exit(1);
-		}
-		seen.set(slug, relativePath);
-		const dateRaw =
-			typeof frontmatter.date === "string" ? frontmatter.date : null;
-		const lastmod = toLastMod(dateRaw);
-		const excerpt =
-			typeof frontmatter.excerpt === "string"
-				? frontmatter.excerpt
-				: typeof frontmatter.description === "string"
-					? frontmatter.description
-					: "";
-		entries.push({
-			slug,
-			lastmod,
-			title: title || fileName,
-			description: excerpt || title || fileName,
-			date: dateRaw,
-		});
-	}
-	return entries;
 }
 
 export function deriveKoPublicAssets(root: string): string[] {
@@ -427,7 +326,11 @@ function buildSitemap(dist: string) {
 	writeFile(path.join(dist, "sitemap.xml"), xml);
 }
 
-export function verifySitemapContract(dist: string, root: string) {
+export function verifySitemapContract(
+	dist: string,
+	root: string,
+	contract: UrlContract = loadUrlContract(root),
+) {
 	const sitemapPath = path.join(dist, "sitemap.xml");
 	if (!fs.existsSync(sitemapPath)) {
 		logError("build-github", "Sitemap missing: dist/sitemap.xml", {
@@ -469,12 +372,13 @@ export function verifySitemapContract(dist: string, root: string) {
 		process.exit(1);
 	}
 
-	for (const alias of LEGACY_POST_ALIASES) {
-		const aliasedLoc = `${siteOrigin}/post/${alias.from}/`;
+	for (const alias of contract.urls) {
+		if (alias.kind !== "alias") continue;
+		const aliasedLoc = `${siteOrigin}${alias.url}`;
 		if (actual.includes(aliasedLoc)) {
 			logError(
 				"build-github",
-				`Legacy post alias must be excluded from sitemap: ${aliasedLoc}`,
+				`URL contract alias must be excluded from sitemap: ${aliasedLoc}`,
 				{ error: new Error(`aliased sitemap loc: ${aliasedLoc}`) },
 			);
 			process.exit(1);
@@ -564,13 +468,19 @@ export function validatePostCategoryTagConsistency(root: string) {
 	}
 }
 
-export function renderLegacyLocaleAliasHtml(): string {
-	const canonical = `${siteOrigin}/ko/`;
-	const redirect = "/ko/";
-	const title = "한국어 페이지로 이동";
+export function renderLegacyLocaleAliasHtml(target = "/ko/"): string {
+	const locale: UrlLocale = target.startsWith("/ko/") ? "ko" : "en";
+	const canonical = `${siteOrigin}${target}`;
+	const redirect = target;
+	const title =
+		locale === "ko"
+			? "한국어 페이지로 이동"
+			: "Redirecting to the English site";
+	const openLabel =
+		locale === "ko" ? "한국어 사이트 열기" : "Open the English site";
 	return (
 		`<!doctype html>` +
-		`<html lang="ko">` +
+		`<html lang="${locale}">` +
 		`<head>` +
 		`<meta charset="utf-8"/>` +
 		`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
@@ -579,27 +489,29 @@ export function renderLegacyLocaleAliasHtml(): string {
 		`<meta http-equiv="refresh" content="0; url=${redirect}"/>` +
 		`</head>` +
 		`<body>` +
-		`<noscript><a href="${redirect}">한국어 사이트 열기</a></noscript>` +
+		`<noscript><a href="${redirect}">${openLabel}</a></noscript>` +
 		`</body>` +
 		`</html>`
 	);
 }
 
-export function buildLegacyLocaleAlias(dist: string) {
-	writeFile(path.join(dist, "kr", "index.html"), renderLegacyLocaleAliasHtml());
-}
-
 export function renderLegacyPostAliasHtml(
-	alias: LegacyPostAlias,
+	locale: UrlLocale,
 	post: LegacyPostAliasTarget,
+	finalTarget: string,
 ) {
-	const canonical = `${siteOrigin}/post/${alias.to}/`;
-	const redirect = `/#/post/${alias.to}`;
+	const destination = parsePostAliasUrl(finalTarget);
+	if (!destination) {
+		throw new Error(`invalid alias final target: ${finalTarget}`);
+	}
+	const localePrefix = locale === "ko" ? "/ko" : "";
+	const canonical = `${siteOrigin}${finalTarget}`;
+	const redirect = `${localePrefix}/#/post/${destination.slug}`;
 	const title = post.title;
 	const description = post.description || post.title;
 	return (
 		`<!doctype html>` +
-		`<html lang="en">` +
+		`<html lang="${locale}">` +
 		`<head>` +
 		`<meta charset="utf-8"/>` +
 		`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
@@ -622,87 +534,201 @@ export function renderLegacyPostAliasHtml(
 	);
 }
 
-export function validateLegacyPostAliases(
-	root: string,
-	aliases: LegacyPostAlias[] = LEGACY_POST_ALIASES,
-) {
-	const currentSlugs = new Set(
-		collectPostEntries(root, "en").map((entry) => entry.slug),
-	);
-	const seenFrom = new Set<string>();
-	const fromValues = new Set(aliases.map((alias) => alias.from));
+function aliasPathSegments(url: string): string[] {
+	return url.slice(1, -1).split("/").filter(Boolean);
+}
 
-	const fail = (message: string) => {
-		logError("build-github", `Legacy post alias registry invalid: ${message}`, {
-			error: new Error(message),
+function failUrlContract(message: string): never {
+	logError("build-github", `URL contract invalid: ${message}`, {
+		error: new Error(message),
+	});
+	process.exit(1);
+}
+
+export function loadUrlContract(root: string): UrlContract {
+	const contractPath = path.join(root, URL_CONTRACT_FILE);
+	if (!fs.existsSync(contractPath)) {
+		failUrlContract(`${URL_CONTRACT_FILE} is missing at ${root}`);
+	}
+	try {
+		return parseUrlContract(
+			JSON.parse(fs.readFileSync(contractPath, "utf-8")) as unknown,
+		);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		failUrlContract(`${URL_CONTRACT_FILE}: ${message}`);
+	}
+}
+
+export function validateUrlContractAliases(
+	root: string,
+	contract: UrlContract = loadUrlContract(root),
+) {
+	const violations = validateUrlContract(contract, deriveCanonicalUrls(root));
+	if (violations.length === 0) return;
+	for (const violation of violations) {
+		logError("build-github", `URL contract invalid: ${violation}`, {
+			error: new Error(violation),
 		});
-		process.exit(1);
+	}
+	process.exit(1);
+}
+
+export function buildAliasPages(
+	dist: string,
+	root: string,
+	contract: UrlContract = loadUrlContract(root),
+) {
+	const postsByLocale = new Map<
+		UrlLocale,
+		ReturnType<typeof collectPostEntries>
+	>();
+	const postsFor = (locale: UrlLocale) => {
+		const cached = postsByLocale.get(locale);
+		if (cached) return cached;
+		const entries = collectPostEntries(root, locale);
+		postsByLocale.set(locale, entries);
+		return entries;
 	};
 
-	for (const alias of aliases) {
-		if (!alias.from || !alias.to) {
-			fail(`empty from/to (from="${alias.from}", to="${alias.to}")`);
-		}
-		if (alias.from === alias.to) {
-			fail(`self-referencing alias "${alias.from}"`);
-		}
-		if (seenFrom.has(alias.from)) {
-			fail(`duplicate from "${alias.from}"`);
-		}
-		seenFrom.add(alias.from);
-		if (currentSlugs.has(alias.from)) {
-			fail(`from "${alias.from}" collides with a current English slug`);
-		}
-		if (!currentSlugs.has(alias.to)) {
-			fail(`target "${alias.to}" is not a current English slug`);
-		}
-		if (fromValues.has(alias.to)) {
-			fail(`target "${alias.to}" is another alias source (chain/cycle)`);
-		}
-	}
-}
+	for (const alias of contract.urls) {
+		if (alias.kind !== "alias") continue;
+		const { final } = resolveAlias(contract, alias.url);
+		const origin = parsePostAliasUrl(alias.url);
+		const destination = parsePostAliasUrl(final);
 
-export function buildLegacyPostAliases(dist: string) {
-	const entries = collectPostEntries(process.cwd(), "en");
-	for (const alias of LEGACY_POST_ALIASES) {
-		const post = entries.find((entry) => entry.slug === alias.to);
-		if (!post) {
-			logError(
-				"build-github",
-				`Legacy post alias target not found: ${alias.to}`,
-				{
-					error: new Error(`legacy post alias target missing: ${alias.to}`),
-				},
+		if (!origin && !destination) {
+			if (final !== "/" && final !== "/ko/") {
+				failUrlContract(`unsupported alias target: ${alias.url} -> ${final}`);
+			}
+			writeFile(
+				path.join(dist, ...aliasPathSegments(alias.url), "index.html"),
+				renderLegacyLocaleAliasHtml(final),
 			);
-			process.exit(1);
+			continue;
 		}
-		writeFile(
-			path.join(dist, "post", alias.from, "index.html"),
-			renderLegacyPostAliasHtml(alias, post),
+		if (!origin || !destination) {
+			failUrlContract(
+				`alias mixes post and locale targets: ${alias.url} -> ${final}`,
+			);
+		}
+		if (origin.locale !== destination.locale) {
+			failUrlContract(`alias locale change: ${alias.url} -> ${final}`);
+		}
+		const post = postsFor(destination.locale).find(
+			(entry) => entry.slug === destination.slug,
 		);
-		const koAlias = path.join(dist, "ko", "post", alias.from);
-		if (fs.existsSync(koAlias)) {
-			logError(
-				"build-github",
-				`Legacy post alias must not exist in the Korean tree: ${path.relative(dist, koAlias)}`,
-				{ error: new Error(`unexpected ko alias: ${koAlias}`) },
+		if (!post) {
+			failUrlContract(`alias target post not found: ${final}`);
+		}
+		const localeDir = origin.locale === "ko" ? path.join(dist, "ko") : dist;
+		writeFile(
+			path.join(localeDir, "post", origin.slug, "index.html"),
+			renderLegacyPostAliasHtml(origin.locale, post, final),
+		);
+		if (
+			origin.locale === "en" &&
+			fs.existsSync(path.join(dist, "ko", "post", origin.slug))
+		) {
+			failUrlContract(
+				`alias must not exist in the Korean tree: ko/post/${origin.slug}`,
 			);
-			process.exit(1);
 		}
 	}
 }
 
-function verifyBuildOutput(distPath: string) {
+export function verifyAliasOutputs(
+	dist: string,
+	root: string,
+	contract: UrlContract = loadUrlContract(root),
+) {
+	const sitemapPath = path.join(dist, "sitemap.xml");
+	const sitemapXml = fs.existsSync(sitemapPath)
+		? fs.readFileSync(sitemapPath, "utf-8")
+		: "";
+	const violations: string[] = [];
+
+	for (const alias of contract.urls) {
+		if (alias.kind !== "alias") continue;
+		const { final } = resolveAlias(contract, alias.url);
+		const filePath = path.join(
+			dist,
+			...aliasPathSegments(alias.url),
+			"index.html",
+		);
+		const relativePath = path.relative(dist, filePath).replaceAll("\\", "/");
+		if (!fs.existsSync(filePath)) {
+			violations.push(`missing alias output: ${relativePath}`);
+			continue;
+		}
+		const html = fs.readFileSync(filePath, "utf-8");
+		const canonical = `${siteOrigin}${final}`;
+		if (!html.includes(`rel="canonical" href="${canonical}"`)) {
+			violations.push(
+				`alias canonical mismatch: ${relativePath} (expected ${canonical})`,
+			);
+		}
+		const origin = parsePostAliasUrl(alias.url);
+		const destination = parsePostAliasUrl(final);
+		if (origin && destination) {
+			const localePrefix = destination.locale === "ko" ? "/ko" : "";
+			const redirect = `${localePrefix}/#/post/${destination.slug}`;
+			if (!html.includes(`http-equiv="refresh" content="0; url=${redirect}"`)) {
+				violations.push(
+					`alias refresh mismatch: ${relativePath} (expected ${redirect})`,
+				);
+			}
+			if (!html.includes(`location.replace(${JSON.stringify(redirect)})`)) {
+				violations.push(
+					`alias script redirect mismatch: ${relativePath} (expected ${redirect})`,
+				);
+			}
+			if (!html.includes('name="robots" content="noindex,follow"')) {
+				violations.push(`alias robots mismatch: ${relativePath}`);
+			}
+			if (
+				destination.locale === "en" &&
+				fs.existsSync(path.join(dist, "ko", "post", origin.slug))
+			) {
+				violations.push(
+					`alias must not exist in Korean tree: ko/post/${origin.slug}`,
+				);
+			}
+		} else if (
+			!html.includes(`http-equiv="refresh" content="0; url=${final}"`)
+		) {
+			violations.push(
+				`alias refresh mismatch: ${relativePath} (expected ${final})`,
+			);
+		}
+
+		const aliasLoc = `${siteOrigin}${alias.url}`;
+		if (sitemapXml.includes(`<loc>${aliasLoc}</loc>`)) {
+			violations.push(`alias url present in sitemap: ${aliasLoc}`);
+		}
+	}
+
+	if (violations.length === 0) return;
+	for (const violation of violations) {
+		logError("build-github", `Alias output violation: ${violation}`, {
+			error: new Error(violation),
+		});
+	}
+	process.exit(1);
+}
+
+function verifyBuildOutput(distPath: string, contract: UrlContract) {
 	console.log("🚀 Verifying Axiom GitHub Pages build output...");
 	const expectedFiles = [
 		path.join(distPath, "index.html"),
 		path.join(distPath, "ko", "index.html"),
 		path.join(distPath, "ko", "resume", "index.html"),
 		path.join(distPath, "resume", "index.html"),
-		path.join(distPath, "kr", "index.html"),
-		...LEGACY_POST_ALIASES.map((alias) =>
-			path.join(distPath, "post", alias.from, "index.html"),
-		),
+		...contract.urls
+			.filter((entry) => entry.kind === "alias")
+			.map((entry) =>
+				path.join(distPath, ...aliasPathSegments(entry.url), "index.html"),
+			),
 	];
 
 	if (!fs.existsSync(distPath)) {
@@ -780,6 +806,7 @@ function describeSetMismatch(actual: string[], expected: string[]): string {
 export function findLocaleBoundaryViolations(
 	dist: string,
 	root: string,
+	contract: UrlContract = loadUrlContract(root),
 ): string[] {
 	const violations: string[] = [];
 
@@ -794,8 +821,10 @@ export function findLocaleBoundaryViolations(
 	const enSlugs = new Set(
 		collectPostEntries(root, "en").map((entry) => entry.slug),
 	);
-	for (const alias of LEGACY_POST_ALIASES) {
-		enSlugs.add(alias.from);
+	for (const alias of contract.urls) {
+		if (alias.kind !== "alias") continue;
+		const origin = parsePostAliasUrl(alias.url);
+		if (origin?.locale === "en") enSlugs.add(origin.slug);
 	}
 	const enPostDirs = listSubdirectories(path.join(dist, "post"));
 	const expectedEnDirs = [...enSlugs].sort();
@@ -839,7 +868,9 @@ export function findLocaleBoundaryViolations(
 		"evidence",
 		"images/profile.png",
 		"ko/images/profile.png",
-		"kr/index.html",
+		...contract.urls
+			.filter((entry) => entry.kind === "alias")
+			.map((entry) => `${aliasPathSegments(entry.url).join("/")}/index.html`),
 	];
 	for (const relativePath of requiredPaths) {
 		const absolutePath = path.join(dist, ...relativePath.split("/"));
@@ -850,8 +881,12 @@ export function findLocaleBoundaryViolations(
 	return violations;
 }
 
-export function verifyLocaleBoundary(dist: string, root: string) {
-	const violations = findLocaleBoundaryViolations(dist, root);
+export function verifyLocaleBoundary(
+	dist: string,
+	root: string,
+	contract: UrlContract = loadUrlContract(root),
+) {
+	const violations = findLocaleBoundaryViolations(dist, root, contract);
 	if (violations.length === 0) return;
 	for (const violation of violations) {
 		logError("build-github", `Locale boundary violation: ${violation}`, {
@@ -863,7 +898,8 @@ export function verifyLocaleBoundary(dist: string, root: string) {
 
 export function main() {
 	const root = process.cwd();
-	validateLegacyPostAliases(root);
+	const contract = loadUrlContract(root);
+	validateUrlContractAliases(root, contract);
 	validatePostCategoryTagConsistency(root);
 	const dist = path.join(root, "dist");
 
@@ -873,18 +909,18 @@ export function main() {
 	buildBlog(dist, "en");
 	buildBlog(dist, "ko");
 	copyKoPublicAssets(root, dist);
-	buildLegacyLocaleAlias(dist);
 	buildResumeLandingPage(dist, "ko");
 	buildResumeLandingPage(dist, "en");
 	buildPostLandingPages(dist, "ko");
 	buildPostLandingPages(dist, "en");
-	buildLegacyPostAliases(dist);
+	buildAliasPages(dist, root, contract);
 	buildSitemap(dist);
 	verifyPostLandingPages(dist, root);
-	verifySitemapContract(dist, root);
+	verifySitemapContract(dist, root, contract);
 	buildRobots(dist);
-	verifyLocaleBoundary(dist, root);
-	verifyBuildOutput(dist);
+	verifyAliasOutputs(dist, root, contract);
+	verifyLocaleBoundary(dist, root, contract);
+	verifyBuildOutput(dist, contract);
 }
 
 if (process.argv[1] && path.basename(process.argv[1]) === "build-github.ts") {

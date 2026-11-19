@@ -1,0 +1,327 @@
+{
+  "version": 1,
+  "urls": [
+    {
+      "url": "/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/ko/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/2025-08-05-6/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/2025-08-17-8/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/2026-03-17-19/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/2026-04-06-22/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/2026-05-27-28/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/42-ai/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/ai-archright-trinity/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/ai-kyc/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/ai-qa/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/ai-verified/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/ai/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/axiom-ai/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/axiom-bmc-uap-lean-proof-vault/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/bash/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/celery-redis-temporal/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/cvfactory-celery-fastapi-playwright/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/cvfactory-django-docker-ai/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/db/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/deepface-insightface/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/django-svelte-vanilla-js-vs/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/google/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/kyc-3/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/kyc-react-ffmpeg-mediarecorder-api/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/nim-vs-rust/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/react/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/sonarqube-community-edition-grade-a/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/stryker-cosmic-ray/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/the-agent-wrote-the-theorem-ai/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/traefik-turborepo/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/resume/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/kr/",
+      "kind": "alias",
+      "target": "/ko/",
+      "evidence": "existing public locale alias"
+    },
+    {
+      "url": "/post/42-silence-what-it-means-to-control-failure-in-ai-code-verification/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/a-junior-developer-s-first-google-login-implementation-a-practical-guide-through-trial-and-error/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/architecture-philosophy-rule-first-design/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/as-a-new-hire-i-m-leading-the-company-platform-s-facial-authentication-system-development/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/axiom-deterministic-integrity-engine-for-probabilistic-ai/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/behind-cvfactory-s-backend-celery-fastapi-and-playwright-at-scale/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/building-a-kyc-video-recording-and-splitting-system-react-ffmpeg-mediarecorder-api/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/debugging-a-production-kyc-system-a-multi-layer-problem-solving-guide-i-wrote-after-3-days-of-infrastructure-hell/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/do-i-really-need-svelte-in-my-django-project-a-practical-checklist-i-wrote-after-comparing-vanilla-js-vs-frameworks/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/face-recognition-project-development-technical-challenges-and-system-stabilization-journey/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/from-celery-redis-to-temporal-a-journey-toward-idempotency-and-reliable-workflows/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/how-i-built-cvfactory-deploying-an-ai-cover-letter-generator-with-django-docker/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/i-finally-achieved-automatic-id-card-and-face-capture-on-web-pages-face-similarity-comparison-between-images-and-videos-and-database-storage/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/implementing-sonarqube-community-edition-in-my-repository-achieving-grade-a-code-quality-locally/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/in-the-age-of-probabilistic-intelligence-a-thirst-for-deterministic-systems/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/inside-axiom-s-verification-kernel-bmc-uap-lean-replay-and-the-proof-vault/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/junior-developer-s-full-stack-ai-journey-completing-the-kyc-system-and-growing/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/nim-vs-rust-language-is-a-matter-of-coherence-not-performance/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/react-migration-camera-library-replacement-and-edge-detection-improvements/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/removing-bash-accidentally-killed-the-execution-environment/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/synchronous-batch-flexing-vs-asynchronous-multithreading-how-i-choose-architecture/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/testing-in-the-age-of-ai-agents-how-i-kept-qa-from-collapsing/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/the-agent-wrote-the-theorem-a-formal-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
+      "kind": "alias",
+      "target": "/post/the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
+      "evidence": "legacy slug rename"
+    },
+    {
+      "url": "/post/the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/the-infrastructure-overhaul-that-saved-my-development-velocity-a-traefik-turborepo-migration-story/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/the-most-dangerous-word-in-ai-coding-verified/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/the-pitfalls-of-test-coverage-introducing-mutation-testing-with-stryker-and-cosmic-ray/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/upgrading-face-recognition-from-deepface-to-insightface-performance-quality-and-integration/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/where-does-truth-live-in-ai-generated-code/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/why-we-still-don-t-trust-ai-generated-code-the-archright-trinity/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/resume/",
+      "kind": "canonical",
+      "locale": "en"
+    }
+  ]
+}

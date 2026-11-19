@@ -65,6 +65,13 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": ["url-contract.json"],
+			"formatter": {
+				"indentStyle": "space",
+				"indentWidth": 2
+			}
 		}
 	]
 }
