@@ -486,6 +486,7 @@ export function renderLegacyLocaleAliasHtml(target = "/ko/"): string {
 		`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
 		`<title>${xmlEscape(title)}</title>` +
 		`<link rel="canonical" href="${xmlEscape(canonical)}"/>` +
+		`<meta name="robots" content="noindex,follow"/>` +
 		`<meta http-equiv="refresh" content="0; url=${redirect}"/>` +
 		`</head>` +
 		`<body>` +
@@ -670,6 +671,9 @@ export function verifyAliasOutputs(
 		}
 		const origin = parsePostAliasUrl(alias.url);
 		const destination = parsePostAliasUrl(final);
+		if (!html.includes('name="robots" content="noindex,follow"')) {
+			violations.push(`alias robots mismatch: ${relativePath}`);
+		}
 		if (origin && destination) {
 			const localePrefix = destination.locale === "ko" ? "/ko" : "";
 			const redirect = `${localePrefix}/#/post/${destination.slug}`;
@@ -682,9 +686,6 @@ export function verifyAliasOutputs(
 				violations.push(
 					`alias script redirect mismatch: ${relativePath} (expected ${redirect})`,
 				);
-			}
-			if (!html.includes('name="robots" content="noindex,follow"')) {
-				violations.push(`alias robots mismatch: ${relativePath}`);
 			}
 			if (
 				destination.locale === "en" &&

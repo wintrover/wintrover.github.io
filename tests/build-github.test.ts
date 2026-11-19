@@ -136,7 +136,7 @@ describe("build-github locale alias", () => {
 		expect(html).toContain('http-equiv="refresh" content="0; url=/ko/"');
 		expect(html).toContain('<noscript><a href="/ko/">');
 		expect(html).toContain('<html lang="ko">');
-		expect(html).not.toContain("noindex");
+		expect(html).toContain('<meta name="robots" content="noindex,follow"/>');
 	});
 
 	test("renderLegacyLocaleAliasHtml는 독립 HTML 문서를 반환한다", () => {
