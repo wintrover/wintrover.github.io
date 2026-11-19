@@ -3,8 +3,10 @@ import fc from "fast-check";
 import { push } from "svelte-spa-router";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import PostDetail from "../src/components/PostDetail.svelte";
+import { getRuntimeOrigin } from "../src/lib/config";
 import type { Post } from "../src/lib/postLoader";
 import * as postLoader from "../src/lib/postLoader";
+import { posts } from "../src/stores/posts";
 
 // Mock postLoader
 vi.mock("../src/lib/postLoader", () => ({
@@ -474,5 +476,82 @@ describe("PostDetail Component", () => {
 		).toBeInTheDocument();
 		expect(screen.getByText("홈으로 돌아가기")).toBeInTheDocument();
 		expect(document.title).toBe("포스트를 찾을 수 없습니다");
+	});
+
+	describe("SPA head identity", () => {
+		const postA: Post = {
+			...mockPost,
+			slug: "first",
+			fileName: "first",
+			title: "First Post",
+		};
+		const postB: Post = {
+			...mockPost,
+			slug: "second",
+			fileName: "second",
+			title: "Second Post",
+		};
+
+		beforeEach(() => {
+			document.head
+				.querySelectorAll('link[rel="canonical"]')
+				.forEach((link) => {
+					link.remove();
+				});
+			document.title = "";
+			posts.set([postA, postB]);
+		});
+
+		afterEach(() => {
+			posts.set([]);
+			document.head
+				.querySelectorAll('link[rel="canonical"]')
+				.forEach((link) => {
+					link.remove();
+				});
+		});
+
+		test("캐시된 포스트로 초기 진입해도 제목과 canonical이 포스트 값으로 수렴해야 함", async () => {
+			document.head.insertAdjacentHTML(
+				"beforeend",
+				'<link rel="canonical" href="https://wintrover.github.io/" />',
+			);
+
+			render(PostDetail, { params: { slug: "first" } });
+
+			await waitFor(() => {
+				expect(screen.getByText("First Post")).toBeInTheDocument();
+			});
+
+			expect(document.title).toBe("First Post");
+			const links = [
+				...document.querySelectorAll<HTMLLinkElement>('link[rel="canonical"]'),
+			];
+			expect(links).toHaveLength(1);
+			expect(links[0]?.getAttribute("href")).toBe(
+				`${getRuntimeOrigin()}/post/first/`,
+			);
+		});
+
+		test("slug 전환 시 제목과 canonical이 새 포스트 값으로 갱신되어야 함", async () => {
+			const { rerender } = render(PostDetail, { params: { slug: "first" } });
+
+			await waitFor(() => {
+				expect(document.title).toBe("First Post");
+			});
+
+			await rerender({ params: { slug: "second" } });
+
+			await waitFor(() => {
+				expect(document.title).toBe("Second Post");
+			});
+			const links = [
+				...document.querySelectorAll<HTMLLinkElement>('link[rel="canonical"]'),
+			];
+			expect(links).toHaveLength(1);
+			expect(links[0]?.getAttribute("href")).toBe(
+				`${getRuntimeOrigin()}/post/second/`,
+			);
+		});
 	});
 });

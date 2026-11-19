@@ -25,6 +25,11 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 	const homePage = read("src/routes/+page.svelte");
 	const postFeed = read("src/components/PostFeed.svelte");
 	const postDetail = read("src/components/PostDetail.svelte");
+	const notFound = read("src/components/NotFound.svelte");
+	const resumePage = read("src/components/ResumePage.svelte");
+	const seoController = read("src/lib/seo.ts");
+	const mainEntry = read("src/main.ts");
+	const indexTemplate = read("index.html");
 
 	test("Given 도메인 계약 When 검토 Then 필수 헌법 규칙이 빠짐없이 존재한다", () => {
 		expect(agents).toContain("SSOT 원칙");
@@ -250,7 +255,6 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 	});
 
 	test("Given GEO 정책 When robots와 메타 검증 Then AI 검색 제어 지시어를 유지한다", () => {
-		const indexTemplate = read("index.html");
 		expect(buildSpec).toContain(
 			"max-image-preview:large,max-snippet:-1,max-video-preview:-1",
 		);
@@ -295,5 +299,18 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(imageTools).toContain("export async function runGenerateImagesCi");
 		expect(imageTools).toContain('logError("generate-images-ci"');
 		expect(imageTools).toContain("process.exit(1)");
+	});
+
+	test("Given SPA head identity When 검증 Then canonical·title은 단일 컨트롤러가 소유한다", () => {
+		expect(urlSpec).toContain("SPA head identity");
+		expect(seoController).toContain('link[rel="canonical"]');
+		expect(seoController).toContain("document.title =");
+		expect(seoController).toContain('data-seo-owner="spa"');
+		for (const component of [postDetail, blogList, notFound, resumePage]) {
+			expect(component).not.toContain('rel="canonical"');
+			expect(component).not.toContain("<title>");
+		}
+		expect(mainEntry).not.toContain("canonical.href");
+		expect(indexTemplate).toContain('rel="canonical"');
 	});
 });

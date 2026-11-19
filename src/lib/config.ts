@@ -134,16 +134,6 @@ export function buildNotFoundSeoUrl(resolvedLocale: SupportedLocale) {
 	return `${getRuntimeOrigin()}${localePrefix(resolvedLocale)}/`;
 }
 
-export function buildBlogListSeoUrl(args: {
-	isBrowser: boolean;
-	currentHref: string | null;
-	resolvedLocale: "ko" | "en";
-}) {
-	const { isBrowser, currentHref, resolvedLocale } = args;
-	if (isBrowser && currentHref) return currentHref;
-	return `${getRuntimeOrigin()}${localePrefix(resolvedLocale)}/`;
-}
-
 export function buildPostDetailSeo(args: {
 	post: Post | null;
 	loading: boolean;

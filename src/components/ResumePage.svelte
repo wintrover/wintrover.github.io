@@ -1,9 +1,11 @@
 <script lang="ts">
-import { defaultOgImage, siteOrigin } from "../lib/config";
+import { onMount } from "svelte";
+import { getRuntimeOrigin } from "../lib/config";
 import { detectLocaleFromRuntime, localePrefix } from "../lib/locale";
 import en from "../lib/resume/locales/en.json";
 import ko from "../lib/resume/locales/ko.json";
 import { content, site } from "../lib/resume/site";
+import { applyResumeSeo } from "../lib/seo";
 
 type Dictionary = Record<string, unknown>;
 
@@ -15,7 +17,7 @@ const dict: Dictionary =
 	resolvedLocale === "en"
 		? (en as unknown as Dictionary)
 		: (ko as unknown as Dictionary);
-const canonicalResumeUrl = `${siteOrigin}${localePrefix(resolvedLocale)}/resume/`;
+const canonicalResumeUrl = `${getRuntimeOrigin()}${localePrefix(resolvedLocale)}/resume/`;
 
 function getValue(obj: Dictionary, key: string): unknown {
 	return key.split(".").reduce<unknown>((acc, part) => {
@@ -30,27 +32,22 @@ function t(key: string): string {
 	const value = getValue(dict, key);
 	return typeof value === "string" ? value : "";
 }
+
+onMount(() => {
+	applyResumeSeo({
+		canonical: canonicalResumeUrl,
+		title: t("meta.title"),
+		description: t("meta.description"),
+		keywords: t("meta.keywords"),
+		ogTitle: t("meta.og_title"),
+		ogDescription: t("meta.og_description"),
+		ogType: t("meta.og_type"),
+		imageAlt: t("profile_alt"),
+	});
+});
 </script>
 
 <svelte:head>
-	<title>{t("meta.title")}</title>
-	<link rel="canonical" href={canonicalResumeUrl} />
-	<link rel="alternate" hreflang="ko" href={`${siteOrigin}/ko/resume/`} />
-	<link rel="alternate" hreflang="en" href={`${siteOrigin}/resume/`} />
-	<link rel="alternate" hreflang="x-default" href={`${siteOrigin}/`} />
-	<meta name="description" content={t("meta.description")} />
-	<meta name="keywords" content={t("meta.keywords")} />
-	<meta
-		name="robots"
-		content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
-	/>
-	<meta property="og:title" content={t("meta.og_title")} />
-	<meta property="og:description" content={t("meta.og_description")} />
-	<meta property="og:type" content={t("meta.og_type")} />
-	<meta property="og:url" content={canonicalResumeUrl} />
-	<meta property="og:image" content={defaultOgImage} />
-	<meta property="og:image:alt" content={t("profile_alt")} />
-	<meta property="og:site_name" content="Axiom" />
 	{#if site.fontAwesomeStylesheetUrl}
 		<link rel="stylesheet" href={site.fontAwesomeStylesheetUrl} />
 	{/if}

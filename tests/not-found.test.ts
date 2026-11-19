@@ -75,7 +75,8 @@ describe("Not-found 라우트 시나리오 검증", () => {
 
 	test("Given SPA not-found 뷰 When SEO 경계 검증 Then robots 색인 제외를 주장하지 않는다", () => {
 		expect(notFound).not.toMatch(/noindex/i);
-		expect(notFound).toContain('rel="canonical"');
+		expect(notFound).toContain("applyNotFoundSeo(");
+		expect(notFound).not.toContain('rel="canonical"');
 	});
 
 	test("Given notFound 문구 When SSOT 검증 Then config의 ko/en 쌍에서 공급된다", () => {

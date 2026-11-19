@@ -1,7 +1,6 @@
 import { mount } from "svelte";
 import App from "./App.svelte";
 import { initAnalytics } from "./lib/analytics";
-import { siteOrigin } from "./lib/config";
 import {
 	detectLocaleFromRuntime,
 	localeBase,
@@ -56,15 +55,6 @@ if (typeof window !== "undefined") {
 if (typeof document !== "undefined") {
 	const htmlLang = detectLocaleFromRuntime(window.location.pathname);
 	document.documentElement.lang = htmlLang;
-	const canonical = document.querySelector('link[rel="canonical"]');
-	const envLocale = import.meta.env.VITE_LOCALE;
-	const locale =
-		envLocale === "ko" || envLocale === "en"
-			? envLocale
-			: (parseLocaleFromPathname(window.location.pathname) ?? htmlLang);
-	if (canonical instanceof HTMLLinkElement) {
-		canonical.href = `${siteOrigin}${localeBase(locale)}`;
-	}
 }
 
 initAnalytics();
