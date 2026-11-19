@@ -183,10 +183,20 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(buildScript).toContain(
 			'path.join(distPath, "ko", "resume", "index.html")',
 		);
+		expect(buildScript).toContain('path.join(distPath, "kr", "index.html")');
 		expect(buildScript).not.toContain(
 			'path.join(distPath, "en", "index.html")',
 		);
 		expect(buildScript).toContain("process.exit(1)");
+	});
+
+	test("Given build-github.ts When legacy alias 검증 Then /kr을 locale로 승격하지 않는다", () => {
+		const sitemapFn = buildScript.slice(
+			buildScript.indexOf("function buildSitemap"),
+			buildScript.indexOf("function buildRobots"),
+		);
+		expect(sitemapFn).not.toContain("kr");
+		expect(locale).not.toContain("kr");
 	});
 
 	test("Given build-github.ts When sitemap 생성 Then locale URL 구조를 보존한다", () => {

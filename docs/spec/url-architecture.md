@@ -8,6 +8,9 @@
 - 기본 언어는 영어(English)이며 루트 경로 `/`를 사용한다.
 - 한국어는 `/ko/` 경로를 사용한다.
 - `/en/` 경로는 아키텍처에서 제거하며, 신규 링크/리다이렉트/사이트맵/캐노니컬에서 사용하지 않는다.
+- `/kr`과 `/kr/`는 `/ko/`로 수렴하는 호환 별칭이며 canonical은 `/ko/`다. 별칭은 locale이 아니므로 `src/lib/locale.ts`·`parseLocaleFromPathname`·hreflang·sitemap·canonical에 `kr`을 추가하지 않는다.
+- `/kr` 하위 경로(`/kr/post/...` 등)는 이 계약에 포함하지 않는다. `/kr`은 GitHub Pages가 `/kr/`로 301 정규화한 뒤 200 별칭 문서를 제공하는 경로만 지원한다.
+- `/en/`은 루트가 영어 canonical이므로 별칭을 두지 않는다. `/kr` 별칭은 한국어 canonical이 `/ko/`로 분리되어 있기 때문에만 존재한다.
 - 영어 콘텐츠의 표준 URL은 루트 기반(`/post/:slug/`, `/resume/`)으로 유지한다.
 
 ## Not-Found 라우트 계약
@@ -29,6 +32,7 @@
 ## 이력서 메타데이터
 
 - 이력서 소셜의 LinkedIn 링크는 `https://www.linkedin.com/in/<slug>/` 형식의 canonical URL을 사용하며, GitHub 링크는 `https://github.com/wintrover` 개인 프로필을 사용한다.
+- 이력서 프로젝트의 Axiom GitHub 링크는 저장소 `https://github.com/Archright/Axiom`을 사용한다. 소셜 GitHub 링크와 프로젝트 저장소 링크는 서로 다른 계약이며 혼합하지 않는다.
 - 이력서 메타 타이틀은 로케일 공통으로 `resume` 표기를 사용한다.
 
 ## 관련

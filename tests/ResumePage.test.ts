@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/svelte";
+import { cleanup, render, screen, within } from "@testing-library/svelte";
 import { tick } from "svelte";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import ResumePage from "../src/components/ResumePage.svelte";
@@ -37,6 +37,15 @@ describe("ResumePage", () => {
 			"href",
 			"https://github.com/wintrover",
 		);
+		const axiomCard = screen
+			.getByRole("heading", { level: 4, name: "Axiom" })
+			.closest("article") as HTMLElement | null;
+		expect(axiomCard).not.toBeNull();
+		expect(
+			within(axiomCard as HTMLElement).getByRole("link", {
+				name: "GitHub Repository",
+			}),
+		).toHaveAttribute("href", "https://github.com/Archright/Axiom");
 		expect(document.querySelector(".section.motion-reveal")).not.toBeNull();
 		expect(document.querySelector(".cards.motion-stagger-list")).not.toBeNull();
 		expect(document.querySelector(".card.motion-card")).not.toBeNull();

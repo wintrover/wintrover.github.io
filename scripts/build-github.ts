@@ -385,6 +385,31 @@ export function validatePostCategoryTagConsistency(root: string) {
 	}
 }
 
+export function renderLegacyLocaleAliasHtml(): string {
+	const canonical = `${siteOrigin}/ko/`;
+	const redirect = "/ko/";
+	const title = "한국어 페이지로 이동";
+	return (
+		`<!doctype html>` +
+		`<html lang="ko">` +
+		`<head>` +
+		`<meta charset="utf-8"/>` +
+		`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
+		`<title>${xmlEscape(title)}</title>` +
+		`<link rel="canonical" href="${xmlEscape(canonical)}"/>` +
+		`<meta http-equiv="refresh" content="0; url=${redirect}"/>` +
+		`</head>` +
+		`<body>` +
+		`<noscript><a href="${redirect}">한국어 사이트 열기</a></noscript>` +
+		`</body>` +
+		`</html>`
+	);
+}
+
+export function buildLegacyLocaleAlias(dist: string) {
+	writeFile(path.join(dist, "kr", "index.html"), renderLegacyLocaleAliasHtml());
+}
+
 function verifyBuildOutput(distPath: string) {
 	console.log("🚀 Verifying Axiom GitHub Pages build output...");
 	const expectedFiles = [
@@ -392,6 +417,7 @@ function verifyBuildOutput(distPath: string) {
 		path.join(distPath, "ko", "index.html"),
 		path.join(distPath, "ko", "resume", "index.html"),
 		path.join(distPath, "resume", "index.html"),
+		path.join(distPath, "kr", "index.html"),
 	];
 
 	if (!fs.existsSync(distPath)) {
@@ -434,6 +460,7 @@ export function main() {
 
 	buildBlog(dist, "en");
 	buildBlog(dist, "ko");
+	buildLegacyLocaleAlias(dist);
 	buildResumeLandingPage(dist, "ko");
 	buildResumeLandingPage(dist, "en");
 	buildPostLandingPages(dist, "ko");
