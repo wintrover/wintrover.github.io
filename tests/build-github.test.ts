@@ -4,24 +4,30 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
+	buildAliasPages,
 	buildBlog,
-	buildLegacyLocaleAlias,
-	buildLegacyPostAliases,
 	collectPostEntries,
 	copyKoPublicAssets,
 	deriveKoPublicAssets,
 	findLocaleBoundaryViolations,
-	LEGACY_POST_ALIASES,
 	renderLegacyLocaleAliasHtml,
 	renderLegacyPostAliasHtml,
 	renderPostLandingHtml,
 	resolvePostSlug,
-	validateLegacyPostAliases,
 	validatePostCategoryTagConsistency,
+	validateUrlContractAliases,
+	verifyAliasOutputs,
 	verifyLocaleBoundary,
 	verifyPostLandingPages,
 	verifySitemapContract,
 } from "../scripts/build-github";
+import {
+	type AliasUrlEntry,
+	type CanonicalUrlEntry,
+	FIXED_CANONICAL_URLS,
+	serializeUrlContract,
+	type UrlEntry,
+} from "../scripts/public-urls";
 import { siteOrigin } from "../src/lib/config";
 
 vi.mock("node:child_process", async (importOriginal) => {
@@ -56,15 +62,49 @@ function writePost(relativePath: string, content: string) {
 	fs.writeFileSync(filePath, content);
 }
 
+function canonicalEntry(url: string): CanonicalUrlEntry {
+	return {
+		url,
+		kind: "canonical",
+		locale: url.startsWith("/ko/") ? "ko" : "en",
+	};
+}
+
+function aliasEntry(url: string, target: string): AliasUrlEntry {
+	return { url, kind: "alias", target, evidence: "test fixture" };
+}
+
+function writeContract(entries: UrlEntry[]) {
+	fs.writeFileSync(
+		path.join(tempRoot, "url-contract.json"),
+		serializeUrlContract({ version: 1, urls: entries }),
+	);
+}
+
+function derivedCanonicalEntries(): CanonicalUrlEntry[] {
+	const urls = [
+		...FIXED_CANONICAL_URLS,
+		...collectPostEntries(tempRoot, "en").map((post) => `/post/${post.slug}/`),
+		...collectPostEntries(tempRoot, "ko").map(
+			(post) => `/ko/post/${post.slug}/`,
+		),
+	];
+	return urls.map(canonicalEntry);
+}
+
+function mockExit() {
+	return vi.spyOn(process, "exit").mockImplementation(() => {
+		throw new Error("process.exit");
+	});
+}
+
 describe("build-github category/tag consistency", () => {
 	test("Axiom 태그 + Archright 카테고리는 통과한다", () => {
 		writePost(
 			"archright/temp-test-valid.md",
 			"---\ncategory: Archright\ntags: [Axiom]\n---\nBody",
 		);
-		const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
-			throw new Error("process.exit");
-		});
+		const exitSpy = mockExit();
 		validatePostCategoryTagConsistency(tempRoot);
 		expect(exitSpy).not.toHaveBeenCalled();
 	});
@@ -74,9 +114,7 @@ describe("build-github category/tag consistency", () => {
 			"project/temp-test-invalid.md",
 			"---\ncategory: Project\ntags: [Axiom]\n---\nBody",
 		);
-		const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {
-			throw new Error("process.exit");
-		});
+		const exitSpy = mockExit();
 		expect(() => validatePostCategoryTagConsistency(tempRoot)).toThrow(
 			"process.exit",
 		);
@@ -84,9 +122,10 @@ describe("build-github category/tag consistency", () => {
 	});
 });
 
-describe("build-github legacy locale alias", () => {
+describe("build-github locale alias", () => {
 	test("/kr alias는 canonical /ko/와 0초 meta refresh를 가진다", () => {
-		buildLegacyLocaleAlias(tempRoot);
+		writeContract([canonicalEntry("/ko/"), aliasEntry("/kr/", "/ko/")]);
+		buildAliasPages(tempRoot, tempRoot);
 		const html = fs.readFileSync(
 			path.join(tempRoot, "kr", "index.html"),
 			"utf-8",
@@ -108,31 +147,34 @@ describe("build-github legacy locale alias", () => {
 	});
 });
 
-describe("build-github legacy post alias", () => {
-	const alias = LEGACY_POST_ALIASES[0];
+describe("build-github post alias", () => {
+	const fromSlug = "legacy-old-post";
+	const toSlug = "current-post";
 	const post = {
-		title:
-			"The Agent Wrote the Theorem: A Model-Level Disproof, a Pipeline Gap, and a Refusal to Cheat",
-		description: "This post moved to a new URL.",
+		title: "Current Post",
+		description: "Current description",
 	};
-	const targetPath =
-		"https://wintrover.github.io/post/the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/";
 
-	test("LEGACY_POST_ALIASES는 옛 slug를 현재 slug로 매핑한다", () => {
-		expect(alias).toEqual({
-			from: "the-agent-wrote-the-theorem-a-formal-disproof-a-pipeline-gap-and-a-refusal-to-cheat",
-			to: "the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat",
-		});
-	});
+	function writeAliasFixture() {
+		writePost(
+			"current-post.md",
+			"---\ntitle: Current Post\ndescription: Current description\ndate: 2026-01-02\n---\nBody",
+		);
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry(`/post/${fromSlug}/`, `/post/${toSlug}/`),
+		]);
+	}
 
 	test("renderLegacyPostAliasHtml는 영어 canonical과 noindex meta refresh를 가진다", () => {
-		const html = renderLegacyPostAliasHtml(alias, post);
+		const targetPath = `${siteOrigin}/post/${toSlug}/`;
+		const html = renderLegacyPostAliasHtml("en", post, `/post/${toSlug}/`);
 		expect(html.startsWith("<!doctype html>")).toBe(true);
 		expect(html).toContain('<html lang="en">');
 		expect(html).toContain(`rel="canonical" href="${targetPath}"`);
 		expect(html).toContain('<meta name="robots" content="noindex,follow"/>');
 		expect(html).toContain(
-			'http-equiv="refresh" content="0; url=/#/post/the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat"',
+			`http-equiv="refresh" content="0; url=/#/post/${toSlug}"`,
 		);
 		expect(html).toContain(`<meta property="og:url" content="${targetPath}"`);
 		expect(html).toContain(
@@ -141,22 +183,27 @@ describe("build-github legacy post alias", () => {
 		expect(html).toContain('<meta property="og:site_name" content="Axiom"/>');
 	});
 
-	test("buildLegacyPostAliases는 영어 트리에만 별칭을 생성한다", () => {
-		buildLegacyPostAliases(tempRoot);
+	test("buildAliasPages는 영어 트리에만 별칭을 생성한다", () => {
+		writeAliasFixture();
+		buildAliasPages(tempRoot, tempRoot);
 		expect(
-			fs.existsSync(path.join(tempRoot, "post", alias.from, "index.html")),
+			fs.existsSync(path.join(tempRoot, "post", fromSlug, "index.html")),
 		).toBe(true);
-		expect(fs.existsSync(path.join(tempRoot, "ko", "post", alias.from))).toBe(
+		expect(fs.existsSync(path.join(tempRoot, "ko", "post", fromSlug))).toBe(
 			false,
 		);
 	});
-});
 
-function mockExit() {
-	return vi.spyOn(process, "exit").mockImplementation(() => {
-		throw new Error("process.exit");
+	test("영어 별칭이 한국어 트리에 존재하면 빌드 실패한다", () => {
+		writeAliasFixture();
+		fs.mkdirSync(path.join(tempRoot, "ko", "post", fromSlug), {
+			recursive: true,
+		});
+		const exitSpy = mockExit();
+		expect(() => buildAliasPages(tempRoot, tempRoot)).toThrow("process.exit");
+		expect(exitSpy).toHaveBeenCalledWith(1);
 	});
-}
+});
 
 describe("build-github post slug identity", () => {
 	test("한국어 제목은 fileName slug로 폴백한다", () => {
@@ -202,56 +249,199 @@ describe("build-github collectPostEntries slug contract", () => {
 	});
 });
 
-describe("build-github legacy post alias registry validation", () => {
+describe("build-github url contract validation", () => {
+	function writeCurrentPost() {
+		writePost(
+			"current-english-post.md",
+			"---\ntitle: Current English Post\ndate: 2026-01-01\n---\nBody",
+		);
+	}
+
 	test("유효한 레지스트리는 통과한다", () => {
-		writePost("current-english-post.md", "---\ndate: 2026-01-01\n---\nBody");
-		const exitSpy = mockExit();
-		validateLegacyPostAliases(tempRoot, [
-			{ from: "legacy-old-post", to: "current-english-post" },
+		writeCurrentPost();
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry("/post/legacy-old-post/", "/post/current-english-post/"),
 		]);
+		const exitSpy = mockExit();
+		validateUrlContractAliases(tempRoot);
 		expect(exitSpy).not.toHaveBeenCalled();
 	});
 
 	test("from === to이면 빌드 실패한다", () => {
-		writePost("current-english-post.md", "---\ndate: 2026-01-01\n---\nBody");
+		writeCurrentPost();
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry("/post/same-slug/", "/post/same-slug/"),
+		]);
 		mockExit();
-		expect(() =>
-			validateLegacyPostAliases(tempRoot, [
-				{ from: "same-slug", to: "same-slug" },
-			]),
-		).toThrow("process.exit");
+		expect(() => validateUrlContractAliases(tempRoot)).toThrow("process.exit");
 	});
 
-	test("from 중복이면 빌드 실패한다", () => {
-		writePost("current-english-post.md", "---\ndate: 2026-01-01\n---\nBody");
+	test("alias URL 중복이면 빌드 실패한다", () => {
+		writeCurrentPost();
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry("/post/duplicate-from/", "/post/current-english-post/"),
+			aliasEntry("/post/duplicate-from/", "/post/current-english-post/"),
+		]);
 		mockExit();
-		expect(() =>
-			validateLegacyPostAliases(tempRoot, [
-				{ from: "duplicate-from", to: "current-english-post" },
-				{ from: "duplicate-from", to: "current-english-post" },
-			]),
-		).toThrow("process.exit");
+		expect(() => validateUrlContractAliases(tempRoot)).toThrow("process.exit");
 	});
 
-	test("from이 현재 영어 slug와 충돌하면 빌드 실패한다", () => {
-		writePost("current-english-post.md", "---\ndate: 2026-01-01\n---\nBody");
-		writePost("other-current-post.md", "---\ndate: 2026-01-02\n---\nBody");
+	test("alias URL이 현재 canonical slug와 충돌하면 빌드 실패한다", () => {
+		writeCurrentPost();
+		writePost(
+			"other-current-post.md",
+			"---\ntitle: Other Current Post\ndate: 2026-01-02\n---\nBody",
+		);
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry("/post/current-english-post/", "/post/other-current-post/"),
+		]);
 		mockExit();
-		expect(() =>
-			validateLegacyPostAliases(tempRoot, [
-				{ from: "current-english-post", to: "other-current-post" },
-			]),
-		).toThrow("process.exit");
+		expect(() => validateUrlContractAliases(tempRoot)).toThrow("process.exit");
 	});
 
-	test("to가 현재 영어 slug에 없으면 빌드 실패한다", () => {
-		writePost("current-english-post.md", "---\ndate: 2026-01-01\n---\nBody");
+	test("alias target이 registry에 없으면 빌드 실패한다", () => {
+		writeCurrentPost();
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry("/post/legacy-old-post/", "/post/missing-target/"),
+		]);
 		mockExit();
-		expect(() =>
-			validateLegacyPostAliases(tempRoot, [
-				{ from: "legacy-old-post", to: "missing-target" },
-			]),
-		).toThrow("process.exit");
+		expect(() => validateUrlContractAliases(tempRoot)).toThrow("process.exit");
+	});
+
+	test("레지스트리 canonical이 파생 집합과 다르면 빌드 실패한다", () => {
+		writeCurrentPost();
+		writeContract([
+			...derivedCanonicalEntries(),
+			canonicalEntry("/post/not-a-real-post/"),
+		]);
+		mockExit();
+		expect(() => validateUrlContractAliases(tempRoot)).toThrow("process.exit");
+	});
+
+	test("체인 별칭은 최종 canonical로 해석되어 A→C 산출물을 만든다", () => {
+		writePost(
+			"current-post.md",
+			"---\ntitle: Current Post\ndescription: Current description\ndate: 2026-01-02\n---\nBody",
+		);
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry("/post/mid-post/", "/post/current-post/"),
+			aliasEntry("/post/old-post/", "/post/mid-post/"),
+		]);
+		const exitSpy = mockExit();
+		validateUrlContractAliases(tempRoot);
+		expect(exitSpy).not.toHaveBeenCalled();
+		buildAliasPages(tempRoot, tempRoot);
+		for (const slug of ["old-post", "mid-post"]) {
+			const html = fs.readFileSync(
+				path.join(tempRoot, "post", slug, "index.html"),
+				"utf-8",
+			);
+			expect(html).toContain(
+				`rel="canonical" href="${siteOrigin}/post/current-post/"`,
+			);
+			expect(html).toContain(
+				'http-equiv="refresh" content="0; url=/#/post/current-post"',
+			);
+			expect(html).toContain('location.replace("/#/post/current-post")');
+		}
+	});
+});
+
+describe("build-github alias output verification", () => {
+	function writeAliasFixture() {
+		writePost(
+			"current-post.md",
+			"---\ntitle: Current Post\ndescription: Current description\ndate: 2026-01-02\n---\nBody",
+		);
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry("/kr/", "/ko/"),
+			aliasEntry("/post/legacy-old-post/", "/post/current-post/"),
+		]);
+	}
+
+	function writeSitemap(locs: string[]) {
+		const body = locs.map((loc) => `<url><loc>${loc}</loc></url>`).join("");
+		fs.writeFileSync(
+			path.join(tempRoot, "sitemap.xml"),
+			`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}</urlset>`,
+		);
+	}
+
+	function canonicalSitemapLocs() {
+		return [
+			...FIXED_CANONICAL_URLS,
+			...collectPostEntries(tempRoot, "en").map(
+				(post) => `/post/${post.slug}/`,
+			),
+			...collectPostEntries(tempRoot, "ko").map(
+				(post) => `/ko/post/${post.slug}/`,
+			),
+		].map((url) => `${siteOrigin}${url}`);
+	}
+
+	function writeValidBuild() {
+		writeAliasFixture();
+		buildAliasPages(tempRoot, tempRoot);
+		writeSitemap(canonicalSitemapLocs());
+	}
+
+	test("registry 별칭 산출물은 canonical·refresh·noindex·sitemap 제외를 만족한다", () => {
+		writeValidBuild();
+		const exitSpy = mockExit();
+		verifyAliasOutputs(tempRoot, tempRoot);
+		expect(exitSpy).not.toHaveBeenCalled();
+	});
+
+	test("canonical이 변조된 별칭 산출물은 빌드 실패한다", () => {
+		writeValidBuild();
+		const aliasPath = path.join(
+			tempRoot,
+			"post",
+			"legacy-old-post",
+			"index.html",
+		);
+		fs.writeFileSync(
+			aliasPath,
+			fs
+				.readFileSync(aliasPath, "utf-8")
+				.replace(
+					`${siteOrigin}/post/current-post/`,
+					`${siteOrigin}/post/tampered/`,
+				),
+		);
+		const exitSpy = mockExit();
+		expect(() => verifyAliasOutputs(tempRoot, tempRoot)).toThrow(
+			"process.exit",
+		);
+		expect(exitSpy).toHaveBeenCalledWith(1);
+	});
+
+	test("별칭 URL이 sitemap에 노출되면 빌드 실패한다", () => {
+		writeValidBuild();
+		writeSitemap([
+			...canonicalSitemapLocs(),
+			`${siteOrigin}/post/legacy-old-post/`,
+		]);
+		mockExit();
+		expect(() => verifyAliasOutputs(tempRoot, tempRoot)).toThrow(
+			"process.exit",
+		);
+	});
+
+	test("별칭 산출물이 없으면 빌드 실패한다", () => {
+		writeAliasFixture();
+		writeSitemap(canonicalSitemapLocs());
+		mockExit();
+		expect(() => verifyAliasOutputs(tempRoot, tempRoot)).toThrow(
+			"process.exit",
+		);
 	});
 });
 
@@ -316,6 +506,8 @@ describe("build-github post landing verification", () => {
 });
 
 describe("build-github sitemap contract", () => {
+	const aliasUrl = "/post/legacy-landing-post/";
+
 	const expectedLocs = () => [
 		`${siteOrigin}/`,
 		`${siteOrigin}/ko/`,
@@ -334,6 +526,10 @@ describe("build-github sitemap contract", () => {
 			"ko/2026-03-17-19.md",
 			"---\ntitle: 한국어 제목\ndate: 2026-03-17\n---\nBody",
 		);
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry(aliasUrl, "/post/landing-post/"),
+		]);
 	}
 
 	function writeSitemap(locs: string[]) {
@@ -373,12 +569,9 @@ describe("build-github sitemap contract", () => {
 		expect(exitSpy).toHaveBeenCalledWith(1);
 	});
 
-	test("레거시 alias from이 sitemap에 노출되면 빌드 실패한다", () => {
+	test("레지스트리 alias URL이 sitemap에 노출되면 빌드 실패한다", () => {
 		writeFixturePosts();
-		writeSitemap([
-			...expectedLocs(),
-			`${siteOrigin}/post/${LEGACY_POST_ALIASES[0].from}/`,
-		]);
+		writeSitemap([...expectedLocs(), `${siteOrigin}${aliasUrl}`]);
 		const exitSpy = mockExit();
 		expect(() =>
 			verifySitemapContract(path.join(tempRoot, "dist"), tempRoot),
@@ -455,6 +648,7 @@ describe("build-github locale boundary verification", () => {
 	const distRoot = () => path.join(tempRoot, "dist");
 	const koPostSlug = "ko-post";
 	const enPostSlug = "en-post";
+	const legacyAliasSlug = "legacy-alias";
 
 	function writeFixture() {
 		fs.mkdirSync(path.join(tempRoot, "public", "images"), { recursive: true });
@@ -464,6 +658,11 @@ describe("build-github locale boundary verification", () => {
 		);
 		writePost("en-post.md", "---\ntitle: En Post\n---\nBody");
 		writePost("ko/ko-post.md", "---\ntitle: Ko Post\n---\nBody");
+		writeContract([
+			...derivedCanonicalEntries(),
+			aliasEntry("/kr/", "/ko/"),
+			aliasEntry(`/post/${legacyAliasSlug}/`, `/post/${enPostSlug}/`),
+		]);
 
 		const dist = distRoot();
 		const files = [
@@ -493,9 +692,14 @@ describe("build-github locale boundary verification", () => {
 			recursive: true,
 		});
 		fs.mkdirSync(path.join(dist, "post", enPostSlug), { recursive: true });
-		fs.mkdirSync(path.join(dist, "post", LEGACY_POST_ALIASES[0].from), {
-			recursive: true,
-		});
+		const legacyAliasPath = path.join(
+			dist,
+			"post",
+			legacyAliasSlug,
+			"index.html",
+		);
+		fs.mkdirSync(path.dirname(legacyAliasPath), { recursive: true });
+		fs.writeFileSync(legacyAliasPath, "");
 	}
 
 	test("경계를 지키는 산출물은 위반이 없다", () => {

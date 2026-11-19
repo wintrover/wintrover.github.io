@@ -171,7 +171,8 @@ Feature: Context SSoT architecture and UI invariants
     And each landing page must match renderPostLandingHtml byte for byte
 
   Scenario: Legacy post aliases are permanent and validated
-    Given the legacy English post alias registry is append-only
+    Given the public URL contract registry is append-only
     When the build validates alias from/to before writing dist
-    Then empty, self-referencing, duplicate, current-slug, missing-target, and chained aliases must fail the build
+    Then empty, self-referencing, duplicate, current-slug, and missing-target aliases must fail the build
+    And chained aliases must resolve to the final canonical URL
     And alias source URLs must be excluded from the sitemap

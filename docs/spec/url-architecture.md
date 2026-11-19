@@ -25,11 +25,22 @@
 - 빌드 canonical slug는 `slugify(title) || slugify(fileName)`이다. 제목이 비었거나 정규화 결과가 비면 파일명 slug를 사용하고, 둘 다 비면 빌드를 실패시킨다(fail-closed).
 - 비라틴 문자 제목(예: 한국어)은 `slugify`가 빈 문자열을 반환하므로 `fileName` slug를 사용한다.
 - 한 locale 안에서 하나의 canonical slug는 정확히 하나의 포스트에 속한다. 파생 slug가 중복되면 빌드는 실패하며, 조용히 덮어쓰거나 건너뛰지 않는다.
-- 기존에 공개된 영어 포스트 별칭(`LEGACY_POST_ALIASES`)은 영구 보존한다. 신규 별칭은 append-only 관례로만 추가하며 기존 항목을 수정·삭제하지 않는다.
-- 별칭 레지스트리는 다음을 검증한다: `from`/`to` 비어 있음, `from === to`, `from` 중복, `from`이 현재 영어 canonical slug와 충돌, `to`가 현재 영어 canonical slug에 없음, `to`가 다른 별칭의 `from`과 일치(체인/사이클). 그리고 별칭 `from` URL은 sitemap에서 제외한다.
+- 공개 URL 장부는 `url-contract.json`이며 canonical과 alias의 단일 권위다. 스키마·전이 행렬·보장 범위는 [url-contract.md](url-contract.md)에 있다.
+- 기존에 공개된 영어 포스트 별칭은 영구 보존한다. 신규 별칭은 append-only 관례로만 추가하며 기존 항목의 target을 수정하거나 삭제하지 않는다.
+- registry는 다음을 검증한다: canonical 집합과 파생 집합의 일치(누락·추가 모두 위반), url 중복, self-reference, target 미등록, 순환 체인, locale 변경, alias URL과 canonical slug 충돌. 체인은 허용하며 최종 canonical로 해석한다. alias `from` URL은 sitemap에서 제외한다.
 - 한국어 별칭 이력은 아직 레지스트리에 없다. 한국어 포스트의 과거 slug 호환은 이 계약의 범위가 아니다.
 - `/kr` 하위 경로(`/kr/post/...` 등)는 이 계약에 포함하지 않는다.
 - 포스트 로더는 기존 canonical slug(`dont`)와 현재 slug(`don-t`)를 모두 조회 호환해 과거 링크의 Post not found를 방지해야 한다.
+
+## SPA head identity
+
+- 문서 head의 `title`·`link[rel="canonical"]`·`meta[name="description"]`·OG 메타·JSON-LD는 `src/lib/seo.ts` 단일 컨트롤러가 소유한다. 라우트 컴포넌트는 `<svelte:head>`로 canonical이나 title을 중복 생성하지 않는다.
+- 정적 셸(`index.html`)의 canonical·title·메타는 크롤러와 no-JS 진입을 위해 유지한다. SPA는 부팅 후 기존 canonical 링크를 제자리에서 갱신하고 중복 링크를 제거해 항상 정확히 1개로 수렴한다.
+- 라우트별 canonical은 다음 값을 따른다: home = `${origin}${localeBase(locale)}`, category/tag 뷰 = home과 동일한 로케일 루트, post = `${origin}${localePrefix(locale)}/post/${slug}/`, resume = `${origin}${localePrefix(locale)}/resume/`, NotFound = locale 루트.
+- 카테고리·태그 화면은 독립 공개 URL이 아니라 로케일 블로그 리스트의 뷰다. `/ko/category/...` 같은 hashless 경로는 실제 정적 파일이 없으므로 canonical로 사용하지 않으며, canonical은 `#` fragment를 포함하지 않는 로케일 루트다.
+- 라우트별 title은 다음 값을 따른다: post = 포스트 제목, resume = 로케일 resume 메타 타이틀, NotFound = 로케일 NotFound 문구, home = 정적 셸의 로케일 블로그 타이틀.
+- `src/main.ts`는 부팅 시점에 canonical을 로케일 루트로 덮어쓰지 않는다. canonical 갱신 권위는 `src/lib/seo.ts` 하나다.
+- 라우트 전환에서 이전 라우트의 title·canonical·JSON-LD가 잔류해서는 안 된다. 새 라우트 컴포넌트(또는 포스트 데이터 해석)가 컨트롤러를 호출해 값을 갱신한다.
 
 ## 포스트 메타데이터 정규화
 

@@ -8,6 +8,8 @@ import {
 import fc from "fast-check";
 import { tick } from "svelte";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { getRuntimeOrigin } from "../src/lib/config";
+import type { Post } from "../src/lib/postLoader";
 import * as postLoader from "../src/lib/postLoader";
 import { posts } from "../src/stores/posts";
 
@@ -428,5 +430,104 @@ describe("App.svelte", () => {
 		).toBeInTheDocument();
 		expect(screen.getByText("홈으로 돌아가기")).toBeInTheDocument();
 		expect(document.title).toBe("페이지를 찾을 수 없습니다");
+	});
+
+	test("라우트 전환에서 head identity는 단일 canonical과 라우트별 title을 유지해야 함", async () => {
+		const cachedPost: Post = {
+			fileName: "cached-post",
+			title: "Cached Post",
+			slug: "cached-post",
+			category: "Tech",
+			date: "2023-10-01",
+			content: "Body content",
+			html: "<p>Body content</p>",
+			excerpt: "Cached excerpt",
+			tags: ["svelte"],
+		};
+		vi.mocked(posts).set([cachedPost]);
+		window.location.hash = "#/post/cached-post";
+		render(App);
+
+		const canonicalLinks = () => [
+			...document.querySelectorAll<HTMLLinkElement>('link[rel="canonical"]'),
+		];
+
+		await waitFor(() => {
+			expect(
+				document.querySelector(".post-detail h1.post-title")?.textContent,
+			).toBe("Cached Post");
+		});
+		expect(document.title).toBe("Cached Post");
+		expect(canonicalLinks()).toHaveLength(1);
+		expect(canonicalLinks()[0]?.getAttribute("href")).toBe(
+			`${getRuntimeOrigin()}/post/cached-post/`,
+		);
+
+		const navigate = async (hash: string) => {
+			window.location.hash = hash;
+			window.dispatchEvent(new HashChangeEvent("hashchange"));
+		};
+
+		await navigate("#/");
+		await waitFor(() => {
+			expect(document.querySelector(".post-detail")).toBeNull();
+		});
+		await waitFor(() => {
+			expect(document.title).toBe("Axiom - Integrity Proof Engineer");
+		});
+		expect(canonicalLinks()).toHaveLength(1);
+		expect(canonicalLinks()[0]?.getAttribute("href")).toBe(
+			`${getRuntimeOrigin()}/`,
+		);
+
+		await navigate("#/resume");
+		await waitFor(() => {
+			expect(document.querySelector(".resume")).not.toBeNull();
+		});
+		expect(document.title).toBe("resume");
+		expect(canonicalLinks()).toHaveLength(1);
+		expect(canonicalLinks()[0]?.getAttribute("href")).toBe(
+			`${getRuntimeOrigin()}/resume/`,
+		);
+
+		await navigate("#/category/tech");
+		await waitFor(() => {
+			expect(document.querySelector(".blog-page")).not.toBeNull();
+		});
+		await waitFor(() => {
+			expect(document.title).toBe("Tech");
+		});
+		expect(canonicalLinks()).toHaveLength(1);
+		expect(canonicalLinks()[0]?.getAttribute("href")).toBe(
+			`${getRuntimeOrigin()}/`,
+		);
+		expect(canonicalLinks()[0]?.getAttribute("href")).not.toContain("#");
+
+		await navigate("#/category/tech/tag/svelte");
+		await waitFor(() => {
+			expect(document.title).toBe("Tech #svelte");
+		});
+		expect(canonicalLinks()).toHaveLength(1);
+		expect(canonicalLinks()[0]?.getAttribute("href")).toBe(
+			`${getRuntimeOrigin()}/`,
+		);
+		expect(canonicalLinks()[0]?.getAttribute("href")).not.toContain("#");
+
+		await navigate("#/no-such-route");
+		await waitFor(() => {
+			expect(screen.getByText("Page not found")).toBeInTheDocument();
+		});
+		expect(document.title).toBe("Page not found");
+		expect(canonicalLinks()).toHaveLength(1);
+		expect(canonicalLinks()[0]?.getAttribute("href")).toBe(
+			`${getRuntimeOrigin()}/`,
+		);
+		expect(
+			document.querySelectorAll(
+				'script[type="application/ld+json"][data-seo-owner="spa"]',
+			),
+		).toHaveLength(0);
+
+		vi.mocked(posts).set([]);
 	});
 });
