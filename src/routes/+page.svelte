@@ -1,8 +1,11 @@
 <script lang="ts">
+import { onMount } from "svelte";
 import { fade } from "svelte/transition";
 import { push } from "svelte-spa-router";
 import PostFeed from "../components/PostFeed.svelte";
+import { detectLocaleFromRuntime } from "../lib/locale";
 import type { Post } from "../lib/postLoader";
+import { applyHomeSeo } from "../lib/seo";
 import { posts as postsStore } from "../stores/posts";
 
 let homePosts: Post[] = [];
@@ -10,6 +13,10 @@ let homePosts: Post[] = [];
 function openPost(slug: string) {
 	void push(`/post/${slug}`);
 }
+
+onMount(() => {
+	applyHomeSeo(detectLocaleFromRuntime(window.location.pathname));
+});
 
 $: {
 	const allPosts: Post[] = Array.isArray($postsStore) ? $postsStore : [];

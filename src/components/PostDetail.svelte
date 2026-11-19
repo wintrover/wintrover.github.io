@@ -1,14 +1,11 @@
 <script lang="ts">
 import { onMount, tick } from "svelte";
 import { push } from "svelte-spa-router";
-import {
-	buildPostDetailSeo,
-	defaultOgImage,
-	getNotFoundCopy,
-} from "../lib/config";
+import { getNotFoundCopy } from "../lib/config";
 import { detectLocaleFromRuntime } from "../lib/locale";
 import { logError } from "../lib/log";
 import { loadPostBySlug, type Post } from "../lib/postLoader";
+import { applyPostSeo } from "../lib/seo";
 import { formatDate } from "../lib/utils";
 import { posts as postsStore } from "../stores/posts";
 import Comments from "./Comments.svelte";
@@ -22,10 +19,6 @@ let loading = true;
 
 let currentSlug: string | null = null;
 let resolvedLocale: "ko" | "en" = "en";
-let seoTitle = "Axiom";
-let seoDescription = "";
-let canonicalUrl = "";
-let structuredData = "";
 let routeMotionKey = "post";
 
 function normalizeRouteSlug(rawSlug?: string) {
@@ -49,6 +42,7 @@ async function loadPostData(slug: string) {
 		if (cached) {
 			post = cached;
 			loading = false;
+			applyPostSeo({ post: cached, loading: false, slug, resolvedLocale });
 			return;
 		}
 
@@ -60,6 +54,7 @@ async function loadPostData(slug: string) {
 
 		post = postData;
 		loading = false;
+		applyPostSeo({ post: postData, loading: false, slug, resolvedLocale });
 	} catch (error) {
 		if (currentSlug === slug) {
 			currentSlug = null;
@@ -84,6 +79,7 @@ async function loadPostData(slug: string) {
 			error,
 		});
 		loading = false;
+		applyPostSeo({ post: null, loading: false, slug, resolvedLocale });
 	}
 }
 
@@ -93,15 +89,7 @@ $: resolvedLocale = detectLocaleFromRuntime(
 
 $: notFoundCopy = getNotFoundCopy({ scope: "post", resolvedLocale });
 
-$: {
-	const slug = normalizeRouteSlug(params?.slug);
-	routeMotionKey = slug || "post";
-	const seo = buildPostDetailSeo({ post, loading, slug, resolvedLocale });
-	seoTitle = seo.seoTitle;
-	seoDescription = seo.seoDescription;
-	canonicalUrl = seo.canonicalUrl;
-	structuredData = seo.structuredData;
-}
+$: routeMotionKey = normalizeRouteSlug(params?.slug) || "post";
 
 onMount(() => {
 	const slug = normalizeRouteSlug(params?.slug);
@@ -199,28 +187,6 @@ void formatDate;
 void Comments;
 void goBack;
 </script>
-
-<svelte:head>
-	<title>{seoTitle}</title>
-	{#if seoDescription}
-		<meta name="description" content={seoDescription} />
-	{/if}
-	<meta
-		name="robots"
-		content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
-	/>
-	<meta property="og:title" content={seoTitle} />
-	<meta property="og:description" content={seoDescription} />
-	<meta property="og:type" content={post ? "article" : "website"} />
-	<meta property="og:url" content={canonicalUrl} />
-	<meta property="og:image" content={defaultOgImage} />
-	<meta property="og:image:alt" content={post?.title ?? seoTitle} />
-	<meta property="og:site_name" content="Axiom" />
-	<link rel="canonical" href={canonicalUrl} />
-	{#if structuredData}
-		<script type="application/ld+json">{structuredData}</script>
-	{/if}
-</svelte:head>
 
 {#key routeMotionKey}
 	{#if post}
