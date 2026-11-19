@@ -17,6 +17,7 @@
 		"sync:post-localization:working": "tsx scripts/sync-post-localization.ts --mode=working --write",
 		"gate:procedure:ci": "tsx scripts/procedure-gate.ts --mode=ci",
 		"gate:procedure:staged": "tsx scripts/procedure-gate.ts --mode=staged",
+		"url-contract:update": "tsx scripts/update-url-contract.ts",
 		"images:generate:ci": "tsx scripts/image-tools.ts generate-images-ci",
 		"svg:to-png": "tsx scripts/image-tools.ts svg-to-png",
 		"mcp:code-index": "code-index-mcp",

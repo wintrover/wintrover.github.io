@@ -13,7 +13,9 @@
   1. `pnpm exec biome check .` — 포맷·린트
   2. `pnpm run typecheck` — `tsc --noEmit`
   3. `pnpm run test` — `vitest run`
-  4. `pnpm run build:github` — GitHub Pages 산출물 빌드
+  4. `pnpm run build:github` — GitHub Pages 산출물 빌드 (`url-contract.json` registry 검증 포함)
+  5. `Fetch PR base` — `pull_request`·`merge_group`에서만 `git fetch --no-tags --depth=1 origin "$BASE_SHA"` 실행
+  6. `URL contract append-only` — `pull_request`·`merge_group`에서만 `pnpm exec tsx scripts/verify-url-contract-append-only.ts --base "$BASE_SHA"` 실행. base registry가 없으면 bootstrap으로, 있으면 삭제·retarget·locale 변경을 fail-closed로 검사한다. push·`workflow_dispatch`에서는 5·6을 건너뛴다.
 - **커버리지는 CI에서 실행되지 않는다.** (아래 §3 참조)
 
 ## 2. GitHub ruleset `main-protection`

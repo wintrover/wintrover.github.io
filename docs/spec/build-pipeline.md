@@ -11,6 +11,7 @@
   - `dist/resume/index.html`
   - `dist/ko/resume/index.html`
   - `dist/kr/index.html` (canonical `/ko/`로 수렴하는 레거시 별칭, sitemap/hreflang 제외)
+- `url-contract.json`이 선언한 모든 alias URL의 산출물도 필수 entrypoint다. `verifyBuildOutput`은 registry의 alias 파일 경로를 기대하며 `dist/kr/index.html`도 그 registry 항목으로 포함된다.
 - 블로그 브랜드 메타데이터(타이틀/설명/OG)는 런타임 설정과 빌드 파이프라인에서 **하나의 공유 소스**로부터 파생되어야 한다.
 - 오너 직함(브랜드 정체성)의 공식 선언은 헌법(`AGENTS.md` §0.1)을 따르며, 사이트 브랜드 표면(`brandProfile`·resume locales·`public/404.html` 타이틀·빌드 폴백 문자열)이 그 직함을 동일하게 반영해야 한다.
 - 직함 재발급 시 이전 직함의 full-string이 소스와 빌드 산출물(HTML·JS 번들)에 잔존해서는 안 된다.
@@ -27,6 +28,7 @@
 - `findLocaleBoundaryViolations`/`verifyLocaleBoundary`는 `dist/ko/post`·`dist/post` 디렉터리 집합을 각각 KO slug 집합, EN slug ∪ 레거시 별칭 집합과 비교하고, `dist/ko/images` 파일 집합을 `deriveKoPublicAssets` 결과와 비교한다. `dist/ko` 아래 `evidence`·`404.html`·`.nojekyll`·`auto-merge-verification.txt`·`kr`·`sitemap.xml`·`robots.txt`의 존재, 필수 산출물의 누락은 모두 빌드 실패다.
 - 포스트 랜딩 페이지와 레거시 포스트 slug 별칭은 `build-github.ts`가 생성해야 하며 `public/`에 두지 않는다. Vite의 `publicDir` 복사는 영어 빌드에만 적용되므로 영어 전용 문서가 `dist/ko/`에 나타나서는 안 된다.
 - `/ko` 트리에는 한국어 slug만 포함되어야 한다. 영어 전용 레거시 포스트 별칭은 `dist/post/<옛 slug>/index.html`에만 생성하고 `dist/ko/post/<옛 slug>/`를 만들지 않는다.
+- 별칭 문서의 생성·검증은 `url-contract.json` registry를 권위로 삼는다. `buildAliasPages`가 각 alias의 최종 canonical을 해석해 최종 목적지 기준 canonical·redirect를 쓰고, `verifyAliasOutputs`가 파일 존재·canonical·meta refresh·`location.replace`·포스트 alias의 `noindex,follow`·sitemap 미포함을 확인한다. 스키마·전이 행렬은 [url-contract.md](url-contract.md)가 정본이다.
 - 수집된 모든 포스트는 정적 랜딩 페이지(`dist[/ko]/post/<slug>/index.html`)를 가져야 하며, 누락은 빌드 실패다.
 - `collectPostEntries`는 slug를 파생할 수 없는 파일을 조용히 건너뛰지 않는다. 해당 파일 경로를 로그로 남기고 빌드를 실패시킨다. 한 locale 안에서 파생 slug가 중복되어도 빌드를 실패시킨다.
 - `verifyPostLandingPages`는 각 랜딩 파일을 `renderPostLandingHtml` 결과와 바이트 단위로 비교하고, 불일치(canonical/redirect 포함)를 빌드 실패로 처리한다.
