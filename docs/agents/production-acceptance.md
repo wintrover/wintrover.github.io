@@ -67,7 +67,7 @@ node scripts/verify-production.mjs --include-spa-seo
 - sitemap 불일치: detail의 `multiset vs url-contract` / `multiset vs dist` / `multiset vs source`로 기준 집합을 확인한다. 누락·추가·중복 항목이 함께 나온다.
 - `/kr` 체인 실패: `http:alias:/kr`(301·Location), `http:alias:/kr/`(canonical·refresh·robots), `http:alias:/kr/chain:/ko/`(200 여부)를 구분해 본다. `chain:/ko/`가 301이면 정규화가 한 번 더 일어난 것이다.
 - 404 실패 위치: 1단계는 `http:unknown`(HTTP 응답), 2단계는 `browser:unknown`(hash 착지·최종 문서 200), 3단계는 `browser:unknown:dom`(DOM head)다.
-- `FAIL setup`: `tsx`/`puppeteer` 미설치, `collectPostEntries`·`LEGACY_POST_ALIASES`·`parseFrontMatter` export 누락, 또는 `url-contract.json` 형식 오류다.
+- `FAIL setup`: `tsx`/`puppeteer` 미설치, `collectPostEntries`·`parseFrontMatter` export 누락, 또는 `url-contract.json` 형식 오류다. alias는 `url-contract.json`만 권위로 사용하며 빌드 스크립트 export에 의존하지 않는다.
 
 ## 관련
 

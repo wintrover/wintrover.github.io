@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { collectPostEntries } from "../scripts/build-github";
 import {
+	buildRepositoryContract,
 	categoryHashTarget,
 	categoryTagHashTarget,
 	compareUrlMultisets,
@@ -66,15 +67,35 @@ function featureScenarios(feature: string) {
 	);
 }
 
+describe("production acceptance repository wiring", () => {
+	test("Given build-github 모듈 When 계약 도출 Then LEGACY_POST_ALIASES 없이 post entry만 도출한다", () => {
+		const module = {
+			collectPostEntries: (_root: string, locale: string) => [
+				{ slug: `${locale}-slug`, title: `${locale} title` },
+			],
+		};
+		const contract = buildRepositoryContract(module, root);
+		expect(contract).toEqual({
+			koEntries: [{ slug: "ko-slug", title: "ko title" }],
+			enEntries: [{ slug: "en-slug", title: "en title" }],
+			aliases: [],
+		});
+		expect(read("scripts/verify-production.mjs")).not.toContain(
+			"LEGACY_POST_ALIASES",
+		);
+	});
+});
+
 describe("production acceptance feature contract", () => {
 	const feature = read("tests/features/production-acceptance.feature");
 
-	test("Given feature 파일 When 시나리오 카탈로그 Then 6개 시나리오가 유지된다", () => {
+	test("Given feature 파일 When 시나리오 카탈로그 Then 7개 시나리오가 유지된다", () => {
 		expect(featureScenarios(feature)).toEqual([
 			"Production HTTP contract holds for landings, aliases, sitemap, and forbidden paths",
 			"Korean posts are observed through real browser requests",
 			"SPA head SEO is an opt-in flag",
 			"Sitemap expectation follows url-contract.json when present",
+			"Registry kinds separate canonical and alias expectations",
 			"Legacy /kr and unknown paths are judged stage by stage",
 			"SPA head SEO covers category and tag routes",
 		]);
@@ -84,7 +105,7 @@ describe("production acceptance feature contract", () => {
 		const blocks = feature
 			.split(/\r?\n(?=\s*Scenario:)/)
 			.filter((block) => block.includes("Scenario:"));
-		expect(blocks).toHaveLength(6);
+		expect(blocks).toHaveLength(7);
 		for (const block of blocks) {
 			expect(block).toContain("Given ");
 			expect(block).toContain("When ");
@@ -420,6 +441,32 @@ describe("url-contract 기대 집합", () => {
 				{ from: "/kr/", to: null },
 			],
 		});
+	});
+
+	test("Given 저장소 registry 형태 When 파싱 Then kind로 canonical과 alias를 분리한다", () => {
+		expect(
+			parseUrlContract({
+				version: 1,
+				urls: [
+					{ url: "/", kind: "canonical", locale: "en" },
+					{ url: "/ko/", kind: "canonical", locale: "ko" },
+					{ url: "/kr/", kind: "alias", target: "/ko/", evidence: "e" },
+					{ url: "/post/old/", kind: "alias", target: "/post/new/" },
+				],
+			}),
+		).toEqual({
+			canonical: ["/", "/ko/"],
+			aliases: [
+				{ from: "/kr/", to: "/ko/" },
+				{ from: "/post/old/", to: "/post/new/" },
+			],
+		});
+	});
+
+	test("Given 알 수 없는 kind When 파싱 Then fail-closed로 throw한다", () => {
+		expect(() =>
+			parseUrlContract({ urls: [{ url: "/", kind: "legacy" }] }),
+		).toThrow("unknown kind");
 	});
 
 	test("Given 잘못된 contract When 파싱 Then fail-closed로 throw한다", () => {

@@ -334,7 +334,23 @@ export function parseUrlContract(raw, origin = PRODUCTION_ORIGIN) {
 	if (!Array.isArray(canonicalInput)) {
 		throw new Error("url-contract.json: canonical URL array is missing");
 	}
-	const canonical = canonicalInput.map((entry) => {
+	const canonicalEntries = [];
+	const registryAliasEntries = [];
+	for (const entry of canonicalInput) {
+		if (entry !== null && typeof entry === "object" && "kind" in entry) {
+			if (entry.kind !== "canonical" && entry.kind !== "alias") {
+				throw new Error(
+					`url-contract.json: unknown kind ${JSON.stringify(entry.kind)}`,
+				);
+			}
+			if (entry.kind === "alias") {
+				registryAliasEntries.push(entry);
+				continue;
+			}
+		}
+		canonicalEntries.push(entry);
+	}
+	const canonical = canonicalEntries.map((entry) => {
 		let value = null;
 		if (typeof entry === "string") {
 			value = entry;
@@ -352,7 +368,7 @@ export function parseUrlContract(raw, origin = PRODUCTION_ORIGIN) {
 	if (!Array.isArray(aliasesInput)) {
 		throw new Error("url-contract.json: aliases must be an array");
 	}
-	const aliases = aliasesInput.map((entry) =>
+	const aliases = [...registryAliasEntries, ...aliasesInput].map((entry) =>
 		normalizeContractAlias(entry, origin),
 	);
 	return { canonical, aliases };
@@ -378,7 +394,7 @@ function normalizeContractAlias(entry, origin) {
 			`url-contract.json: invalid alias entry ${JSON.stringify(entry)}`,
 		);
 	}
-	const toRaw = entry.to ?? null;
+	const toRaw = entry.to ?? entry.target ?? null;
 	if (toRaw !== null && typeof toRaw !== "string") {
 		throw new Error(
 			`url-contract.json: invalid alias target ${JSON.stringify(entry)}`,
@@ -1669,24 +1685,18 @@ async function runBrowserChecks(
 }
 
 /**
+ * Derives post entries from an already-imported build script module. Aliases
+ * are intentionally not derived here: `url-contract.json` is the single alias
+ * authority.
+ *
+ * @param {{ collectPostEntries?: (root: string, locale: "ko" | "en") => { slug: string, title: string }[] }} module
  * @param {string} root
- * @returns {Promise<{ koEntries: { slug: string, title: string }[], enEntries: { slug: string, title: string }[], aliases: { from: string, to: string }[] }>}
+ * @returns {{ koEntries: { slug: string, title: string }[], enEntries: { slug: string, title: string }[], aliases: { from: string, to: string }[] }}
  */
-async function loadRepositoryContract(root) {
-	const { tsImport } = await import("tsx/esm/api");
-	const buildScript = path.join(root, "scripts", "build-github.ts");
-	const module = await tsImport(
-		pathToFileURL(buildScript).href,
-		import.meta.url,
-	);
+export function buildRepositoryContract(module, root) {
 	if (typeof module.collectPostEntries !== "function") {
 		throw new Error(
 			"collectPostEntries export missing from scripts/build-github.ts",
-		);
-	}
-	if (!Array.isArray(module.LEGACY_POST_ALIASES)) {
-		throw new Error(
-			"LEGACY_POST_ALIASES export missing from scripts/build-github.ts",
 		);
 	}
 	const koEntries = module.collectPostEntries(root, "ko");
@@ -1694,7 +1704,21 @@ async function loadRepositoryContract(root) {
 	if (!Array.isArray(koEntries) || !Array.isArray(enEntries)) {
 		throw new Error("collectPostEntries did not return arrays");
 	}
-	return { koEntries, enEntries, aliases: module.LEGACY_POST_ALIASES };
+	return { koEntries, enEntries, aliases: [] };
+}
+
+/**
+ * @param {string} root
+ * @returns {Promise<{ koEntries: { slug: string, title: string }[], enEntries: { slug: string, title: string }[], aliases: { from: string, to: string }[] }>}
+ */
+export async function loadRepositoryContract(root) {
+	const { tsImport } = await import("tsx/esm/api");
+	const buildScript = path.join(root, "scripts", "build-github.ts");
+	const module = await tsImport(
+		pathToFileURL(buildScript).href,
+		import.meta.url,
+	);
+	return buildRepositoryContract(module, root);
 }
 
 /**
