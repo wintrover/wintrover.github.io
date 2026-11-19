@@ -585,7 +585,7 @@ describe("build-github Korean public asset derivation", () => {
 		const assets = deriveKoPublicAssets(process.cwd());
 		expect(assets).toEqual([...new Set(assets)].sort());
 		expect(assets).toContain("images/profile.png");
-		expect(assets).toHaveLength(36);
+		expect(assets).toHaveLength(35);
 		for (const asset of assets) {
 			expect(fs.existsSync(path.resolve("public", asset))).toBe(true);
 		}

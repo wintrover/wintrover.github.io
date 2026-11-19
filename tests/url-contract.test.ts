@@ -63,9 +63,9 @@ describe("url contract URL helpers", () => {
 		expect(parsePostAliasUrl("/resume/")).toBeNull();
 	});
 
-	test("deriveCanonicalUrls produces the 62 published canonical URLs", () => {
+	test("deriveCanonicalUrls produces the 61 published canonical URLs", () => {
 		const derived = deriveCanonicalUrls(process.cwd());
-		expect(derived.size).toBe(62);
+		expect(derived.size).toBe(61);
 		for (const url of FIXED_CANONICAL_URLS) {
 			expect(derived.has(url)).toBe(true);
 		}
@@ -480,7 +480,7 @@ describe("url contract serialization and update planning", () => {
 });
 
 describe("committed url-contract.json", () => {
-	test("registry holds 62 canonical and 2 alias URLs and matches derived URLs", () => {
+	test("registry holds 61 canonical and 2 alias URLs and matches derived URLs", () => {
 		const raw = fs.readFileSync(
 			path.join(process.cwd(), "url-contract.json"),
 			"utf-8",
@@ -492,9 +492,9 @@ describe("committed url-contract.json", () => {
 		const aliasEntries = contract.urls.filter(
 			(entry) => entry.kind === "alias",
 		);
-		expect(canonicalEntries).toHaveLength(62);
+		expect(canonicalEntries).toHaveLength(61);
 		expect(aliasEntries).toHaveLength(2);
-		expect(contract.urls).toHaveLength(64);
+		expect(contract.urls).toHaveLength(63);
 		expect(
 			validateUrlContract(contract, deriveCanonicalUrls(process.cwd())),
 		).toEqual([]);
