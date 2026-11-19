@@ -490,6 +490,29 @@ describe("App.svelte", () => {
 			`${getRuntimeOrigin()}/resume/`,
 		);
 
+		await navigate("#/category/tech");
+		await waitFor(() => {
+			expect(document.querySelector(".blog-page")).not.toBeNull();
+		});
+		await waitFor(() => {
+			expect(document.title).toBe("Tech");
+		});
+		expect(canonicalLinks()).toHaveLength(1);
+		expect(canonicalLinks()[0]?.getAttribute("href")).toBe(
+			`${getRuntimeOrigin()}/`,
+		);
+		expect(canonicalLinks()[0]?.getAttribute("href")).not.toContain("#");
+
+		await navigate("#/category/tech/tag/svelte");
+		await waitFor(() => {
+			expect(document.title).toBe("Tech #svelte");
+		});
+		expect(canonicalLinks()).toHaveLength(1);
+		expect(canonicalLinks()[0]?.getAttribute("href")).toBe(
+			`${getRuntimeOrigin()}/`,
+		);
+		expect(canonicalLinks()[0]?.getAttribute("href")).not.toContain("#");
+
 		await navigate("#/no-such-route");
 		await waitFor(() => {
 			expect(screen.getByText("Page not found")).toBeInTheDocument();

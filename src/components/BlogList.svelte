@@ -1,10 +1,6 @@
 <script lang="ts">
 import { push } from "svelte-spa-router";
-import {
-	blogDefaultSeo,
-	buildBlogListSeoUrl,
-	getRuntimeOrigin,
-} from "../lib/config";
+import { blogDefaultSeo } from "../lib/config";
 import { detectLocaleFromRuntime } from "../lib/locale";
 import type { Post } from "../lib/postLoader";
 import { filterPostsByRoute, toPostArray } from "../lib/postQuery";
@@ -21,7 +17,6 @@ let filteredPosts: Post[] = [];
 let resolvedLocale: "ko" | "en" = "en";
 let seoTitle = blogDefaultSeo.title;
 let seoDescription = blogDefaultSeo.description.en;
-let seoUrl = `${getRuntimeOrigin()}/`;
 let routeMotionKey = "all";
 
 function selectPost(post: Post) {
@@ -51,16 +46,10 @@ $: {
 			? `${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""} 글 목록`
 			: `Posts in ${categoryLabel}${tagLabel ? ` ${tagLabel}` : ""}.`
 		: blogDefaultSeo.description[isKo ? "ko" : "en"];
-	seoUrl = buildBlogListSeoUrl({
-		isBrowser: browser,
-		currentHref: browser ? window.location.href : null,
-		resolvedLocale,
-	});
 	if (browser) {
 		applyBlogListSeo({
 			title: seoTitle,
 			description: seoDescription,
-			canonical: seoUrl,
 			resolvedLocale,
 		});
 	}

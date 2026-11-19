@@ -30,3 +30,9 @@ Feature: SPA head identity
     Then every observed document must have exactly one canonical link
     And the title and canonical value must update for each route
     And no stale duplicate canonical or structured data may remain
+
+  Scenario: Category and tag views canonicalize to the locale root
+    Given the SPA is on a hash route for a category or tag view
+    When the view applies its head identity
+    Then the canonical must be the locale root without a fragment
+    And the title and description must keep the category or tag labels

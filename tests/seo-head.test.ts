@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import { beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import {
 	getBlogBuildMeta,
 	getNotFoundCopy,
@@ -7,6 +7,7 @@ import {
 } from "../src/lib/config";
 import type { Post } from "../src/lib/postLoader";
 import {
+	applyBlogListSeo,
 	applyHomeSeo,
 	applyNotFoundSeo,
 	applyPostSeo,
@@ -68,6 +69,10 @@ function expectSingleCanonical(expectedHref: string) {
 describe("SPA head identity controller", () => {
 	beforeEach(() => {
 		document.head.innerHTML = shellHead;
+	});
+
+	afterEach(() => {
+		window.history.replaceState({}, "", "/");
 	});
 
 	test("포스트 라우트는 정확히 1개의 canonical과 포스트 제목으로 수렴해야 함", () => {
@@ -141,6 +146,42 @@ describe("SPA head identity controller", () => {
 		expect(document.querySelectorAll('meta[name="keywords"]')).toHaveLength(0);
 	});
 
+	test("카테고리·태그 뷰 canonical은 fragment 없는 로케일 루트여야 함", () => {
+		const origin = getRuntimeOrigin();
+		window.location.hash = "#/category/Project/tag/CVFactory";
+
+		const cases = [
+			{ resolvedLocale: "en" as const, expected: `${origin}/` },
+			{ resolvedLocale: "ko" as const, expected: `${origin}/ko/` },
+		];
+
+		for (const { resolvedLocale, expected } of cases) {
+			applyBlogListSeo({
+				title: "Project #CVFactory",
+				description: "Posts in Project #CVFactory.",
+				resolvedLocale,
+			});
+
+			expectSingleCanonical(expected);
+			expect(canonicalHrefs()[0]).not.toContain("#");
+		}
+	});
+
+	test("카테고리 없는 블로그 리스트 canonical도 로케일 루트여야 함", () => {
+		const origin = getRuntimeOrigin();
+		const meta = getBlogBuildMeta("ko");
+		window.location.hash = "#/";
+
+		applyBlogListSeo({
+			title: meta.ogTitle,
+			description: meta.metaDescription,
+			resolvedLocale: "ko",
+		});
+
+		expectSingleCanonical(`${origin}/ko/`);
+		expect(canonicalHrefs()[0]).not.toContain("#");
+	});
+
 	test("unknown 라우트는 NotFound 제목과 locale 루트 canonical로 복귀해야 함", () => {
 		const origin = getRuntimeOrigin();
 		applyPostSeo({
@@ -159,8 +200,9 @@ describe("SPA head identity controller", () => {
 		expect(structuredDataScripts()).toHaveLength(0);
 	});
 
-	test("home → post → home → resume → unknown 전환에서 canonical은 항상 1개여야 함", () => {
+	test("home → post → category → tag → resume → unknown 전환에서 canonical은 항상 1개여야 함", () => {
 		const origin = getRuntimeOrigin();
+		window.location.hash = "#/category/Project";
 		const steps: { apply: () => void; title: string; canonical: string }[] = [
 			{
 				apply: () => applyHomeSeo("ko"),
@@ -199,6 +241,26 @@ describe("SPA head identity controller", () => {
 				canonical: `${origin}/ko/resume/`,
 			},
 			{
+				apply: () =>
+					applyBlogListSeo({
+						title: "Project",
+						description: "Posts in Project.",
+						resolvedLocale: "ko",
+					}),
+				title: "Project",
+				canonical: `${origin}/ko/`,
+			},
+			{
+				apply: () =>
+					applyBlogListSeo({
+						title: "Project #CVFactory",
+						description: "Posts in Project #CVFactory.",
+						resolvedLocale: "ko",
+					}),
+				title: "Project #CVFactory",
+				canonical: `${origin}/ko/`,
+			},
+			{
 				apply: () => applyNotFoundSeo("ko"),
 				title: getNotFoundCopy({ scope: "page", resolvedLocale: "ko" }).title,
 				canonical: `${origin}/ko/`,
@@ -209,6 +271,7 @@ describe("SPA head identity controller", () => {
 			step.apply();
 			expect(document.title).toBe(step.title);
 			expectSingleCanonical(step.canonical);
+			expect(canonicalHrefs()[0]).not.toContain("#");
 		}
 	});
 

@@ -188,21 +188,22 @@ export function applyNotFoundSeo(resolvedLocale: Locale) {
 export function applyBlogListSeo(args: {
 	title: string;
 	description: string;
-	canonical: string;
 	resolvedLocale: Locale;
 }) {
+	const origin = getRuntimeOrigin();
+	const canonical = `${origin}${localeBase(args.resolvedLocale)}`;
 	applySeo({
 		title: args.title,
 		description: args.description,
-		canonical: args.canonical,
+		canonical,
 		ogTitle: args.title,
 		ogDescription: args.description,
 		ogType: "website",
-		ogUrl: args.canonical,
+		ogUrl: canonical,
 		ogImage: defaultOgImage,
 		ogImageAlt: args.title,
 		ogSiteName: "Axiom",
-		alternates: homeAlternates(getRuntimeOrigin()),
+		alternates: homeAlternates(origin),
 	});
 }
 

@@ -3,7 +3,6 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 import {
 	blogDefaultSeo,
-	buildBlogListSeoUrl,
 	buildNotFoundSeoUrl,
 	buildPostDetailSeo,
 	getBlogBuildMeta,
@@ -76,36 +75,6 @@ describe("buildPostDetailSeo", () => {
 		expect(seo.seoDescription).toBe("");
 		expect(seo.canonicalUrl).toContain("/");
 		expect(seo.structuredData).toBe("");
-	});
-});
-
-describe("buildBlogListSeoUrl", () => {
-	test("브라우저 환경이면 현재 href를 우선 사용해야 함", () => {
-		const url = buildBlogListSeoUrl({
-			isBrowser: true,
-			currentHref: "https://example.com/category/project",
-			resolvedLocale: "en",
-		});
-		expect(url).toBe("https://example.com/category/project");
-	});
-
-	test("브라우저 외 환경의 영어 canonical은 루트(/)를 사용해야 함", () => {
-		const url = buildBlogListSeoUrl({
-			isBrowser: false,
-			currentHref: null,
-			resolvedLocale: "en",
-		});
-		expect(url.endsWith("/")).toBe(true);
-		expect(url).not.toContain("/en/");
-	});
-
-	test("브라우저 외 환경의 한국어 canonical은 /ko/를 사용해야 함", () => {
-		const url = buildBlogListSeoUrl({
-			isBrowser: false,
-			currentHref: null,
-			resolvedLocale: "ko",
-		});
-		expect(url).toContain("/ko/");
 	});
 });
 
