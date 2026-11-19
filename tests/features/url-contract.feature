@@ -54,3 +54,9 @@ Feature: Public URL contract is the append-only alias authority
     Then the sitemap must contain only canonical URLs
     And the /kr/ document must canonicalize to /ko/ with a zero-second refresh
     And every alias document must declare robots noindex,follow
+
+  Scenario: One guarantee register bounds the public contract claims
+    Given the public contract guarantee register
+    When a reader asks what the published URL contract guarantees
+    Then guaranteed, not guaranteed, and unknown decisions must be separated
+    And CI must not be claimed as the production acceptance witness
