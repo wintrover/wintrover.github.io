@@ -36,8 +36,16 @@ Feature: Reproducible production acceptance
     When the tool compares the production sitemap loc multiset with the expectation
     Then the expectation must come from url-contract.json when present, then dist/sitemap.xml, then source post entries
     And each canonical URL must be compared root-relative with no missing, unexpected, or duplicate entries
-    And every alias URL from the contract or the legacy registry must be absent
+    And every alias URL from the contract must be absent
     And the 62 loc total must not decide pass or fail
+
+  Scenario: Registry kinds separate canonical and alias expectations
+    Given url-contract.json declares kind canonical and kind alias entries
+    When the tool derives the sitemap expectation
+    Then only canonical entries must enter the expectation
+    And alias entries must be normalized from url and target without entering the sitemap expectation
+    And an unknown kind must fail the run
+    And the tool must not require a legacy alias export from build-github.ts
 
   Scenario: Legacy /kr and unknown paths are judged stage by stage
     Given the production alias and 404 documents are deployed

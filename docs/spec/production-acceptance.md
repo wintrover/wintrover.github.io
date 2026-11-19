@@ -30,10 +30,10 @@
 ## sitemap 집합 계약
 
 - 기대 집합의 우선순위는 `url-contract.json` → `dist/sitemap.xml` → 소스 파생(`collectPostEntries`)이다.
-- `url-contract.json`은 저장소 루트에 있을 때만 사용한다. 허용 형식은 canonical URL 배열 또는 `{ "canonical": [...], "aliases": [...] }`이며, `urls`는 `canonical`의 별칭이다. 각 canonical 항목은 문자열 또는 `{ "url" | "loc" | "canonical": "..." }`다.
+- `url-contract.json`은 저장소 루트에 있을 때만 사용한다. 허용 형식은 canonical URL 배열, `{ "canonical": [...], "aliases": [...] }`, 또는 `{ "urls": [...] }` registry다. registry 항목은 `kind`(`canonical` | `alias`)로 분리하며, 알 수 없는 kind는 `FAIL setup`이다. 각 canonical 항목은 문자열 또는 `{ "url" | "loc" | "canonical": "..." }`이고, alias 항목은 `url`+`target`을 쓴다.
 - `url-contract.json`의 canonical URL은 host를 제거한 root-relative 경로로 정규화해 비교한다. production `/sitemap.xml`의 `<loc>`도 root-relative로 정규화한다.
 - 판정은 **다중집합 완전 동등성**이다. 누락·추가·중복이 각각 0개여야 한다. 62는 소스 파생 집합의 현재 총계를 출력할 뿐 판정 기준이 아니다.
-- alias 항목은 sitemap에 없어야 한다. alias의 `from`은 경로/URL 또는 포스트 slug(`/post/<slug>/`로 해석)이며, 계약이 없으면 `LEGACY_POST_ALIASES`의 `from`을 사용한다. `/kr` 항목도 0개다.
+- alias 항목은 sitemap에 없어야 한다. alias의 `from`은 경로/URL 또는 포스트 slug(`/post/<slug>/`로 해석)이며 `to`/`target`은 root-relative 경로로 정규화한다. alias의 단일 권위는 `url-contract.json`이며 빌드 스크립트 export에 의존하지 않는다. `/kr` 항목도 0개다.
 - `url-contract.json`이 존재하는데 JSON이 깨졌거나 canonical 배열이 없으면 `FAIL setup`으로 종료한다(fail-closed).
 
 ## 404 3단계 계약
