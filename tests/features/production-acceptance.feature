@@ -23,13 +23,13 @@ Feature: Reproducible production acceptance
     And no .markdown-content image may have naturalWidth 0
     And asset correctness must be observed from browser requests rather than deriveKoPublicAssets
 
-  Scenario: SPA head SEO is an opt-in flag
+  Scenario: SPA head SEO is the default with a skip opt-out
     Given the production SPA emits a single canonical and a route-specific document title
     When the tool runs with default flags
-    Then the spa-seo check must be skipped and the run must still pass
-    And when the tool runs with --include-spa-seo
-    Then each post page must have exactly one canonical equal to its post URL
-    And document.title must equal the post title
+    Then every post head check and every category/tag head check must run
+    And --include-spa-seo must remain accepted as a no-op
+    And when the tool runs with --skip-spa-seo
+    Then the spa-seo checks must be reported as skipped without failing the run
 
   Scenario: Sitemap expectation follows url-contract.json when present
     Given the repository root may contain url-contract.json with canonical URLs and aliases
@@ -59,7 +59,24 @@ Feature: Reproducible production acceptance
 
   Scenario: SPA head SEO covers category and tag routes
     Given a category and a tag exist in source frontmatter
-    When the tool runs with --include-spa-seo
+    When the tool runs with default flags
     Then the category and tag hash routes must render a title containing the category label
     And each route must have exactly one canonical equal to its locale root without a hash
     And the hashless category path must not be accepted as a canonical
+
+  Scenario: English browser parity covers posts, home, resume, and the SPA 404 shell
+    Given the production English tree is deployed at the origin root
+    When the tool visits every EN post landing in a real browser
+    Then the final hash must be #/post/<slug> with html lang=en and document.title equal to the EN post title
+    And each EN post must have exactly one canonical equal to its hashless post URL
+    And no same-origin request may fail and no .markdown-content image may have naturalWidth 0
+    And / must render lang=en and /resume/ must render lang=en with the exact Axiom card href and popup URL prefix
+    And an EN 404 shell path must land on a same-origin hash URL whose final document responds 200
+    And its document title must be Page not found with exactly one root canonical, indexing robots, and zero JSON-LD
+
+  Scenario: Locale-boundary negatives reject alias leakage into the Korean tree
+    Given url-contract.json declares alias URLs under /post/<slug>/
+    When the tool derives locale-boundary negatives from the registry and collectPostEntries
+    Then each alias slug that is not a KO post slug must answer 404 at /ko/post/<slug>/
+    And /en/ and /en/resume/ must answer 404
+    And the tool must not invent URL families outside the registry

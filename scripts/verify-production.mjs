@@ -22,19 +22,27 @@ export const BROWSER_TIMEOUT_MS = 45_000;
 export const EXPECTED_SITEMAP_LOC_COUNT = 62;
 export const URL_CONTRACT_FILENAME = "url-contract.json";
 export const UNKNOWN_PATH = "/definitely-not-a-real-path-xyz/";
+/**
+ * The shared `404.html` shell selects English for an explicit `/en` prefix, so
+ * this path deterministically exercises the English shell branch instead of
+ * depending on the browser's `navigator.language`.
+ */
+export const EN_UNKNOWN_PATH = "/en/definitely-not-a-real-path-xyz/";
 export const AXIOM_REPOSITORY_URL = "https://github.com/Archright/Axiom";
 export const NOT_FOUND_TITLES = {
 	en: "Page not found",
 	ko: "페이지를 찾을 수 없습니다",
 };
 
-export const FORBIDDEN_KO_PATHS = [
+export const FORBIDDEN_LOCALE_PATHS = [
 	"/ko/evidence/",
 	"/ko/404.html",
 	"/ko/.nojekyll",
 	"/ko/auto-merge-verification.txt",
 	"/ko/sitemap.xml",
 	"/ko/robots.txt",
+	"/en/",
+	"/en/resume/",
 ];
 
 export const REQUIRED_ROOT_PATHS = [
@@ -779,20 +787,62 @@ export function findLegacyAliasLocs(locs, aliases, origin = PRODUCTION_ORIGIN) {
 }
 
 /**
+ * Alias URLs that look like post paths must not leak into the Korean tree:
+ * `/ko/post/<slug>/` has to answer 404. Aliases come from `url-contract.json`
+ * only, and a slug that is itself a canonical KO post is skipped because its
+ * 200 response is legitimate.
+ *
+ * @param {{ from: string, to: string | null }[]} aliases
+ * @param {string[]} koSlugs
+ * @returns {string[]}
+ */
+export function deriveKoLocaleBoundaryPaths(aliases, koSlugs) {
+	const koSlugSet = new Set(koSlugs);
+	const paths = new Set();
+	for (const alias of aliases) {
+		const match = /^\/post\/([^/]+)\/$/.exec(alias.from);
+		if (!match) continue;
+		const slug = match[1];
+		if (!slug || koSlugSet.has(slug)) continue;
+		paths.add(`/ko/post/${slug}/`);
+	}
+	return [...paths].sort();
+}
+
+/**
+ * SPA head SEO is the default. `--include-spa-seo` remains accepted as a
+ * backward-compatible no-op so existing commands keep exit code 0.
+ *
  * @param {string[]} argv
- * @returns {{ includeSpaSeo: boolean, unknown: string[] }}
+ * @returns {{ skipSpaSeo: boolean, includeSpaSeo: boolean, unknown: string[] }}
  */
 export function parseCliArgs(argv) {
 	const unknown = [];
+	let skipSpaSeo = false;
 	let includeSpaSeo = false;
 	for (const arg of argv) {
-		if (arg === "--include-spa-seo") {
+		if (arg === "--skip-spa-seo") {
+			skipSpaSeo = true;
+		} else if (arg === "--include-spa-seo") {
 			includeSpaSeo = true;
 		} else {
 			unknown.push(arg);
 		}
 	}
-	return { includeSpaSeo, unknown };
+	return { skipSpaSeo, includeSpaSeo, unknown };
+}
+
+/**
+ * @param {{ skipSpaSeo: boolean, includeSpaSeo: boolean }} flags
+ * @returns {"enabled" | "skipped"}
+ */
+export function resolveSpaSeoMode({ skipSpaSeo, includeSpaSeo }) {
+	if (skipSpaSeo && includeSpaSeo) {
+		throw new Error(
+			"--skip-spa-seo and --include-spa-seo are mutually exclusive",
+		);
+	}
+	return skipSpaSeo ? "skipped" : "enabled";
 }
 
 /**
@@ -1140,15 +1190,16 @@ async function waitForPageValue(
 
 /**
  * @param {import("puppeteer").Browser} browser
+ * @param {"en" | "ko"} locale
  * @param {string} slug
  */
-async function visitPost(browser, slug) {
+async function visitPost(browser, locale, slug) {
 	const page = await browser.newPage();
 	const watch = watchPage(page);
 	let stage = "goto";
 	try {
 		const response = await page.goto(
-			`${PRODUCTION_ORIGIN}${postLandingPath("ko", slug)}`,
+			`${PRODUCTION_ORIGIN}${postLandingPath(locale, slug)}`,
 			{
 				waitUntil: "networkidle0",
 				timeout: BROWSER_TIMEOUT_MS,
@@ -1190,7 +1241,7 @@ async function visitPost(browser, slug) {
 			return {
 				lang: document.documentElement.lang,
 				hash: window.location.hash,
-				title: titleElement?.textContent?.trim() ?? "",
+				h1: titleElement?.textContent?.trim() ?? "",
 				imageCount: images.length,
 				brokenImages: images.filter((image) => image.naturalWidth === 0).length,
 				canonicals: [...document.querySelectorAll('link[rel="canonical"]')].map(
@@ -1199,12 +1250,16 @@ async function visitPost(browser, slug) {
 				documentTitle: document.title,
 			};
 		});
-		if (info.lang !== "ko") problems.push(`lang=${info.lang}`);
+		if (info.lang !== locale) {
+			problems.push(`lang=${info.lang} expected=${locale}`);
+		}
 		if (info.hash !== postHashFragment(slug)) {
 			problems.push(`hash=${JSON.stringify(info.hash)}`);
 		}
-		if (!/[가-힣]/.test(info.title)) {
-			problems.push(`h1 not Korean: ${JSON.stringify(info.title)}`);
+		if (!info.h1) {
+			problems.push("post h1 missing");
+		} else if (locale === "ko" && !/[가-힣]/.test(info.h1)) {
+			problems.push(`h1 not Korean: ${JSON.stringify(info.h1)}`);
 		}
 		if (info.brokenImages > 0) {
 			problems.push(`broken images=${info.brokenImages}/${info.imageCount}`);
@@ -1236,15 +1291,19 @@ async function visitPost(browser, slug) {
 
 /**
  * @param {import("puppeteer").Browser} browser
+ * @param {"en" | "ko"} locale
  */
-async function checkHome(browser) {
+async function checkHome(browser, locale) {
 	const page = await browser.newPage();
 	const watch = watchPage(page);
 	try {
-		const response = await page.goto(`${PRODUCTION_ORIGIN}/ko/`, {
-			waitUntil: "networkidle0",
-			timeout: BROWSER_TIMEOUT_MS,
-		});
+		const response = await page.goto(
+			`${PRODUCTION_ORIGIN}${localePrefix(locale)}/`,
+			{
+				waitUntil: "networkidle0",
+				timeout: BROWSER_TIMEOUT_MS,
+			},
+		);
 		const problems = [];
 		if (response?.status() !== 200) {
 			problems.push(`status=${response?.status() ?? "null"}`);
@@ -1259,11 +1318,13 @@ async function checkHome(browser) {
 			lang: document.documentElement.lang,
 			hangul: /[가-힣]/.test(document.body.textContent ?? ""),
 		}));
-		if (info.lang !== "ko") problems.push(`lang=${info.lang}`);
-		if (!info.hangul) problems.push("no Hangul text");
+		if (info.lang !== locale) {
+			problems.push(`lang=${info.lang} expected=${locale}`);
+		}
+		if (locale === "ko" && !info.hangul) problems.push("no Hangul text");
 		problems.push(...requestProblems(watch));
 		if (problems.length > 0) throw new Error(problems.join("; "));
-		return "lang=ko";
+		return `lang=${locale}`;
 	} finally {
 		await page.close().catch(() => {});
 	}
@@ -1271,15 +1332,19 @@ async function checkHome(browser) {
 
 /**
  * @param {import("puppeteer").Browser} browser
+ * @param {"en" | "ko"} locale
  */
-async function checkResume(browser) {
+async function checkResume(browser, locale) {
 	const page = await browser.newPage();
 	const watch = watchPage(page);
 	try {
-		const response = await page.goto(`${PRODUCTION_ORIGIN}/ko/resume/`, {
-			waitUntil: "networkidle0",
-			timeout: BROWSER_TIMEOUT_MS,
-		});
+		const response = await page.goto(
+			`${PRODUCTION_ORIGIN}${localePrefix(locale)}/resume/`,
+			{
+				waitUntil: "networkidle0",
+				timeout: BROWSER_TIMEOUT_MS,
+			},
+		);
 		const problems = [];
 		if (response?.status() !== 200) {
 			problems.push(`status=${response?.status() ?? "null"}`);
@@ -1291,10 +1356,10 @@ async function checkResume(browser) {
 			Boolean,
 		);
 		const lang = await page.evaluate(() => document.documentElement.lang);
-		if (lang !== "ko") problems.push(`lang=${lang}`);
+		if (lang !== locale) problems.push(`lang=${lang} expected=${locale}`);
 		problems.push(...requestProblems(watch));
 		if (problems.length > 0) throw new Error(problems.join("; "));
-		return "lang=ko";
+		return `lang=${locale}`;
 	} finally {
 		await page.close().catch(() => {});
 	}
@@ -1302,14 +1367,18 @@ async function checkResume(browser) {
 
 /**
  * @param {import("puppeteer").Browser} browser
+ * @param {"en" | "ko"} locale
  */
-async function checkAxiom(browser) {
+async function checkAxiom(browser, locale) {
 	const page = await browser.newPage();
 	try {
-		const response = await page.goto(`${PRODUCTION_ORIGIN}/ko/resume/`, {
-			waitUntil: "networkidle0",
-			timeout: BROWSER_TIMEOUT_MS,
-		});
+		const response = await page.goto(
+			`${PRODUCTION_ORIGIN}${localePrefix(locale)}/resume/`,
+			{
+				waitUntil: "networkidle0",
+				timeout: BROWSER_TIMEOUT_MS,
+			},
+		);
 		ensure(
 			response?.status() === 200,
 			`status=${response?.status() ?? "null"}`,
@@ -1395,14 +1464,18 @@ async function checkKrBrowser(browser) {
 /**
  * Stage 2 of the 404 contract: the browser must end on a same-origin hash URL
  * whose document response is 200. The initial unknown-path response (stage 1)
- * is judged separately over HTTP, and the SPA head (stage 3) is opt-in.
+ * is judged separately over HTTP; the SPA head is judged in stage 3.
+ *
+ * The English shell is reached through an explicit `/en` prefix so the check
+ * does not depend on the browser's `navigator.language`.
  *
  * @param {import("puppeteer").Browser} browser
- * @returns {Promise<{ problems: string[], info: { href: string, pathname: string, hash: string, rendered: boolean, documentTitle: string, canonicals: string[], robots: string[], jsonLdCount: number } | null }>}
+ * @param {{ path: string, expectedLocale: "en" | "ko" }} options
+ * @returns {Promise<{ problems: string[], info: { href: string, pathname: string, hash: string, lang: string, rendered: boolean, documentTitle: string, canonicals: string[], robots: string[], jsonLdCount: number } | null }>}
  */
-async function visitUnknown(browser) {
+async function visitUnknown(browser, { path: unknownPath, expectedLocale }) {
 	const page = await browser.newPage();
-	const unknownUrl = `${PRODUCTION_ORIGIN}${UNKNOWN_PATH}`;
+	const unknownUrl = `${PRODUCTION_ORIGIN}${unknownPath}`;
 	const navigations = [];
 	page.on("response", (response) => {
 		if (response.request().isNavigationRequest()) {
@@ -1432,6 +1505,7 @@ async function visitUnknown(browser) {
 			href: window.location.href,
 			pathname: window.location.pathname,
 			hash: window.location.hash,
+			lang: document.documentElement.lang,
 			rendered: Boolean(document.querySelector('[data-testid="not-found"]')),
 			documentTitle: document.title,
 			canonicals: [...document.querySelectorAll('link[rel="canonical"]')].map(
@@ -1468,6 +1542,15 @@ async function visitUnknown(browser) {
 		if (!isSameOriginUrl(info.href)) {
 			problems.push(`final url not same-origin: ${info.href}`);
 		}
+		if (info.lang !== expectedLocale) {
+			problems.push(`lang=${info.lang} expected=${expectedLocale}`);
+		}
+		const expectedPathname = `${localePrefix(expectedLocale)}/`;
+		if (info.pathname !== expectedPathname) {
+			problems.push(
+				`pathname=${JSON.stringify(info.pathname)} expected=${JSON.stringify(expectedPathname)}`,
+			);
+		}
 		if (!info.hash.startsWith("#/")) {
 			problems.push(
 				`final hash=${JSON.stringify(info.hash)} expected same-origin hash route`,
@@ -1498,10 +1581,11 @@ async function visitUnknown(browser) {
 
 /**
  * @param {import("puppeteer").Browser} browser
+ * @param {{ path: string, expectedLocale: "en" | "ko" }} options
  * @param {(info: { pathname: string, canonicals: string[], documentTitle: string, robots: string[], jsonLdCount: number }) => void} onState
  */
-async function checkUnknownBrowser(browser, onState) {
-	const result = await visitUnknown(browser);
+async function checkUnknownBrowser(browser, options, onState) {
+	const result = await visitUnknown(browser, options);
 	if (result.info) onState(result.info);
 	if (result.problems.length > 0) throw new Error(result.problems.join("; "));
 	return `hash=${result.info?.hash ?? ""} document=200`;
@@ -1584,15 +1668,16 @@ async function checkCategoryRoute(browser, locale, sample, includeTag) {
 
 /**
  * @param {ReturnType<typeof createReporter>} reporter
- * @param {{ slug: string, title: string }[]} koEntries
- * @param {boolean} includeSpaSeo
- * @param {{ ko: ReturnType<typeof pickCategoryTagSample>, en: ReturnType<typeof pickCategoryTagSample> }} categorySamples
+ * @param {{
+ *   koEntries: { slug: string, title: string }[],
+ *   enEntries: { slug: string, title: string }[],
+ *   spaSeoEnabled: boolean,
+ *   categorySamples: { ko: ReturnType<typeof pickCategoryTagSample>, en: ReturnType<typeof pickCategoryTagSample> },
+ * }} input
  */
 async function runBrowserChecks(
 	reporter,
-	koEntries,
-	includeSpaSeo,
-	categorySamples,
+	{ koEntries, enEntries, spaSeoEnabled, categorySamples },
 ) {
 	let browser = null;
 	try {
@@ -1613,7 +1698,7 @@ async function runBrowserChecks(
 		for (const entry of koEntries) {
 			let seoState = null;
 			await reporter.check(`browser:post:${entry.slug}`, async () => {
-				const result = await visitPost(browser, entry.slug);
+				const result = await visitPost(browser, "ko", entry.slug);
 				seoState = {
 					canonicals: result.info.canonicals,
 					documentTitle: result.info.documentTitle,
@@ -1624,7 +1709,7 @@ async function runBrowserChecks(
 				}
 				return `images=${result.info.imageCount}`;
 			});
-			if (!includeSpaSeo) continue;
+			if (!spaSeoEnabled) continue;
 			await reporter.check(`spa-seo:${entry.slug}`, async () => {
 				ensure(seoState !== null, "post visit failed; SEO state unavailable");
 				const problems = evaluatePostSeo({
@@ -1637,37 +1722,84 @@ async function runBrowserChecks(
 				return "canonical=1 title=post";
 			});
 		}
-		await reporter.check("browser:home", () => checkHome(browser));
-		await reporter.check("browser:resume", () => checkResume(browser));
-		await reporter.check("browser:axiom", () => checkAxiom(browser));
+		for (const entry of enEntries) {
+			await reporter.check(`browser:en-post:${entry.slug}`, async () => {
+				const result = await visitPost(browser, "en", entry.slug);
+				const problems = [...result.problems];
+				if (spaSeoEnabled) {
+					problems.push(
+						...evaluatePostSeo({
+							canonicals: result.info.canonicals,
+							documentTitle: result.info.documentTitle,
+							expectedCanonical: postCanonicalUrl("en", entry.slug),
+							expectedTitle: entry.title,
+						}),
+					);
+				}
+				if (problems.length > 0) throw new Error(problems.join("; "));
+				return spaSeoEnabled
+					? `images=${result.info.imageCount} canonical=1 title=en-post`
+					: `images=${result.info.imageCount}`;
+			});
+		}
+		await reporter.check("browser:home", () => checkHome(browser, "ko"));
+		await reporter.check("browser:resume", () => checkResume(browser, "ko"));
+		await reporter.check("browser:axiom", () => checkAxiom(browser, "ko"));
 		await reporter.check("browser:kr", () => checkKrBrowser(browser));
+		await reporter.check("browser:en-home", () => checkHome(browser, "en"));
+		await reporter.check("browser:en-resume", () => checkResume(browser, "en"));
+		await reporter.check("browser:en-axiom", () => checkAxiom(browser, "en"));
 		let unknownState = null;
 		await reporter.check("browser:unknown", () =>
-			checkUnknownBrowser(browser, (info) => {
-				unknownState = info;
-			}),
+			checkUnknownBrowser(
+				browser,
+				{ path: UNKNOWN_PATH, expectedLocale: "ko" },
+				(info) => {
+					unknownState = info;
+				},
+			),
 		);
 		await reporter.check("browser:unknown:dom", async () => {
 			ensure(
 				unknownState !== null,
 				"unknown page visit failed; SPA head state unavailable",
 			);
-			const locale =
-				unknownState.pathname === "/ko" ||
-				unknownState.pathname.startsWith("/ko/")
-					? "ko"
-					: "en";
 			const problems = evaluateSpaNotFoundDocument({
-				locale,
+				locale: "ko",
 				canonicals: unknownState.canonicals,
 				documentTitle: unknownState.documentTitle,
 				robots: unknownState.robots,
 				jsonLdCount: unknownState.jsonLdCount,
 			});
 			if (problems.length > 0) throw new Error(problems.join("; "));
-			return `canonical=${locale} root robots=index json-ld=0`;
+			return "canonical=ko root robots=index json-ld=0";
 		});
-		if (!includeSpaSeo) return;
+		let enUnknownState = null;
+		await reporter.check("browser:en-unknown", () =>
+			checkUnknownBrowser(
+				browser,
+				{ path: EN_UNKNOWN_PATH, expectedLocale: "en" },
+				(info) => {
+					enUnknownState = info;
+				},
+			),
+		);
+		await reporter.check("browser:en-unknown:dom", async () => {
+			ensure(
+				enUnknownState !== null,
+				"EN unknown page visit failed; SPA head state unavailable",
+			);
+			const problems = evaluateSpaNotFoundDocument({
+				locale: "en",
+				canonicals: enUnknownState.canonicals,
+				documentTitle: enUnknownState.documentTitle,
+				robots: enUnknownState.robots,
+				jsonLdCount: enUnknownState.jsonLdCount,
+			});
+			if (problems.length > 0) throw new Error(problems.join("; "));
+			return "canonical=en root robots=index json-ld=0";
+		});
+		if (!spaSeoEnabled) return;
 		for (const locale of /** @type {const} */ (["ko", "en"])) {
 			const sample = categorySamples[locale];
 			await reporter.check(`spa-seo:category:${locale}`, async () => {
@@ -1824,15 +1956,28 @@ function sortEntries(entries) {
 
 export async function main(argv = process.argv.slice(2)) {
 	const reporter = createReporter();
-	const { includeSpaSeo, unknown } = parseCliArgs(argv);
+	const parsed = parseCliArgs(argv);
+	const { unknown } = parsed;
 	if (unknown.length > 0) {
 		process.stderr.write(`Unknown option(s): ${unknown.join(" ")}\n`);
 		process.stderr.write(
-			"Usage: node scripts/verify-production.mjs [--include-spa-seo]\n",
+			"Usage: node scripts/verify-production.mjs [--skip-spa-seo]\n",
 		);
 		process.exitCode = 2;
 		return;
 	}
+	let spaSeoMode;
+	try {
+		spaSeoMode = resolveSpaSeoMode(parsed);
+	} catch (error) {
+		process.stderr.write(`${describeError(error)}\n`);
+		process.stderr.write(
+			"Usage: node scripts/verify-production.mjs [--skip-spa-seo]\n",
+		);
+		process.exitCode = 2;
+		return;
+	}
+	const spaSeoEnabled = spaSeoMode === "enabled";
 
 	const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 	let contract;
@@ -1882,8 +2027,18 @@ export async function main(argv = process.argv.slice(2)) {
 			urlContract,
 		}),
 	);
-	for (const pathname of FORBIDDEN_KO_PATHS) {
+	for (const pathname of FORBIDDEN_LOCALE_PATHS) {
 		await reporter.check(`http:forbidden:${pathname}`, () =>
+			checkStatus(pathname, 404),
+		);
+	}
+	const koSlugs = koEntries.map((entry) => entry.slug);
+	const localeBoundaryAliases = urlContract ? urlContract.aliases : [];
+	for (const pathname of deriveKoLocaleBoundaryPaths(
+		localeBoundaryAliases,
+		koSlugs,
+	)) {
+		await reporter.check(`http:locale-boundary:${pathname}`, () =>
 			checkStatus(pathname, 404),
 		);
 	}
@@ -1894,17 +2049,27 @@ export async function main(argv = process.argv.slice(2)) {
 	}
 	await reporter.check("http:unknown", () => checkUnknownHttp());
 
-	if (includeSpaSeo) {
+	if (spaSeoEnabled) {
 		process.stdout.write(
 			"MODE spa-seo enabled: post, category, and tag head checks are required\n",
 		);
+		if (parsed.includeSpaSeo) {
+			process.stdout.write(
+				"NOTE --include-spa-seo is accepted as a no-op; SPA head SEO is the default\n",
+			);
+		}
 	} else {
 		reporter.skip(
 			"spa-seo",
-			"opt-in; pass --include-spa-seo to require post and category/tag head checks",
+			"disabled by --skip-spa-seo; post and category/tag head checks are not required",
 		);
 	}
-	await runBrowserChecks(reporter, koEntries, includeSpaSeo, categorySamples);
+	await runBrowserChecks(reporter, {
+		koEntries,
+		enEntries,
+		spaSeoEnabled,
+		categorySamples,
+	});
 
 	const summary = reporter.summary();
 	process.stdout.write(
