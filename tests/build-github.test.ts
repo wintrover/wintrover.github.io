@@ -4,7 +4,10 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
 	buildLegacyLocaleAlias,
+	buildLegacyPostAliases,
+	LEGACY_POST_ALIASES,
 	renderLegacyLocaleAliasHtml,
+	renderLegacyPostAliasHtml,
 	validatePostCategoryTagConsistency,
 } from "../scripts/build-github";
 
@@ -79,5 +82,49 @@ describe("build-github legacy locale alias", () => {
 		expect(html.startsWith("<!doctype html>")).toBe(true);
 		expect(html).toContain('rel="canonical"');
 		expect(html).toContain('http-equiv="refresh"');
+	});
+});
+
+describe("build-github legacy post alias", () => {
+	const alias = LEGACY_POST_ALIASES[0];
+	const post = {
+		title:
+			"The Agent Wrote the Theorem: A Model-Level Disproof, a Pipeline Gap, and a Refusal to Cheat",
+		description: "This post moved to a new URL.",
+	};
+	const targetPath =
+		"https://wintrover.github.io/post/the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/";
+
+	test("LEGACY_POST_ALIASES는 옛 slug를 현재 slug로 매핑한다", () => {
+		expect(alias).toEqual({
+			from: "the-agent-wrote-the-theorem-a-formal-disproof-a-pipeline-gap-and-a-refusal-to-cheat",
+			to: "the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat",
+		});
+	});
+
+	test("renderLegacyPostAliasHtml는 영어 canonical과 noindex meta refresh를 가진다", () => {
+		const html = renderLegacyPostAliasHtml(alias, post);
+		expect(html.startsWith("<!doctype html>")).toBe(true);
+		expect(html).toContain('<html lang="en">');
+		expect(html).toContain(`rel="canonical" href="${targetPath}"`);
+		expect(html).toContain('<meta name="robots" content="noindex,follow"/>');
+		expect(html).toContain(
+			'http-equiv="refresh" content="0; url=/#/post/the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat"',
+		);
+		expect(html).toContain(`<meta property="og:url" content="${targetPath}"`);
+		expect(html).toContain(
+			'<meta property="og:image" content="https://wintrover.github.io/images/profile.png"/>',
+		);
+		expect(html).toContain('<meta property="og:site_name" content="Axiom"/>');
+	});
+
+	test("buildLegacyPostAliases는 영어 트리에만 별칭을 생성한다", () => {
+		buildLegacyPostAliases(tempRoot);
+		expect(
+			fs.existsSync(path.join(tempRoot, "post", alias.from, "index.html")),
+		).toBe(true);
+		expect(fs.existsSync(path.join(tempRoot, "ko", "post", alias.from))).toBe(
+			false,
+		);
 	});
 });

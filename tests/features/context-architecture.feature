@@ -104,6 +104,7 @@ Feature: Context SSoT architecture and UI invariants
     Then dist must include root and /ko entrypoints
     And dist must include root and /ko resume entrypoints
     And dist must include the legacy /kr locale alias entrypoint
+    And the /ko tree must not contain English-only legacy post aliases
     And verification must fail fast with non-zero exit on missing files
 
   Scenario: Sitemap generation preserves locale architecture

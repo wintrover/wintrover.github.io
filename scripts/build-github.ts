@@ -24,6 +24,24 @@ type ResumeLocaleJson = {
 const robotsMetaContent =
 	"index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
 
+type LegacyPostAlias = {
+	from: string;
+	to: string;
+};
+
+type LegacyPostAliasTarget = {
+	title: string;
+	description: string;
+};
+
+// English-tree-only: Vite copies public/ into every locale outDir, so this alias must never live in public/.
+export const LEGACY_POST_ALIASES: LegacyPostAlias[] = [
+	{
+		from: "the-agent-wrote-the-theorem-a-formal-disproof-a-pipeline-gap-and-a-refusal-to-cheat",
+		to: "the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat",
+	},
+];
+
 function run(cmd: string, args: string[], env: Env = {}) {
 	execFileSync(cmd, args, {
 		stdio: "inherit",
@@ -410,6 +428,69 @@ export function buildLegacyLocaleAlias(dist: string) {
 	writeFile(path.join(dist, "kr", "index.html"), renderLegacyLocaleAliasHtml());
 }
 
+export function renderLegacyPostAliasHtml(
+	alias: LegacyPostAlias,
+	post: LegacyPostAliasTarget,
+) {
+	const canonical = `${siteOrigin}/post/${alias.to}/`;
+	const redirect = `/#/post/${alias.to}`;
+	const title = post.title;
+	const description = post.description || post.title;
+	return (
+		`<!doctype html>` +
+		`<html lang="en">` +
+		`<head>` +
+		`<meta charset="utf-8"/>` +
+		`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
+		`<title>${xmlEscape(title)}</title>` +
+		`<meta name="description" content="${xmlEscape(description)}"/>` +
+		`<meta name="robots" content="noindex,follow"/>` +
+		`<link rel="canonical" href="${xmlEscape(canonical)}"/>` +
+		`<meta property="og:title" content="${xmlEscape(title)}"/>` +
+		`<meta property="og:type" content="article"/>` +
+		`<meta property="og:url" content="${xmlEscape(canonical)}"/>` +
+		`<meta property="og:image" content="${xmlEscape(defaultOgImage)}"/>` +
+		`<meta property="og:site_name" content="Axiom"/>` +
+		`<meta http-equiv="refresh" content="0; url=${redirect}"/>` +
+		`<script>(()=>{location.replace(${JSON.stringify(redirect)});})();</script>` +
+		`</head>` +
+		`<body>` +
+		`<noscript><a href="${xmlEscape(redirect)}">Open post</a></noscript>` +
+		`</body>` +
+		`</html>`
+	);
+}
+
+export function buildLegacyPostAliases(dist: string) {
+	const entries = collectPostEntries(process.cwd(), "en");
+	for (const alias of LEGACY_POST_ALIASES) {
+		const post = entries.find((entry) => entry.slug === alias.to);
+		if (!post) {
+			logError(
+				"build-github",
+				`Legacy post alias target not found: ${alias.to}`,
+				{
+					error: new Error(`legacy post alias target missing: ${alias.to}`),
+				},
+			);
+			process.exit(1);
+		}
+		writeFile(
+			path.join(dist, "post", alias.from, "index.html"),
+			renderLegacyPostAliasHtml(alias, post),
+		);
+		const koAlias = path.join(dist, "ko", "post", alias.from);
+		if (fs.existsSync(koAlias)) {
+			logError(
+				"build-github",
+				`Legacy post alias must not exist in the Korean tree: ${path.relative(dist, koAlias)}`,
+				{ error: new Error(`unexpected ko alias: ${koAlias}`) },
+			);
+			process.exit(1);
+		}
+	}
+}
+
 function verifyBuildOutput(distPath: string) {
 	console.log("🚀 Verifying Axiom GitHub Pages build output...");
 	const expectedFiles = [
@@ -418,6 +499,7 @@ function verifyBuildOutput(distPath: string) {
 		path.join(distPath, "ko", "resume", "index.html"),
 		path.join(distPath, "resume", "index.html"),
 		path.join(distPath, "kr", "index.html"),
+		path.join(distPath, "post", LEGACY_POST_ALIASES[0].from, "index.html"),
 	];
 
 	if (!fs.existsSync(distPath)) {
@@ -465,6 +547,7 @@ export function main() {
 	buildResumeLandingPage(dist, "en");
 	buildPostLandingPages(dist, "ko");
 	buildPostLandingPages(dist, "en");
+	buildLegacyPostAliases(dist);
 	buildSitemap(dist);
 	buildRobots(dist);
 	verifyBuildOutput(dist);
