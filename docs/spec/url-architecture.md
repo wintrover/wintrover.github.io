@@ -22,6 +22,13 @@
 ## slug 정규화와 조회 호환
 
 - 배포 스크립트의 canonical URL slug 생성은 앱 라우터의 `slugify` 규칙과 동일해야 하며, 아포스트로피가 포함된 제목도 동일 slug로 정규화해야 한다.
+- 빌드 canonical slug는 `slugify(title) || slugify(fileName)`이다. 제목이 비었거나 정규화 결과가 비면 파일명 slug를 사용하고, 둘 다 비면 빌드를 실패시킨다(fail-closed).
+- 비라틴 문자 제목(예: 한국어)은 `slugify`가 빈 문자열을 반환하므로 `fileName` slug를 사용한다.
+- 한 locale 안에서 하나의 canonical slug는 정확히 하나의 포스트에 속한다. 파생 slug가 중복되면 빌드는 실패하며, 조용히 덮어쓰거나 건너뛰지 않는다.
+- 기존에 공개된 영어 포스트 별칭(`LEGACY_POST_ALIASES`)은 영구 보존한다. 신규 별칭은 append-only 관례로만 추가하며 기존 항목을 수정·삭제하지 않는다.
+- 별칭 레지스트리는 다음을 검증한다: `from`/`to` 비어 있음, `from === to`, `from` 중복, `from`이 현재 영어 canonical slug와 충돌, `to`가 현재 영어 canonical slug에 없음, `to`가 다른 별칭의 `from`과 일치(체인/사이클). 그리고 별칭 `from` URL은 sitemap에서 제외한다.
+- 한국어 별칭 이력은 아직 레지스트리에 없다. 한국어 포스트의 과거 slug 호환은 이 계약의 범위가 아니다.
+- `/kr` 하위 경로(`/kr/post/...` 등)는 이 계약에 포함하지 않는다.
 - 포스트 로더는 기존 canonical slug(`dont`)와 현재 slug(`don-t`)를 모두 조회 호환해 과거 링크의 Post not found를 방지해야 한다.
 
 ## 포스트 메타데이터 정규화

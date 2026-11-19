@@ -157,3 +157,21 @@ Feature: Context SSoT architecture and UI invariants
     Then GA4 measurement ID should read from secrets first
     And GA4 measurement ID should allow vars fallback
     And GSC verification token should allow vars or secrets injection
+
+  Scenario: Korean post titles fall back to fileName slug
+    Given a Korean post title whose slugify result is empty
+    When the build derives the canonical slug from title and fileName
+    Then the slug should fall back to slugify(fileName)
+    And a post with no derivable slug from either source should fail the build
+
+  Scenario: Every collected post has a static landing page
+    Given the build collects post entries for each locale
+    When post landing pages are generated from those entries
+    Then every collected post must have dist[/ko]/post/<slug>/index.html
+    And each landing page must match renderPostLandingHtml byte for byte
+
+  Scenario: Legacy post aliases are permanent and validated
+    Given the legacy English post alias registry is append-only
+    When the build validates alias from/to before writing dist
+    Then empty, self-referencing, duplicate, current-slug, missing-target, and chained aliases must fail the build
+    And alias source URLs must be excluded from the sitemap
