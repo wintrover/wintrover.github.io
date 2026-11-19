@@ -7,6 +7,7 @@ import {
 	siteOrigin,
 } from "../src/lib/config";
 import { logError } from "../src/lib/log";
+import { renderMarkdownBody } from "../src/lib/markdown";
 import { parseFrontMatter, slugify } from "../src/lib/utils";
 
 type Env = Record<string, string | undefined>;
@@ -63,7 +64,7 @@ function writeFile(target: string, content: string) {
 	fs.writeFileSync(target, content);
 }
 
-function buildBlog(dist: string, locale: "ko" | "en") {
+export function buildBlog(dist: string, locale: "ko" | "en") {
 	const basePath = locale === "ko" ? "/ko/" : "/";
 	const outDir = locale === "ko" ? path.join(dist, "ko") : dist;
 	const meta = getBlogBuildMeta(locale);
@@ -76,6 +77,7 @@ function buildBlog(dist: string, locale: "ko" | "en") {
 		VITE_OG_TITLE: meta.ogTitle,
 		VITE_OG_DESCRIPTION: meta.ogDescription,
 		VITE_OG_IMAGE_ALT: meta.ogImageAlt,
+		COPY_PUBLIC_DIR: locale === "ko" ? "false" : "true",
 	});
 }
 
@@ -186,6 +188,49 @@ export function collectPostEntries(root: string, locale: "ko" | "en") {
 		});
 	}
 	return entries;
+}
+
+export function deriveKoPublicAssets(root: string): string[] {
+	const koPostsDir = path.join(root, "src", "posts", "ko");
+	const assets = new Set<string>(["images/profile.png"]);
+	if (fs.existsSync(koPostsDir)) {
+		for (const filePath of walkMarkdownFiles(koPostsDir)) {
+			const raw = fs.readFileSync(filePath, "utf-8");
+			const { content } = parseFrontMatter(raw);
+			const html = renderMarkdownBody(content, "/");
+			for (const match of html.matchAll(/src\s*=\s*(["'])([^"']+)\1/g)) {
+				const src = match[2];
+				if (!src.startsWith("/images/")) continue;
+				assets.add(src.slice(1));
+			}
+		}
+	}
+
+	const sorted = [...assets].sort();
+	for (const relativePath of sorted) {
+		const absolutePath = path.join(root, "public", relativePath);
+		if (fs.existsSync(absolutePath)) continue;
+		logError(
+			"build-github",
+			`Korean public asset missing under public/: ${relativePath}`,
+			{ error: new Error(`missing public asset: ${relativePath}`) },
+		);
+		process.exit(1);
+	}
+	return sorted;
+}
+
+export function copyKoPublicAssets(
+	root: string,
+	dist: string,
+	assets: string[] = deriveKoPublicAssets(root),
+) {
+	for (const relativePath of assets) {
+		const sourcePath = path.join(root, "public", relativePath);
+		const targetPath = path.join(dist, "ko", relativePath);
+		mk(path.dirname(targetPath));
+		fs.copyFileSync(sourcePath, targetPath);
+	}
 }
 
 function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
@@ -685,6 +730,137 @@ function verifyBuildOutput(distPath: string) {
 	console.log("📦 Axiom build is ready for GitHub Pages deployment!");
 }
 
+function listSubdirectories(target: string): string[] {
+	if (!fs.existsSync(target)) return [];
+	return fs
+		.readdirSync(target, { withFileTypes: true })
+		.filter((entry) => entry.isDirectory())
+		.map((entry) => entry.name)
+		.sort();
+}
+
+function listRelativeFiles(target: string): string[] {
+	const results: string[] = [];
+	if (!fs.existsSync(target)) return results;
+	const stack: string[] = [target];
+	while (stack.length > 0) {
+		const current = stack.pop();
+		if (!current) continue;
+		for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+			const full = path.join(current, entry.name);
+			if (entry.isDirectory()) {
+				stack.push(full);
+				continue;
+			}
+			if (entry.isFile()) {
+				results.push(path.relative(target, full).replaceAll("\\", "/"));
+			}
+		}
+	}
+	return results.sort();
+}
+
+function hasSameValues(actual: string[], expected: string[]): boolean {
+	const actualSet = new Set(actual);
+	const expectedSet = new Set(expected);
+	return (
+		actualSet.size === expectedSet.size &&
+		[...actualSet].every((value) => expectedSet.has(value))
+	);
+}
+
+function describeSetMismatch(actual: string[], expected: string[]): string {
+	const actualSet = new Set(actual);
+	const expectedSet = new Set(expected);
+	const missing = expected.filter((value) => !actualSet.has(value));
+	const unexpected = actual.filter((value) => !expectedSet.has(value));
+	return `missing: [${missing.join(", ")}], unexpected: [${unexpected.join(", ")}]`;
+}
+
+export function findLocaleBoundaryViolations(
+	dist: string,
+	root: string,
+): string[] {
+	const violations: string[] = [];
+
+	const koSlugs = collectPostEntries(root, "ko").map((entry) => entry.slug);
+	const koPostDirs = listSubdirectories(path.join(dist, "ko", "post"));
+	if (!hasSameValues(koPostDirs, koSlugs)) {
+		violations.push(
+			`dist/ko/post directory set mismatch (${describeSetMismatch(koPostDirs, koSlugs)})`,
+		);
+	}
+
+	const enSlugs = new Set(
+		collectPostEntries(root, "en").map((entry) => entry.slug),
+	);
+	for (const alias of LEGACY_POST_ALIASES) {
+		enSlugs.add(alias.from);
+	}
+	const enPostDirs = listSubdirectories(path.join(dist, "post"));
+	const expectedEnDirs = [...enSlugs].sort();
+	if (!hasSameValues(enPostDirs, expectedEnDirs)) {
+		violations.push(
+			`dist/post directory set mismatch (${describeSetMismatch(enPostDirs, expectedEnDirs)})`,
+		);
+	}
+
+	const derivedAssets = deriveKoPublicAssets(root);
+	const actualAssets = listRelativeFiles(path.join(dist, "ko", "images")).map(
+		(relativePath) => `images/${relativePath}`,
+	);
+	if (!hasSameValues(actualAssets, derivedAssets)) {
+		violations.push(
+			`dist/ko/images asset set mismatch (${describeSetMismatch(actualAssets, derivedAssets)})`,
+		);
+	}
+
+	const forbiddenPaths = [
+		"evidence",
+		"404.html",
+		".nojekyll",
+		"auto-merge-verification.txt",
+		"kr",
+		"sitemap.xml",
+		"robots.txt",
+	];
+	for (const relativePath of forbiddenPaths) {
+		if (!fs.existsSync(path.join(dist, "ko", relativePath))) continue;
+		violations.push(`forbidden in Korean tree: ko/${relativePath}`);
+	}
+
+	const requiredPaths = [
+		"index.html",
+		"ko/index.html",
+		"ko/resume/index.html",
+		"resume/index.html",
+		"404.html",
+		".nojekyll",
+		"evidence",
+		"images/profile.png",
+		"ko/images/profile.png",
+		"kr/index.html",
+	];
+	for (const relativePath of requiredPaths) {
+		const absolutePath = path.join(dist, ...relativePath.split("/"));
+		if (fs.existsSync(absolutePath)) continue;
+		violations.push(`missing required build output: ${relativePath}`);
+	}
+
+	return violations;
+}
+
+export function verifyLocaleBoundary(dist: string, root: string) {
+	const violations = findLocaleBoundaryViolations(dist, root);
+	if (violations.length === 0) return;
+	for (const violation of violations) {
+		logError("build-github", `Locale boundary violation: ${violation}`, {
+			error: new Error(violation),
+		});
+	}
+	process.exit(1);
+}
+
 export function main() {
 	const root = process.cwd();
 	validateLegacyPostAliases(root);
@@ -694,13 +870,9 @@ export function main() {
 	rm(dist);
 	mk(dist);
 
-	const publicDir = path.join(root, "public");
-	if (fs.existsSync(publicDir)) {
-		fs.cpSync(publicDir, dist, { recursive: true });
-	}
-
 	buildBlog(dist, "en");
 	buildBlog(dist, "ko");
+	copyKoPublicAssets(root, dist);
 	buildLegacyLocaleAlias(dist);
 	buildResumeLandingPage(dist, "ko");
 	buildResumeLandingPage(dist, "en");
@@ -711,6 +883,7 @@ export function main() {
 	verifyPostLandingPages(dist, root);
 	verifySitemapContract(dist, root);
 	buildRobots(dist);
+	verifyLocaleBoundary(dist, root);
 	verifyBuildOutput(dist);
 }
 

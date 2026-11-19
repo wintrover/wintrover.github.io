@@ -38,13 +38,12 @@ function flattenLegacyAssetsPath(p: string) {
 
 type FrontMatterValue = string | number | boolean | string[];
 
-export function normalizeImageSrc(src: string): string;
-export function normalizeImageSrc<T>(src: T): T;
-export function normalizeImageSrc(src: unknown) {
+export function normalizeImageSrcWithBase(src: string, base: string): string;
+export function normalizeImageSrcWithBase<T>(src: T, base: string): T;
+export function normalizeImageSrcWithBase(src: unknown, base: string) {
 	if (!src || typeof src !== "string") return src;
 	if (/^(https?:\/\/|data:)/i.test(src)) return src;
 
-	const base = getBaseUrl();
 	let p = src;
 	if (p.startsWith(base)) {
 		p = p.slice(base.length);
@@ -58,6 +57,12 @@ export function normalizeImageSrc(src: unknown) {
 	}
 
 	return joinBase(base, p);
+}
+
+export function normalizeImageSrc(src: string): string;
+export function normalizeImageSrc<T>(src: T): T;
+export function normalizeImageSrc(src: unknown) {
+	return normalizeImageSrcWithBase(src, getBaseUrl());
 }
 
 export function formatDate(dateString: string) {

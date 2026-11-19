@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import { describe, expect, test } from "vitest";
-import { normalizeImageSrc } from "../src/lib/utils";
+import { normalizeImageSrc, normalizeImageSrcWithBase } from "../src/lib/utils";
 
 describe("normalizeImageSrc", () => {
 	test("원격 URL 및 data URI는 변경하지 않음 (Equivalence Partitioning: Remote/Data)", () => {
@@ -110,6 +110,38 @@ describe("normalizeImageSrc", () => {
 				const input = v as unknown as string;
 				expect(normalizeImageSrc(input)).toBe(input);
 			}),
+		);
+	});
+});
+
+describe("normalizeImageSrcWithBase", () => {
+	test("주어진 base로 정규화 접두사를 결정한다", () => {
+		expect(normalizeImageSrcWithBase("/images/test.png", "/")).toBe(
+			"/images/test.png",
+		);
+		expect(normalizeImageSrcWithBase("/ko/images/test.png", "/ko/")).toBe(
+			"/ko/images/test.png",
+		);
+		expect(normalizeImageSrcWithBase("/images/test.png", "/ko/")).toBe(
+			"/ko/images/test.png",
+		);
+	});
+
+	test("base가 /ko/일 때 레거시 경로도 동일 규칙으로 플래트닝된다", () => {
+		expect(normalizeImageSrcWithBase("/assets/images/test.jpg", "/ko/")).toBe(
+			"/ko/images/test.jpg",
+		);
+		expect(normalizeImageSrcWithBase("blog/images/test.png", "/ko/")).toBe(
+			"/ko/images/test.png",
+		);
+	});
+
+	test("원격 URL과 비문자열 입력은 base와 무관하게 그대로 반환한다", () => {
+		expect(normalizeImageSrcWithBase("https://example.com/a.png", "/ko/")).toBe(
+			"https://example.com/a.png",
+		);
+		expect(normalizeImageSrcWithBase(null as unknown as string, "/ko/")).toBe(
+			null,
 		);
 	});
 });

@@ -1,15 +1,16 @@
 import { marked } from "marked";
+import { getBaseUrl } from "./config";
 import { logError } from "./log";
-import { normalizeImageSrc, parseFrontMatter } from "./utils";
+import { normalizeImageSrcWithBase, parseFrontMatter } from "./utils";
 
-export function renderMarkdownBody(markdownBody: string) {
+export function renderMarkdownBody(markdownBody: string, base = getBaseUrl()) {
 	const htmlRaw = marked.parse(markdownBody, { async: false }) as string;
 
 	return htmlRaw.replace(/<img\b[^>]*>/g, (tag: string) =>
 		tag.replace(
 			/\bsrc\s*=\s*(["'])([^"']+)\1/,
 			(_full: string, q: string, src: string) =>
-				`src=${q}${normalizeImageSrc(src)}${q}`,
+				`src=${q}${normalizeImageSrcWithBase(src, base)}${q}`,
 		),
 	);
 }

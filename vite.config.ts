@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => {
 		base: process.env.VITE_BASE_PATH ?? "/",
 		build: {
 			outDir: process.env.VITE_OUT_DIR ?? "dist",
-			copyPublicDir: true,
+			copyPublicDir: process.env.COPY_PUBLIC_DIR !== "false",
 			chunkSizeWarningLimit: 900,
 			rollupOptions: {
 				output: {

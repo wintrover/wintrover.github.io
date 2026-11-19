@@ -9,7 +9,7 @@ import {
 	test,
 	vi,
 } from "vitest";
-import { parseMarkdown } from "../src/lib/markdown";
+import { parseMarkdown, renderMarkdownBody } from "../src/lib/markdown";
 import { normalizeImageSrc } from "../src/lib/utils";
 
 const originalFetch = global.fetch;
@@ -190,6 +190,18 @@ describe("markdown utilities", () => {
 				}),
 			);
 			errorSpy.mockRestore();
+		});
+	});
+
+	describe("renderMarkdownBody base", () => {
+		test("base를 지정하면 해당 base로 이미지 src를 정규화한다", () => {
+			const html = renderMarkdownBody("![a](/images/test.png)", "/ko/");
+			expect(html).toContain('src="/ko/images/test.png"');
+		});
+
+		test("base를 생략하면 getBaseUrl() 기본값을 사용한다", () => {
+			const html = renderMarkdownBody("![a](/images/test.png)");
+			expect(html).toContain('src="/images/test.png"');
 		});
 	});
 });
