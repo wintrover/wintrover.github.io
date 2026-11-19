@@ -22,3 +22,4 @@ Feature: Resume content integrity
     Given resume project entries are defined in korean and english locales
     When the axiom project entry is resolved
     Then title must be "Axiom" and the description must present the integrity proof engine for AI-generated software logic
+    And the project GitHub link must be https://github.com/Archright/Axiom

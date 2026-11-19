@@ -2,7 +2,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { validatePostCategoryTagConsistency } from "../scripts/build-github";
+import {
+	buildLegacyLocaleAlias,
+	renderLegacyLocaleAliasHtml,
+	validatePostCategoryTagConsistency,
+} from "../scripts/build-github";
 
 let tempRoot: string;
 
@@ -51,5 +55,29 @@ describe("build-github category/tag consistency", () => {
 			"process.exit",
 		);
 		expect(exitSpy).toHaveBeenCalledWith(1);
+	});
+});
+
+describe("build-github legacy locale alias", () => {
+	test("/kr alias는 canonical /ko/와 0초 meta refresh를 가진다", () => {
+		buildLegacyLocaleAlias(tempRoot);
+		const html = fs.readFileSync(
+			path.join(tempRoot, "kr", "index.html"),
+			"utf-8",
+		);
+		expect(html).toContain(
+			'rel="canonical" href="https://wintrover.github.io/ko/"',
+		);
+		expect(html).toContain('http-equiv="refresh" content="0; url=/ko/"');
+		expect(html).toContain('<noscript><a href="/ko/">');
+		expect(html).toContain('<html lang="ko">');
+		expect(html).not.toContain("noindex");
+	});
+
+	test("renderLegacyLocaleAliasHtml는 독립 HTML 문서를 반환한다", () => {
+		const html = renderLegacyLocaleAliasHtml();
+		expect(html.startsWith("<!doctype html>")).toBe(true);
+		expect(html).toContain('rel="canonical"');
+		expect(html).toContain('http-equiv="refresh"');
 	});
 });

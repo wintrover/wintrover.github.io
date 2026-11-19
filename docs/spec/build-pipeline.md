@@ -10,6 +10,7 @@
   - `dist/ko/index.html`
   - `dist/resume/index.html`
   - `dist/ko/resume/index.html`
+  - `dist/kr/index.html` (canonical `/ko/`로 수렴하는 레거시 별칭, sitemap/hreflang 제외)
 - 블로그 브랜드 메타데이터(타이틀/설명/OG)는 런타임 설정과 빌드 파이프라인에서 **하나의 공유 소스**로부터 파생되어야 한다.
 - 오너 직함(브랜드 정체성)의 공식 선언은 헌법(`AGENTS.md` §0.1)을 따르며, 사이트 브랜드 표면(`brandProfile`·resume locales·`public/404.html` 타이틀·빌드 폴백 문자열)이 그 직함을 동일하게 반영해야 한다.
 - 직함 재발급 시 이전 직함의 full-string이 소스와 빌드 산출물(HTML·JS 번들)에 잔존해서는 안 된다.
@@ -20,6 +21,7 @@
 - 페이지뷰 경로 계산 시 해시 기반 라우팅(`#/...`)은 실제 페이지 경로(`/...`)로 정규화해 전송해야 한다.
 - `index.html`은 `%VITE_GOOGLE_SITE_VERIFICATION%` 값을 사용하는 `google-site-verification` 메타 태그를 유지해야 한다.
 - 영어는 루트에 배치하므로 `dist/en/index.html` 생성에 의존하지 않는다.
+- 레거시 `/kr` 별칭은 두 `buildBlog` 호출이 `dist`를 재생성한 뒤, `verifyBuildOutput` 이전에 `buildLegacyLocaleAlias`가 생성해야 한다. `public/`에 두지 않는다(ko 빌드의 `copyPublicDir`가 `dist/ko/kr/`로 복사해 계약 밖 URL을 만든다).
 - Sitemap과 canonical 생성 시 영어는 루트 prefix(`""`), 한국어는 `/ko` prefix를 사용한다.
 - 검색/AI 노출 제어 메타는 `index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1` 정책을 기본으로 유지해야 한다.
 - 브라우저 탭 제목(`<title>`)은 페이지 의미 중심으로 유지하고 브랜드 suffix(`- Axiom`)를 덧붙이지 않는다.

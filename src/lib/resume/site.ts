@@ -49,7 +49,7 @@ export const content = {
 			links: [
 				{
 					type: "github",
-					url: "https://github.com/Archright",
+					url: "https://github.com/Archright/Axiom",
 					iconClass: "fab fa-github",
 					titleKey: "project_link.github",
 				},
