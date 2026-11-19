@@ -116,7 +116,11 @@ function toLastMod(value: unknown) {
 	return d.toISOString().slice(0, 10);
 }
 
-function collectPostEntries(root: string, locale: "ko" | "en") {
+export function resolvePostSlug(title: string, fileName: string): string {
+	return slugify(title) || slugify(fileName);
+}
+
+export function collectPostEntries(root: string, locale: "ko" | "en") {
 	const postsRoot = path.join(root, "src", "posts");
 	const koRoot = path.join(postsRoot, "ko");
 	const files =
@@ -138,6 +142,7 @@ function collectPostEntries(root: string, locale: "ko" | "en") {
 		description: string;
 		date: string | null;
 	}[] = [];
+	const seen = new Map<string, string>();
 	for (const filePath of files) {
 		const fileName = path.basename(filePath, ".md");
 		const raw = fs.readFileSync(filePath, "utf8");
@@ -145,8 +150,24 @@ function collectPostEntries(root: string, locale: "ko" | "en") {
 		const frontmatter = data as FrontmatterData;
 		const title =
 			typeof frontmatter.title === "string" ? frontmatter.title : "";
-		const slug = slugify(title || fileName || "");
-		if (!slug) continue;
+		const slug = resolvePostSlug(title, fileName);
+		const relativePath = path.relative(root, filePath).replaceAll("\\", "/");
+		if (!slug) {
+			logError("build-github", `Post slug cannot be derived: ${relativePath}`, {
+				error: new Error(`empty post slug: ${relativePath}`),
+			});
+			process.exit(1);
+		}
+		const duplicatePath = seen.get(slug);
+		if (duplicatePath) {
+			logError(
+				"build-github",
+				`Duplicate post slug "${slug}" in ${locale} locale: ${duplicatePath} and ${relativePath}`,
+				{ error: new Error(`duplicate post slug: ${slug}`) },
+			);
+			process.exit(1);
+		}
+		seen.set(slug, relativePath);
 		const dateRaw =
 			typeof frontmatter.date === "string" ? frontmatter.date : null;
 		const lastmod = toLastMod(dateRaw);
@@ -223,59 +244,99 @@ function buildResumeLandingPage(dist: string, locale: "ko" | "en") {
 	writeFile(path.join(localeDir, "resume", "index.html"), html);
 }
 
+export function renderPostLandingHtml(
+	locale: "ko" | "en",
+	post: {
+		slug: string;
+		title: string;
+		description: string;
+		date: string | null;
+	},
+): string {
+	const localePrefix = locale === "ko" ? "/ko" : "";
+	const canonical = `${siteOrigin}${localePrefix}/post/${post.slug}/`;
+	const redirect = `${localePrefix}/#/post/${post.slug}`;
+	const title = post.title;
+	const description = post.description || post.title;
+	const jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		headline: post.title,
+		image: [defaultOgImage],
+		datePublished: post.date ?? undefined,
+		dateModified: post.date ?? undefined,
+		author: {
+			"@type": "Person",
+			name: "wintrover",
+			url: `${siteOrigin}/`,
+		},
+		description,
+		mainEntityOfPage: canonical,
+	};
+	const jsonLdString = JSON.stringify(jsonLd).replaceAll("<", "\\u003c");
+
+	return (
+		`<!doctype html>` +
+		`<html lang="${xmlEscape(locale)}" prefix="og: https://ogp.me/ns#">` +
+		`<head>` +
+		`<meta charset="utf-8"/>` +
+		`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
+		`<title>${xmlEscape(title)}</title>` +
+		`<meta name="description" content="${xmlEscape(description)}"/>` +
+		`<meta name="robots" content="${robotsMetaContent}"/>` +
+		`<link rel="canonical" href="${xmlEscape(canonical)}"/>` +
+		`<meta property="og:title" content="${xmlEscape(post.title)}"/>` +
+		`<meta property="og:description" content="${xmlEscape(description)}"/>` +
+		`<meta property="og:type" content="article"/>` +
+		`<meta property="og:url" content="${xmlEscape(canonical)}"/>` +
+		`<meta property="og:image" content="${xmlEscape(defaultOgImage)}"/>` +
+		`<meta property="og:image:alt" content="${xmlEscape(post.title)}"/>` +
+		`<meta property="og:site_name" content="Axiom"/>` +
+		`<script type="application/ld+json">${jsonLdString}</script>` +
+		`<script>(()=>{location.replace(${JSON.stringify(redirect)});})();</script>` +
+		`</head>` +
+		`<body>` +
+		`<noscript><a href="${xmlEscape(redirect)}">Open post</a></noscript>` +
+		`</body>` +
+		`</html>`
+	);
+}
+
 function buildPostLandingPages(dist: string, locale: "ko" | "en") {
 	const root = process.cwd();
 	const localeDir = locale === "ko" ? path.join(dist, "ko") : dist;
-	const localePrefix = locale === "ko" ? "/ko" : "";
 	const posts = collectPostEntries(root, locale);
 	for (const post of posts) {
-		const canonical = `${siteOrigin}${localePrefix}/post/${post.slug}/`;
-		const redirect = `${localePrefix}/#/post/${post.slug}`;
-		const title = post.title;
-		const description = post.description || post.title;
-		const jsonLd = {
-			"@context": "https://schema.org",
-			"@type": "BlogPosting",
-			headline: post.title,
-			image: [defaultOgImage],
-			datePublished: post.date ?? undefined,
-			dateModified: post.date ?? undefined,
-			author: {
-				"@type": "Person",
-				name: "wintrover",
-				url: `${siteOrigin}/`,
-			},
-			description,
-			mainEntityOfPage: canonical,
-		};
-		const jsonLdString = JSON.stringify(jsonLd).replaceAll("<", "\\u003c");
+		writeFile(
+			path.join(localeDir, "post", post.slug, "index.html"),
+			renderPostLandingHtml(locale, post),
+		);
+	}
+}
 
-		const html =
-			`<!doctype html>` +
-			`<html lang="${xmlEscape(locale)}" prefix="og: https://ogp.me/ns#">` +
-			`<head>` +
-			`<meta charset="utf-8"/>` +
-			`<meta name="viewport" content="width=device-width,initial-scale=1"/>` +
-			`<title>${xmlEscape(title)}</title>` +
-			`<meta name="description" content="${xmlEscape(description)}"/>` +
-			`<meta name="robots" content="${robotsMetaContent}"/>` +
-			`<link rel="canonical" href="${xmlEscape(canonical)}"/>` +
-			`<meta property="og:title" content="${xmlEscape(post.title)}"/>` +
-			`<meta property="og:description" content="${xmlEscape(description)}"/>` +
-			`<meta property="og:type" content="article"/>` +
-			`<meta property="og:url" content="${xmlEscape(canonical)}"/>` +
-			`<meta property="og:image" content="${xmlEscape(defaultOgImage)}"/>` +
-			`<meta property="og:image:alt" content="${xmlEscape(post.title)}"/>` +
-			`<meta property="og:site_name" content="Axiom"/>` +
-			`<script type="application/ld+json">${jsonLdString}</script>` +
-			`<script>(()=>{location.replace(${JSON.stringify(redirect)});})();</script>` +
-			`</head>` +
-			`<body>` +
-			`<noscript><a href="${xmlEscape(redirect)}">Open post</a></noscript>` +
-			`</body>` +
-			`</html>`;
-
-		writeFile(path.join(localeDir, "post", post.slug, "index.html"), html);
+export function verifyPostLandingPages(dist: string, root: string) {
+	for (const locale of ["ko", "en"] as const) {
+		const localeDir = locale === "ko" ? path.join(dist, "ko") : dist;
+		for (const post of collectPostEntries(root, locale)) {
+			const filePath = path.join(localeDir, "post", post.slug, "index.html");
+			const relativePath = path.relative(dist, filePath).replaceAll("\\", "/");
+			if (!fs.existsSync(filePath)) {
+				logError("build-github", `Post landing page missing: ${relativePath}`, {
+					error: new Error(`missing post landing: ${relativePath}`),
+				});
+				process.exit(1);
+			}
+			const actual = fs.readFileSync(filePath, "utf-8");
+			const expected = renderPostLandingHtml(locale, post);
+			if (actual !== expected) {
+				logError(
+					"build-github",
+					`Post landing canonical/redirect mismatch: ${relativePath}`,
+					{ error: new Error(`post landing mismatch: ${relativePath}`) },
+				);
+				process.exit(1);
+			}
+		}
 	}
 }
 
@@ -319,6 +380,61 @@ function buildSitemap(dist: string) {
 		`</urlset>`;
 
 	writeFile(path.join(dist, "sitemap.xml"), xml);
+}
+
+export function verifySitemapContract(dist: string, root: string) {
+	const sitemapPath = path.join(dist, "sitemap.xml");
+	if (!fs.existsSync(sitemapPath)) {
+		logError("build-github", "Sitemap missing: dist/sitemap.xml", {
+			error: new Error("sitemap.xml not found"),
+		});
+		process.exit(1);
+	}
+	const xml = fs.readFileSync(sitemapPath, "utf-8");
+	const actual = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
+
+	const expected = [
+		`${siteOrigin}/`,
+		`${siteOrigin}/ko/`,
+		`${siteOrigin}/resume/`,
+		`${siteOrigin}/ko/resume/`,
+	];
+	for (const locale of ["en", "ko"] as const) {
+		const localePrefix = locale === "ko" ? "/ko" : "";
+		for (const post of collectPostEntries(root, locale)) {
+			expected.push(`${siteOrigin}${localePrefix}/post/${post.slug}/`);
+		}
+	}
+
+	const expectedSorted = [...expected].sort();
+	const actualSorted = [...actual].sort();
+	const same =
+		expectedSorted.length === actualSorted.length &&
+		expectedSorted.every((loc, i) => loc === actualSorted[i]);
+	if (!same) {
+		logError(
+			"build-github",
+			`Sitemap URL contract mismatch: expected ${expectedSorted.length} URLs, found ${actualSorted.length}`,
+			{
+				error: new Error(
+					`sitemap mismatch: expected [${expectedSorted.join(", ")}] actual [${actualSorted.join(", ")}]`,
+				),
+			},
+		);
+		process.exit(1);
+	}
+
+	for (const alias of LEGACY_POST_ALIASES) {
+		const aliasedLoc = `${siteOrigin}/post/${alias.from}/`;
+		if (actual.includes(aliasedLoc)) {
+			logError(
+				"build-github",
+				`Legacy post alias must be excluded from sitemap: ${aliasedLoc}`,
+				{ error: new Error(`aliased sitemap loc: ${aliasedLoc}`) },
+			);
+			process.exit(1);
+		}
+	}
 }
 
 function buildRobots(dist: string) {
@@ -461,6 +577,46 @@ export function renderLegacyPostAliasHtml(
 	);
 }
 
+export function validateLegacyPostAliases(
+	root: string,
+	aliases: LegacyPostAlias[] = LEGACY_POST_ALIASES,
+) {
+	const currentSlugs = new Set(
+		collectPostEntries(root, "en").map((entry) => entry.slug),
+	);
+	const seenFrom = new Set<string>();
+	const fromValues = new Set(aliases.map((alias) => alias.from));
+
+	const fail = (message: string) => {
+		logError("build-github", `Legacy post alias registry invalid: ${message}`, {
+			error: new Error(message),
+		});
+		process.exit(1);
+	};
+
+	for (const alias of aliases) {
+		if (!alias.from || !alias.to) {
+			fail(`empty from/to (from="${alias.from}", to="${alias.to}")`);
+		}
+		if (alias.from === alias.to) {
+			fail(`self-referencing alias "${alias.from}"`);
+		}
+		if (seenFrom.has(alias.from)) {
+			fail(`duplicate from "${alias.from}"`);
+		}
+		seenFrom.add(alias.from);
+		if (currentSlugs.has(alias.from)) {
+			fail(`from "${alias.from}" collides with a current English slug`);
+		}
+		if (!currentSlugs.has(alias.to)) {
+			fail(`target "${alias.to}" is not a current English slug`);
+		}
+		if (fromValues.has(alias.to)) {
+			fail(`target "${alias.to}" is another alias source (chain/cycle)`);
+		}
+	}
+}
+
 export function buildLegacyPostAliases(dist: string) {
 	const entries = collectPostEntries(process.cwd(), "en");
 	for (const alias of LEGACY_POST_ALIASES) {
@@ -499,7 +655,9 @@ function verifyBuildOutput(distPath: string) {
 		path.join(distPath, "ko", "resume", "index.html"),
 		path.join(distPath, "resume", "index.html"),
 		path.join(distPath, "kr", "index.html"),
-		path.join(distPath, "post", LEGACY_POST_ALIASES[0].from, "index.html"),
+		...LEGACY_POST_ALIASES.map((alias) =>
+			path.join(distPath, "post", alias.from, "index.html"),
+		),
 	];
 
 	if (!fs.existsSync(distPath)) {
@@ -529,6 +687,7 @@ function verifyBuildOutput(distPath: string) {
 
 export function main() {
 	const root = process.cwd();
+	validateLegacyPostAliases(root);
 	validatePostCategoryTagConsistency(root);
 	const dist = path.join(root, "dist");
 
@@ -549,6 +708,8 @@ export function main() {
 	buildPostLandingPages(dist, "en");
 	buildLegacyPostAliases(dist);
 	buildSitemap(dist);
+	verifyPostLandingPages(dist, root);
+	verifySitemapContract(dist, root);
 	buildRobots(dist);
 	verifyBuildOutput(dist);
 }

@@ -71,6 +71,9 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 			"Post path category mapping must be prototype-safe",
 			"Legacy Project category should normalize to Personal project",
 			"Pages workflow injects analytics env from secrets with vars fallback",
+			"Korean post titles fall back to fileName slug",
+			"Every collected post has a static landing page",
+			"Legacy post aliases are permanent and validated",
 		];
 		const scenarios = [...feature.matchAll(/^\s*Scenario:\s*(.+)$/gm)].map(
 			(match) => match[1].trim(),
@@ -190,11 +193,22 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(buildScript).toContain("process.exit(1)");
 	});
 
+	test("Given build-github.ts When slug·랜딩·sitemap 계약 검증 Then fail-closed 검증기를 호출한다", () => {
+		expect(buildScript).toContain("resolvePostSlug");
+		expect(buildScript).toContain("validateLegacyPostAliases(root)");
+		expect(buildScript).toContain("verifyPostLandingPages(dist, root)");
+		expect(buildScript).toContain("verifySitemapContract(dist, root)");
+		expect(urlSpec).toContain("fileName");
+		expect(urlSpec).toContain("영구 보존");
+		expect(buildSpec).toContain("정적 랜딩");
+		expect(buildSpec).toContain("조용히");
+	});
+
 	test("Given public assets When locale 산출물 검증 Then 영어 전용 문서는 public에 두지 않는다", () => {
 		expect(fs.existsSync(path.join(root, "public", "post"))).toBe(false);
 		expect(fs.existsSync(path.join(root, "public", "kr"))).toBe(false);
 		expect(buildScript).toContain("buildLegacyPostAliases(dist)");
-		expect(buildScript).toContain("LEGACY_POST_ALIASES[0].from");
+		expect(buildScript).toContain("LEGACY_POST_ALIASES.map");
 		const aliasFn = buildScript.slice(
 			buildScript.indexOf("export function buildLegacyPostAliases"),
 			buildScript.indexOf("function verifyBuildOutput"),
