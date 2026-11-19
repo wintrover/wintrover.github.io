@@ -2,8 +2,15 @@
 
 This directory is a **curated public snapshot** of the Axiom experiment
 `act2-wp-toml-b1-input-integrity/p0d2g`. It exists because the Axiom source
-repository is private, while the claims in the companion blog post must be
-checkable by a reader who has no access to it.
+repository was private when this snapshot was assembled, while the claims in
+the companion blog post must be checkable by a reader who has no access to it.
+
+**Visibility note (2026-11-19).** `Archright/Axiom` is now a public repository.
+The recorded source commit `7ae9561a9` is not present in the public repository,
+so no public revision of the snapshot source exists to compare against. Every
+reference below to the Axiom repository, its toolchain, or their contents as
+"private" therefore describes the snapshot-time state, not the state at
+reading time.
 
 The snapshot is served verbatim from this blog's `public/` directory. It is
 not a re-execution and not a re-analysis. It is an English-language edition
@@ -14,7 +21,7 @@ translations in `TRANSLATIONS.md`.
 
 | Item | Value |
 |---|---|
-| Source repository | `Archright/Axiom` (private) |
+| Source repository | `Archright/Axiom` (private at snapshot time) |
 | Source commit at snapshot time | `7ae9561a9` |
 | Experiment record last changed | `9775389e2` (2026-10-18, PR #912) |
 | Snapshot generated | 2026-10-20 |
@@ -80,6 +87,10 @@ relative paths, so it can be verified from this directory:
 ```sh
 sha256sum -c --strict SHA256SUMS
 ```
+
+`README.md`'s own manifest entry was re-generated on 2026-11-19 to record the
+visibility note above; every other entry is unchanged since manifest
+generation.
 
 This proves:
 
