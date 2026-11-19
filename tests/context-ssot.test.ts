@@ -220,6 +220,16 @@ describe("SSoT 도메인 계약 규칙 전수 검증", () => {
 		expect(aliasFn).not.toContain('writeFile(path.join(dist, "ko"');
 	});
 
+	test("Given locale 출력 경계 When 검증 Then 공개 자산 경계는 fail-closed다", () => {
+		expect(buildScript).toContain("deriveKoPublicAssets");
+		expect(buildScript).toContain("copyKoPublicAssets");
+		expect(buildScript).toContain("findLocaleBoundaryViolations");
+		expect(buildScript).toContain("verifyLocaleBoundary(dist, root)");
+		expect(buildScript).toContain("COPY_PUBLIC_DIR");
+		expect(buildSpec).toContain("deriveKoPublicAssets");
+		expect(buildSpec).toContain("locale 출력 경계");
+	});
+
 	test("Given build-github.ts When legacy alias 검증 Then /kr을 locale로 승격하지 않는다", () => {
 		const sitemapFn = buildScript.slice(
 			buildScript.indexOf("function buildSitemap"),

@@ -1,11 +1,16 @@
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
+	buildBlog,
 	buildLegacyLocaleAlias,
 	buildLegacyPostAliases,
 	collectPostEntries,
+	copyKoPublicAssets,
+	deriveKoPublicAssets,
+	findLocaleBoundaryViolations,
 	LEGACY_POST_ALIASES,
 	renderLegacyLocaleAliasHtml,
 	renderLegacyPostAliasHtml,
@@ -13,10 +18,21 @@ import {
 	resolvePostSlug,
 	validateLegacyPostAliases,
 	validatePostCategoryTagConsistency,
+	verifyLocaleBoundary,
 	verifyPostLandingPages,
 	verifySitemapContract,
 } from "../scripts/build-github";
 import { siteOrigin } from "../src/lib/config";
+
+vi.mock("node:child_process", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("node:child_process")>();
+	const execFileSync = vi.fn();
+	return {
+		...actual,
+		execFileSync,
+		default: { ...actual, execFileSync },
+	};
+});
 
 let tempRoot: string;
 
@@ -368,5 +384,176 @@ describe("build-github sitemap contract", () => {
 			verifySitemapContract(path.join(tempRoot, "dist"), tempRoot),
 		).toThrow("process.exit");
 		expect(exitSpy).toHaveBeenCalledWith(1);
+	});
+});
+
+describe("build-github Korean public asset derivation", () => {
+	test("한국어 포스트가 참조하는 자산만 정렬·중복 제거해 파생한다", () => {
+		const assets = deriveKoPublicAssets(process.cwd());
+		expect(assets).toEqual([...new Set(assets)].sort());
+		expect(assets).toContain("images/profile.png");
+		expect(assets).toHaveLength(36);
+		for (const asset of assets) {
+			expect(fs.existsSync(path.resolve("public", asset))).toBe(true);
+		}
+	});
+
+	test("한국어 사이트가 사용하지 않는 public 이미지는 파생 집합에 포함되지 않는다", () => {
+		const assets = new Set(deriveKoPublicAssets(process.cwd()));
+		expect(assets.has("images/404.jpg")).toBe(false);
+		expect(assets.has("images/404-error.jpg")).toBe(false);
+		expect(assets.has("images/kyc-sequence-diagram.svg")).toBe(false);
+	});
+
+	test("파생 자산이 public에 없으면 빌드 실패한다", () => {
+		fs.mkdirSync(path.join(tempRoot, "public", "images"), { recursive: true });
+		fs.writeFileSync(
+			path.join(tempRoot, "public", "images", "profile.png"),
+			"profile",
+		);
+		writePost(
+			"ko/missing-asset.md",
+			"---\ntitle: Missing Asset\n---\n![missing](/images/does-not-exist.png)",
+		);
+		const exitSpy = mockExit();
+		expect(() => deriveKoPublicAssets(tempRoot)).toThrow("process.exit");
+		expect(exitSpy).toHaveBeenCalledWith(1);
+	});
+});
+
+describe("build-github Korean public asset copy", () => {
+	test("copyKoPublicAssets는 지정한 자산만 dist/ko로 복사한다", () => {
+		fs.mkdirSync(path.join(tempRoot, "public", "images", "nested"), {
+			recursive: true,
+		});
+		fs.writeFileSync(
+			path.join(tempRoot, "public", "images", "profile.png"),
+			"profile",
+		);
+		fs.writeFileSync(
+			path.join(tempRoot, "public", "images", "nested", "extra.png"),
+			"extra",
+		);
+		copyKoPublicAssets(tempRoot, path.join(tempRoot, "dist"), [
+			"images/profile.png",
+		]);
+		expect(
+			fs.readFileSync(
+				path.join(tempRoot, "dist", "ko", "images", "profile.png"),
+				"utf-8",
+			),
+		).toBe("profile");
+		expect(
+			fs.existsSync(
+				path.join(tempRoot, "dist", "ko", "images", "nested", "extra.png"),
+			),
+		).toBe(false);
+	});
+});
+
+describe("build-github locale boundary verification", () => {
+	const distRoot = () => path.join(tempRoot, "dist");
+	const koPostSlug = "ko-post";
+	const enPostSlug = "en-post";
+
+	function writeFixture() {
+		fs.mkdirSync(path.join(tempRoot, "public", "images"), { recursive: true });
+		fs.writeFileSync(
+			path.join(tempRoot, "public", "images", "profile.png"),
+			"profile",
+		);
+		writePost("en-post.md", "---\ntitle: En Post\n---\nBody");
+		writePost("ko/ko-post.md", "---\ntitle: Ko Post\n---\nBody");
+
+		const dist = distRoot();
+		const files = [
+			"index.html",
+			"ko/index.html",
+			"ko/resume/index.html",
+			"resume/index.html",
+			"404.html",
+			".nojekyll",
+			"kr/index.html",
+		];
+		for (const relativePath of files) {
+			const filePath = path.join(dist, relativePath);
+			fs.mkdirSync(path.dirname(filePath), { recursive: true });
+			fs.writeFileSync(filePath, "");
+		}
+		fs.mkdirSync(path.join(dist, "evidence"), { recursive: true });
+		for (const relativePath of [
+			"images/profile.png",
+			"ko/images/profile.png",
+		]) {
+			const filePath = path.join(dist, relativePath);
+			fs.mkdirSync(path.dirname(filePath), { recursive: true });
+			fs.writeFileSync(filePath, "profile");
+		}
+		fs.mkdirSync(path.join(dist, "ko", "post", koPostSlug), {
+			recursive: true,
+		});
+		fs.mkdirSync(path.join(dist, "post", enPostSlug), { recursive: true });
+		fs.mkdirSync(path.join(dist, "post", LEGACY_POST_ALIASES[0].from), {
+			recursive: true,
+		});
+	}
+
+	test("경계를 지키는 산출물은 위반이 없다", () => {
+		writeFixture();
+		expect(findLocaleBoundaryViolations(distRoot(), tempRoot)).toEqual([]);
+	});
+
+	test("KO 트리에 금지된 파일이 있으면 위반이다", () => {
+		writeFixture();
+		fs.writeFileSync(path.join(distRoot(), "ko", "404.html"), "");
+		expect(findLocaleBoundaryViolations(distRoot(), tempRoot)).toContain(
+			"forbidden in Korean tree: ko/404.html",
+		);
+	});
+
+	test("KO 이미지 집합이 파생 집합과 다르면 위반이다", () => {
+		writeFixture();
+		fs.writeFileSync(
+			path.join(distRoot(), "ko", "images", "unused.png"),
+			"unused",
+		);
+		const violations = findLocaleBoundaryViolations(distRoot(), tempRoot);
+		expect(
+			violations.some((violation) =>
+				violation.includes("dist/ko/images asset set mismatch"),
+			),
+		).toBe(true);
+	});
+
+	test("경계 위반 시 verifyLocaleBoundary는 빌드를 실패시킨다", () => {
+		writeFixture();
+		fs.writeFileSync(path.join(distRoot(), "ko", "404.html"), "");
+		const exitSpy = mockExit();
+		expect(() => verifyLocaleBoundary(distRoot(), tempRoot)).toThrow(
+			"process.exit",
+		);
+		expect(exitSpy).toHaveBeenCalledWith(1);
+	});
+});
+
+describe("build-github blog build environment", () => {
+	test("ko 빌드는 publicDir 복사를 끄고 en 빌드는 켠다", () => {
+		const execSpy = vi.mocked(execFileSync);
+		execSpy.mockClear();
+		const dist = path.join(tempRoot, "dist");
+		buildBlog(dist, "en");
+		buildBlog(dist, "ko");
+		const enOptions = execSpy.mock.calls[0]?.[2] as unknown as {
+			env?: Record<string, string>;
+		};
+		const koOptions = execSpy.mock.calls[1]?.[2] as unknown as {
+			env?: Record<string, string>;
+		};
+		expect(enOptions.env?.COPY_PUBLIC_DIR).toBe("true");
+		expect(koOptions.env?.COPY_PUBLIC_DIR).toBe("false");
+		expect(enOptions.env?.VITE_OUT_DIR).toBe(dist);
+		expect(koOptions.env?.VITE_OUT_DIR).toBe(path.join(dist, "ko"));
+		expect(enOptions.env?.VITE_BASE_PATH).toBe("/");
+		expect(koOptions.env?.VITE_BASE_PATH).toBe("/ko/");
 	});
 });
