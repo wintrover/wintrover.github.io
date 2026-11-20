@@ -149,11 +149,11 @@ void isActive;
                       {tag.label} ({tag.count})
                     </button>
                     {#if tag.children && tag.children.length > 0}
-                      <ul class="subtopic-tree nested-tree">
+                      <ul class="subtopic-tree">
                         {#each tag.children as child}
                           <li class="subtopic-node">
                             <button
-                              class="category-link subtopic-item subtopic-leaf {isActive(child, currentActivePath) ? 'active' : ''}"
+                              class="category-link subtopic-item {isActive(child, currentActivePath) ? 'active' : ''}"
                               on:click={() => selectCategory(child)}
                             >
                               {child.label} ({child.count})
@@ -368,32 +368,6 @@ void isActive;
     background: rgb(39 39 42 / 65%);
     border-color: rgb(82 82 91 / 85%);
     padding-left: 0.95rem;
-  }
-
-  .subtopic-tree.nested-tree {
-    margin: 0.05rem 0 0.16rem 0.35rem;
-    padding-left: 0.55rem;
-  }
-
-  .category-link.subtopic-leaf {
-    font-size: 0.72rem;
-    color: #8f8f98;
-    padding-left: 1.1rem;
-  }
-
-  .category-link.subtopic-leaf:hover {
-    color: #d4d4d8;
-    background: rgb(39 39 42 / 40%);
-    border-color: rgb(63 63 70 / 70%);
-    padding-left: 1.1rem;
-  }
-
-  .category-link.subtopic-leaf.active {
-    color: #f4f4f5;
-    font-weight: 500;
-    background: rgb(39 39 42 / 65%);
-    border-color: rgb(82 82 91 / 85%);
-    padding-left: 1.1rem;
   }
 
   @keyframes sideReveal {

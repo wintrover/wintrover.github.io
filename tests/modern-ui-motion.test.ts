@@ -23,6 +23,7 @@ describe("모던 UI 모션 시나리오 검증", () => {
 			"Mobile sidebar toggle keeps sidebar open after manual open",
 			"Sidebar active indicator follows current route",
 			"Sidebar nested subtopics are constrained to approved list",
+			"Nested sidebar subtopics reuse the shared subtopic style",
 		]);
 	});
 

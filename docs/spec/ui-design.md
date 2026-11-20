@@ -21,7 +21,8 @@
 - 푸터 소셜 링크는 이메일·GitHub·LinkedIn 3종으로 한정한다.
 - 카테고리/태그 라우트 간 전환 시에도 포스트 리스트 진입 모션은 재생되어야 하며, 동일 컴포넌트 재사용으로 모션이 소실되면 안 된다.
 - 모든 신규 모션은 `prefers-reduced-motion` 환경에서 과도한 이동/지연 없이 즉시 또는 최소 전환으로 동작해야 한다.
-- 사이드바 카테고리 하위 항목은 태그 일반 목록이 아니라 서브주제 목록으로 취급하며 `SMBholdings`, `CVFactory`, `Archright`만 노출한다.
+- 사이드바 카테고리 하위 항목은 태그 일반 목록이 아니라 서브주제 목록으로 취급하며, 승인된 서브주제(`SMBholdings`, `CVFactory`, `Axiom` 계층)만 노출한다.
+- Archright의 Axiom 서브주제는 `Axiom > (Axiom for External Repos | Axiom logs)` 계층으로 렌더링하되, 중첩 항목도 다른 서브주제와 동일한 `category-link subtopic-item` 스타일을 공유하고 별도 리프 스타일을 두지 않는다.
 
 ## 디자인 변경 규칙
 
