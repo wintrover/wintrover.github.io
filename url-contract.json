@@ -144,6 +144,11 @@
       "locale": "ko"
     },
     {
+      "url": "/ko/post/nim-toml-serialization-ai/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
       "url": "/ko/post/nim-vs-rust/",
       "kind": "canonical",
       "locale": "ko"
@@ -165,8 +170,9 @@
     },
     {
       "url": "/ko/post/the-agent-wrote-the-theorem-ai/",
-      "kind": "canonical",
-      "locale": "ko"
+      "kind": "alias",
+      "target": "/ko/post/nim-toml-serialization-ai/",
+      "evidence": "published slug rename 2026-11-20"
     },
     {
       "url": "/ko/post/traefik-turborepo/",
@@ -287,6 +293,11 @@
       "locale": "en"
     },
     {
+      "url": "/post/nim-toml-serialization-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
       "url": "/post/nim-vs-rust-language-is-a-matter-of-coherence-not-performance/",
       "kind": "canonical",
       "locale": "en"
@@ -319,8 +330,9 @@
     },
     {
       "url": "/post/the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
-      "kind": "canonical",
-      "locale": "en"
+      "kind": "alias",
+      "target": "/post/nim-toml-serialization-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
+      "evidence": "published slug rename 2026-11-20"
     },
     {
       "url": "/post/the-infrastructure-overhaul-that-saved-my-development-velocity-a-traefik-turborepo-migration-story/",
