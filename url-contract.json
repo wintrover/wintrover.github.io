@@ -77,6 +77,11 @@
       "locale": "ko"
     },
     {
+      "url": "/ko/post/axiom-went-upstream/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
       "url": "/ko/post/bash/",
       "kind": "canonical",
       "locale": "ko"
@@ -189,6 +194,11 @@
     },
     {
       "url": "/post/axiom-deterministic-integrity-engine-for-probabilistic-ai/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/axiom-went-upstream-one-line-one-test-and-the-evidence-that-expired/",
       "kind": "canonical",
       "locale": "en"
     },

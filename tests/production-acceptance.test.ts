@@ -208,8 +208,8 @@ describe("sitemap loc 추출과 다중집합 비교", () => {
 		).toEqual({ locs: ["src"], source: "source" });
 	});
 
-	test("Given 저장소 posts When 기대 sitemap loc 생성 Then 62개이며 중복이 없다", () => {
-		expect(EXPECTED_SITEMAP_LOC_COUNT).toBe(62);
+	test("Given 저장소 posts When 기대 sitemap loc 생성 Then 64개이며 중복이 없다", () => {
+		expect(EXPECTED_SITEMAP_LOC_COUNT).toBe(64);
 		const locs = expectedSitemapLocs({
 			koSlugs: collectPostEntries(root, "ko").map((entry) => entry.slug),
 			enSlugs: collectPostEntries(root, "en").map((entry) => entry.slug),
