@@ -197,7 +197,7 @@ export function getRuntimeOrigin() {
 }
 
 export const siteConfig = {
-	name: "Axiom",
+	name: "Suhyok Yoon",
 	description: brandProfile.role.en,
 	avatar: `${baseUrl}images/profile.png`,
 	baseUrl,
@@ -206,6 +206,6 @@ export const siteConfig = {
 	social: {
 		email: "wintrover@gmail.com",
 		github: "wintrover",
-		linkedin: "suhyok-yun-1934b713a",
+		linkedin: "suhyok-yoon-1934b713a",
 	},
 };

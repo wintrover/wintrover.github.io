@@ -138,10 +138,18 @@ describe("Sidebar Component", () => {
 		expect(push).toHaveBeenCalledWith("/category/company-work/tag/smbholdings");
 	});
 
+	test("프로필 이름은 오너 이름을 표시해야 함", () => {
+		render(Sidebar);
+
+		expect(document.querySelector(".site-name")?.textContent?.trim()).toBe(
+			"Suhyok Yoon",
+		);
+	});
+
 	test("아바타는 링크가 아니고 클릭 시 이동하지 않아야 함", async () => {
 		render(Sidebar);
 
-		const avatar = screen.getByAltText(/axiom/i); // 대소문자 무시
+		const avatar = screen.getByAltText("Suhyok Yoon");
 		await fireEvent.click(avatar);
 
 		expect(get(selectedCategory)).toBe("all");

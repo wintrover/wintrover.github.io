@@ -39,7 +39,7 @@ describe("Footer Component", () => {
 		const linkedinLink = screen.getByTitle("LinkedIn");
 		expect(linkedinLink).toHaveAttribute(
 			"href",
-			"https://linkedin.com/in/testlink",
+			"https://www.linkedin.com/in/testlink/",
 		);
 	});
 
@@ -100,7 +100,7 @@ describe("Footer Component", () => {
 					if (linkedin) {
 						expect(screen.getByTitle("LinkedIn")).toHaveAttribute(
 							"href",
-							`https://linkedin.com/in/${linkedin}`,
+							`https://www.linkedin.com/in/${linkedin}/`,
 						);
 					} else {
 						expect(screen.queryByTitle("LinkedIn")).not.toBeInTheDocument();

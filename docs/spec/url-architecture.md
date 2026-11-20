@@ -50,6 +50,7 @@
 ## 이력서 메타데이터
 
 - 이력서 소셜의 LinkedIn 링크는 `https://www.linkedin.com/in/<slug>/` 형식의 canonical URL을 사용하며, GitHub 링크는 `https://github.com/wintrover` 개인 프로필을 사용한다.
+- 푸터의 LinkedIn 링크도 동일한 canonical URL(`https://www.linkedin.com/in/suhyok-yoon-1934b713a/`)을 사용한다.
 - 이력서 프로젝트의 Axiom GitHub 링크는 저장소 `https://github.com/Archright/Axiom`을 사용한다. 소셜 GitHub 링크와 프로젝트 저장소 링크는 서로 다른 계약이며 혼합하지 않는다.
 - 이력서 메타 타이틀은 로케일 공통으로 `resume` 표기를 사용한다.
 
