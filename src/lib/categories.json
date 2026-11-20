@@ -14,8 +14,8 @@
 			"slug": "archright",
 			"color": "#ff7b00",
 			"icon": "🧭",
-			"tags": ["Axiom"],
-			"exclusiveTags": ["Axiom"]
+			"tags": ["Axiom External Repos", "Axiom General"],
+			"exclusiveTags": ["Axiom", "Axiom External Repos", "Axiom General"]
 		},
 		"company": {
 			"name": "Company Work",

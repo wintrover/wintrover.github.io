@@ -39,3 +39,17 @@ Feature: Post creation standard
     And if the frontmatter or folder assigned a different category
     Then the loader automatically overrides it to Archright
     And a warning is logged for the mismatch
+
+  Scenario: Archright posts carry exactly one Axiom subtopic tag
+    Given an Archright blog post is created
+    When the post frontmatter tags are defined
+    Then it should contain the Axiom tag
+    And it should contain exactly one of "Axiom External Repos" or "Axiom General"
+
+  Scenario: Axiom External Repos posts follow the repo-first format
+    Given a blog post is tagged with "Axiom External Repos"
+    When the post frontmatter and body are written
+    Then the title should start with the verified repository name followed by a colon
+    And the first section heading should be "References" in English or "자료" in Korean
+    And the references section should appear at the top of the body
+    And the text should not use emphasis words such as "real", "actually", "genuine", or "decisive"

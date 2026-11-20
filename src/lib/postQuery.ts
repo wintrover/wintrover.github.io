@@ -17,7 +17,12 @@ type CategoryConfigLike = {
 	categories?: Record<string, { name?: unknown; tags?: unknown }>;
 };
 
-const sidebarSubtopics = ["SMBholdings", "CVFactory", "Axiom"] as const;
+const sidebarSubtopics = [
+	"SMBholdings",
+	"CVFactory",
+	"Axiom External Repos",
+	"Axiom General",
+] as const;
 const subtopicLabelByLowercase = Object.fromEntries(
 	sidebarSubtopics.map((subtopic) => [subtopic.toLowerCase(), subtopic]),
 ) as Record<string, string>;
