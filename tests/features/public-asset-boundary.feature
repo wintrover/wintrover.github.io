@@ -16,8 +16,8 @@ Feature: Locale public asset boundary
     When evidence, 404.html, .nojekyll, auto-merge-verification.txt, kr, sitemap.xml or robots.txt exists under dist/ko
     Then the build must fail closed
 
-  Scenario: Post directory sets match collected locale slugs
+  Scenario: Post directory sets match collected locale slugs and registry aliases
     Given the build output is verified after the sitemap step
-    When dist/ko/post and dist/post directory sets are compared with collected slugs
-    Then the Korean tree must contain only Korean slugs
-    And the English tree may additionally contain legacy alias slugs
+    When dist/ko/post and dist/post directory sets are compared with collected slugs and post aliases
+    Then the Korean tree must contain Korean canonical slugs and Korean post alias slugs
+    And the English tree must contain English canonical slugs and English post alias slugs

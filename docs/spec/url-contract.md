@@ -75,7 +75,7 @@
 
 - sitemap에는 canonical URL만 넣는다. alias URL은 어떤 경우에도 포함하지 않는다. 빌드와 `verifyAliasOutputs`가 이를 검사한다.
 - `/kr/`은 `/ko/`로 수렴하는 locale alias다. 별칭 문서는 canonical `/ko/`, 0초 meta refresh, noscript 링크를 유지하고 sitemap·hreflang에 넣지 않는다.
-- 모든 alias 문서는 `noindex,follow`를 가진다. 포스트 alias는 canonical=최종 canonical, 0초 meta refresh와 `location.replace`를 유지한다. 영어 alias는 `dist/ko/post/<옛 slug>/`를 만들지 않는다.
+- 모든 alias 문서는 `noindex,follow`를 가진다. 포스트 alias는 canonical=최종 canonical, 0초 meta refresh와 `location.replace`를 유지한다. 영어 alias는 `dist/ko/post/<옛 slug>/`를 만들지 않고, 한국어 alias는 `dist/ko/post/<옛 slug>/`에만 만든다.
 
 ## 런타임 퍼지 폴백은 권위가 아니다
 

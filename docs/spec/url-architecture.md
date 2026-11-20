@@ -28,7 +28,7 @@
 - 공개 URL 장부는 `url-contract.json`이며 canonical과 alias의 단일 권위다. 스키마·전이 행렬·보장 범위는 [url-contract.md](url-contract.md)에 있다.
 - 기존에 공개된 영어 포스트 별칭은 영구 보존한다. 신규 별칭은 append-only 관례로만 추가하며 기존 항목의 target을 수정하거나 삭제하지 않는다.
 - registry는 다음을 검증한다: canonical 집합과 파생 집합의 일치(누락·추가 모두 위반), url 중복, self-reference, target 미등록, 순환 체인, locale 변경, alias URL과 canonical slug 충돌. 체인은 허용하며 최종 canonical로 해석한다. alias `from` URL은 sitemap에서 제외한다.
-- 한국어 별칭 이력은 아직 레지스트리에 없다. 한국어 포스트의 과거 slug 호환은 이 계약의 범위가 아니다.
+- 한국어 포스트의 과거 slug도 같은 alias 규칙으로 보존한다. 한국어 alias는 `dist/ko/post/<옛 slug>/index.html`에 생성하고 sitemap에서 제외한다.
 - `/kr` 하위 경로(`/kr/post/...` 등)는 이 계약에 포함하지 않는다.
 - 포스트 로더는 기존 canonical slug(`dont`)와 현재 slug(`don-t`)를 모두 조회 호환해 과거 링크의 Post not found를 방지해야 한다.
 
