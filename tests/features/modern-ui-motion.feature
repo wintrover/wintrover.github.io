@@ -43,3 +43,9 @@ Feature: Modern UI motion across core blog surfaces
     When I inspect the nested subtopic buttons
     Then nested subtopic buttons should share the category-link subtopic-item style
     And they should not use a separate leaf style
+
+  Scenario: Sidebar profile shows the owner name instead of the project name
+    Given I render the app shell
+    When I inspect the profile name under the avatar
+    Then it should display the owner name Suhyok Yoon
+    And it should not display the project name Axiom as the profile name

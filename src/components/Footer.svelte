@@ -20,7 +20,7 @@ void siteConfig;
       {/if}
 
       {#if siteConfig.social.linkedin}
-        <a href="https://linkedin.com/in/{siteConfig.social.linkedin}" title="LinkedIn" class="social-link">
+        <a href="https://www.linkedin.com/in/{siteConfig.social.linkedin}/" title="LinkedIn" class="social-link">
           <svg class="svg-icon"><use href="#icon-linkedin"></use></svg>
         </a>
       {/if}

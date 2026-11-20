@@ -17,6 +17,7 @@ describe("푸터 소셜 링크 검증", () => {
 		);
 		expect(scenarios).toEqual([
 			"footer renders email github and linkedin social links only",
+			"footer linkedin link uses the canonical www profile URL",
 		]);
 	});
 
@@ -29,5 +30,14 @@ describe("푸터 소셜 링크 검증", () => {
 		expect(footer).toContain('title="Email"');
 		expect(footer).toContain('title="GitHub"');
 		expect(footer).toContain('title="LinkedIn"');
+	});
+
+	test("Given 설정과 푸터 When 확인 Then LinkedIn은 canonical URL로 연결된다", () => {
+		const config = read("src/lib/config.ts");
+		const footer = read("src/components/Footer.svelte");
+		expect(config).toContain('linkedin: "suhyok-yoon-1934b713a"');
+		expect(footer).toContain(
+			'href="https://www.linkedin.com/in/{siteConfig.social.linkedin}/"',
+		);
 	});
 });
