@@ -36,4 +36,4 @@ Feature: Modern UI motion across core blog surfaces
   Scenario: Sidebar nested subtopics are constrained to approved list
     Given I render the app shell with category nested items
     When I inspect nested labels under category nodes
-    Then nested items should only include SMBholdings CVFactory Axiom External Repos and Axiom General
+    Then nested items should only include SMBholdings CVFactory and the Axiom tree with Axiom for External Repos and Axiom logs
