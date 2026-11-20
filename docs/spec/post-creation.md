@@ -37,6 +37,17 @@
 
 - 공개 포스트 본문에는 작성 프로세스용 체크리스트(예: Verification Checklist, Length Guidelines)를 남기지 않는다.
 
+## Axiom 검증 대상 저장소 포스트 형식
+
+Axiom이 특정 리포지토리를 검증한 결과를 다루는 포스트는 다음 형식을 따른다.
+
+- 제목은 검증 대상 리포지토리 이름으로 시작한다. `Axiom in <repo>: ...` 형태를 쓰지 않는다. 예: `nim-libp2p: One Length Law, One Counterexample, One Merged Fix`, `nim-toml-serialization: AI가 작성한 명제를 검증기가 반증한 기록`. 제목 변경으로 canonical slug가 바뀌면 기존 URL을 alias로 보존한다.
+- 출처·자료 목록의 제목은 영어 `References`, 한국어 `자료`로 쓴다. `Evidence`·`증거`를 절 제목으로 쓰지 않는다.
+- 출처·자료 목록은 본문 맨 끝이 아니라 frontmatter 직후 첫 절, 즉 서두에 배치한다.
+- 서술은 관측된 결과와 성과를 먼저 제시한다. 판정의 재현성·증거 보존 한계는 별도 절로 압축하고, 제목이나 글의 중심에 두지 않는다.
+- 업스트림 수용이 있는 경우 메인테이너의 수용·병합을 대상 저장소의 결함이 존재했다는 증거로 서술한다. 다만 그 수용이 Axiom 판정의 재현성을 확인하지는 않는다는 경계는 유지한다.
+- `real`, `actually`, `genuine`, `decisive`와 한국어 `실제`·`진짜` 같은 강조어를 붙이지 않는다. 사실과 관측만 서술한다.
+
 ## 프로젝트 명칭 정책
 
 - 포스팅 내용에서 프로젝트명은 일관되게 지칭한다.

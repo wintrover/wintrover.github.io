@@ -65,6 +65,7 @@
   - `description`: 1-2문장의 핵심 요약
 - **프로젝트 명칭 정책**: 포스팅 내용에서 프로젝트명은 일관되게 지칭한다. `Axiom Enterprise` 폴더명을 그대로 사용하지 말고 `Axiom`으로만 지칭한다. (예: "Axiom Enterprise was built" → "Axiom was built")
 - **본문 구성**: 섹션 구성과 분량은 전달력을 해치지 않는 범위에서 자유롭게 쓴다.
+- **Axiom 검증 대상 저장소 포스트 형식**: 제목은 검증 대상 리포지토리 이름으로 시작하고, 출처 목록은 `References`(한국어 `자료`)로 서두에 둔다. 강조어(`real`·`실제` 등) 없이 결과와 관측을 먼저 서술한다. 정본은 `docs/spec/post-creation.md`다.
 - **공개 포스트 본문에는 작성 프로세스용 체크리스트를 남기지 않는다.** (예: Verification Checklist, Length Guidelines)
 
 ### 콘텐츠 변경 경로와 병합 검증
