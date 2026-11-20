@@ -37,3 +37,9 @@ Feature: Modern UI motion across core blog surfaces
     Given I render the app shell with category nested items
     When I inspect nested labels under category nodes
     Then nested items should only include SMBholdings CVFactory and the Axiom tree with Axiom for External Repos and Axiom logs
+
+  Scenario: Nested sidebar subtopics reuse the shared subtopic style
+    Given I render the app shell with a nested subtopic group
+    When I inspect the nested subtopic buttons
+    Then nested subtopic buttons should share the category-link subtopic-item style
+    And they should not use a separate leaf style

@@ -401,6 +401,17 @@ describe("Sidebar Component", () => {
 		).toBeInTheDocument();
 		expect(screen.getByText("Axiom logs (1)")).toBeInTheDocument();
 
+		const axiomNode = screen.getByText("Axiom (2)").closest("li");
+		expect(axiomNode).not.toBeNull();
+		const nestedSubtopicButtons = axiomNode
+			? [...axiomNode.querySelectorAll(".subtopic-item")]
+			: [];
+		expect(nestedSubtopicButtons).toHaveLength(3);
+		for (const button of nestedSubtopicButtons) {
+			expect(button.classList.contains("subtopic-item")).toBe(true);
+			expect(button.classList.contains("subtopic-leaf")).toBe(false);
+		}
+
 		await fireEvent.click(screen.getByText("Axiom for External Repos (1)"));
 
 		expect(get(selectedCategory)).toBe("Archright - axiom-for-external-repos");
