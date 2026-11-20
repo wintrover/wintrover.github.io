@@ -44,10 +44,10 @@ Feature: Post creation standard
     Given an Archright blog post is created
     When the post frontmatter tags are defined
     Then it should contain the Axiom tag
-    And it should contain exactly one of "Axiom External Repos" or "Axiom General"
+    And it should contain exactly one of "Axiom for External Repos" or "Axiom logs"
 
-  Scenario: Axiom External Repos posts follow the repo-first format
-    Given a blog post is tagged with "Axiom External Repos"
+  Scenario: Axiom for External Repos posts follow the repo-first format
+    Given a blog post is tagged with "Axiom for External Repos"
     When the post frontmatter and body are written
     Then the title should start with the verified repository name followed by a colon
     And the first section heading should be "References" in English or "자료" in Korean

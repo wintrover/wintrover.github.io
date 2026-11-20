@@ -14,8 +14,14 @@
 			"slug": "archright",
 			"color": "#ff7b00",
 			"icon": "🧭",
-			"tags": ["Axiom External Repos", "Axiom General"],
-			"exclusiveTags": ["Axiom", "Axiom External Repos", "Axiom General"]
+			"tags": ["Axiom"],
+			"subtopicGroups": [
+				{
+					"label": "Axiom",
+					"children": ["Axiom for External Repos", "Axiom logs"]
+				}
+			],
+			"exclusiveTags": ["Axiom", "Axiom for External Repos", "Axiom logs"]
 		},
 		"company": {
 			"name": "Company Work",

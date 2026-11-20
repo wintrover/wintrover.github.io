@@ -7,20 +7,21 @@
 
 - 모든 포스트는 영어(English)와 한국어(Korean) 두 언어로 작성해야 한다.
 - 신규 포스팅 등록 시 영어 원문과 한국어 버전을 기본으로 동시 작성하며, 파일명은 동일한 `YYYY-MM-DD-N.md`를 사용한다. 경로는 콘텐츠 성격에 따라 다음을 따른다.
-  - **Archright 카테고리**: Axiom 프로젝트 및 정형 검증 관련 포스트. 영어 `src/posts/archright/`, 한국어 `src/posts/ko/archright/`에 저장한다. frontmatter의 `category` 값을 `Archright`로 설정하고 `tags`에 반드시 `Axiom`을 포함해야 한다. 여기에 더해 사이드바 서브토픽 태그 `Axiom External Repos` 또는 `Axiom General` 중 정확히 하나를 포함한다 (아래 "Archright 서브토픽 분류" 참조).
+  - **Archright 카테고리**: Axiom 프로젝트 및 정형 검증 관련 포스트. 영어 `src/posts/archright/`, 한국어 `src/posts/ko/archright/`에 저장한다. frontmatter의 `category` 값을 `Archright`로 설정하고 `tags`에 반드시 `Axiom`을 포함해야 한다. 여기에 더해 사이드바 서브토픽 태그 `Axiom for External Repos` 또는 `Axiom logs` 중 정확히 하나를 포함한다 (아래 "Archright 서브토픽 분류" 참조).
   - **Project 카테고리**: 개인 프로젝트 일반. 영어 `src/posts/project/`, 한국어 `src/posts/ko/project/`에 저장하며 frontmatter의 `category` 값을 `Project`로 설정한다.
   - **Company Work 카테고리**: 재직 중 회사 업무 회고. 영어 `src/posts/company/`, 한국어 `src/posts/ko/company/`에 저장하며 frontmatter의 `category` 값을 `Company Work`로 설정한다.
 
 ## Archright 서브토픽 분류
 
-- Archright 포스트는 `Axiom` 태그를 유지한 채 다음 두 서브토픽 태그 중 정확히 하나를 추가한다. 사이드바는 이 태그로 하위 목록을 만든다.
-  - `Axiom External Repos`: 외부 리포지토리를 대상으로 Axiom이 검증을 수행한 결과를 다루는 포스트.
-  - `Axiom General`: 그 외 Axiom 자체의 아키텍처·철학·도구·회고를 다루는 포스트.
-- 두 태그는 `Axiom`과 마찬가지로 Archright 전용이며 `exclusiveTags`로 강제된다.
+- Archright 포스트는 `Axiom` 태그를 유지한 채 다음 두 서브토픽 태그 중 정확히 하나를 추가한다. 사이드바는 `Archright > Axiom > (Axiom for External Repos | Axiom logs)` 계층으로 표시한다.
+  - `Axiom for External Repos`: 외부 리포지토리를 대상으로 Axiom이 검증을 수행한 결과를 다루는 포스트.
+  - `Axiom logs`: 그 외 Axiom 자체의 아키텍처·철학·도구·회고를 다루는 포스트.
+- 계층은 `categories.json`의 `subtopicGroups`에 정의하며, `Axiom` 항목 자체는 Archright 포스트 전체를 필터링한다.
+- 세 태그는 모두 Archright 전용이며 `exclusiveTags`로 강제된다.
 
 ## 카테고리/태그 독점 규칙 (exclusiveTags)
 
-- `categories.json`의 `exclusiveTags`에 선언된 태그는 해당 카테고리에서만 사용할 수 있다. 예: `Axiom`·`Axiom External Repos`·`Axiom General` 태그는 반드시 `Archright` 카테고리여야 하며, 빌드(`build-github.ts`)와 절차 게이트(`procedure-gate.ts`)에서 하드 검증되어 위반 시 즉시 실패한다. 런타임에서는 `postLoader.ts`가 자동으로 `Archright`로 덮어쓴다.
+- `categories.json`의 `exclusiveTags`에 선언된 태그는 해당 카테고리에서만 사용할 수 있다. 예: `Axiom`·`Axiom for External Repos`·`Axiom logs` 태그는 반드시 `Archright` 카테고리여야 하며, 빌드(`build-github.ts`)와 절차 게이트(`procedure-gate.ts`)에서 하드 검증되어 위반 시 즉시 실패한다. 런타임에서는 `postLoader.ts`가 자동으로 `Archright`로 덮어쓴다.
 
 ## 한영 포스트 동기화 규칙
 
@@ -46,7 +47,7 @@
 
 ## Axiom 검증 대상 저장소 포스트 형식
 
-Axiom이 특정 리포지토리를 검증한 결과를 다루는 포스트는 다음 형식을 따른다. 이 형식은 `Axiom External Repos` 서브토픽 태그가 붙은 모든 포스트에 적용한다.
+Axiom이 특정 리포지토리를 검증한 결과를 다루는 포스트는 다음 형식을 따른다. 이 형식은 `Axiom for External Repos` 서브토픽 태그가 붙은 모든 포스트에 적용한다.
 
 - 제목은 검증 대상 리포지토리 이름으로 시작한다. `Axiom in <repo>: ...` 형태를 쓰지 않는다. 예: `nim-libp2p: One Length Law, One Counterexample, One Merged Fix`, `nim-toml-serialization: AI가 작성한 명제를 검증기가 반증한 기록`. 제목 변경으로 canonical slug가 바뀌면 기존 URL을 alias로 보존한다.
 - 출처·자료 목록의 제목은 영어 `References`, 한국어 `자료`로 쓴다. `Evidence`·`증거`를 절 제목으로 쓰지 않는다.

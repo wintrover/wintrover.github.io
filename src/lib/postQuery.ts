@@ -13,15 +13,24 @@ type PostFilterResult = {
 	tagLabel: string;
 };
 
+type SubtopicGroupConfig = {
+	label: string;
+	children: string[];
+};
+
 type CategoryConfigLike = {
-	categories?: Record<string, { name?: unknown; tags?: unknown }>;
+	categories?: Record<
+		string,
+		{ name?: unknown; tags?: unknown; subtopicGroups?: unknown }
+	>;
 };
 
 const sidebarSubtopics = [
 	"SMBholdings",
 	"CVFactory",
-	"Axiom External Repos",
-	"Axiom General",
+	"Axiom",
+	"Axiom for External Repos",
+	"Axiom logs",
 ] as const;
 const subtopicLabelByLowercase = Object.fromEntries(
 	sidebarSubtopics.map((subtopic) => [subtopic.toLowerCase(), subtopic]),
@@ -33,6 +42,24 @@ function resolveSidebarSubtopicLabel(raw: string): string | null {
 	return subtopicLabelByLowercase[normalized] ?? null;
 }
 
+function parseSubtopicGroups(value: unknown): SubtopicGroupConfig[] {
+	if (!Array.isArray(value)) return [];
+	const groups: SubtopicGroupConfig[] = [];
+	for (const raw of value) {
+		if (!raw || typeof raw !== "object") continue;
+		const label = (raw as { label?: unknown }).label;
+		const children = (raw as { children?: unknown }).children;
+		if (typeof label !== "string" || !label.trim()) continue;
+		groups.push({
+			label,
+			children: Array.isArray(children)
+				? children.filter((child): child is string => typeof child === "string")
+				: [],
+		});
+	}
+	return groups;
+}
+
 export type SidebarItem = {
 	label: string;
 	slug: string;
@@ -40,6 +67,7 @@ export type SidebarItem = {
 	value: string;
 	isTag?: boolean;
 	parentSlug?: string;
+	children?: SidebarItem[];
 };
 
 export type CategoryGroup = {
@@ -96,16 +124,22 @@ export function buildSidebarData(
 	categoryGroups: CategoryGroup[];
 } {
 	const configuredTagsByCategoryName: Record<string, string[]> = {};
+	const configuredGroupsByCategoryName: Record<string, SubtopicGroupConfig[]> =
+		{};
 	const categoryEntries = config?.categories ?? {};
 	for (const entry of Object.values(categoryEntries)) {
 		const name = entry?.name;
 		const tags = entry?.tags;
 		if (typeof name === "string" && name) {
-			configuredTagsByCategoryName[name] = Array.isArray(tags)
-				? tags
-						.map((tag) => resolveSidebarSubtopicLabel(String(tag)))
-						.filter((tag): tag is string => Boolean(tag))
-				: [];
+			const groups = parseSubtopicGroups(entry?.subtopicGroups);
+			const labels = [
+				...(Array.isArray(tags) ? tags.map(String) : []),
+				...groups.flatMap((group) => [group.label, ...group.children]),
+			]
+				.map((tag) => resolveSidebarSubtopicLabel(tag))
+				.filter((tag): tag is string => Boolean(tag));
+			configuredTagsByCategoryName[name] = Array.from(new Set(labels));
+			configuredGroupsByCategoryName[name] = groups;
 		}
 	}
 
@@ -155,23 +189,46 @@ export function buildSidebarData(
 		const tagsForCategory: SidebarItem[] = [];
 
 		if (categoriesWithConfiguredTags.has(name)) {
+			const makeTagItem = (label: string): SidebarItem => {
+				const tagSlug = slugify(label);
+				return {
+					label,
+					slug: tagSlug,
+					count: tagCountByCategory[name]?.[label] ?? 0,
+					value: `${name} - ${tagSlug}`,
+					isTag: true,
+					parentSlug: categorySlug,
+				};
+			};
+			const groups = configuredGroupsByCategoryName[name] ?? [];
+			const groupedLabels = new Set<string>();
+			for (const group of groups) {
+				const groupLabel = resolveSidebarSubtopicLabel(group.label);
+				if (!groupLabel) continue;
+				const children = group.children
+					.map((child) => resolveSidebarSubtopicLabel(child))
+					.filter((child): child is string => Boolean(child))
+					.map((child) => makeTagItem(child));
+				if (children.length === 0) continue;
+				groupedLabels.add(groupLabel);
+				for (const child of children) {
+					groupedLabels.add(child.label);
+				}
+				tagsForCategory.push({
+					...makeTagItem(groupLabel),
+					children,
+				});
+			}
 			const fromConfig = configuredTagsByCategoryName[name] ?? [];
 			const fromPosts = Object.keys(tagCountByCategory[name] ?? {});
 			const tags = Array.from(new Set([...fromConfig, ...fromPosts]))
 				.map((tag) => resolveSidebarSubtopicLabel(String(tag)))
 				.filter((tag): tag is string => Boolean(tag))
+				.filter((tag) => !groupedLabels.has(tag))
 				.sort((a, b) => a.localeCompare(b));
 
 			for (const tag of tags) {
-				const tagSlug = slugify(tag);
-				tagsForCategory.push({
-					label: tag,
-					slug: tagSlug,
-					count: tagCountByCategory[name]?.[tag] ?? 0,
-					value: `${name} - ${tagSlug}`,
-					isTag: true,
-					parentSlug: categorySlug,
-				});
+				tagsForCategory.push(makeTagItem(tag));
 			}
 		}
 

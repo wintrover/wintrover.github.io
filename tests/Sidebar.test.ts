@@ -329,7 +329,7 @@ describe("Sidebar Component", () => {
 		expect(projectGroup?.tags).toHaveLength(0);
 	});
 
-	test("buildSidebarData는 Archright 서브토픽을 두 라벨로 분리해야 함", () => {
+	test("buildSidebarData는 Archright의 Axiom 서브토픽을 3단 계층으로 만들어야 함", () => {
 		const makePost = (fileName: string, tags: string[]): Post => ({
 			fileName,
 			title: fileName,
@@ -342,15 +342,21 @@ describe("Sidebar Component", () => {
 			content: "",
 		});
 		const generatedPosts = [
-			makePost("external", ["Axiom", "Axiom External Repos"]),
-			makePost("general-1", ["Axiom", "Axiom General"]),
-			makePost("general-2", ["Axiom", "Axiom General"]),
+			makePost("external", ["Axiom", "Axiom for External Repos"]),
+			makePost("logs-1", ["Axiom", "Axiom logs"]),
+			makePost("logs-2", ["Axiom", "Axiom logs"]),
 		];
 		const config = {
 			categories: {
 				archright: {
 					name: "Archright",
-					tags: ["Axiom External Repos", "Axiom General"],
+					tags: ["Axiom"],
+					subtopicGroups: [
+						{
+							label: "Axiom",
+							children: ["Axiom for External Repos", "Axiom logs"],
+						},
+					],
 				},
 			},
 		};
@@ -361,8 +367,45 @@ describe("Sidebar Component", () => {
 		);
 
 		expect(archrightGroup?.tags.map((tag) => [tag.label, tag.count])).toEqual([
-			["Axiom External Repos", 1],
-			["Axiom General", 2],
+			["Axiom", 3],
 		]);
+		expect(
+			archrightGroup?.tags[0]?.children?.map((tag) => [tag.label, tag.count]),
+		).toEqual([
+			["Axiom for External Repos", 1],
+			["Axiom logs", 2],
+		]);
+	});
+
+	test("Archright의 Axiom 트리를 렌더링하고 하위 항목으로 이동해야 함", async () => {
+		const makePost = (fileName: string, tags: string[]): Post => ({
+			fileName,
+			title: fileName,
+			category: "Archright",
+			tags,
+			slug: fileName,
+			date: "2024-01-03",
+			excerpt: "",
+			html: "",
+			content: "",
+		});
+		posts.set([
+			makePost("external", ["Axiom", "Axiom for External Repos"]),
+			makePost("logs", ["Axiom", "Axiom logs"]),
+		]);
+		render(Sidebar);
+
+		expect(screen.getByText("Axiom (2)")).toBeInTheDocument();
+		expect(
+			screen.getByText("Axiom for External Repos (1)"),
+		).toBeInTheDocument();
+		expect(screen.getByText("Axiom logs (1)")).toBeInTheDocument();
+
+		await fireEvent.click(screen.getByText("Axiom for External Repos (1)"));
+
+		expect(get(selectedCategory)).toBe("Archright - axiom-for-external-repos");
+		expect(push).toHaveBeenCalledWith(
+			"/category/archright/tag/axiom-for-external-repos",
+		);
 	});
 });

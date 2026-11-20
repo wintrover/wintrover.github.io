@@ -5,7 +5,7 @@ import { walkMarkdownFiles } from "../scripts/post-entries";
 import { parseFrontMatter } from "../src/lib/utils";
 
 const root = process.cwd();
-const subtopicTag = "Axiom External Repos";
+const subtopicTag = "Axiom for External Repos";
 
 type TargetPost = {
 	file: string;
@@ -37,7 +37,7 @@ const targets = [
 	...collectTargets(path.join("src", "posts", "ko", "archright"), "ko"),
 ];
 
-describe("Axiom External Repos 포스트 형식", () => {
+describe("Axiom for External Repos 포스트 형식", () => {
 	test("대상 포스트가 두 언어에 존재한다", () => {
 		expect(
 			targets.filter((post) => post.locale === "en").length,
