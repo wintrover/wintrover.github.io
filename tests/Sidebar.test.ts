@@ -328,4 +328,41 @@ describe("Sidebar Component", () => {
 		expect(projectGroup).toBeDefined();
 		expect(projectGroup?.tags).toHaveLength(0);
 	});
+
+	test("buildSidebarData는 Archright 서브토픽을 두 라벨로 분리해야 함", () => {
+		const makePost = (fileName: string, tags: string[]): Post => ({
+			fileName,
+			title: fileName,
+			category: "Archright",
+			tags,
+			slug: fileName,
+			date: "2024-01-03",
+			excerpt: "",
+			html: "",
+			content: "",
+		});
+		const generatedPosts = [
+			makePost("external", ["Axiom", "Axiom External Repos"]),
+			makePost("general-1", ["Axiom", "Axiom General"]),
+			makePost("general-2", ["Axiom", "Axiom General"]),
+		];
+		const config = {
+			categories: {
+				archright: {
+					name: "Archright",
+					tags: ["Axiom External Repos", "Axiom General"],
+				},
+			},
+		};
+
+		const result = buildSidebarData(generatedPosts, config);
+		const archrightGroup = result.categoryGroups.find(
+			(group) => group.category.label === "Archright",
+		);
+
+		expect(archrightGroup?.tags.map((tag) => [tag.label, tag.count])).toEqual([
+			["Axiom External Repos", 1],
+			["Axiom General", 2],
+		]);
+	});
 });
