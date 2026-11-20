@@ -16,10 +16,10 @@ export const PRODUCTION_ORIGIN = "https://wintrover.github.io";
 export const REQUEST_TIMEOUT_MS = 30_000;
 export const BROWSER_TIMEOUT_MS = 45_000;
 /**
- * Informational only: the source-derived set currently has 62 entries. Sitemap
+ * Informational only: the source-derived set currently has 64 entries. Sitemap
  * acceptance is multiset equality against the expectation, never this count.
  */
-export const EXPECTED_SITEMAP_LOC_COUNT = 62;
+export const EXPECTED_SITEMAP_LOC_COUNT = 64;
 export const URL_CONTRACT_FILENAME = "url-contract.json";
 export const UNKNOWN_PATH = "/definitely-not-a-real-path-xyz/";
 /**

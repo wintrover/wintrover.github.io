@@ -37,7 +37,7 @@ Feature: Reproducible production acceptance
     Then the expectation must come from url-contract.json when present, then dist/sitemap.xml, then source post entries
     And each canonical URL must be compared root-relative with no missing, unexpected, or duplicate entries
     And every alias URL from the contract must be absent
-    And the 62 loc total must not decide pass or fail
+    And the 64 loc total must not decide pass or fail
 
   Scenario: Registry kinds separate canonical and alias expectations
     Given url-contract.json declares kind canonical and kind alias entries
