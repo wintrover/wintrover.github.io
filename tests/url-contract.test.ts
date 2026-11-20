@@ -480,7 +480,7 @@ describe("url contract serialization and update planning", () => {
 });
 
 describe("committed url-contract.json", () => {
-	test("registry holds 64 canonical and 4 alias URLs and matches derived URLs", () => {
+	test("registry holds 64 canonical and 6 alias URLs and matches derived URLs", () => {
 		const raw = fs.readFileSync(
 			path.join(process.cwd(), "url-contract.json"),
 			"utf-8",
@@ -493,14 +493,16 @@ describe("committed url-contract.json", () => {
 			(entry) => entry.kind === "alias",
 		);
 		expect(canonicalEntries).toHaveLength(64);
-		expect(aliasEntries).toHaveLength(4);
-		expect(contract.urls).toHaveLength(68);
+		expect(aliasEntries).toHaveLength(6);
+		expect(contract.urls).toHaveLength(70);
 		expect(
 			validateUrlContract(contract, deriveCanonicalUrls(process.cwd())),
 		).toEqual([]);
 		expect(aliasEntries.map((entry) => entry.url).sort()).toEqual([
+			"/ko/post/axiom-in-nim-libp2p/",
 			"/ko/post/axiom-went-upstream/",
 			"/kr/",
+			"/post/axiom-in-nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
 			"/post/axiom-went-upstream-one-line-one-test-and-the-evidence-that-expired/",
 			"/post/the-agent-wrote-the-theorem-a-formal-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
 		]);
