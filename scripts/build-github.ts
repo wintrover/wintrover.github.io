@@ -811,11 +811,19 @@ export function findLocaleBoundaryViolations(
 ): string[] {
 	const violations: string[] = [];
 
-	const koSlugs = collectPostEntries(root, "ko").map((entry) => entry.slug);
+	const koSlugs = new Set(
+		collectPostEntries(root, "ko").map((entry) => entry.slug),
+	);
+	for (const alias of contract.urls) {
+		if (alias.kind !== "alias") continue;
+		const origin = parsePostAliasUrl(alias.url);
+		if (origin?.locale === "ko") koSlugs.add(origin.slug);
+	}
 	const koPostDirs = listSubdirectories(path.join(dist, "ko", "post"));
-	if (!hasSameValues(koPostDirs, koSlugs)) {
+	const expectedKoDirs = [...koSlugs].sort();
+	if (!hasSameValues(koPostDirs, expectedKoDirs)) {
 		violations.push(
-			`dist/ko/post directory set mismatch (${describeSetMismatch(koPostDirs, koSlugs)})`,
+			`dist/ko/post directory set mismatch (${describeSetMismatch(koPostDirs, expectedKoDirs)})`,
 		);
 	}
 

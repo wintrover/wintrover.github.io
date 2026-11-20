@@ -649,6 +649,7 @@ describe("build-github locale boundary verification", () => {
 	const koPostSlug = "ko-post";
 	const enPostSlug = "en-post";
 	const legacyAliasSlug = "legacy-alias";
+	const legacyKoAliasSlug = "legacy-ko-alias";
 
 	function writeFixture() {
 		fs.mkdirSync(path.join(tempRoot, "public", "images"), { recursive: true });
@@ -662,6 +663,7 @@ describe("build-github locale boundary verification", () => {
 			...derivedCanonicalEntries(),
 			aliasEntry("/kr/", "/ko/"),
 			aliasEntry(`/post/${legacyAliasSlug}/`, `/post/${enPostSlug}/`),
+			aliasEntry(`/ko/post/${legacyKoAliasSlug}/`, `/ko/post/${koPostSlug}/`),
 		]);
 
 		const dist = distRoot();
@@ -691,6 +693,15 @@ describe("build-github locale boundary verification", () => {
 		fs.mkdirSync(path.join(dist, "ko", "post", koPostSlug), {
 			recursive: true,
 		});
+		const legacyKoAliasPath = path.join(
+			dist,
+			"ko",
+			"post",
+			legacyKoAliasSlug,
+			"index.html",
+		);
+		fs.mkdirSync(path.dirname(legacyKoAliasPath), { recursive: true });
+		fs.writeFileSync(legacyKoAliasPath, "");
 		fs.mkdirSync(path.join(dist, "post", enPostSlug), { recursive: true });
 		const legacyAliasPath = path.join(
 			dist,
@@ -705,6 +716,16 @@ describe("build-github locale boundary verification", () => {
 	test("경계를 지키는 산출물은 위반이 없다", () => {
 		writeFixture();
 		expect(findLocaleBoundaryViolations(distRoot(), tempRoot)).toEqual([]);
+	});
+
+	test("KO 포스트 alias 디렉터리가 없으면 위반이다", () => {
+		writeFixture();
+		fs.rmSync(path.join(distRoot(), "ko", "post", legacyKoAliasSlug), {
+			recursive: true,
+		});
+		expect(findLocaleBoundaryViolations(distRoot(), tempRoot)).toContain(
+			`dist/ko/post directory set mismatch (missing: [${legacyKoAliasSlug}], unexpected: [])`,
+		);
 	});
 
 	test("KO 트리에 금지된 파일이 있으면 위반이다", () => {

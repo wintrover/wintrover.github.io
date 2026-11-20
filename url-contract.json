@@ -77,9 +77,15 @@
       "locale": "ko"
     },
     {
-      "url": "/ko/post/axiom-went-upstream/",
+      "url": "/ko/post/axiom-in-nim-libp2p/",
       "kind": "canonical",
       "locale": "ko"
+    },
+    {
+      "url": "/ko/post/axiom-went-upstream/",
+      "kind": "alias",
+      "target": "/ko/post/axiom-in-nim-libp2p/",
+      "evidence": "published slug rename 2026-11-20"
     },
     {
       "url": "/ko/post/bash/",
@@ -198,9 +204,15 @@
       "locale": "en"
     },
     {
-      "url": "/post/axiom-went-upstream-one-line-one-test-and-the-evidence-that-expired/",
+      "url": "/post/axiom-in-nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
       "kind": "canonical",
       "locale": "en"
+    },
+    {
+      "url": "/post/axiom-went-upstream-one-line-one-test-and-the-evidence-that-expired/",
+      "kind": "alias",
+      "target": "/post/axiom-in-nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
+      "evidence": "published slug rename 2026-11-20"
     },
     {
       "url": "/post/behind-cvfactory-s-backend-celery-fastapi-and-playwright-at-scale/",
