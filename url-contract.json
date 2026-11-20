@@ -78,8 +78,9 @@
     },
     {
       "url": "/ko/post/axiom-in-nim-libp2p/",
-      "kind": "canonical",
-      "locale": "ko"
+      "kind": "alias",
+      "target": "/ko/post/nim-libp2p/",
+      "evidence": "published slug rename 2026-11-20"
     },
     {
       "url": "/ko/post/axiom-went-upstream/",
@@ -134,6 +135,11 @@
     },
     {
       "url": "/ko/post/kyc-react-ffmpeg-mediarecorder-api/",
+      "kind": "canonical",
+      "locale": "ko"
+    },
+    {
+      "url": "/ko/post/nim-libp2p/",
       "kind": "canonical",
       "locale": "ko"
     },
@@ -205,8 +211,9 @@
     },
     {
       "url": "/post/axiom-in-nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
-      "kind": "canonical",
-      "locale": "en"
+      "kind": "alias",
+      "target": "/post/nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
+      "evidence": "published slug rename 2026-11-20"
     },
     {
       "url": "/post/axiom-went-upstream-one-line-one-test-and-the-evidence-that-expired/",
@@ -271,6 +278,11 @@
     },
     {
       "url": "/post/junior-developer-s-full-stack-ai-journey-completing-the-kyc-system-and-growing/",
+      "kind": "canonical",
+      "locale": "en"
+    },
+    {
+      "url": "/post/nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
       "kind": "canonical",
       "locale": "en"
     },
