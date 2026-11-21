@@ -316,14 +316,33 @@ describe("selectExistingDevtoArticle", () => {
 		});
 	});
 
-	test("canonical이 다르면 매칭하지 않는다", () => {
-		const other = article({
+	test("canonical이 달라도 같은 제목의 draft는 slug 변경으로 보고 매칭한다", () => {
+		const renamed = article({
 			id: 5,
 			title: "Publish One Test Post",
 			canonical_url: "https://wintrover.github.io/post/other/",
 		});
 		expect(
-			selectExistingDevtoArticle([other], CANONICAL, "Publish One Test Post"),
+			selectExistingDevtoArticle([renamed], CANONICAL, "Publish One Test Post"),
+		).toEqual({
+			kind: "one",
+			article: renamed,
+		});
+	});
+
+	test("canonical이 다르고 공개된 글은 제목이 같아도 매칭하지 않는다", () => {
+		const published = article({
+			id: 6,
+			title: "Publish One Test Post",
+			canonical_url: "https://wintrover.github.io/post/other/",
+			published: true,
+		});
+		expect(
+			selectExistingDevtoArticle(
+				[published],
+				CANONICAL,
+				"Publish One Test Post",
+			),
 		).toEqual({
 			kind: "none",
 		});

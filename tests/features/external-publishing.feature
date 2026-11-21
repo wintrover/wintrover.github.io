@@ -37,3 +37,12 @@ Feature: External publishing body preparation
     When Draft One runs again for the same post
     Then the run must end with state unknown
     And no automatic retry POST or PUT may follow
+
+  Scenario: A renamed draft is adopted by title instead of duplicated
+    Given an existing draft whose canonical URL no longer matches the post
+    And the draft title equals the post title
+    And the draft is not published
+    When Draft One runs for the renamed post
+    Then the draft must be adopted and updated via PUT on the same article id
+    And no new POST request may be made
+    And a published article with the same title must not be adopted

@@ -288,9 +288,15 @@
       "locale": "en"
     },
     {
-      "url": "/post/nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
+      "url": "/post/nim-libp2p-a-length-law-found-what-sixteen-months-of-tests-could-not/",
       "kind": "canonical",
       "locale": "en"
+    },
+    {
+      "url": "/post/nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
+      "kind": "alias",
+      "target": "/post/nim-libp2p-a-length-law-found-what-sixteen-months-of-tests-could-not/",
+      "evidence": "published slug rename 2026-11-21"
     },
     {
       "url": "/post/nim-toml-serialization-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
