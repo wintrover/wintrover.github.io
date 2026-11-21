@@ -63,6 +63,7 @@ describe("에이전트 헌법 분할 계약", () => {
 			"codeowners declares the control plane paths",
 			"retired procedure gate workflow is absent",
 			"automation app is not a bypass actor",
+			"publishing approval is the owner's decision executed on instruction",
 		]);
 	});
 
@@ -112,6 +113,15 @@ describe("에이전트 헌법 분할 계약", () => {
 		expect(agents).not.toContain("mcp_Sequential_Thinking_sequentialthinking");
 		expect(agents).not.toContain("mcp_Chrome_DevTools_MCP_*");
 		expect(agents).not.toContain("ctx7 library");
+	});
+
+	test("Given AGENTS.md When 발행 승인 권위를 확인 Then 결정권과 집행이 분리되어 있다", () => {
+		const agents = read("AGENTS.md");
+		expect(agents).toContain("발행 결정권은 오너에게만 있다");
+		expect(agents).toContain("에이전트는 스스로 발행을 결정할 수 없다");
+		expect(agents).toContain("그 지시가 승인 결정이다");
+		expect(agents).toContain("owner-instructed:");
+		expect(agents).toContain("승인 API를 호출할 수 없다");
 	});
 
 	test("Given docs/agents When 절차 문서를 확인 Then 세 문서가 존재하고 비어 있지 않다", () => {

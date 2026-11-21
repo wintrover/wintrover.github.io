@@ -8,13 +8,14 @@ Repeatable, minimal steps to create **one draft** on DEV.to, verify it externall
 - The `Draft One` workflow is the only write path; it is triggered by `repository_dispatch` (`draft-one`).
 - The owner is the required reviewer for the `sns-publish` environment.
 - `prevent_self_review` is not enabled on the `sns-publish` environment (measured 2026-11-05): the user who triggered the run is not blocked from approving it.
+- The agent may call the approval API only when the owner explicitly instructed that publish in the conversation; the approval comment records `owner-instructed: <instruction summary>`.
 - Images are publicly reachable at absolute URLs under `https://wintrover.github.io/images/...`.
 
 > **전환 상태 (2026-10-22)**
 >
 > - 자동화 App `wintrover-automation`(App ID 5415157, 권한은 [docs/spec/automation-identity.md](spec/automation-identity.md)의 정본을 따름 — `repository_dispatch` 가능)은 **유일한 자동화 경로**다. 오너의 관리자 PAT는 서버 측에서 폐기되었다.
 > - dispatch와 API 호출은 `scripts/app-token.ts`가 발급한 App 설치 토큰을 사용한다(`pnpm exec tsx scripts/app-token.ts`). 이 App은 관리자 권한이 없고 ruleset 우회(bypass) 주체로 등록되지 않으며 워크플로 파일을 수정할 수 없다.
-> - `sns-publish` 환경의 오너 승인 게이트는 전환 여부와 무관하게 불변이다. 오너는 브라우저에서 승인한다.
+> - `sns-publish` 환경의 오너 승인 게이트는 전환 여부와 무관하게 불변이다. 승인 결정권은 오너에게 있다. 오너가 대화에서 명시적으로 발행을 지시하면 에이전트가 그 결정을 승인 API로 집행하고, 지시가 없으면 승인하지 않는다.
 
 ## Checklist (run in order)
 
@@ -43,15 +44,16 @@ gh run list --workflow=publish-one.yml --limit 1 \
 ```
 Expected: `event=repository_dispatch`, `actor=<automation-app>`, `headBranch=main`, `status=waiting`.
 
-4) Approve the environment deployment (owner only)
+4) Approve the environment deployment (owner decision; the agent may execute it)
+Run this only when the owner explicitly instructed that publish. The comment is the audit record.
 ```
 RUN_ID=<run-id>
 ENV_ID=$(gh api repos/wintrover/wintrover.github.io/actions/runs/$RUN_ID/pending_deployments --jq '.[0].environment.id')
-printf '{"environment_ids":[%s],"state":"approved","comment":"owner-approved draft-only dispatch"}' "$ENV_ID" \
+printf '{"environment_ids":[%s],"state":"approved","comment":"owner-instructed: <instruction summary>"}' "$ENV_ID" \
   | gh api -X POST repos/wintrover/wintrover.github.io/actions/runs/$RUN_ID/pending_deployments --input -
 gh run watch "$RUN_ID" --exit-status
 ```
-Expected: the job starts only after approval.
+Expected: the job starts only after approval, and the approval record names the owner instruction.
 
 5) Verify the external result — this is the only success evidence
 ```
