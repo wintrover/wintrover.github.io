@@ -59,11 +59,7 @@ describe("Legacy publish path isolation", () => {
 			.filter((workflow) => workflow.content.includes("secrets.DEVTO_API_KEY"))
 			.map((workflow) => workflow.name)
 			.sort();
-		expect(referencing).toEqual([
-			"draft-delete.yml",
-			"publish-one.yml",
-			"unpublish-one.yml",
-		]);
+		expect(referencing).toEqual(["publish-one.yml", "unpublish-one.yml"]);
 		for (const workflow of workflows().filter((entry) =>
 			referencing.includes(entry.name),
 		)) {

@@ -16,7 +16,8 @@
 - 갱신 PUT이 4xx면 `failed`, 5xx·타임아웃·응답 유실이면 `unknown`으로 종료한다. `unknown`은 성공이 아니며 자동 재POST·자동 재PUT 없이 외부 목록 재조회로만 판정한다(헌법 §0.4 불변). [REQ-EXT-PUB-07]
 - 완료 판정의 유일한 증거는 외부 관측(`GET /api/articles/me/all`에서 동일 `id`가 `published:false`)이다. 워크플로 로그의 success는 증거가 아니다. [REQ-EXT-PUB-08]
 - 제목 변경으로 canonical URL이 달라진 재실행은 canonical 대신 정규화된 제목이 일치하는 기존 초안을 adopt하고, 같은 article id로 제목·canonical·본문을 PUT 갱신한다. 제목 폴백은 공개되지 않은 초안에만 적용하며, 일치하는 초안이 둘 이상이면 `ambiguous`로 종료하고 아무것도 쓰지 않는다. [REQ-EXT-PUB-09]
-- 중복 초안 정리는 `Draft Delete`(`workflow_dispatch`)로만 수행한다. `published:false`인 초안만 삭제하고 공개 글은 거부한다. 삭제 판정은 `/api/articles/me/all`에서 해당 `id`가 사라진 관측이다. [REQ-EXT-PUB-10]
+- 제목과 canonical이 같은 실행에서 함께 바뀌면 두 키 어느 쪽으로도 기존 초안을 찾을 수 없어 새 초안이 만들어진다. 제목 변경은 canonical을 이전 값으로 고정한 실행과 canonical을 새 값으로 바꾸는 실행으로 나눈다.
+- Forem API는 글 삭제 엔드포인트를 제공하지 않는다. `DELETE /api/articles/{id}`는 라우트가 없어 404를 반환한다(실측 2026-11-21). 중복 초안은 DEV.to 대시보드에서 직접 삭제하며, 자동화 경로를 두지 않는다.
 
 ## 관련
 
