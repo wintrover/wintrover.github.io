@@ -51,3 +51,11 @@ Feature: Agent constitution split
     When it attempts a ruleset change, a workflow-file push, or a bypass merge
     Then the platform rejects each attempt
     And merging requires only the passing validate check with auto-merge
+
+  Scenario: publishing approval is the owner's decision executed on instruction
+    Given the sns-publish environment requires the owner as reviewer
+    When the owner explicitly instructs a publish in the conversation
+    Then that instruction is the approval decision
+    And the agent may execute it through the approval API
+    And the approval record must carry the instruction basis
+    And no pending publish run may be approved without an owner instruction

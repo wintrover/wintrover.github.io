@@ -92,8 +92,8 @@
 - **정본**: 발행 본문 변환(상대 링크 절대화)과 재실행 시 초안 재동기화(adopt 후 PUT 갱신) 계약의 정본은 [docs/spec/external-publishing.md](../spec/external-publishing.md)다.
 - **초안 전용**: `Draft One`은 `published:false` 초안만 만든다. 공개 전환은 이 저장소의 자동화 범위가 아니다. 이미 공개된 글을 초안으로 되돌릴 때는 `Unpublish One`을 사용한다.
 - **단일 실행 경로**: 발행은 `.github/workflows/publish-one.yml`의 `repository_dispatch: draft-one`으로만 요청한다. 로컬에서 `scripts/post-to-dev.ts`를 직접 실행하지 않는다. `--publish-one` 외의 레거시 경로는 `PUBLISH_LEGACY_ENABLED` 없이는 거부된다.
-- **승인 경계**: 실제 실행은 `sns-publish` 환경의 오너 승인을 통과해야 한다. 에이전트는 승인자가 될 수 없다.
-- **자동화 신원 (App 설치 토큰)**: 자동화는 GitHub App `wintrover-automation`의 설치 토큰(`pnpm exec tsx scripts/app-token.ts` 발급)으로만 동작한다. 관리자 권한이 없고 ruleset 우회(bypass) 주체로 등록되지 않으며 워크플로 파일을 수정할 수 없다. `Draft One` dispatch는 `wintrover-automation` App 신원이 수행하고, `sns-publish` 환경 승인은 오너가 브라우저에서 수행한다.
+- **승인 경계**: 실제 실행은 `sns-publish` 환경의 오너 승인을 통과해야 한다. 에이전트는 스스로 승인 결정을 내릴 수 없고, 오너가 대화에서 명시적으로 지시한 경우에만 그 결정을 승인 API로 집행한다. 승인 코멘트에는 `owner-instructed: <지시 요약>`을 남긴다.
+- **자동화 신원 (App 설치 토큰)**: 자동화는 GitHub App `wintrover-automation`의 설치 토큰(`pnpm exec tsx scripts/app-token.ts` 발급)으로만 동작한다. 관리자 권한이 없고 ruleset 우회(bypass) 주체로 등록되지 않으며 워크플로 파일을 수정할 수 없다. `Draft One` dispatch는 `wintrover-automation` App 신원이 수행하고, `sns-publish` 환경 승인은 오너 지시에 따라 에이전트가 집행하거나 오너가 직접 수행한다.
 - **사전 검증**: 발행 전 `pnpm run typecheck`, `pnpm run test`, `pnpm run build:github`가 통과해야 한다.
 - **외부 관측이 유일한 증거**: 성공 판정은 `GET https://dev.to/api/articles/me/all`에서 동일 `id`가 `published:false`로 보이는 것이다. 워크플로 로그의 success나 로컬 마커는 증거가 아니다.
 - **재실행**: 동일 포스트를 다시 요청하면 기존 초안을 찾아 `already_draft`/`draft_found`로 종료해야 하며 새 POST를 만들면 안 된다.
