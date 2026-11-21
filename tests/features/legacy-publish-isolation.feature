@@ -14,8 +14,8 @@ Feature: Legacy publish path isolation
   Scenario: Only approved draft workflows can read the DEV.to credential
     Given workflows declare the DEVTO_API_KEY secret
     When the secret references are enumerated
-    Then only publish-one, unpublish-one and draft-delete may reference it
-    And all three must run behind the sns-publish environment
+    Then only publish-one and unpublish-one may reference it
+    And both must run behind the sns-publish environment
 
   Scenario: Legacy CLI requires explicit opt-in
     Given PUBLISH_LEGACY_ENABLED is unset
