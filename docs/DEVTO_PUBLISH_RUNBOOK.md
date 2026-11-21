@@ -83,6 +83,16 @@ Delete any local artifact and dispatch the same post again. Expected: the same `
 ```
 Expected: the workflow fails with `unknown`; no automatic re-POST follows. Reconcile by listing `/me/all` and matching canonical/title.
 
+## Duplicate draft cleanup
+
+A title change moves the canonical URL. When the title and canonical change in the same run, `Draft One` cannot match the previous draft by either key and creates a second draft. Remove the stale one with `Draft Delete`; it refuses anything that is not a draft and verifies the id is absent afterwards.
+
+```
+gh workflow run draft-delete.yml -f article_id=<stale-id> -f confirm=DELETE
+gh run watch <run-id> --exit-status
+```
+Expected: evidence action `deleted`, and `/me/all` no longer contains that id. Approval follows the same owner-instruction rule as `Draft One`.
+
 ## Notes & Pitfalls
 
 - `published:true` is never produced by `Draft One`. If an article is already public, the run fails with `published_exists` and requires `Unpublish One` first.
