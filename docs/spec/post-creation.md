@@ -49,7 +49,7 @@
 
 Axiom이 특정 리포지토리를 검증한 결과를 다루는 포스트는 다음 형식을 따른다. 이 형식은 `Axiom for External Repos` 서브토픽 태그가 붙은 모든 포스트에 적용한다.
 
-- 제목은 검증 대상 리포지토리 이름으로 시작한다. `Axiom in <repo>: ...` 형태를 쓰지 않는다. 예: `nim-libp2p: One Length Law, One Counterexample, One Merged Fix`, `nim-toml-serialization: AI가 작성한 명제를 검증기가 반증한 기록`. 제목 변경으로 canonical slug가 바뀌면 기존 URL을 alias로 보존한다.
+- 제목은 검증 대상 리포지토리 이름으로 시작한다. `Axiom in <repo>: ...` 형태를 쓰지 않는다. 예: `nim-libp2p: A Length Law Found What Sixteen Months of Tests Could Not`, `nim-toml-serialization: AI가 작성한 명제를 검증기가 반증한 기록`. 제목 변경으로 canonical slug가 바뀌면 기존 URL을 alias로 보존한다.
 - 출처·자료 목록의 제목은 영어 `References`, 한국어 `자료`로 쓴다. `Evidence`·`증거`를 절 제목으로 쓰지 않는다.
 - 출처·자료 목록은 본문 맨 끝이 아니라 frontmatter 직후 첫 절, 즉 서두에 배치한다.
 - 서술은 관측된 결과와 성과를 먼저 제시한다. 판정의 재현성·증거 보존 한계는 별도 절로 압축하고, 제목이나 글의 중심에 두지 않는다.

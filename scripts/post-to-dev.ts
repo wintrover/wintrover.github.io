@@ -1448,7 +1448,7 @@ export function selectExistingDevtoArticle(
 		canonicalMatches.length === 0 && targetTitle.length > 0
 			? articles.filter(
 					(article) =>
-						!normalizeCanonicalUrl(article.canonical_url || "") &&
+						article.published !== true &&
 						normalizeDevtoTitle(article.title || "") === targetTitle,
 				)
 			: [];

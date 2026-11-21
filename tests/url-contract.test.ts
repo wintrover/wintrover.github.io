@@ -493,8 +493,8 @@ describe("committed url-contract.json", () => {
 			(entry) => entry.kind === "alias",
 		);
 		expect(canonicalEntries).toHaveLength(64);
-		expect(aliasEntries).toHaveLength(8);
-		expect(contract.urls).toHaveLength(72);
+		expect(aliasEntries).toHaveLength(9);
+		expect(contract.urls).toHaveLength(73);
 		expect(
 			validateUrlContract(contract, deriveCanonicalUrls(process.cwd())),
 		).toEqual([]);
@@ -505,6 +505,7 @@ describe("committed url-contract.json", () => {
 			"/kr/",
 			"/post/axiom-in-nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
 			"/post/axiom-went-upstream-one-line-one-test-and-the-evidence-that-expired/",
+			"/post/nim-libp2p-one-length-law-one-counterexample-one-merged-fix/",
 			"/post/the-agent-wrote-the-theorem-a-formal-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
 			"/post/the-agent-wrote-the-theorem-a-model-level-disproof-a-pipeline-gap-and-a-refusal-to-cheat/",
 		]);
